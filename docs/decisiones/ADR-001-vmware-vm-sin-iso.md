@@ -1,7 +1,7 @@
 # ADR-001 — Máquina virtual base VMware sin ISO
 
 - **Fecha:** 2026-10-09 (Panamá)
-- **Estado:** VM creada y 8 vCPU observadas en VMware; invitado en instalación, configuración final del SO aún no verificada.
+- **Estado:** Ubuntu Desktop 26.04.1 instalado, 8 vCPU comprobadas, servidor SSH activo. Conexión remota aún pendiente por huella antigua de IP reutilizada.
 - **Issues relacionadas:** #1, #10 ([002]), #34 ([026]) y #29 ([021]).
 - **Decisión:** Crear desde cero una única máquina virtual Ubuntu Desktop en VMware Workstation Pro mediante asistente **Custom (Advanced)** y **I will install the operating system later**; no conectar imagen ISO ni iniciar la VM durante la preparación del hardware.
 
@@ -11,10 +11,10 @@
 |---|---|
 | Nombre de VM | NETLAB360-Ubuntu-Desktop |
 | Invitado | Linux → Ubuntu 64-bit |
-| Distribución | Ubuntu Desktop 26.04.1 LTS, sujeto a comprobar soporte de Guest OS en la versión de VMware instalada |
+| Distribución | **Ubuntu Desktop 26.04.1 LTS**, versión real comprobada en el sistema |
 | Hipervisor | **Verificado:** VMware Workstation Pro 26H1u1 (26.0.1, build 25688693) |
 | Firmware | UEFI; Secure Boot según compatibilidad comprobada (preferente activado) |
-| vCPU | **8 vCPU visibles en captura posterior** tras corregir la asignación; verificar 1×8 y `nproc=8` al instalar Ubuntu |
+| vCPU | **8 vCPU comprobadas** tanto en VMware como con `nproc=8` |
 | RAM | **VM observada:** 16 GB; **host:** 63.70 GB; mantener configuración actual |
 | Disco virtual | **VM observada:** 160 GB SCSI; aprovisionamiento y división de archivo no comprobados |
 | Controladora | **Observada:** SCSI. Mantener salvo necesidad justificada |
@@ -39,7 +39,7 @@
 - [x] Confirmar ubicación general de almacenamiento (C:, carpeta Documents\\Virtual Machines), con 425.57 GB libres en C: según PowerShell.
 - [ ] Capturar valores elegidos en el asistente, antes de pulsar Finish.
 - [x] Crear VM y comprobar que está apagada; el usuario indica que fue creada sin ISO. Aún falta comprobar conexión CD/DVD.
-- [ ] Instalar Ubuntu posteriormente usando ISO validada; mantenimiento y comprobaciones.
+- [x] Instalar Ubuntu Desktop 26.04.1 LTS, aplicar mantenimiento y comprobar servicios básicos. Falta cotejar hash de ISO y acceso remoto SSH.
 - [x] Registrar inventario en `docs/infraestructura/01-inventario-host-y-vmware.md` y enlazar a #10 y #34.
 
 ## Referencias oficiales consultadas
@@ -48,4 +48,4 @@
 - Broadcom KB 315434: creación y configuración de VM en Workstation: https://knowledge.broadcom.com/external/article/315434/create-virtual-machines-in-vmware-workst.html
 - Aviso de seguridad Broadcom, versión corregida 26H1u1: https://support.broadcom.com/web/ecx/support-content-notification/-/external/content/security-advisories/0/38288
 
-**Inspección 2026-10-09:** VM VMware 26H1u1 con 8 vCPU mostradas, 16 GB RAM, SCSI de 160 GB, NAT; instalación de Ubuntu en curso. Pendientes: comprobar `nproc`, firmware, OS real e IP/SSH. Inventario detallado en `docs/infraestructura/01-inventario-host-y-vmware.md` y procedimiento en `docs/infraestructura/02-ubuntu-desktop-instalacion-ssh.md`.
+**Inspección 2026-10-09:** VM VMware 26H1u1 con Ubuntu 26.04.1 LTS instalado; `nproc=8`, 16 GB RAM asignada, SCSI 160 GB, NAT `192.168.47.130/24` y SSH activo. Pendientes: comparar huella SSH por IP reutilizada, validar acceso desde Windows, verificar ISO descargada y funcionamiento final. Inventario detallado en `docs/infraestructura/01-inventario-host-y-vmware.md` y procedimiento en `docs/infraestructura/02-ubuntu-desktop-instalacion-ssh.md`.
