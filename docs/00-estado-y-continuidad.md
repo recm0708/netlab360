@@ -42,13 +42,15 @@ Cada fase es un candidato demostrable independiente; el cumplimiento definitivo 
 - **Ubuntu Desktop 26.04.1 LTS instalado**; usuario `rc-aa-ec`, hostname `netlab360-lab`, `nproc=8`, RAM 15 GiB, `/dev/sda2` 157 GB, kernel `7.0.0-38-generic`, SSH y VMware Tools activos.
 - Se abrió la issue **#38** para Ubuntu Desktop + SSH. Guía versionada: `docs/infraestructura/02-ubuntu-desktop-instalacion-ssh.md`.
 - **VMnet8/IP administrativa definitiva propuesta y aplicada:** `192.168.47.40/24`, fuera del pool DHCP `192.168.47.128–254` y reservas declaradas. Gateway `192.168.47.2`; DNS `.2` y `1.1.1.1`; perfil `netlab360-gestion`. Gateway e Internet 4/4 pings, DNS funcional. ADR-002 actualizado.
-- **SSH Windows comprobado:** huella ED25519 de Ubuntu y Windows coincide; sesión exitosa `ssh rc-aa-ec@192.168.47.40` con contraseña. Entrada histórica de `.130` no se eliminó.
+- **SSH Windows comprobado con clave:** credencial Ed25519 de cliente generada en `C:\\Users\\ruben\\.ssh\\netlab360_ed25519`, clave pública autorizada, login sin contraseña de Ubuntu validado, alias `ssh netlab360` probado. La llave requiere passphrase local. Entrada antigua `.130` no se eliminó.
+- **Reinicio completo comprobado:** IP manual `192.168.47.40/24`, perfil `netlab360-gestion`, gateway `192.168.47.2`, servicio SSH y VMware Tools activos; DNS `github.com` operativo.
+- **GitHub CLI:** `gh` versión 2.46.0 instalada desde Ubuntu; intento `gh auth login -h github.com -p https -w` falló al intentar abrir navegador Snap en sesión SSH sin variable `DISPLAY`. La autorización de GitHub no ha concluido.
 - Se ha recomendado **rotar la contraseña compartida en chat** y no documentarla ni reutilizarla en otros servicios. No almacenar secretos.
 - Issue #38 y guía `docs/infraestructura/02-ubuntu-desktop-instalacion-ssh.md` actualizadas.
 
 ## Próxima sesión
-1. Desde PowerShell, generar par de llaves Ed25519 específico y copiar **solo la pública** al `authorized_keys` de `rc-aa-ec`. Verificar conexión por clave con PasswordAuthentication=no.
-2. Opcional: definir alias SSH local `netlab360` y cambiar contraseña de Ubuntu que había sido compartida en conversación.
-3. Comprobar persistencia de `192.168.47.40` tras reinicio completo del invitado; actualizar #39 y #38.
-4. Instalar GitHub CLI (`gh`) en Ubuntu y autenticar su cuenta, clonar el repositorio privado **ya inicializado** sin duplicar issues ni inicializar de cero.
-5. Importar planificación v0.2 validada, revisar `.gitignore` y conservar los archivos nuevos de GitHub.
+1. En Ubuntu por SSH, ejecutar `GH_BROWSER=/bin/true gh auth login -h github.com -p https -w` y finalizar el código de dispositivo en **el navegador de Windows** (`https://github.com/login/device`); no compartir código ni token.
+2. Verificar `gh auth status`, `gh auth setup-git` y `gh repo view recm0708/netlab360 --json isPrivate,nameWithOwner`.
+3. Clonar el repositorio privado ya inicializado en `~/proyectos/netlab360` sin `git init` ni duplicar issues.
+4. Revisar actualización de `gh` 2.46.0 a versión estable oficial en una actividad separada, sin bloquear autenticación.
+5. Importar planificación v0.2 sin sobrescribir decisiones y manuales más recientes; rotar contraseña de Ubuntu anteriormente compartida y conservar secretos fuera del repositorio.
