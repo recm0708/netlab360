@@ -1,47 +1,51 @@
-# ADR-002 — Direccionamiento IPv4 estable de la VM de administración NETLAB360
+# ADR-002 — IPv4 fija de administración para NETLAB360
 
-**Fecha:** 2026-10-09 (Panamá). **Estado:** propuesta condicionada; la IP fija todavía **NO ha sido aplicada**. **Issue:** #39, vinculada a #38, #10, #1.
+**Fecha:** 2026-10-09 (Panamá). **Estado:** configuración aplicada y acceso SSH por contraseña comprobado; persistencia tras reinicio y autenticación por clave pendientes. **Issues:** #39 y #38.
 
-## Problema
+## Antecedentes y reserva
 
-`netlab360-lab` recibe `192.168.47.130/24` por DHCP en VMware NAT/VMnet8. Esta red se comparte con VMs de otras materias y se han reutilizado direcciones IP; Windows conserva claves antiguas SSH para `.130`. Es preferible una IP estable, sin deshabilitar la validación de identidad del servidor.
+VMware VMnet8 usa `192.168.47.0/24`, con adaptador Windows `192.168.47.1/24`, puerta de enlace y DNS NAT `192.168.47.2`. El intervalo DHCP, comprobado visualmente en Virtual Network Editor, es **`192.168.47.128` hasta `192.168.47.254`**.
 
-## Observaciones verificadas
+Las direcciones que el equipo declaró reservadas son: `.1`, `.2`, `.10`, `.129`, `.137`, `.145`, `.146`, `.149`, `.150`, `.151` dentro de la red 192.168.47.0/24. Algunas son históricas y pueden estar sujetas a DHCP; no reasignarlas.
 
-| Componente | Valor |
-|---|---|
-| Red | `192.168.47.0/24` |
-| Interfaz Windows VMware VMnet8 | `192.168.47.1/24` |
-| VMware NAT gateway | `192.168.47.2` |
-| Ubuntu `ens33` antes del cambio | `192.168.47.130/24` por DHCP |
-| Hostname | `netlab360-lab` |
-| Cuenta | `rc-aa-ec` |
-| DHCP pool VMware | PENDIENTE comprobar en Virtual Network Editor |
-| DNS de DHCP | PENDIENTE registrar desde NetworkManager |
+Se eligió **`192.168.47.40/24`** porque está fuera del pool DHCP y de las reservas identificadas. `arping -D -I ens33 -c 3 192.168.47.40` emitió 3 solicitudes con 0 respuestas. Esto no prueba absolutamente que no exista un equipo apagado con la misma IP; se conserva una reserva administrativa para NETLAB360.
 
-## Decisión propuesta
+## Configuración realizada en Ubuntu
 
-- Candidata `192.168.47.40/24`, **sujeta a comprobación**: fuera del intervalo DHCP, no asignada ni reservada para otra VM.
-- Mantener `192.168.47.2` como ruta predeterminada si la configuración del NAT sigue igual.
-- Usar `nmcli` de Ubuntu Desktop NetworkManager para fijar IPv4 manual y DNS obtenido/validado del perfil DHCP vigente. No editar simultáneamente Netplan o archivos de NetworkManager por diferentes mecanismos.
-- Mantener el usuario SSH `rc-aa-ec`; el usuario `root` no es el esperado.
-- Conservar/restablecer el perfil DHCP previo si falla el cambio. Aplicar desde la consola local de la VM, no mediante SSH durante el cambio.
-- El host físico de Windows debe poder establecer sesión por VMnet8 sin port forwarding en el NAT.
+- Hostname `netlab360-lab` y cuenta Linux `rc-aa-ec`.
+- Interfaz: `ens33`.
+- Perfil nuevo NetworkManager `netlab360-gestion` con `ipv4.method manual`, IP `192.168.47.40/24`, gateway `192.168.47.2`, DNS `192.168.47.2` y `1.1.1.1`.
+- Se deshabilitó `connection.autoconnect` del perfil anterior `netplan-ens33` sin eliminarlo, para facilitar la recuperación.
+- Tras cambiar el perfil, `ip -4 -br address`, `ip route`, `nmcli connection show --active` y `resolvectl` confirmaron la configuración.
+- Gateway: 4 respuestas ICMP de 4 (0 % pérdidas).
+- Internet (`1.1.1.1`): 4 respuestas de 4 (0 % pérdidas).
+- DNS: `getent ahostsv4 ubuntu.com` resolvió direcciones.
 
-## Comprobaciones previas obligatorias
+## Acceso remoto
 
-1. VMware Workstation → **Edit → Virtual Network Editor → VMnet8 → DHCP Settings**, verificar `Start IP address` y `End IP address`; no modificar otros pools ni rangos.
-2. VMware → NAT Settings, verificar gateway.
-3. Revisar inventario de VMs y direcciones estáticas; desde Windows revisar si candidata responde y datos ARP, sin considerar una falta de respuesta prueba definitiva de disponibilidad.
-4. En Ubuntu: `nmcli -t -f NAME,DEVICE,TYPE connection show --active`; `nmcli -f IP4.DNS,IP4.GATEWAY device show ens33`.
+La antigua dirección DHCP `192.168.47.130` tenía una clave SSH antigua en el `known_hosts` de Windows. **No se borró esa clave**, porque ya no se emplea esa dirección.
 
-## Seguimiento
+La huella ED25519 del servidor obtenida directamente desde Ubuntu coincidió con la mostrada por el nuevo cliente SSH en Windows para `192.168.47.40`. El usuario aceptó la huella y obtuvo exitosamente una consola remota autenticada con contraseña en `rc-aa-ec@netlab360-lab`.
 
-- [ ] Rango DHCP validado.
-- [ ] IP candidata seleccionada y sin conflicto.
-- [ ] Configuración manual guardada y aplicada.
-- [ ] Dirección/ruta/DNS validados tras reconectar.
-- [ ] SSH al nuevo IP confirmado con identidad verificada y claves del cliente.
-- [ ] Documentación actualizada con el resultado real y procedimiento de rollback.
+## Estado y pruebas finales
 
-**Nota de seguridad:** no reutilizar ni registrar la contraseña que fue revelada en el chat. Documentar únicamente procedimiento de credenciales.
+- [x] Pool DHCP visualmente comprobado: `192.168.47.128–254`.
+- [x] Dirección de administración elegida fuera del DHCP y de las reservas declaradas; sin respuestas ARP en pruebas.
+- [x] Perfil NetworkManager estático activado; perfil DHCP conservado.
+- [x] IP, ruta, DNS y pruebas de conectividad validadas.
+- [x] Huella SSH comprobada y sesión remota de Windows lograda con contraseña.
+- [x] Identificación y procedimiento documentados sin guardar secretos.
+- [ ] Verificar que `192.168.47.40` persiste después de **reinicio completo** de Ubuntu y comprobar acceso SSH.
+- [ ] Comprobar autenticación de cliente por clave SSH Ed25519 y alias `netlab360`.
+
+## Restauración (desde consola local VMware)
+
+```bash
+sudo nmcli connection modify netplan-ens33 connection.autoconnect yes
+sudo nmcli connection down netlab360-gestion
+sudo nmcli connection up netplan-ens33
+```
+
+El cambio de dirección puede cerrar una sesión SSH; ejecutar rollback desde consola VMware. Si cambia el pool DHCP u otra VM requiere la dirección, revaluar la IP y registrar la decisión.
+
+**Seguridad:** no reutilizar ni publicar contraseñas privadas en este proyecto.
