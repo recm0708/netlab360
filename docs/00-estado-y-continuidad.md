@@ -19,7 +19,7 @@ Fecha inicial: 2026-10-09 (Panamá, UTC−05:00).
 - [ ] Verificar etiquetas y milestones generados por GitHub Actions.
 - [ ] Comparar cuerpos de las issues con los archivos de `backlog/`; sincronizar únicamente si no afecta checkboxes ya trabajados.
 - [ ] Verificar que el pipeline CI inicial sea exitoso y no involucre operaciones de red privilegiadas.
-- [ ] Confirmar versiones compatibles para Ubuntu Desktop y VMware (no instalar por ser «la última» sin verificación).
+- [ ] Confirmar versiones compatibles para Ubuntu Desktop y VMware (no instalar por ser «la última» sin verificación). Se revisaron referencias oficiales para 26H1u1; falta inspección local del equipo.
 - [ ] Preparar laboratorio mínimo de F1 con segmentación, ruta de respaldo y evento realmente observable.
 - [ ] Abrir tres entregables editables y comenzar evidencias desde F1.
 - [ ] Registrar requisitos nuevos de la docente como cambios controlados.
@@ -34,5 +34,10 @@ Fecha inicial: 2026-10-09 (Panamá, UTC−05:00).
 ## Condición de entrega
 Cada fase es un candidato demostrable independiente; el cumplimiento definitivo queda condicionado a los requisitos/rúbrica que publique la docente. No se declarará un SLO, failover, IA, streaming ni LAG «validado» sin prueba reproducible.
 
+## Estado de preparación del entorno (2026-10-09)
+- El usuario aprobó **crear VM nueva VMware Workstation sin ISO**; queda documentado en `docs/decisiones/ADR-001-vmware-vm-sin-iso.md`.
+- Se iniciaron las tareas #10, #34, #1 y #29 mediante comentarios de seguimiento. Ningún criterio de creación o instalación de VM se declara completado.
+- Referencia oficial apunta a VMware Workstation Pro 26H1u1 como versión corregida; se requiere versión instalada y datos reales del anfitrión.
+
 ## Próxima sesión
-Primero revisar ejecución de GitHub Actions, luego importar el paquete aprobado y verificar repositorio. No comenzar instalación de la VM hasta comprobar versión y recursos del anfitrión.
+Obtener **Help → About VMware Workstation Pro** y datos de CPU/RAM/espacio libre de Windows; definir hardware VMware Custom, seleccionar **I will install the operating system later**, revisar capturas del resumen, terminar VM apagada sin ISO. Después descargar/verificar ISO e instalar Ubuntu. La importación del paquete v0.2 al GitHub existente sigue pendiente.
