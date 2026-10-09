@@ -1,6 +1,6 @@
 # Preparación previa a la pausa — NETLAB360
 
-**Fase:** S01. **Issue:** #41. Este archivo explica un instalador de herramientas base. No debe usarse para desplegar los laboratorios ni modificar los adaptadores de red.
+**Fase:** S01. **Issue:** #41. **Ejecución de 2026-10-09 interrumpida:** el instalador abortó en la comprobación inicial `sudo -v` por tres intentos de autenticación incorrecta. **No se instalaron las herramientas del script.** Esta guía registra cómo reanudar sin rehacer la VM.
 
 ## Requisitos previos
 
@@ -12,7 +12,17 @@
 
 ## Ejecución
 
-Desde la sesión SSH Ubuntu:
+Primero comprobar privilegios desde SSH, identificando claramente la contraseña Ubuntu frente a la passphrase del cliente SSH:
+
+~~~bash
+whoami
+sudo -k
+sudo -v
+~~~
+
+Si `sudo -v` falla, **detenerse**. No volver a ejecutar el instalador hasta resolver el inicio de sesión sudo. No enviar contraseñas al chat ni guardarlas en Git. Si el teclado US/caps lock no coincide con lo esperado, comprobar desde la consola de VMware.
+
+Solo después de comprobar sudo, desde la sesión SSH Ubuntu:
 
 ~~~bash
 cd ~/proyectos/netlab360
@@ -25,7 +35,7 @@ El instalador valida SO, arquitectura y hostname; realiza mantenimiento de APT e
 
 El script **no** añade el usuario al grupo docker (dicho grupo da permisos equivalentes a root), **no** modifica SSH, UFW, Netplan ni interfaces y **no** crea ni despliega topologías. Los comandos Docker se realizan con sudo.
 
-Si un comando falla, detenerse y revisar el log; no apagar ni dar por terminado.
+Si un comando falla, detenerse y revisar el log; no dar por terminado. El usuario realizó la pausa antes de terminar por bloqueo sudo; la VM recibió `sudo systemctl poweroff` y SSH se cerró. Debe confirmarse desde VMware que está apagada. No atribuir el fallo a Docker, OpenTofu, Ansible o Node.js, que no llegaron a instalarse.
 
 ## Evidencias de salida
 
@@ -72,3 +82,15 @@ El cliente SSH se desconectará. Confirmar en VMware que la VM aparece apagada. 
 - OpenTofu: https://opentofu.org/docs/intro/install/
 - Node.js (LTS): https://github.com/nodejs/Release
 - NodeSource: https://github.com/nodesource/distributions
+
+## Evidencia real de intento interrumpido (2026-10-09)
+
+- Git sincronizado por fast-forward hasta `7644cf5` y sin cambios locales.
+- Sintaxis `bash -n` exitosa, revisión del contenido realizada.
+- Script abortó inmediatamente después de iniciar por `sudo -v` y tres contraseñas rechazadas.
+- Log local: `~/netlab360-bootstrap/evidencias/02-preparacion-herramientas-20261009-150619.log` (contiene solo mensajes de la verificación inicial; no ejecutar script de nuevo por ahora).
+- Docker: comando no encontrado, servicio inactivo. Servicios SSH y VMware Tools activos; IPv4 fija y espacio libres comprobados.
+- No reinicio pendiente según post-check.
+- `sudo systemctl poweroff` solicitado; desconexión SSH compatible con apagado, pendiente verificación visual en VMware.
+
+**Estado de Git remoto:** contiene nuevos commits de documentación posteriores al apagado. Al regresar es imprescindible un `git pull --ff-only origin main` antes de volver a trabajar.
