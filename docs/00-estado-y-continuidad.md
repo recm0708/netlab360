@@ -59,10 +59,24 @@ Cada fase es un candidato demostrable independiente; el cumplimiento definitivo 
 - **Template v0.2 pendiente:** se conserva y se importará solo con revisión para no sobrescribir documentos posteriores, sin duplicar issues.
 - **Seguridad:** token GitHub y llave cliente SSH permanecen en el invitado/Windows; **sanitizar antes de exportar VM a docente**. Rotar la contraseña que fue compartida en conversación.
 
-## Próxima acción
-1. Abrir PowerShell `ssh netlab360`; `cd ~/proyectos/netlab360 && git pull --ff-only origin main`.
-2. `bash -n scripts/bootstrap/preparar-entorno-ubuntu.sh` y, tras revisar el contenido, `bash scripts/bootstrap/preparar-entorno-ubuntu.sh`.
-3. Verificar versiones Docker/Ansible/OpenTofu/Node/GitHub CLI, estado `docker/ssh/open-vm-tools`, IP, disco y logs de instalación.
-4. Actualizar issues y registrar resultados; no cerrar #41 hasta confirmación.
-5. Detener VM limpiamente con `sync; sudo systemctl poweroff`. Confirmar apagado en VMware.
-6. Cuando el usuario regrese, iniciar VM, comprobar `ssh netlab360`, hacer mantenimiento de actualizaciones y retomar #41/S01 sin inventar nuevos estados.
+## Pausa operativa: resultado final registrado (2026-10-09, 15:06–15:10 EST)
+
+**La preparación no terminó. NO declarar Docker, OpenTofu, Ansible ni Node.js instalados por este script.**
+
+- `git pull --ff-only origin main` completó fast-forward a commit `7644cf5`, se revisó script y `bash -n` no mostró errores.
+- Al ejecutar `scripts/bootstrap/preparar-entorno-ubuntu.sh`, creó el archivo `~/netlab360-bootstrap/evidencias/02-preparacion-herramientas-20261009-150619.log` y **abortó en `sudo -v`** tras tres intentos de autenticación incorrecta. Por `set -e`, ningún paquete del script llegó a instalarse.
+- Verificación posterior: `sudo docker` → `command not found`; servicio docker inactivo. `ssh` y `open-vm-tools` activos, IPv4 `192.168.47.40/24`, raíz 157G/137G disponibles, sin reinicio requerido. Git limpio (`## main...origin/main`).
+- Se ejecutaron `sync` y `sudo systemctl poweroff`. El enlace SSH se cerró con `Connection reset`; es compatible con apagado, pero la confirmación visual de VMware sigue pendiente.
+- Issue #41 **permanece abierta**. No se activaron simulaciones, redes, containers ni aplicaciones del proyecto.
+- La contraseña de sudo en Ubuntu corresponde al usuario **rc-aa-ec**, no a la frase de contraseña de la llave SSH privada de Windows. No enviar ni almacenar ningún secreto. Verificar distribución teclado y Caps Lock desde consola VMware si falla.
+
+## Próxima acción cuando el usuario solicite reanudar
+
+1. Confirmar desde VMware que la VM está apagada; si es así, no es necesario hacer nada hasta el siguiente día de trabajo.
+2. Al regresar, encender VM en VMware y desde PowerShell abrir `ssh netlab360`.
+3. En Ubuntu, ejecutar **primero** `sudo -k && sudo -v` introduciendo la contraseña actual del usuario Ubuntu (no la passphrase SSH) y verificar que retorna sin error. Si falla, detenerse y revisar desde consola VMware. No insistir con el instalador.
+4. Desde Ubuntu, `cd ~/proyectos/netlab360 && git pull --ff-only origin main`. El remoto habrá avanzado debido a esta actualización documental.
+5. Ejecutar `bash -n scripts/bootstrap/preparar-entorno-ubuntu.sh`; luego `bash scripts/bootstrap/preparar-entorno-ubuntu.sh`. Corregir errores de compatibilidad repositorio/paquete en el paso específico; no instalar servicios de topología.
+6. Validar versiones, `sudo docker run --rm hello-world`, Docker/SSH/open-vm-tools activos, IP, Git limpio y evidencias. Actualizar #41.
+7. Solo después de comprobar que la preparación terminó, crear instantánea de recuperación y apagar ordenadamente.
+
