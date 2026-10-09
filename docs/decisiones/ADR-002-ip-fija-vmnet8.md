@@ -1,6 +1,6 @@
 # ADR-002 — IPv4 fija de administración para NETLAB360
 
-**Fecha:** 2026-10-09 (Panamá). **Estado:** configuración aplicada y acceso SSH por contraseña comprobado; persistencia tras reinicio y autenticación por clave pendientes. **Issues:** #39 y #38.
+**Fecha:** 2026-10-09 (Panamá). **Estado:** implementada y validada. IP fija y autenticación SSH por clave comprobadas después del reinicio. **Issues:** #39 y #38.
 
 ## Antecedentes y reserva
 
@@ -35,8 +35,8 @@ La huella ED25519 del servidor obtenida directamente desde Ubuntu coincidió con
 - [x] IP, ruta, DNS y pruebas de conectividad validadas.
 - [x] Huella SSH comprobada y sesión remota de Windows lograda con contraseña.
 - [x] Identificación y procedimiento documentados sin guardar secretos.
-- [ ] Verificar que `192.168.47.40` persiste después de **reinicio completo** de Ubuntu y comprobar acceso SSH.
-- [ ] Comprobar autenticación de cliente por clave SSH Ed25519 y alias `netlab360`.
+- [x] Después del reinicio, permanece `192.168.47.40/24`, ruta por `192.168.47.2`, perfil `netlab360-gestion` y acceso remoto operativo.
+- [x] Acceso remoto con llave Ed25519, verificación de clave pública y alias `ssh netlab360` funcional desde PowerShell, también tras reinicio.
 
 ## Restauración (desde consola local VMware)
 
