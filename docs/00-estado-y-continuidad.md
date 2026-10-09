@@ -37,7 +37,11 @@ Cada fase es un candidato demostrable independiente; el cumplimiento definitivo 
 ## Estado de preparación del entorno (2026-10-09)
 - El usuario aprobó **crear VM nueva VMware Workstation sin ISO**; queda documentado en `docs/decisiones/ADR-001-vmware-vm-sin-iso.md`.
 - Se iniciaron las tareas #10, #34, #1 y #29 mediante comentarios de seguimiento. Ningún criterio de creación o instalación de VM se declara completado.
-- Referencia oficial apunta a VMware Workstation Pro 26H1u1 como versión corregida; se requiere versión instalada y datos reales del anfitrión.
+- VMware Workstation Pro **26H1u1 (26.0.1 build 25688693)** ya está verificado, con i9-12900H (14 núcleos, 20 hilos), 63.70 GB RAM y espacio libre suficiente en C:.
+- Tras ajuste del usuario, VMware muestra **8 vCPU**, 16 GB RAM, disco SCSI 160 GB y NIC NAT.
+- El usuario **encendió la VM e inició instalación Ubuntu Desktop**. Todavía no hay verificación del sistema invitado, IP, kernel ni SSH.
+- Se abrió la issue **#38** para Ubuntu Desktop + SSH. Guía versionada: `docs/infraestructura/02-ubuntu-desktop-instalacion-ssh.md`.
+- Ubuntu Desktop **26.04.1 LTS** comprobada en página oficial (https://ubuntu.com/download/desktop); versión instalada real todavía pendiente.
 
 ## Próxima sesión
-Obtener **Help → About VMware Workstation Pro** y datos de CPU/RAM/espacio libre de Windows; definir hardware VMware Custom, seleccionar **I will install the operating system later**, revisar capturas del resumen, terminar VM apagada sin ISO. Después descargar/verificar ISO e instalar Ubuntu. La importación del paquete v0.2 al GitHub existente sigue pendiente.
+Completar instalación Ubuntu Desktop y comprobar `hostnamectl`, `/etc/os-release`, `nproc=8`, `ip -4 -br address` y ruta por defecto. Instalar/actualizar paquetes básicos, `open-vm-tools-desktop` y `openssh-server`. Probar acceso desde PowerShell por la IP NAT con clave Ed25519; **no endurecer SSH ni cambiar firewall antes de probar acceso**. Adjuntar resultados a #38 y #10. La importación del paquete v0.2 al GitHub existente sigue pendiente.
