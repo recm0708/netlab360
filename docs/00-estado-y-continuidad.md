@@ -39,14 +39,16 @@ Cada fase es un candidato demostrable independiente; el cumplimiento definitivo 
 - Se iniciaron las tareas #10, #34, #1 y #29 mediante comentarios de seguimiento. Ningún criterio de creación o instalación de VM se declara completado.
 - VMware Workstation Pro **26H1u1 (26.0.1 build 25688693)** ya está verificado, con i9-12900H (14 núcleos, 20 hilos), 63.70 GB RAM y espacio libre suficiente en C:.
 - Tras ajuste del usuario, VMware muestra **8 vCPU**, 16 GB RAM, disco SCSI 160 GB y NIC NAT.
-- **Ubuntu Desktop 26.04.1 LTS instalado y reiniciado**; usuario `rc-aa-ec`, hostname `netlab360-lab`, `nproc=8`, RAM 15 GiB detectados, `/dev/sda2` 157 GB, kernel `7.0.0-38-generic`, IPv4 `192.168.47.130/24`, gateway `192.168.47.2`, SSH y VMware Tools activos.
+- **Ubuntu Desktop 26.04.1 LTS instalado**; usuario `rc-aa-ec`, hostname `netlab360-lab`, `nproc=8`, RAM 15 GiB, `/dev/sda2` 157 GB, kernel `7.0.0-38-generic`, SSH y VMware Tools activos.
 - Se abrió la issue **#38** para Ubuntu Desktop + SSH. Guía versionada: `docs/infraestructura/02-ubuntu-desktop-instalacion-ssh.md`.
-- **Conexión SSH Windows pendiente:** IP usada anteriormente tiene entrada distinta en `known_hosts`; verificar huella ED25519 local de nueva VM y reemplazar solo esa entrada. Usuario correcto `rc-aa-ec` (no `root`).
+- **VMnet8/IP administrativa definitiva propuesta y aplicada:** `192.168.47.40/24`, fuera del pool DHCP `192.168.47.128–254` y reservas declaradas. Gateway `192.168.47.2`; DNS `.2` y `1.1.1.1`; perfil `netlab360-gestion`. Gateway e Internet 4/4 pings, DNS funcional. ADR-002 actualizado.
+- **SSH Windows comprobado:** huella ED25519 de Ubuntu y Windows coincide; sesión exitosa `ssh rc-aa-ec@192.168.47.40` con contraseña. Entrada histórica de `.130` no se eliminó.
 - Se ha recomendado **rotar la contraseña compartida en chat** y no documentarla ni reutilizarla en otros servicios. No almacenar secretos.
 - Issue #38 y guía `docs/infraestructura/02-ubuntu-desktop-instalacion-ssh.md` actualizadas.
 
 ## Próxima sesión
-1. Desde Ubuntu obtener fingerprint: `sudo ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub -E sha256` y comprobar que coincide con la huella reportada por Windows.
-2. En Windows `Test-NetConnection 192.168.47.130 -Port 22`; solo tras comparar huella, `ssh-keygen -R 192.168.47.130` y `ssh rc-aa-ec@192.168.47.130`.
-3. Instalar/verificar llave Ed25519 para acceso seguro, actualizar #38, evidencias y bitácora.
-4. Importar plantilla v0.2 al repositorio ya existente, sin recrear las 38 issues.
+1. Desde PowerShell, generar par de llaves Ed25519 específico y copiar **solo la pública** al `authorized_keys` de `rc-aa-ec`. Verificar conexión por clave con PasswordAuthentication=no.
+2. Opcional: definir alias SSH local `netlab360` y cambiar contraseña de Ubuntu que había sido compartida en conversación.
+3. Comprobar persistencia de `192.168.47.40` tras reinicio completo del invitado; actualizar #39 y #38.
+4. Instalar GitHub CLI (`gh`) en Ubuntu y autenticar su cuenta, clonar el repositorio privado **ya inicializado** sin duplicar issues ni inicializar de cero.
+5. Importar planificación v0.2 validada, revisar `.gitignore` y conservar los archivos nuevos de GitHub.
