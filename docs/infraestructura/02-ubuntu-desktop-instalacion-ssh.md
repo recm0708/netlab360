@@ -1,6 +1,6 @@
 # NETLAB360 — Guía 01: Ubuntu Desktop y acceso SSH desde Windows
 
-**Estado (2026-10-09):** Ubuntu 26.04.1 instalado y actualizado; SSH y VMware Tools activos. IPv4 fija `192.168.47.40` configurada y acceso SSH por contraseña **validado** desde Windows; pendiente llave de cliente Ed25519.
+**Estado (2026-10-09):** Ubuntu 26.04.1 instalado y actualizado; SSH y VMware Tools activos. IPv4 fija `192.168.47.40` **persistente tras reinicio**, acceso SSH desde Windows **validado con clave de cliente Ed25519**, alias `ssh netlab360` funcional.
 
 **VM:** `NETLAB360-Ubuntu-Desktop`; VMware Workstation Pro 26H1u1; 8 vCPU observadas en VMware, 16 GB RAM, 160 GB SCSI, NAT VMnet8.
 
@@ -68,9 +68,9 @@ No habilitar ni reconfigurar UFW, firewall, DHCP, Netplan ni SSH password polici
 - `ping` al gateway e Internet: 4/4 respuestas en ambos casos; DNS funcional.
 - Huella ED25519 verificada desde consola Ubuntu y comparada con la de Windows; conexión `ssh rc-aa-ec@192.168.47.40` lograda con contraseña. No modificar la entrada histórica .130 en `known_hosts`.
 
-La IP es **estable en la configuración**; falta confirmar reinicio completo para declarar persistencia validada.
+La IP **permanece en 192.168.47.40 después del reinicio completo**; servicio SSH y VMware Tools activos, gateway (3/3 ICMP) y resolución `github.com` comprobados.
 
-## 5. Preparación de la clave SSH (pendiente)
+## 5. Preparación de la clave SSH (ejecutada y validada)
 
 Desde PowerShell 7, **no desde la sesión remota de Ubuntu**:
 
@@ -87,16 +87,16 @@ ssh -i $Clave -o PreferredAuthentications=publickey -o PasswordAuthentication=no
 
 Verificar `whoami` y `hostname` dentro del invitado. El alias local opcional `netlab360` debe usar `HostName 192.168.47.40`, `User rc-aa-ec` e `IdentityFile ~/.ssh/netlab360_ed25519`.
 
-No almacenar claves privadas ni contraseñas en el repositorio. Rotar cualquier contraseña que haya sido compartida en la conversación. Solo desactivar login por contraseña cuando el acceso con llave y el acceso de recuperación por VMware estén probados.
+No almacenar claves privadas ni contraseñas en el repositorio. Rotar cualquier contraseña que haya sido compartida en la conversación. La autenticación por clave está probada. Mantener acceso de recuperación VMware y no cambiar las políticas de `sshd_config` hasta planificar y validar el endurecimiento.
 
 ## 6. Pendientes para cerrar #38
 
 - [x] Registrar SO invitado, IP, gateway, hostname, 8 vCPU, memoria y disco (salidas facilitadas por el usuario).
 - [x] Comprobar instalación, servicio `ssh` operativo y herramientas VMware.
 - [x] Verificar sesión remota SSH desde Windows con contraseña e identidad del servidor comprobada.
-- [ ] Verificar sesión SSH con llave de cliente Ed25519 sin contraseña de usuario.
+- [x] Acceso SSH con llave Ed25519 verificado usando `PasswordAuthentication=no`; requiere únicamente passphrase local de la llave.
 - [x] Regenerar inventario y registrar versión real en `01-inventario-host-y-vmware.md`.
-- [ ] Actualizar los tres entregables: informe académico, bitácora técnica y manual.
+- [ ] Integrar esta instalación a los tres entregables académicos definitivos (documentación técnica de GitHub actualizada).
 
 ## 7. Documentación oficial
 
