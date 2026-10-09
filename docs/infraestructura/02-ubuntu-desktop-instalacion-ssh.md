@@ -1,6 +1,6 @@
 # NETLAB360 — Guía 01: Ubuntu Desktop y acceso SSH desde Windows
 
-**Estado (2026-10-09):** Ubuntu 26.04.1 instalado y actualizado; SSH y VMware Tools activos; acceso remoto bloqueado por huella antigua de una IP reutilizada. Requiere validación y conexión.
+**Estado (2026-10-09):** Ubuntu 26.04.1 instalado y actualizado; SSH y VMware Tools activos. IPv4 fija `192.168.47.40` configurada y acceso SSH por contraseña **validado** desde Windows; pendiente llave de cliente Ed25519.
 
 **VM:** `NETLAB360-Ubuntu-Desktop`; VMware Workstation Pro 26H1u1; 8 vCPU observadas en VMware, 16 GB RAM, 160 GB SCSI, NAT VMnet8.
 
@@ -12,7 +12,7 @@
 | Hostname | **`netlab360-lab`** (confirmado) |
 | Usuario | **`rc-aa-ec`** (iniciales de integrantes: Rubén Cañizares, Álvaro Alvarado y Elicier Castillo) |
 | Zona horaria | `America/Panama` |
-| VM networking | VMnet8 (Windows `192.168.47.1/24`), Ubuntu `ens33` `192.168.47.130/24`, gateway `192.168.47.2` |
+| VM networking | VMnet8 (Windows `192.168.47.1/24`); Ubuntu `ens33` **`192.168.47.40/24` fijo**; gateway `192.168.47.2` |
 | SSH | TCP 22, solo red autorizada |
 | Credenciales | Crear localmente, no compartir ni subir a Git |
 
@@ -59,51 +59,42 @@ timedatectl status
 
 No habilitar ni reconfigurar UFW, firewall, DHCP, Netplan ni SSH password policies hasta verificar enlace remoto.
 
-## 4. Diagnóstico y corrección segura de identidad del host SSH
+## 4. IPv4 estática y primer SSH — verificado
 
-La conexión realizada desde Windows con `ssh root@192.168.47.130` falló **antes de autenticarse** porque existía una huella guardada de otra máquina en esa misma IP (`REMOTE HOST IDENTIFICATION HAS CHANGED`). La VM NAT reutiliza direcciones; no suprimir controles SSH.
+- Pool DHCP VMware: `192.168.47.128–254`; el proyecto utiliza `192.168.47.40/24`, fuera del pool y de las reservas declaradas.
+- Perfil activo: `netlab360-gestion`; perfil DHCP histórico `netplan-ens33` conservado con autoconnect desactivado.
+- Gateway y DNS principal: `192.168.47.2`; DNS secundario `1.1.1.1`.
+- `arping` a .40 antes de asignar: 3 probes, sin respuesta.
+- `ping` al gateway e Internet: 4/4 respuestas en ambos casos; DNS funcional.
+- Huella ED25519 verificada desde consola Ubuntu y comparada con la de Windows; conexión `ssh rc-aa-ec@192.168.47.40` lograda con contraseña. No modificar la entrada histórica .130 en `known_hosts`.
 
-**Paso 4.a — En la consola de Ubuntu, vía VMware:**
+La IP es **estable en la configuración**; falta confirmar reinicio completo para declarar persistencia validada.
 
-```bash
-sudo ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub -E sha256
-sudo systemctl is-active ssh
-ip -4 -br addr show ens33
-```
+## 5. Preparación de la clave SSH (pendiente)
 
-Comparar visualmente el fingerprint del servidor con el que informó el cliente Windows. Si no coincide, detenerse.
-
-**Paso 4.b — En PowerShell Windows, tras comparar:**
-
-```powershell
-Test-NetConnection 192.168.47.130 -Port 22
-ssh-keygen -R 192.168.47.130
-ssh rc-aa-ec@192.168.47.130
-```
-
-Confirmar la nueva huella solo si coincide con la observada localmente. Introducir contraseña local sin compartirla.
-
-## 5. Acceso mediante clave Ed25519 desde Windows
-
-Ejecutar en PowerShell, tras completar primer acceso normal:
+Desde PowerShell 7, **no desde la sesión remota de Ubuntu**:
 
 ```powershell
-$Clave = Join-Path $HOME '.ssh\netlab360_ed25519'
+$Clave = Join-Path $HOME ".ssh\\netlab360_ed25519"
 New-Item -ItemType Directory -Force (Split-Path $Clave) | Out-Null
 if (-not (Test-Path $Clave)) {
-  ssh-keygen -t ed25519 -f $Clave -C 'netlab360-windows'
+    ssh-keygen -t ed25519 -f $Clave -C "netlab360-windows"
 }
-Get-Content "$Clave.pub" | ssh rc-aa-ec@192.168.47.130 "umask 077; mkdir -p ~/.ssh; cat >> ~/.ssh/authorized_keys"
-ssh -i $Clave rc-aa-ec@192.168.47.130
+Get-Content "$Clave.pub" |
+    ssh rc-aa-ec@192.168.47.40 'umask 077; mkdir -p ~/.ssh; cat >> ~/.ssh/authorized_keys; chmod 700 ~/.ssh; chmod 600 ~/.ssh/authorized_keys'
+ssh -i $Clave -o PreferredAuthentications=publickey -o PasswordAuthentication=no rc-aa-ec@192.168.47.40
 ```
 
-No almacenar clave privada o contraseña en repositorio. Cambiar la contraseña inicial porque fue revelada en chat y no reutilizar la misma en todos los servicios. Solo reforzar `sshd_config` cuando esté confirmada la autenticación por clave y se disponga de acceso local alternativo. El futuro hostname SSH alias será `netlab360` y debe apuntar al usuario correcto `rc-aa-ec`.
+Verificar `whoami` y `hostname` dentro del invitado. El alias local opcional `netlab360` debe usar `HostName 192.168.47.40`, `User rc-aa-ec` e `IdentityFile ~/.ssh/netlab360_ed25519`.
+
+No almacenar claves privadas ni contraseñas en el repositorio. Rotar cualquier contraseña que haya sido compartida en la conversación. Solo desactivar login por contraseña cuando el acceso con llave y el acceso de recuperación por VMware estén probados.
 
 ## 6. Pendientes para cerrar #38
 
 - [x] Registrar SO invitado, IP, gateway, hostname, 8 vCPU, memoria y disco (salidas facilitadas por el usuario).
 - [x] Comprobar instalación, servicio `ssh` operativo y herramientas VMware.
-- [ ] Verificar desde Windows conexión TCP 22 y sesión SSH con llave Ed25519.
+- [x] Verificar sesión remota SSH desde Windows con contraseña e identidad del servidor comprobada.
+- [ ] Verificar sesión SSH con llave de cliente Ed25519 sin contraseña de usuario.
 - [x] Regenerar inventario y registrar versión real en `01-inventario-host-y-vmware.md`.
 - [ ] Actualizar los tres entregables: informe académico, bitácora técnica y manual.
 
