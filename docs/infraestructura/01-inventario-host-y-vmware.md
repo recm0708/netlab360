@@ -2,7 +2,7 @@
 
 **Fecha de inspección:** 2026-10-09 (hora local de Panamá).
 **Origen:** dos capturas facilitadas por el usuario (VMware) y salida de PowerShell 7.6.6 (Windows).
-**Estado al 2026-10-09:** Ubuntu Desktop 26.04.1 LTS instalado y reiniciado; 8 vCPU verificadas dentro del invitado; servicio SSH activo. La autenticación remota aún no está validada.
+**Estado al 2026-10-09:** Ubuntu Desktop 26.04.1 LTS instalado; 8 vCPU verificadas; VMnet8 con IP manual **192.168.47.40/24**, acceso SSH desde Windows autenticado con contraseña. Pendiente cliente Ed25519 y prueba de persistencia tras reinicio.
 
 ## Anfitrión Windows
 
@@ -65,14 +65,16 @@
 | Kernel | `7.0.0-38-generic` |
 | Memoria detectada | 15 GiB; swap 4.0 GiB |
 | Volumen raíz | `/dev/sda2`, 157 GB, 138 GB disponibles tras reinicio |
-| Interfaces | `ens33` UP, `192.168.47.130/24`; `lo` |
-| Gateway por DHCP | `192.168.47.2` |
+| Interfaces | `ens33` UP, **`192.168.47.40/24` estática** (antes `.130` por DHCP); `lo` |
+| Gateway NAT | `192.168.47.2`; DNS primario `.2`, secundario `1.1.1.1` |
 | VMware VMnet8 (Windows) | `192.168.47.1/24`, interfaz Up |
 | SSH | `openssh-server` instalado y servicio activo; escucha en `0.0.0.0:22` y `[::]:22` |
 | VMware Tools | `open-vm-tools` activo; `open-vm-tools-desktop` instalado |
 | Sistema | `apt update`, `apt upgrade`, paquetes básicos y `autoremove --purge` ejecutados; 7 paquetes de kernel antiguo eliminados |
 
-**Estado de SSH remoto:** Windows rechazó la huella de host para una IP reutilizada (`REMOTE HOST IDENTIFICATION HAS CHANGED`). Además se intentó `root`; el usuario correcto es `rc-aa-ec`. Pendiente comparar huella desde consola de VMware, limpiar **solo** el registro antiguo de la IP, conectar correctamente y después preparar clave Ed25519. No desactivar verificaciones de host SSH.
+**Estado SSH remoto:** huella ED25519 del servidor cotejada mediante consola VMware y Windows; sesión SSH en `rc-aa-ec@192.168.47.40` exitosa con contraseña. No se tocó `known_hosts` de la IP histórica `.130`. Falta comprobar acceso con llave Ed25519 de cliente.
+
+**Direccionamiento actual:** VMware VMnet8 `192.168.47.0/24`; DHCP `192.168.47.128–254`; IP administrada `192.168.47.40`, fuera del pool y sin colisión observada tras prueba ARP. Perfil NetworkManager `netlab360-gestion`, perfil de reserva `netplan-ens33`. Referencia: [ADR-002](../decisiones/ADR-002-ip-fija-vmnet8.md).
 
 **Cuentas y secretos:** nombres/grupo pueden documentarse; ninguna contraseña real se registrará en Git, capturas o manual. Se recomienda rotar la contraseña que fue compartida en el chat.
 
