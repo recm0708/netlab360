@@ -12,14 +12,14 @@ Construir una plataforma en una máquina virtual Ubuntu Desktop para reproducir 
 
 | Hito | Período (2026) | Alcance |
 | --- | --- | --- |
-| [S01](../../issues/1) | 5–11 oct. | MVP transversal, pruebas de viabilidad |
-| [S02](../../issues/2) | 12–18 oct. | Multisede, LACP y capacidad |
-| [S03](../../issues/3) | 19–25 oct. | Network as Code, IaC y compliance |
-| [S04](../../issues/4) | 26 oct.–1 nov. | Observabilidad e incidentes |
-| [S05](../../issues/5) | 2–8 nov. | Redundancia de equipos y SDN |
-| [S06](../../issues/6) | 9–15 nov. | Ingeniería de datos e IA evaluada |
-| [S07](../../issues/7) | 16–22 nov. | AIOps con aprobación humana |
-| [S08](../../issues/8) | 23–29 nov. | Regresión, documentación y OVA |
+| [S01](https://github.com/recm0708/netlab360/issues/1) | 5–11 oct. | MVP transversal, pruebas de viabilidad |
+| [S02](https://github.com/recm0708/netlab360/issues/2) | 12–18 oct. | Multisede, LACP y capacidad |
+| [S03](https://github.com/recm0708/netlab360/issues/3) | 19–25 oct. | Network as Code, IaC y compliance |
+| [S04](https://github.com/recm0708/netlab360/issues/4) | 26 oct.–1 nov. | Observabilidad e incidentes |
+| [S05](https://github.com/recm0708/netlab360/issues/5) | 2–8 nov. | Redundancia de equipos y SDN |
+| [S06](https://github.com/recm0708/netlab360/issues/6) | 9–15 nov. | Ingeniería de datos e IA evaluada |
+| [S07](https://github.com/recm0708/netlab360/issues/7) | 16–22 nov. | AIOps con aprobación humana |
+| [S08](https://github.com/recm0708/netlab360/issues/8) | 23–29 nov. | Regresión, documentación y OVA |
 
 El detalle de aceptación por fase se encuentra en las issues semanales. Cada fase debe conservar capacidades verificables de red, automatización, observabilidad, analítica, interfaz y documentación. Las fechas y requisitos se ajustarán cuando la docente confirme la rúbrica.
 
