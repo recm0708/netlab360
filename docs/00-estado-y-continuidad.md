@@ -48,9 +48,21 @@ Cada fase es un candidato demostrable independiente; el cumplimiento definitivo 
 - Se ha recomendado **rotar la contraseña compartida en chat** y no documentarla ni reutilizarla en otros servicios. No almacenar secretos.
 - Issue #38 y guía `docs/infraestructura/02-ubuntu-desktop-instalacion-ssh.md` actualizadas.
 
-## Próxima sesión
-1. En Ubuntu por SSH, ejecutar `GH_BROWSER=/bin/true gh auth login -h github.com -p https -w` y finalizar el código de dispositivo en **el navegador de Windows** (`https://github.com/login/device`); no compartir código ni token.
-2. Verificar `gh auth status`, `gh auth setup-git` y `gh repo view recm0708/netlab360 --json isPrivate,nameWithOwner`.
-3. Clonar el repositorio privado ya inicializado en `~/proyectos/netlab360` sin `git init` ni duplicar issues.
-4. Revisar actualización de `gh` 2.46.0 a versión estable oficial en una actividad separada, sin bloquear autenticación.
-5. Importar planificación v0.2 sin sobrescribir decisiones y manuales más recientes; rotar contraseña de Ubuntu anteriormente compartida y conservar secretos fuera del repositorio.
+## Pausa operativa solicitada — 2026-10-09
+- **Objetivo actual:** instalar dependencias base y detenerse sin desplegar redes ni servicios del proyecto. Solo se realizará preparación de plataforma.
+- **GitHub CLI autenticado:** `gh auth status` confirmó la cuenta `recm0708` en github.com, repo privado `recm0708/netlab360` visible, `gh auth setup-git` aplicado.
+- **Git clonado:** `~/proyectos/netlab360`; `git status --short --branch` mostró `## main...origin/main`, sin cambios locales antes de esta actualización remota.
+- **Issue #40:** autenticación y clonación completadas, cerrada. **Issue #41:** instalación de herramientas y pausa operativa, abierta.
+- **Instalador pendiente de ejecución en VM:** `scripts/bootstrap/preparar-entorno-ubuntu.sh` (APT base, GitHub CLI oficial, Docker/Compose/Buildx, Ansible, OpenTofu, Node.js 24 LTS, herramientas de red). No declarar instalado ningún componente hasta recibir salidas.
+- **Guía de ejecución/pausa:** `docs/infraestructura/04-preparacion-herramientas-pausa.md`.
+- **Herramientas diferidas al inicio de implementación:** FRRouting/OVS/Faucet, Containerlab, Prometheus y servicios web/IA; se versionarán y probarán dentro de entornos aislados.
+- **Template v0.2 pendiente:** se conserva y se importará solo con revisión para no sobrescribir documentos posteriores, sin duplicar issues.
+- **Seguridad:** token GitHub y llave cliente SSH permanecen en el invitado/Windows; **sanitizar antes de exportar VM a docente**. Rotar la contraseña que fue compartida en conversación.
+
+## Próxima acción
+1. Abrir PowerShell `ssh netlab360`; `cd ~/proyectos/netlab360 && git pull --ff-only origin main`.
+2. `bash -n scripts/bootstrap/preparar-entorno-ubuntu.sh` y, tras revisar el contenido, `bash scripts/bootstrap/preparar-entorno-ubuntu.sh`.
+3. Verificar versiones Docker/Ansible/OpenTofu/Node/GitHub CLI, estado `docker/ssh/open-vm-tools`, IP, disco y logs de instalación.
+4. Actualizar issues y registrar resultados; no cerrar #41 hasta confirmación.
+5. Detener VM limpiamente con `sync; sudo systemctl poweroff`. Confirmar apagado en VMware.
+6. Cuando el usuario regrese, iniciar VM, comprobar `ssh netlab360`, hacer mantenimiento de actualizaciones y retomar #41/S01 sin inventar nuevos estados.
