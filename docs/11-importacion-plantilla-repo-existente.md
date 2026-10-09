@@ -1,6 +1,6 @@
 # Importar NETLAB360 v0.2 en el repositorio ya inicializado
 
-**Importante:** El repositorio `recm0708/netlab360` ya tiene commits, un README, un registro de continuidad, 37 issues y un workflow de gestión. **No** ejecutar `git init`, `git remote add origin` ni el «primer push» de `docs/08-inicio-github.md` en la plantilla antigua. En su lugar, clonar el repositorio existente.
+**Importante:** El repositorio `recm0708/netlab360` ya tiene commits, un README, un registro de continuidad, 39 issues y un workflow de gestión. **No** ejecutar `git init`, `git remote add origin` ni el «primer push» de `docs/08-inicio-github.md` en la plantilla antigua. En su lugar, clonar el repositorio existente.
 
 ## Paso A — Preparar Ubuntu Desktop
 
@@ -9,7 +9,7 @@ Cuando Ubuntu Desktop esté instalado y actualizado:
 ```bash
 sudo apt update
 sudo apt install -y git gh unzip rsync ca-certificates jq
-gh auth login
+gh auth login -h github.com -p https -w
 gh auth setup-git
 gh auth status
 ```
@@ -35,16 +35,18 @@ test -f "$ZIP" || { echo "Falta el ZIP"; exit 1; }
 TEMP="$(mktemp -d)"
 unzip -q "$ZIP" -d "$TEMP"
 
-rsync -a --exclude='.git/' \
+rsync -a --ignore-existing --exclude='.git/' \
   "$TEMP/NETLAB360_Planificacion_Inicial/" \
   "$HOME/proyectos/netlab360/"
 
 git status --short
 ```
 
-La carpeta `NETLAB360_Planificacion_Inicial` NO debe quedar anidada en el repositorio.
+**No sobrescribir archivos ya presentes en GitHub.** `--ignore-existing` conserva el README, decisiones, guía SSH, inventario y workflows actuales. La carpeta `NETLAB360_Planificacion_Inicial` NO debe quedar anidada en el repositorio.
 
 ## Paso D — Revisar y publicar
+
+**Revisión obligatoria antes del commit:** revisar todos los archivos nuevos y evitar claves, secretos, logs sensibles y carpetas de VM. Si hay archivos que colisionan con documentos versionados posteriormente, incorporarlos mediante revisión/manual, nunca por sobrescritura masiva.
 
 Comprobar `.gitignore` y los archivos antes de hacer commit.
 
@@ -67,6 +69,6 @@ gh issue list -R recm0708/netlab360 --state all --limit 100
 gh run list -R recm0708/netlab360 --limit 5
 ```
 
-Ya existen las 37 issues: no volver a crearlas manualmente. GitHub Actions `bootstrap-github.yml` gestiona automáticamente etiquetas, milestones y su asociación al sincronizarse el directorio `backlog/`.
+Ya existen **39 issues** (#1–#39): no volver a crearlas manualmente. El paquete v0.2 solo representa la planificación inicial, no la versión más actualizada de todos los archivos del proyecto. GitHub Actions `bootstrap-github.yml` gestiona automáticamente etiquetas, milestones y su asociación al sincronizarse el directorio `backlog/`.
 
 **Nota:** Los cuerpos de las issues fueron inicializados con un resumen de aceptación; la plantilla original de `backlog/` tiene un detalle mayor. Actualizar los cuerpos solo tras comprobar que no se perderán casillas marcadas o comentarios.
