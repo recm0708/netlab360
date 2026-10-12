@@ -1,5 +1,20 @@
 # NETLAB360 — Registro de inicialización de GitHub
 
+## HITO DE REANUDACIÓN — B1 validado; primer ensayo L2 B2 PREPARADO, no ejecutado
+
+**Fecha:** 2026-10-12, después de 18:03 Panamá. **Estado actual:** B1 IPAM y capacidades del kernel verificados; no hay infraestructura empresarial desplegada, no hay VLAN real, OSPF, LACP, FRR ni OVS instalados.
+
+- El usuario aportó `RESULTADO_L2=0` del script `precheck-l2-b1.sh`: módulos `8021q`, `bonding`, `openvswitch`, `veth` y `bridge` disponibles (solo bridge cargado). `ip_forward=1`, `ens33 192.168.47.40/24`, gateway `.2`, `docker0 172.17.0.0/16`, cero namespaces y contenedores. Servicios activos, 8 vCPU y aproximadamente 13 GiB disponibles. `VALIDACIÓN B1: OK` reiterada y Git limpio al final de la comprobación anterior a nuevos commits.
+- El usuario **ya tomó dos capturas**: `B1_01_Validacion_IPAM_y_Redes.png` y `B1_02_Compatibilidad_Capa2.png`. **No están incorporadas al repositorio**, no pedir repetirlas. Logs locales `03-b1-preflight-20261012-173813.log` y `04-b1-compatibilidad-l2-20261012-180335.log`, en `~/netlab360-bootstrap/evidencias/`.
+- Bitácoras GitHub: `docs/sesiones/2026-10-12-validacion-ipam-b1.md` y `docs/sesiones/2026-10-12-compatibilidad-l2-b1.md`; issue #11 comentada/actualizada.
+- Nueva decisión propuesta `docs/decisiones/ADR-003-redes-virtuales-aisladas.md`: utilizar inicialmente Linux network namespaces, veth y Linux bridge para ensayo L2; FRRouting/OSPF después, con OVS/Faucet y LACP tratados separadamente. **Propuesta, no validación operativa**.
+- Nuevo script preparatorio `scripts/laboratorio/b2-l2-aislado.sh`: test aislado con dos endpoints VLAN 110, separación de puerto VLAN 120 y restauración, con limpieza al terminar; **NO se ha ejecutado**. Requiere argumento `--snapshot-confirmado` y comprobaciones previas; no se modifica ens33. Versionado para revisión, no sustituye inspección y `bash -n`.
+- **BLOQUEO ANTES DE EJECUTAR PRUEBA:** confirmar la instantánea VMware `NETLAB360-BASE-HERRAMIENTAS`. Ninguna salida de usuario ha confirmado todavía su creación. Si existe, verificar desde VMware; si no, apagar VM ordenadamente, crear snapshot con VM apagada, encender de nuevo y verificar `ssh netlab360`.
+- **PRÓXIMA SECUENCIA:** `cd ~/proyectos/netlab360 && GIT_TERMINAL_PROMPT=0 git pull --ff-only origin main`; `bash -n scripts/laboratorio/b2-l2-aislado.sh`; verificar snapshot; si está confirmado, ejecutar `bash scripts/laboratorio/b2-l2-aislado.sh --snapshot-confirmado` y revisar su salida y `sudo ip netns list`, ruta/IP, Docker y log `05-b2-l2-*.log`. Si falla, detenerse y revisar salida, sin repetir ni agregar otras redes.
+- Al obtener pruebas funcionales, actualizar issue #12, bitácora, evidencias y esta ancla; no cerrar S01 ni declarar failover OSPF hasta demostración.
+
+---
+
 ## ANCLA DE REANUDACIÓN — Estado vigente 2026-10-12, 18:03 Panamá
 
 **Lee esta sección antes que los registros históricos situados más abajo.** NETLAB360 sigue en S01, B1: IPAM y **compatibilidad L2/L3 del kernel ya verificados**. La matriz de conexiones es propuesta, todavía no implementada. **No hay red empresarial desplegada ni Fase 1 cerrada**.
