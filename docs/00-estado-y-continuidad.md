@@ -1,5 +1,47 @@
 # NETLAB360 — Registro de inicialización de GitHub
 
+## ANCLA ACTUAL — 12/10/2026 18:49 Panamá: FRR precheck OK y snapshot CONFIRMADO
+
+**Leer esta sección primero en cualquier conversación nueva.** Usuario confirmó personalmente que creó al principio el snapshot `NETLAB360-BASE-HERRAMIENTAS`; issue #41 de preparación cerrada. **No pedir otra vez snapshot.** Los apagados `sudo systemctl poweroff` y los arranques por SSH también están comprobados. No hay routers FRR ni enlaces WAN ejecutados.
+
+### Estado técnico verificado
+
+- VMware Workstation Pro 26H1u1, VM Ubuntu Desktop 26.04.1 LTS, `netlab360-lab`, `rc-aa-ec`, 8 vCPU, 16 GB RAM, 160 GB disco. `ens33 192.168.47.40/24`, default `192.168.47.2`. `ssh netlab360` desde PowerShell con llave Ed25519. Docker 29.9.0, Compose 5.6.0, OpenTofu 1.13.1, Ansible Core 2.20.1, Node 24.21.0, Python 3.14.4 y GitHub CLI 2.102.0.
+- B0 plataforma y mantenimiento validados; B1 IPAM 3 sedes/9 VLAN/2 WAN y preflight compatibilidad L2 OK. B2-L2 probó conectividad VLAN 110 (3/3), aislamiento VLAN 120, retorno VLAN 110 (3/3), limpieza automática, IP/rutas host intactas.
+- Imagen `quay.io/frrouting/frr:10.7.1` amd64 descargada con digest `sha256:e995beaa50fdc9edb35eadcfefa29b7f062cc06f2b812613789b68fa541554d2`.
+- Precheck de FRR 18:47:25 **`RESULTADO_PRECHECK_ARRANQUE=0`**; metadatos `Entrypoint=["/sbin/tini","--"]` / `Cmd=["/usr/lib/frr/docker-start"]`, que ejecuta `watchfrr $(daemon_list)`. Daemons de fábrica `ospfd=no`, `bgpd=no`, `vtysh_enable=yes`; usuario `frr` UID 100, grupos frr/frrvty. Sin demonios iniciados en prueba de lectura. `/run/frr` existe.
+- Git al terminar este diagnóstico: `## main...origin/main` limpio, hasta `1627726`, **antes de nuevos commits GitHub**. Un error `git status --short --branchcd` fue pegado accidentalmente y después se ejecutó un status correcto, sin cambios.
+- Último log local original: `~/netlab360-bootstrap/evidencias/08-b2-frr-entrypoint-20261012-184725.log` (2.4KB). Bitácora versionada `docs/sesiones/2026-10-12-precheck-arranque-frr-b2.md`.
+- Capturas aportadas de B1 y de inspección FRR ya revisadas en conversación; no constan como archivos rastreados por Git. No repetir capturas validadas. El siguiente paso debe indicar cuándo tomar evidencias de procesos FRR/vecinos/rutas y mantener fecha, hostname, comandos y resultado.
+
+### Seguimiento GitHub y próximos pasos
+
+- **#41 CERRADA:** paquete base, red fija, GitHub CLI, snapshot y recuperación comprobados.
+- **#11 ABIERTA:** diseño IPAM, VLAN y arquitectura; completadas pruebas preliminares, todavía faltan componentes finales.
+- **#12 ABIERTA:** incidente con cambio de ruta, sellos temporales, alarma y dashboard.
+- **#42 ABIERTA (nueva):** subtarea FRR en dos routers, WAN dual OSPF y recuperación, con evidencia funcional.
+- **#1 ABIERTA:** S01 transversal. No llamar fase terminada hasta criterios y entregables validados.
+- Nueva prueba **PREPARADA, NO EJECUTADA:** `scripts/laboratorio/b2-frr-smoke-aislado.sh` para habilitar `zebra` y `ospfd` dentro de UN contenedor Docker temporal `--network none` con capacidades limitadas, inspeccionar `vtysh` y limpiarlo automáticamente. Esta prueba no crea todavía WAN, LAN ni adyacencias.
+- **Comandos para retomar:**
+  ```bash
+  cd ~/proyectos/netlab360
+  GIT_TERMINAL_PROMPT=0 git pull --ff-only origin main
+  bash -n scripts/laboratorio/b2-frr-smoke-aislado.sh
+  sed -n '1,230p' scripts/laboratorio/b2-frr-smoke-aislado.sh
+  bash scripts/laboratorio/b2-frr-smoke-aislado.sh --snapshot-confirmado
+  echo "RESULTADO_LANZAMIENTO_FRR=$?"
+  sudo docker ps -a
+  sudo ip netns list
+  ip -4 -br addr show ens33
+  git status --short --branch
+  ```
+- Si prueba falla, NO repetir automáticamente ni desplegar R-HQ/R-S1: revisar `09-b2-frr-smoke-*.log` y códigos/log de Docker; ajustar script versionado, documentar el cambio y revalidar.
+- Después de prueba satisfactoria, preparar `up/status/down` y configuración para dos routers con WAN primaria 10.78.0.0/30 (costo 10) y respaldo 10.78.0.4/30 (costo 100), OSPF área 0, loopbacks 10.79.0.1/32 y .2/32; medir fallo/restauración, conservar `ens33`.
+- Guardar bitácoras/commits/issues tras subhitos significativos y antes de pausas. Al retomar no repetir instalación base. **Nunca almacenar tokens OAuth, contraseñas, OVA privada o material sensible en repositorio**.
+
+---
+
+
 ## CONTINUAR DESDE AQUÍ — 2026-10-12 18:36 Panamá: imagen FRR inspeccionada
 
 **Estado vigente:** S01 abierta. B0 y B1 validados, primer ensayo B2-L2 de Linux Bridge/VLAN 110/120 superado con restauración y limpieza. Imagen `quay.io/frrouting/frr:10.7.1` descargada e inspeccionada; **R-HQ/R-S1, OSPF y WAN dual todavía NO ejecutados**.
