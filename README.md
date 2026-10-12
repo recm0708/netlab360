@@ -1,6 +1,6 @@
 # NETLAB360 — Planificación semestral
 
-> **Estado:** planificación inicial aprobada; aplicación todavía no implementada.
+> **Estado (2026-10-12):** entorno Ubuntu Desktop/VMware preparado, Docker y herramientas IaC validadas; topología empresarial y aplicación todavía no implementadas.
 
 **Título académico:** Diseño e implementación de una plataforma virtualizada para la automatización, observabilidad y diagnóstico inteligente de redes empresariales multisede.
 
@@ -34,6 +34,11 @@ El detalle de aceptación por fase se encuentra en las issues semanales. Cada fa
 
 Los archivos de configuración, scripts y documentación se conservarán en Git; el estado observado de la red se validará operacionalmente. No incorporar credenciales, claves privadas, estados sensibles de OpenTofu ni discos de VM en este repositorio.
 
-## Próximo paso
+## Ejecución actual y siguiente paso
 
-Importar el contenido completo del paquete `NETLAB360_Planificacion_v0.2.zip`, dejando sus archivos en la **raíz del repositorio**, no dentro de la carpeta `NETLAB360_Planificacion_Inicial/`. Las 37 issues ya fueron abiertas; el proceso de importación debe evitar duplicarlas.
+- [Plan operativo, fases técnicas y pausas](docs/05-plan-operativo-y-pausas.md): primero B0 (línea base y salud) y B1 (arquitectura/IPAM), después MVP funcional de falla observada, telemetría, interfaz y analítica, con pausas tras avances verificables.
+- [Estado de continuidad](docs/00-estado-y-continuidad.md) y [preparación técnica](docs/sesiones/2026-10-12-preparacion-base-validada.md).
+- [Issue #41](https://github.com/recm0708/netlab360/issues/41): base instalada; checkpoint, snapshot y pausa por definir. [Issue #11](https://github.com/recm0708/netlab360/issues/11): siguiente diseño/IPAM.
+- El archivo `NETLAB360_Planificacion_v0.2.zip` se importará solo tras revisión y **sin sobrescribir** documentos nuevos ni duplicar issues existentes; no está importado todavía.
+
+**Protección de credenciales:** el GitHub CLI autenticado dentro del invitado puede contener un token local; se debe eliminar/sanitizar antes de compartir OVA y jamás versionarlo.
