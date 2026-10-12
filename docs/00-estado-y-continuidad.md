@@ -1,5 +1,33 @@
 # NETLAB360 — Registro de inicialización de GitHub
 
+## CONTINUAR DESDE AQUÍ — 2026-10-12 18:36 Panamá: imagen FRR inspeccionada
+
+**Estado vigente:** S01 abierta. B0 y B1 validados, primer ensayo B2-L2 de Linux Bridge/VLAN 110/120 superado con restauración y limpieza. Imagen `quay.io/frrouting/frr:10.7.1` descargada e inspeccionada; **R-HQ/R-S1, OSPF y WAN dual todavía NO ejecutados**.
+
+- `scripts/diagnostico/inspeccionar-imagen-frr-b2.sh` tuvo `RESULTADO_INSPECCION_FRR=0` el 2026-10-12 18:36:14. Usuario `frr` UID100/GID101 y grupo `frrvty` GID102; `id frrvty` imprime mensaje informativo porque no es cuenta. Imagen incluye `/etc/frr/daemons` (ospfd=no, vtysh_enable=yes), binarios vtysh/zebra/ospfd; **no** trae `/etc/frr/frr.conf` de fábrica. Un contenedor temporal de inspección quedó eliminado y Docker continuó sin contenedores.
+- Gestión sin cambios: `ens33 192.168.47.40/24`, ruta predeterminada por `.2`, servicios docker/ssh/open-vm-tools activos y Git limpio antes de los últimos commits documentales. Log `~/netlab360-bootstrap/evidencias/07-b2-inspeccion-imagen-frr-20261012-183614.log`.
+- **Imágenes adjuntas revisadas:** `B1_01_Validacion_IPAM_y_Redes.png` y `B1_02_Compatibilidad_Capa2.png` aprobadas. `B2_01_Imagen_FRR_Descargada.png` refleja INSPECCIÓN de archivos internos FRR y debe renombrarse `B2_02_Inspeccion_Imagen_FRR.png`. No están subidas aún al repositorio Git; su existencia se verificó como adjuntos en la conversación. Bitácora de revisión `docs/sesiones/2026-10-12-inspeccion-interna-frr-y-capturas.md`.
+- **Nueva preparación en GitHub:** `scripts/diagnostico/precheck-arranque-frr-b2.sh` (solo lectura, contenedor temporal sin red; inspecciona Entrypoint, daemons y directorios), `topologias/b2-frr/configs/R-HQ.frr.conf` y `R-S1.frr.conf` (configuraciones CANDIDATAS, NO aplicadas), `topologias/b2-frr/README.md` y documentación de B2-L3. Ver issue #12, todavía ABIERTA.
+- **Próxima secuencia:**
+  ```bash
+  cd ~/proyectos/netlab360
+  GIT_TERMINAL_PROMPT=0 git pull --ff-only origin main
+  bash -n scripts/diagnostico/precheck-arranque-frr-b2.sh
+  bash scripts/diagnostico/precheck-arranque-frr-b2.sh
+  echo "RESULTADO_PRECHECK_ARRANQUE=$?"
+  ls -lh ~/netlab360-bootstrap/evidencias/08-b2-frr-entrypoint-*.log
+  sed -n '1,90p' topologias/b2-frr/configs/R-HQ.frr.conf
+  sed -n '1,90p' topologias/b2-frr/configs/R-S1.frr.conf
+  sudo docker ps -a
+  git status --short --branch
+  ```
+- **Antes de desplegar OSPF:** confirmar desde VMware Snapshot Manager que la instantánea `NETLAB360-BASE-HERRAMIENTAS` existe. El parámetro anterior `--snapshot-confirmado` NO constituye verificación independiente. Diseñar y probar `up/status/down` con limpieza solo de recursos propios y red aislada de VMnet8.
+- **Capturas futuras:** incluir fecha/hostname, comando efectivo, salida de éxito/error y comprobación posterior; usar log para salidas largas. Captura de primera prueba L2-B2 no confirmada, pero existe el log local `05-b2-l2-20261012-181601.log`.
+- **Continuidad:** registrar resultados y evidencias en #12 y aquí cada avance sustancial, sin esperar límite de contexto; usuario prefiere varios comandos por turno y pausas después de hitos significativos. No publicar tokens ni contenido de `~/.config/gh/hosts.yml`.
+
+---
+
+
 ## ÚLTIMO ESTADO — 2026-10-12 18:22 Panamá: FRR 10.7.1 DESCARGADO, OSPF AÚN PENDIENTE
 
 **Priorizar este punto sobre los registros históricos siguientes.** El laboratorio B2-L2 pasó todas las pruebas de conectividad VLAN/aislamiento/restauración, sin residuos. El siguiente paso es **inspección interna de la imagen FRRouting**, antes de crear routers.
