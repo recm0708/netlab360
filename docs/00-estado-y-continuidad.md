@@ -80,3 +80,13 @@ Cada fase es un candidato demostrable independiente; el cumplimiento definitivo 
 6. Validar versiones, `sudo docker run --rm hello-world`, Docker/SSH/open-vm-tools activos, IP, Git limpio y evidencias. Actualizar #41.
 7. Solo después de comprobar que la preparación terminó, crear instantánea de recuperación y apagar ordenadamente.
 
+
+## Reanudación 2026-10-12 — sudo restaurado, Git HTTPS solicita credenciales
+
+- `whoami` identifica `rc-aa-ec`; `sudo -k` y `sudo -v` funcionaron. Problema de autenticación local Ubuntu **resuelto**.
+- Antes de iniciar el instalador, `git pull --ff-only origin main` detuvo el flujo solicitando usuario y contraseña de GitHub. **No hay constancia de pull completado ni de instalación de dependencias en esta sesión**.
+- No introducir contraseña de GitHub por HTTPS. Verificar `gh auth status -h github.com` y `gh api user --jq .login`; luego `gh auth setup-git --hostname github.com` para configurar el helper oficial. Reintentar con `GIT_TERMINAL_PROMPT=0 git ls-remote --heads origin main`, después `GIT_TERMINAL_PROMPT=0 git pull --ff-only origin main`. Si falla, inspeccionar el helper sin exponer tokens.
+- Si `gh auth status` indica que OAuth ha caducado, autorizar desde navegador Windows mediante `GH_BROWSER=/bin/true gh auth login -h github.com -p https -w` con código temporal (no compartir código).
+- Tras Git: hacer mantenimiento preventivo `sudo apt update`, consultar actualizaciones con `apt list --upgradable`, ejecutar `sudo apt upgrade -y`; reiniciar si `/var/run/reboot-required` aparece y verificar SSH/IP/servicios. No forzar phased updates.
+- Ejecutar instalador `scripts/bootstrap/preparar-entorno-ubuntu.sh` solo tras volver a verificar `sudo`, Git y versión del script.
+- Issue #41 continúa abierta hasta versiones y pruebas confirmadas. No declarar Docker/OpenTofu/Ansible/Node instalados.
