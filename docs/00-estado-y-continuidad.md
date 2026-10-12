@@ -112,3 +112,15 @@ El segundo intento de preparación **sí completó** todas las etapas del script
 - **Confirmado en esta conversación:** GH CLI autenticado como `recm0708`; `gh auth setup-git --hostname github.com`, `git ls-remote --exit-code origin refs/heads/main` y `git pull --ff-only origin main` exitosos. Rama local `main...origin/main` limpia al concluir, antes de nuestros commits posteriores de planificación.
 - **Siguiente comando en Ubuntu:** `cd ~/proyectos/netlab360 && GIT_TERMINAL_PROMPT=0 git pull --ff-only origin main` para incorporar estos nuevos documentos; después salud de red, dpkg, APT, Docker, disco, SSH y token protegido. NO volver a ejecutar script instalador ya terminado.
 - **Pendiente:** instantánea base `NETLAB360-BASE-HERRAMIENTAS`, inicio arquitectura IPAM #11; OAuth de GH en `~/.config/gh/hosts.yml` sin cifrar: asegurar permisos y sanitizar antes de exportar VM.
+
+## Precheck final B0 y reinicio de Windows solicitado — 2026-10-12, 11:20 Panamá
+
+- Git: `GIT_TERMINAL_PROMPT=0 git pull --ff-only origin main` exitoso; `git status --short --branch` mostró `## main...origin/main`, sin cambios locales en ese momento. Se hicieron commits remotos posteriores a la revisión: al retomar debe ejecutarse otro pull.
+- Credenciales GH CLI: carpeta `~/.config/gh` permisos `700`, archivo `hosts.yml` permisos `600`; siguen sin cifrar; no difundir ni incluir en una OVA.
+- APT: `sudo apt update` informó todos los paquetes al día; `sudo apt upgrade -y` registró **0 actualizados, 0 instalados, 0 eliminados, 0 pendientes**. `sudo dpkg --audit` vacío, `systemctl --failed` **0 unidades**. Aviso Ubuntu Pro ESM Apps informativo sin impedir el mantenimiento.
+- Los servicios `docker`, `ssh`, `open-vm-tools` mostraron `active`; sin contenedores Docker. Docker Compose **v5.6.0**.
+- `ens33` `192.168.47.40/24`, puerta de enlace `192.168.47.2`; raíz 157G con **136G libres**; **NO SE REQUIERE REINICIO** del invitado por actualizaciones.
+- El usuario **decidió reiniciar Windows anfitrión**, no terminar todavía S01. Se aconseja apagar **antes** la VM desde SSH con `git status --short --branch; sync; sudo systemctl poweroff`, verificar visualmente que aparece apagada en VMware, tomar snapshot `NETLAB360-BASE-HERRAMIENTAS` con VM apagada y después reiniciar Windows. **Ejecución/confirmación del apagado y snapshot aún no recibidas**.
+- No hay más dependencias base por instalar ahora. FRR/OVS/Faucet/Containerlab/Prometheus/backend frontend/IA quedarán para fases del diseño.
+- Tras reiniciar Windows: abrir VMware, arrancar `NETLAB360-Ubuntu-Desktop` solamente si se continúa; en PowerShell `ssh netlab360`; en Ubuntu comprobar red, servicios, `gh auth status -h github.com`, `GIT_TERMINAL_PROMPT=0 git pull --ff-only origin main`, `sudo apt update` y `sudo dpkg --audit`. No repetir instalador.
+- Issue #41 permanece abierta únicamente por snapshot/apagado y confirmación de restauración cuando corresponda. Próximo bloque sustantivo de S01: B1 diseño e IPAM, issue #11, antes de desplegar topologías.
