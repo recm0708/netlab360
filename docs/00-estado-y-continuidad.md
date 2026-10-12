@@ -1,5 +1,32 @@
 # NETLAB360 — Registro de inicialización de GitHub
 
+## ESTADO VIGENTE — 2026-10-12, 18:16 Panamá: B2-L2 DEMOSTRADO
+
+**Priorizar este bloque cuando se retome el proyecto o se abra otra conversación.** El hito B1 concluyó satisfactoriamente, la **primera prueba VLAN B2-L2 está ejecutada y validada**, y está preparado el **preflight B2-L3/OSPF**. **La fase S01 sigue abierta** porque aún faltan WAN/OSPF, telemetría, API/dashboard, analítica y entregables.
+
+### Último trabajo confirmado
+
+- **VM:** Ubuntu 26.04.1 LTS en VMware Workstation 26H1u1, hostname `netlab360-lab`, usuario `rc-aa-ec`, 8 vCPU/16 GB RAM/160 GB disco, SSH desde PowerShell `ssh netlab360` con llave Ed25519. Gestión `ens33=192.168.47.40/24`, gateway `.2`, VMnet8 aislada de laboratorio.
+- **B0/B1:** APT actualizado, Docker/SSH/VMware Tools activos; IPAM B1 validado (3 sedes, 9 VLAN y 2 WAN propuestas, S2 reservada), sin colisiones con rutas/redes activas del host; kernel soporta módulos 8021q/bonding/openvswitch/veth/bridge.
+- **Ejecución B2-L2 2026-10-12 18:16:01:** `bash scripts/laboratorio/b2-l2-aislado.sh --snapshot-confirmado`. Prueba positiva VLAN 110 (3/3, 0.068ms RTT medio); cambio del puerto sw-b a VLAN 120 impide respuesta ICMP; restauración a VLAN 110 (3/3, 0.044ms RTT medio). `PRUEBA B2-L2: OK`, `CODIGO_FINAL: 0`, `RESULTADO_B2=0`. Namespaces eliminados, rutas/IP de ens33 intactas y ningún contenedor Docker. Local Git `## main...origin/main` limpio inmediatamente después de la prueba, **antes de nuevos commits remotos**.
+- **Reinicio intermedio:** se ejecutó `sync; sudo systemctl poweroff`, SSH se desconectó normalmente. Un SSH inmediato agotó el tiempo durante VM apagada; siguiente SSH exitoso tras encenderla. **La existencia de snapshot `NETLAB360-BASE-HERRAMIENTAS` no se observó directamente en VMware**. El argumento `--snapshot-confirmado` declara confirmación del operador, no un chequeo programático; pedir al usuario confirmación de Snapshot Manager antes de enrutamiento.
+- **Evidencias B1:** el usuario dijo haber tomado dos capturas PNG (no subidas a GitHub). No ha indicado todavía captura B2. Log B2 local `~/netlab360-bootstrap/evidencias/05-b2-l2-20261012-181601.log` (~1.6KiB); bitácora GitHub `docs/sesiones/2026-10-12-prueba-vlan-l2-b2.md` (no contiene secretos).
+- **GitHub:** issue #12 actualizada, permanece abierta; #11 y #41 también abiertas. Diseño preliminar para siguiente paso: `docs/arquitectura/03-frr-ospf-dual-wan-b2-plan.md`, diagnóstico `scripts/diagnostico/precheck-frr-b2.sh`. Imagen candidata oficial `quay.io/frrouting/frr:10.7.1` **NO descargada ni verificada**.
+- **Próximas instrucciones para Ubuntu, SOLO LECTURA:**
+  ```bash
+  cd ~/proyectos/netlab360
+  GIT_TERMINAL_PROMPT=0 git pull --ff-only origin main
+  bash -n scripts/diagnostico/precheck-frr-b2.sh
+  bash scripts/diagnostico/precheck-frr-b2.sh
+  echo "RESULTADO_PREFLIGHT_FRR=$?"
+  ls -lh ~/netlab360-bootstrap/evidencias/06-b2-frr-precheck-*.log
+  ```
+  El diagnóstico lee host/Docker/IPAM y consulta el manifiesto de imagen oficial. **No descarga, instala ni ejecuta FRR ni toca interfaces**.
+- **Después del preflight:** revisar compatibilidad del tag/arquitectura, confirmar snapshot, decidir descarga versionada de imagen FRR y generar ensayo WAN dual OSPF aislado con corte/restauración y rollback. No afirmar rutas ni adyacencias antes de pruebas. Diferenciar doble WAN OSPF, LACP, redundancia de equipo y trunks 802.1Q.
+- **Regla de trazabilidad:** actualizar este encabezado, issues y bitácoras al completar un hito sustancial o antes de la próxima pausa; usuario prefiere varios comandos agrupados. No almacenar token OAuth (ubicado en `~/.config/gh/hosts.yml`) en repositorio/OVA; permisos 600 y directorio GH 700.
+
+---
+
 ## HITO DE REANUDACIÓN — B1 validado; primer ensayo L2 B2 PREPARADO, no ejecutado
 
 **Fecha:** 2026-10-12, después de 18:03 Panamá. **Estado actual:** B1 IPAM y capacidades del kernel verificados; no hay infraestructura empresarial desplegada, no hay VLAN real, OSPF, LACP, FRR ni OVS instalados.
