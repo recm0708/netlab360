@@ -25,7 +25,7 @@ Fecha inicial: 2026-10-09 (Panamá, UTC−05:00).
 - [ ] Registrar requisitos nuevos de la docente como cambios controlados.
 
 ## Reglas de continuidad
-1. Antes de continuar, leer este registro, `README.md`, `docs/03-roadmap.md` y las issues abiertas del hito correspondiente.
+1. Antes de continuar, leer este registro, `README.md`, `docs/05-plan-operativo-y-pausas.md` y las issues abiertas del hito correspondiente.
 2. El estado observado y los resultados de los comandos prevalecen sobre supuestos de configuración.
 3. No cerrar issues por completar solamente comandos; deben existir evidencia, comprobación operacional, documentación y recuperación.
 4. Los archivos de máquina virtual, credenciales y state sensible no se almacenan en Git.
@@ -102,3 +102,13 @@ El segundo intento de preparación **sí completó** todas las etapas del script
 - GH CLI informó que la sesión local no está autenticada y la llamada `gh api user` devolvió HTTP 401. El `git pull` inicial **no se completó**.
 - No ejecutar de nuevo script bootstrap. Reautorizar GH CLI desde navegador Windows, ejecutar `gh auth setup-git --hostname github.com`, verificar con `GIT_TERMINAL_PROMPT=0 git ls-remote --heads origin main`, luego `GIT_TERMINAL_PROMPT=0 git pull --ff-only origin main`.
 - Tras confirmar Git, registrar snapshot y apagar; las fases de red aún no se iniciaron.
+
+## Bloques y checkpoints incorporados — 2026-10-12
+
+- Se acordó avanzar por **bloques funcionales sustanciales** (B0 base, B1 IPAM, B2 red y failover, B3 telemetría y dashboard, B4 diagnóstico, B5 documentación), no por pausas a cada subpaso.
+- Conservar evidencia, prueba y commits antes de pausas largas. Ofrecer pausa tras completar uno o varios bloques útiles o aproximadamente 2–4h de trabajo concentrado; **no ejecutar apagados sin decisión del usuario**.
+- La fase S01 planificada para 5–11 de octubre está abierta el 12; no reprogramar fechas ni declarar cumplida sin pruebas. La meta inicial ahora es consolidar B0 y empezar B1 en esta sesión.
+- **Plan maestro operativo:** `docs/05-plan-operativo-y-pausas.md` (creado). README enlaza la guía.
+- **Confirmado en esta conversación:** GH CLI autenticado como `recm0708`; `gh auth setup-git --hostname github.com`, `git ls-remote --exit-code origin refs/heads/main` y `git pull --ff-only origin main` exitosos. Rama local `main...origin/main` limpia al concluir, antes de nuestros commits posteriores de planificación.
+- **Siguiente comando en Ubuntu:** `cd ~/proyectos/netlab360 && GIT_TERMINAL_PROMPT=0 git pull --ff-only origin main` para incorporar estos nuevos documentos; después salud de red, dpkg, APT, Docker, disco, SSH y token protegido. NO volver a ejecutar script instalador ya terminado.
+- **Pendiente:** instantánea base `NETLAB360-BASE-HERRAMIENTAS`, inicio arquitectura IPAM #11; OAuth de GH en `~/.config/gh/hosts.yml` sin cifrar: asegurar permisos y sanitizar antes de exportar VM.
