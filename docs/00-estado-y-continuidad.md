@@ -1,5 +1,31 @@
 # NETLAB360 — Registro de inicialización de GitHub
 
+## ÚLTIMO ESTADO — 2026-10-12 18:22 Panamá: FRR 10.7.1 DESCARGADO, OSPF AÚN PENDIENTE
+
+**Priorizar este punto sobre los registros históricos siguientes.** El laboratorio B2-L2 pasó todas las pruebas de conectividad VLAN/aislamiento/restauración, sin residuos. El siguiente paso es **inspección interna de la imagen FRRouting**, antes de crear routers.
+
+- `precheck-frr-b2.sh`: `RESULTADO_PREFLIGHT_FRR=0`, IPAM B1 OK, host `ens33=192.168.47.40/24`, gateway `.2`, Docker Engine 29.9.0, servicios activos, 0 contenedores, Git limpio tras `git pull` hasta commit `c53ed0f` (antes de nuevos commits remotos).
+- Imagen **descargada** `quay.io/frrouting/frr:10.7.1`, arquitectura `amd64`, digest `sha256:e995beaa50fdc9edb35eadcfefa29b7f062cc06f2b812613789b68fa541554d2`. Manifiesto de plataforma `linux/amd64` también disponible. **No hay contenedores FRR ejecutándose, no hay vecinos OSPF ni failover WAN demostrado.**
+- Evidencia del preflight: `~/netlab360-bootstrap/evidencias/06-b2-frr-precheck-20261012-182150.log` (2.1KiB). Bitácora GitHub `docs/sesiones/2026-10-12-precheck-frr-imagen-b2.md`.
+- Próximo script **versionado pero sin ejecutar**: `scripts/diagnostico/inspeccionar-imagen-frr-b2.sh`. Ejecuta un contenedor temporal sin red, con `--cap-drop ALL`, `--read-only` y `--rm` para verificar el usuario frr, archivos /etc/frr y ejecutables vtysh/zebra/ospfd; no instala ni crea redes.
+- **Comandos para continuar:**
+  ```bash
+  cd ~/proyectos/netlab360
+  GIT_TERMINAL_PROMPT=0 git pull --ff-only origin main
+  bash -n scripts/diagnostico/inspeccionar-imagen-frr-b2.sh
+  bash scripts/diagnostico/inspeccionar-imagen-frr-b2.sh
+  echo "RESULTADO_INSPECCION_FRR=$?"
+  sudo docker ps -a
+  ip -4 -br addr show ens33
+  git status --short --branch
+  ```
+- **Snapshot pendiente de confirmación independiente:** se comprobó apagado y reencendido de Ubuntu antes de B2-L2; se usó flag `--snapshot-confirmado`, pero la existencia/nombre `NETLAB360-BASE-HERRAMIENTAS` no fue observada directamente en VMware Snapshot Manager en esta conversación. Confirmar antes de levantar la topología OSPF.
+- Después de ver la salida: redactar `daemons` y `frr.conf` coherentes con usuarios/permisos reales de la imagen, montar 2 routers aislados con WAN-P `10.78.0.0/30` cost 10 y WAN-B `10.78.0.4/30` cost 100, anunciar prefijos de LAN, probar fallo/restauración y rollback sin ens33. Actualizar issue #12 y esta ancla con evidencia real.
+- Dos capturas B1 confirmadas; **ninguna captura B2 confirmada**. Las imágenes y logs completos siguen locales, no se declaró su subida.
+- Política de trabajo: entregar varios pasos/comandos por turno, actualizar GitHub cada bloque relevante y antes de pausas; no cerrar S01, #12 ni inventar adyacencias/alarma/dashboard.
+
+---
+
 ## ESTADO VIGENTE — 2026-10-12, 18:16 Panamá: B2-L2 DEMOSTRADO
 
 **Priorizar este bloque cuando se retome el proyecto o se abra otra conversación.** El hito B1 concluyó satisfactoriamente, la **primera prueba VLAN B2-L2 está ejecutada y validada**, y está preparado el **preflight B2-L3/OSPF**. **La fase S01 sigue abierta** porque aún faltan WAN/OSPF, telemetría, API/dashboard, analítica y entregables.
