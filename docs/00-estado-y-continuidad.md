@@ -1,5 +1,21 @@
 # NETLAB360 — Registro de inicialización de GitHub
 
+## ANCLA DE REANUDACIÓN — Estado vigente 2026-10-12, posterior a reinicio
+
+**Lee esta sección antes que los registros históricos situados más abajo.** NETLAB360 sigue en S01, primer bloque técnico de diseño B1. **No hay red empresarial desplegada ni Fase 1 cerrada**.
+
+1. **VM:** Ubuntu Desktop 26.04.1 LTS, host `netlab360-lab`, usuario `rc-aa-ec`, VMware Workstation Pro 26H1u1, 8 vCPU, 16 GB RAM, disco virtual 160 GB. Gestión exclusiva por `ens33=192.168.47.40/24` y NAT `192.168.47.2`; Windows PowerShell `ssh netlab360` con llave ED25519.
+2. **Post-reinicio validado:** `docker`, `ssh`, `open-vm-tools` activos, 0 unidades fallidas; GitHub CLI autenticado como `recm0708`, `git pull` exitoso y rama limpia en revisión de las 16:58; APT actualizado, `dpkg --audit` sin salida.
+3. **Toolchain:** Docker Engine 29.9.0, Compose 5.6.0, Buildx 0.38.0, containerd 2.4.1, OpenTofu 1.13.1, Ansible Core 2.20.1, Python 3.14.4, Node.js 24.21.0, npm 11.19.0, gh 2.102.0; Docker hello-world OK; 136 GB disponibles según inventario anterior.
+4. **Checkpoint:** base B0 sana técnicamente. **Snapshot VMware `NETLAB360-BASE-HERRAMIENTAS` aún no confirmado**, pendiente issue #41. No reiniciar instalador.
+5. **B1 nuevo — diseños NO ejecutados:** [documento preliminar](arquitectura/01-topologia-ipam-b1-borrador.md), [IPAM YAML](../inventario/ipam/topologia-b1.yaml), [validador](../scripts/validacion/validar-ipam.py), [preflight solo lectura](../scripts/diagnostico/precheck-b1.sh). Sedes HQ y S1; S2 reservada, WAN primaria/respaldo; dirección empresariales separadas de VMnet8. Ver issue #11.
+6. **PRÓXIMAS INSTRUCCIONES (sin preguntar lo ya resuelto):** `cd ~/proyectos/netlab360 && GIT_TERMINAL_PROMPT=0 git pull --ff-only origin main`; `bash -n scripts/diagnostico/precheck-b1.sh`; `python3 -m py_compile scripts/validacion/validar-ipam.py`; `python3 scripts/validacion/validar-ipam.py inventario/ipam/topologia-b1.yaml`; `bash scripts/diagnostico/precheck-b1.sh`. Pedir solo el resultado final de IPAM/preflight y estado de Git. No hacer interfaces/bridges hasta comprobar colisiones.
+7. **Trazabilidad:** actualizar issue #11 y esta ancla después de la prueba; capturar fecha/hora, comando, resultados, evidencia local, commit y próximos pasos. El plan de pausas está en `docs/05-plan-operativo-y-pausas.md`: un checkpoint tras bloques sustanciales, no tras cada mensaje.
+8. **Seguridad:** GH CLI guarda credenciales en `~/.config/gh/hosts.yml` con permisos 600; nunca compartir token ni empaquetarlo en OVA. No usar `ens33` como switch emulado. El paquete v0.2 de planificación **NO se ha importado** al repo.
+
+---
+
+
 Fecha inicial: 2026-10-09 (Panamá, UTC−05:00).
 
 ## Repositorio
