@@ -90,3 +90,15 @@ Cada fase es un candidato demostrable independiente; el cumplimiento definitivo 
 - Tras Git: hacer mantenimiento preventivo `sudo apt update`, consultar actualizaciones con `apt list --upgradable`, ejecutar `sudo apt upgrade -y`; reiniciar si `/var/run/reboot-required` aparece y verificar SSH/IP/servicios. No forzar phased updates.
 - Ejecutar instalador `scripts/bootstrap/preparar-entorno-ubuntu.sh` solo tras volver a verificar `sudo`, Git y versión del script.
 - Issue #41 continúa abierta hasta versiones y pruebas confirmadas. No declarar Docker/OpenTofu/Ansible/Node instalados.
+
+## Estado vigente — 2026-10-12, instalación base completada
+
+El segundo intento de preparación **sí completó** todas las etapas del script. Tras cancelar el prompt de Git, Bash ejecutó las siguientes órdenes ya suministradas. Actualizó 19 paquetes, instaló herramientas base y verificó Docker `hello-world`, OpenTofu, Ansible, GitHub CLI y Node.js. Ver registro `docs/sesiones/2026-10-12-preparacion-base-validada.md`.
+
+- Docker Engine 29.9.0; Compose 5.6.0; Buildx 0.38.0; containerd 2.4.1.
+- OpenTofu 1.13.1, Ansible Core 2.20.1, Python 3.14.4.
+- Node 24.21.0, npm 11.19.0, gh 2.102.0.
+- Servicios `docker`, `ssh`, `open-vm-tools` activos; IP fija .40; 136 GB libres; sin reboot requerido.
+- GH CLI informó que la sesión local no está autenticada y la llamada `gh api user` devolvió HTTP 401. El `git pull` inicial **no se completó**.
+- No ejecutar de nuevo script bootstrap. Reautorizar GH CLI desde navegador Windows, ejecutar `gh auth setup-git --hostname github.com`, verificar con `GIT_TERMINAL_PROMPT=0 git ls-remote --heads origin main`, luego `GIT_TERMINAL_PROMPT=0 git pull --ff-only origin main`.
+- Tras confirmar Git, registrar snapshot y apagar; las fases de red aún no se iniciaron.
