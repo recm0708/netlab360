@@ -11,7 +11,7 @@ La subprueba B2-L2 ya demostró comunicación de dos endpoints VLAN 110, aislami
 
 Usar **dos routers FRRouting en contenedores aislados con `--network none`**, y unirlos mediante interfaces `veth` independientes administradas por scripts del laboratorio. No ejecutar demonios FRR directamente en el namespace del anfitrión, no conectar Docker default bridge ni `ens33` a interfaces del laboratorio.
 
-**Imagen candidata:** `quay.io/frrouting/frr:10.7.1` (tag propuesto, sujeto a inspección de disponibilidad, arquitectura y descarga). No fijar `latest` ni asumir tag válido sin consulta al registro. FRRouting documenta distribución de imágenes mediante Quay desde FRR 8.4.2; comprobar etiqueta disponible en https://quay.io/repository/frrouting/frr?tab=tags . FRR 10.7.1 figura entre las versiones publicadas en agosto de 2026. La prueba debe guardar digest de la imagen real descargada y verificar comandos de FRR antes de configurar OSPF.
+**Imagen confirmada (2026-10-12):** `quay.io/frrouting/frr:10.7.1` descargada y verificada para `amd64`. Digest `RepoDigests` observado: `sha256:e995beaa50fdc9edb35eadcfefa29b7f062cc06f2b812613789b68fa541554d2`. El tag es válido para esta VM; fijar el digest en el futuro laboratorio reproducible. FRRouting documenta distribución de imágenes mediante Quay desde FRR 8.4.2; la disponibilidad de la etiqueta seleccionada ya fue comprobada con Docker. Referencia de etiquetas: https://quay.io/repository/frrouting/frr?tab=tags . FRR 10.7.1 figura entre las versiones publicadas en agosto de 2026. La prueba debe guardar digest de la imagen real descargada y verificar comandos de FRR antes de configurar OSPF.
 
 Referencias oficiales:
 - https://frrouting.org/release/
@@ -47,4 +47,4 @@ Anunciar interfaces WAN en OSPF área 0; utilizar `passive-interface` para loopb
 
 ## Próxima acción del usuario
 
-Ejecutar **solo el diagnóstico read-only** `scripts/diagnostico/precheck-frr-b2.sh`. Si la etiqueta oficial se encuentra disponible, se podrá descargar e inspeccionar en la siguiente etapa. Guardar logs en `~/netlab360-bootstrap/evidencias/`, sin tokens.
+El diagnóstico `scripts/diagnostico/precheck-frr-b2.sh` terminó exitosamente; la imagen oficial ya fue descargada. **Próximo paso:** inspeccionar el contenido con `scripts/diagnostico/inspeccionar-imagen-frr-b2.sh`, en contenedor efímero `--network none`, sin privilegios y sin iniciar FRR. Comprobar usuarios, daemons y herramientas antes de crear configuraciones. Ver `docs/sesiones/2026-10-12-precheck-frr-imagen-b2.md`. Guardar logs en `~/netlab360-bootstrap/evidencias/`, sin tokens.
