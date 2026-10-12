@@ -3,7 +3,7 @@
 # Precondicion humana: snapshot VMware confirmado. No modifica ens33.
 set -Eeuo pipefail
 
-if [[ "\${1:-}" != "--snapshot-confirmado" ]]; then
+if [[ "${1:-}" != "--snapshot-confirmado" ]]; then
   echo "BLOQUEADO: confirmar antes snapshot VMware NETLAB360-BASE-HERRAMIENTAS."
   echo "Despues: bash $0 --snapshot-confirmado"
   exit 2
