@@ -1,0 +1,62 @@
+# NETLAB360 | Source of Truth preliminar, sin provisionar equipos
+schema_version: "0.1"
+revision: 1
+status: draft
+updated: "2026-10-12"
+description: "IPAM virtual separado de VMware VMnet8; revisar rutas host/Docker antes del despliegue"
+
+management_host:
+  vmnet: VMnet8
+  network: 192.168.47.0/24
+  host_ip: 192.168.47.40
+  gateway: 192.168.47.2
+  interface: ens33
+  locked: true
+
+sites:
+  HQ:
+    status: proposed
+    router: R-HQ
+    loopback: 10.79.0.1/32
+    vlans:
+      - {id: 110, name: HQ-USUARIOS, subnet: 10.70.10.0/24, gateway: 10.70.10.1}
+      - {id: 120, name: HQ-SERVICIOS, subnet: 10.70.20.0/24, gateway: 10.70.20.1}
+      - {id: 130, name: HQ-GESTION-INTERNA, subnet: 10.70.30.0/24, gateway: 10.70.30.1}
+  S1:
+    status: proposed
+    router: R-S1
+    loopback: 10.79.0.2/32
+    vlans:
+      - {id: 210, name: S1-USUARIOS, subnet: 10.71.10.0/24, gateway: 10.71.10.1}
+      - {id: 220, name: S1-SERVICIOS, subnet: 10.71.20.0/24, gateway: 10.71.20.1}
+      - {id: 230, name: S1-GESTION-INTERNA, subnet: 10.71.30.0/24, gateway: 10.71.30.1}
+  S2:
+    status: reserved
+    router: R-S2
+    loopback: 10.79.0.3/32
+    vlans:
+      - {id: 310, name: S2-USUARIOS, subnet: 10.72.10.0/24, gateway: 10.72.10.1}
+      - {id: 320, name: S2-SERVICIOS, subnet: 10.72.20.0/24, gateway: 10.72.20.1}
+      - {id: 330, name: S2-GESTION-INTERNA, subnet: 10.72.30.0/24, gateway: 10.72.30.1}
+
+wan_links:
+  - id: WAN-PRIMARIA-HQ-S1
+    status: proposed
+    subnet: 10.78.0.0/30
+    ospf_cost: 10
+    a: {router: R-HQ, address: 10.78.0.1/30}
+    b: {router: R-S1, address: 10.78.0.2/30}
+  - id: WAN-RESPALDO-HQ-S1
+    status: proposed
+    subnet: 10.78.0.4/30
+    ospf_cost: 100
+    a: {router: R-HQ, address: 10.78.0.5/30}
+    b: {router: R-S1, address: 10.78.0.6/30}
+
+features_pending_validation:
+  - vlan_8021q
+  - frr_ospf_failover
+  - lacp_switch_endpoints
+  - device_redundancy
+  - mtu_and_kernel_capabilities
+  - telemetry_exporter_api_dashboard
