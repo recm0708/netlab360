@@ -1,5 +1,18 @@
 # NETLAB360 — REANUDAR AQUÍ (checkpoint operativo)
 
+## NUEVO ENSAYO PREPARADO — 13/10/2026 ~11:46 | TODAVÍA NO EJECUTADO
+
+**No sustituye el último hito real de 11:24:** el laboratorio dual-WAN con 30/30 ICMP entre LAN simuladas SÍ fue probado y limpiado. Aún **NO se ha medido** la pérdida durante la transición.
+
+- Se creó `scripts/laboratorio/b2-dualwan-medicion-continua.py` que automatiza el ensayo en un solo proceso: `precheck` / `up`, lanza un hilo para ping `HQ 10.70.10.1 → S1 10.71.10.1` y consulta FIB, espera baseline, activa `fail`, observa respaldo, activa `restore`, observa retorno y realiza `down` en `finally`. Genera `17-b2-convergencia-*.log` y `17-b2-convergencia-*.csv` en `~/netlab360-bootstrap/evidencias/`. Los CSV no se suben automáticamente. **Script no validado ni ejecutado en VM todavía**.
+- Antes de ejecutar, el usuario debe traer nuevos commits `git pull --ff-only`, comprobar sintaxis Python vía `python3 -c "import ast,pathlib; ast.parse(pathlib.Path('scripts/laboratorio/b2-dualwan-medicion-continua.py').read_text())"`, revisar script y precheck; ejecutar **solo una vez** con `python3 scripts/laboratorio/b2-dualwan-medicion-continua.py --snapshot-confirmado` si hora Panamá **anterior a 11:53** el 13/10, para dejar 12:00–12:15 libre para cierre.
+- Seguridad: flujo con `--network none` usando scripts previos, no altera `ens33`; al terminar verificar `sudo docker ps -a`, `sudo ip netns list`, `ip -4 -br addr show ens33`, gateway y servicios. Ante error de cleanup, **NO apagar con recursos residuales**, evaluar logs y down.
+- El ensayo contempla intervalos y sondeos discretos; el primer cambio de FIB detectado es una **aproximación limitada por sondeo**, no el tiempo exacto de convergencia OSPF; valores serán desconocidos hasta salida.
+- Si la prueba no termina con suficiente margen o hay dudas, **no ejecutarla** hoy: el hito de ICMP de tres fases ya está preservado, y el script queda listo para próximo arranque.
+
+---
+
+
 **Última comprobación del usuario:** **2026-10-13 11:24:09, América/Panamá**.  
 **Estado real observado:** **B2-L3 DUAL-WAN y tráfico ICMP bidireccional verificados, topología retirada correctamente.**  
 **Fase general:** S01 **ABIERTA, 42% estimado y documentado** — no es nota oficial.  
