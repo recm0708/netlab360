@@ -1,5 +1,31 @@
 # NETLAB360 — Registro de inicialización de GitHub
 
+## PAUSA OPERATIVA SOLICITADA — 2026-10-13 01:17 Panamá (APAGADO PENDIENTE DE CONFIRMACIÓN)
+
+El usuario indicó que **apagará la VM NETLAB360-Ubuntu-Desktop para descansar** y retomará más tarde el 13/10/2026. Esta entrada es un **plan de pausa**, NO una confirmación de que ya se ejecutó el apagado. Los comandos recomendados para la VM Ubuntu son:
+
+```bash
+cd ~/proyectos/netlab360
+GIT_TERMINAL_PROMPT=0 git pull --ff-only origin main
+git status --short --branch
+sudo docker ps -a
+sudo ip netns list
+ip -4 -br address show ens33
+ip -4 route show default
+systemctl is-active docker ssh open-vm-tools
+sync
+sudo systemctl poweroff
+```
+
+Si `git pull --ff-only` falla, o hay cambios Git no identificados, **revisar antes de apagar y no forzar operaciones Git**. Docker no debería tener contenedores del ensayo después del cleanup v5; verificar y no eliminar recursos ajenos. En VMware esperar hasta **Powered Off**; no usar Power Off forzado con Ubuntu encendido. El corte de SSH durante `poweroff` es esperado.
+
+Al reanudar, encender exclusivamente `NETLAB360-Ubuntu-Desktop` y conectar desde Windows por `ssh netlab360`. Realizar verificación de inicio, mantenimiento preventivo proporcionado al usuario sin alterar configuraciones, `git pull --ff-only`, salud servicios/docker/red/almacenamiento. Leer la sección **ESTADO VIGENTE Y REANUDACIÓN — S01 30%** más abajo: FRRouting v5 YA PASÓ (zebra/ospfd y OSPF local), no repetir smoke v1–v5 por inercia. Próximo desarrollo funcional: topología HQ/S1 con dos WAN aisladas, OSPF Full, failover/restauración y evidencias.
+
+Estado de seguimiento antes de apagar: S01 **~30% estimado**, [#1](https://github.com/recm0708/netlab360/issues/1) ABIERTA; issues #39/#40/#41 cerradas, #42 dual WAN ABIERTA, #12 incidente/observabilidad ABIERTA, #43 auditoría posterior de capturas ABIERTA. Capturas solicitadas se presumen tomadas salvo aviso del usuario; pendientes de revisión visual, no subir tokens, claves ni OVA sin sanitizar.
+
+---
+
+
 ## ESTADO VIGENTE Y REANUDACIÓN — S01 30% ESTIMADO, FRR V5 SUPERADO (2026-10-12 23:57 PANAMÁ)
 
 **LEER ANTES DE CUALQUIER APARTADO HISTÓRICO DE ESTA PÁGINA.** Proyecto privado GitHub `recm0708/netlab360`, rama main; Ubuntu Desktop 26.04.1 LTS en VMware Workstation Pro, VM `netlab360-lab`, usuario `rc-aa-ec`, SSH desde Windows `ssh netlab360`, `ens33=192.168.47.40/24`, gateway `192.168.47.2`. Snapshot `NETLAB360-BASE-HERRAMIENTAS` **confirmado por el usuario**, no volver a pedirlo. No modificar VMnet8, ens33, rutas host ni NetworkManager en laboratorios.
