@@ -1,5 +1,11 @@
 # NETLAB360 — Registro oficial de evidencias recibidas y auditadas visualmente (lote 01)
 
+## PUBLICACIÓN FÍSICA CONFIRMADA — 13/10/2026 16:26
+
+**Los 19 PNG auditados y el manifiesto SHA-256 están ahora dentro de GitHub** en `evidencias/capturas/B1_B2_lote01/`. El usuario verificó `CAPTURAS_VERIFICADAS: 19`, SHA256 internos, hizo commit/rebase/push exitosos, y GitHub confirmó [commit `d62d33b`](https://github.com/recm0708/netlab360/commit/d62d33b3dd5876a795ca2dadc47b2a1474c86104) con exactamente 19 PNG + 1 CSV. Los párrafos históricos que mencionan “todavía NO subidos” son anteriores al commit y quedan superados por esta actualización. La issue #43 sigue abierta solo para nuevas capturas y futuras auditorías.
+
+---
+
 **Corte:** 13/10/2026, primera recepción de archivos B1/B2. **Auditoría:** efectuada sobre los **19 PNG efectivamente adjuntados a la conversación**, no sobre imágenes presuntas.  
 **Responsables del contenido:** capturas reales de terminal suministradas por el usuario. **Estado:** recepción y cotejo visual documentados; este archivo es el **registro oficial** dentro del repositorio.  
 **IMPORTANTE:** los **bytes PNG todavía NO se han incorporado físicamente a GitHub**. Se preparó externamente un ZIP con los 19 originales sin modificación visual, usando nombres normalizados, un manifiesto CSV con hashes completos SHA-256 y una copia de este registro. El usuario deberá importarlo al repositorio para archivo binario duradero. **Nunca inventar enlaces de blobs no subidos**.
