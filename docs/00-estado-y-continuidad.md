@@ -1,5 +1,27 @@
 # NETLAB360 — Registro de inicialización de GitHub
 
+## SESIÓN EN CURSO — 2026-10-13 10:42 PANAMÁ | CIERRE OBLIGATORIO ANTES DE 12:15
+
+**Última instrucción del usuario:** continuar NETLAB360 ahora, pero salir a las **12:15 p. m.**; todo debe quedar sincronizado en GitHub y Ubuntu/Windows apagados. Se creó un aviso puntual para **12:00**, momento en que **DEJAMOS DE INICIAR PRUEBAS**. Esta nota **NO significa que el equipo haya sido encendido o que los comandos hayan sido ejecutados**, porque aún faltan sus salidas del arranque de hoy.
+
+### Estado técnico y próximos pasos inmediatos
+- Último éxito comprobado (12/10, 23:57): **smoke FRR v5** con zebra/ospfd reales, OSPF router-id 10.79.0.254, `RESULTADO_SMOKE_FRR_V5=0`, limpieza completa. Evitar repetir smoke v1–v5.
+- S01 **30% estimado**, issues #39/#40/#41 cerradas, #1 S01 abierta, #42 FRR dual-WAN abierta, #12 incidente/alarma abierta, #43 auditoría de capturas abierta. Snapshot `NETLAB360-BASE-HERRAMIENTAS` confirmado por operador; no crear otro por rutina.
+- Primera tarea usuario: encender exclusivamente `NETLAB360-Ubuntu-Desktop`, conectar `ssh netlab360`, confirmar `ens33=192.168.47.40/24`, gateway `.2`, servicios `docker/ssh/open-vm-tools` activos, sin Docker/netns residuales, recursos/kernel.
+- Mantenimiento tras reanudar: `sudo apt update`, `apt list --upgradable`, `sudo apt-get -s upgrade`, `sudo dpkg --audit`, verificar `/run/reboot-required`; revisar resultados antes de hacer upgrade/reiniciar.
+- Sincronizar al inicio con `cd ~/proyectos/netlab360 && GIT_TERMINAL_PROMPT=0 git pull --ff-only origin main && git status --short --branch`. **Nuevo documento ya versionado, no ejecutado:** `docs/arquitectura/04-b2-dualwan-plan-ejecucion-segura.md`, que define 2 contenedores R-HQ/S1 `--network none`, pares veth WAN-P/WAN-B, OSPF área0, costos10/100, validación y rollback sin tocar `ens33`.
+- Si el precheck/actualización se completa sin incidentes y queda tiempo, preparar orquestador aislado `up/status/down` y prueba WAN; no declarar resultados hasta ejecutar y recibir logs.
+
+### Rutina cierre 12:00–12:15 (prioritaria, aunque prueba incompleta)
+1. **12:00:** terminar nuevas pruebas. Si alguna falla, salvar logs; no intentar corregir y reejecutar contra reloj. Actualizar issues #42/#1, reporte y esta continuidad con resultados confirmados.
+2. **Hasta 12:10:** actualizar commits GitHub (asistente vía conector si procede), luego usuario `git pull --ff-only origin main`, verificar `git status -sb`, `git rev-parse HEAD`, `git rev-parse origin/main`; confirmar sin cambios locales y misma revisión. Preservar logs locales; los PNG se presumen tomados y se auditarán después, NO se han subido automáticamente.
+3. Comprobar `sudo docker ps -a`, `sudo ip netns list`, `ip -4 -br addr show ens33`, `ip -4 route show default`, `systemctl is-active docker ssh open-vm-tools`. Si hubo recursos aislados de B2, ejecutar su **rollback específico** antes de apagar; no forzar eliminación de recursos ajenos.
+4. **12:10–12:15:** `sync; sudo systemctl poweroff`, comprobar estado **Powered Off** de VMware Workstation y solo después apagar Windows desde Inicio. Cierre SSH normal durante poweroff. **No prometer apagado remoto hecho por el asistente.**
+5. Si trabajo no concluido a las 12:00, continuar otro día desde el hito exacto documentado y no aumentar 30% sin nueva evidencia aceptada.
+
+---
+
+
 ## PAUSA OPERATIVA SOLICITADA — 2026-10-13 01:17 Panamá (APAGADO PENDIENTE DE CONFIRMACIÓN)
 
 El usuario indicó que **apagará la VM NETLAB360-Ubuntu-Desktop para descansar** y retomará más tarde el 13/10/2026. Esta entrada es un **plan de pausa**, NO una confirmación de que ya se ejecutó el apagado. Los comandos recomendados para la VM Ubuntu son:
