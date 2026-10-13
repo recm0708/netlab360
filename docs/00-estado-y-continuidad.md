@@ -1,5 +1,20 @@
 # NETLAB360 — Registro de inicialización de GitHub
 
+## CHECKPOINT VIGENTE — 13/10/2026 18:36 PANAMÁ | PROMETHEUS ALERTAS FIRING/RESUELTAS, LABORATORIO LIMPIO
+
+**Este bloque prevalece sobre todas las notas anteriores que indican reglas no cargadas o puertos ocupados.** El usuario completó pasos 70–80 y compartió salida real de las tres terminales: **Prometheus 3.7.0 cargó tres reglas** después de generar glob absoluto en `scripts/observabilidad/ejecutar-prometheus-local.sh`; `/api/v1/rules` mostró 1 grupo, 3 reglas, scrape `up=1`, `B3_REGLAS_LISTAS=SI`, código0, evidencia **B3_11**. `b2-dualwan-ospf.sh up` obtuvo doble OSPF Full y ruta WAN-P (código0); `fail` conmutó a WAN-B (`RESULTADO_FAIL_PROMETHEUS=0`). A **18:33:35** Prometheus devolvió **`NETLAB360WANPrimaryDown=firing` (warning)** y **`NETLAB360WanBackupSelected=firing` (info)**; evidencia **B3_12**. A **18:34:09** `restore` retornó WAN-P (`RESULTADO_RESTORE_PROMETHEUS=0`); a 18:34:36 API `ALERTAS_WAN_ACTIVAS=0`, `ALERTAS_WAN_RESUELTAS=SI`, evidencia **B3_13**.
+
+**Cierre confirmado:** `down` B2 código 0, exporter topology OFFLINE, Terminales 1 y 2 detenidas con Ctrl+C limpio. Postcheck **18:36:03** (**B3_14**) `PUERTO_9090_LIBRE:SI`, `PUERTO_9108_LIBRE:SI`, Docker sin contenedores, netns vacíos, `ens33 UP 192.168.47.40/24`, GW `192.168.47.2`, docker/ssh/open-vm-tools activos. `git status` `## main...origin/main` limpio a la hora de esa comprobación **antes** de nuevos commits de documentación. **No volver a ejecutar WAN-P fail/restore por segunda vez** para constatar Prometheus: está demostrado. No hay servicios de laboratorio que dejar corriendo según postcheck.
+
+**Estado de capturas:** B3_05–B3_14 y B3_09_FINAL se presumen **tomadas** por regla del usuario, con resultados de consola del nuevo grupo B3_11–14 inspeccionados textualmente; **sus PNG todavía NO han sido enviados/auditados visualmente ni subidos**. Los 24 PNG originales de lotes 01/02 B1/B2/B3 sí fueron recibidos, visualmente auditados y físicamente publicados GitHub; no confundir conjuntos.
+
+**Resultado y límites:** matriz [`docs/control/01-avance-s01.md`](control/01-avance-s01.md) ahora **53% técnico estimado** (B3 10/15) tras alertas reales. **No Alertmanager ni receptores/notificaciones**, ni dashboard NOC multisitio integral ni SLI/SLO formal. S01 issue #1 permanece ABIERTA; no afirmar aceptación 11/11. [Bitácora B3 Prometheus firing/recuperación](sesiones/2026-10-13-b3-prometheus-alertas-firing-y-resolucion-verificadas.md). [Plan de recuperación desde semana 9](control/02-plan-recuperacion-semana-09.md): prioridad siguiente **B2-L2 VLAN/trunk/ACL y cliente-servicio realmente extremo a extremo**, seguido de LACP/dual-NIC, IaC OpenTofu/Ansible, IA evaluada y entregables/release/OVA, con consulta docente en #36. Evitar seguir sobreoptimizando OSPF y Prometheus.
+
+**Para retomar en Ubuntu:** `cd ~/proyectos/netlab360; GIT_TERMINAL_PROMPT=0 git pull --ff-only origin main; git status --short --branch; sudo docker ps -a; sudo ip netns list; ip -4 -br addr show ens33; ip -4 route show default`. Verificar que los archivos `.gitignore`, scripts y docs nuevos bajaron. **NO** tocar `ens33`, VMnet8, default gateway, NetworkManager ni la red de administración. **No** ejecutar cierre/apagado automáticamente; solo si el usuario lo solicita. Entregar varios pasos de una vez por preferencia expresa del usuario.
+
+---
+
+
 ## PUNTO MÁS RECIENTE — 13/10/2026 18:15 PANAMÁ | PROMETHEUS REAL SCRAPE OK, REGLAS AÚN NO CARGADAS
 
 **PREVALECE SOBRE NOTAS DE 17:45:** Usuario envió salida de pasos 60–69. A 18:08:52 postcheck final `B3_09_FINAL` demostró **PUERTO_9108_LIBRE: SI**, Docker/netns vacíos, `ens33 192.168.47.40/24`, GW `192.168.47.2`, docker/ssh/open-vm-tools activos. `git pull` llevó a `a1390bb`, nueva `.gitignore` ignoró `__pycache__`, `GIT_SINCRONIZADO: SI` antes de los commits posteriores.
