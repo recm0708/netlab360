@@ -1,5 +1,8 @@
 # NETLAB360 — Planificación semestral
 
+> **Actualización de B3 (13/10/2026 15:29 Panamá):** la VM se reanudó y mantuvo con red/servicios correctos. El usuario recuperó CSV B2 (76/76 ICMP y `CSV_INTEGRIDAD: OK`) y generó realmente un **resumen JSON y métricas `.prom` retrospectivas**, `B3_ANALISIS_RETROSPECTIVO=OK`. Se versionó un nuevo prototipo de [API y panel NOC histórico](servicios/noc-historico/README.md) basado en Python estándar, **pendiente de validación y ejecución en Ubuntu**. **Prometheus, telemetría en vivo, alertas y dashboard NOC dinámico NO están desplegados.** [Bitácora B3-01](docs/sesiones/2026-10-13-b3-linea-base-retrospectiva-validada.md). S01 se mantiene en **43% estimado**, no se incrementa por preparar código.
+
+
 > **Estado verificado (2026-10-13, 11:52 Panamá):** S01 **abierta, ~43% estimado** (ver [control ponderado](docs/control/01-avance-s01.md)); base Ubuntu/VMware, VMnet8/SSH y snapshot completos; IPAM draft validado, ensayo VLAN L2 completado y **FRRouting v5 con zebra/ospfd/OSPF local funcionando**, además de **dos routers R-HQ/R-S1 con OSPF Full por WAN principal/respaldo, conmutación y restauración de FIB comprobadas**. Se comprobaron **30/30 pings ICMP entre interfaces LAN simuladas de los routers, en ambos sentidos y tres estados**, más **76/76 sondeos ICMP** durante ensayo temporal de interrupción/restauración (cero pérdidas observadas, sin garantizar continuidad entre muestras). Faltan medición durante la conmutación, clientes/servicios reales, métricas/alertas, API/dashboard, IaC del laboratorio e IA.
 
 **Título académico:** Diseño e implementación de una plataforma virtualizada para la automatización, observabilidad y diagnóstico inteligente de redes empresariales multisede.
