@@ -1,7 +1,7 @@
 # NETLAB360 — Control de avance y cierre de Fase S01
 
-**Corte técnico actualizado:** 2026-10-13 11:52 (Panamá, UTC−05:00).  
-**Versión de seguimiento:** v1.3. **Fase:** [#1](https://github.com/recm0708/netlab360/issues/1) **ABIERTA**.  
+**Corte técnico actualizado:** 2026-10-13 16:09 (Panamá, UTC−05:00).  
+**Versión de seguimiento:** v1.4. **Fase:** [#1](https://github.com/recm0708/netlab360/issues/1) **ABIERTA**.  
 **Estado oficial de la rúbrica:** pendiente de ratificación con la docente. **Porcentaje provisional; no es nota, auditoría de cumplimiento oficial ni valor calculado por GitHub.**
 
 ## 1. Estimación ponderada del avance S01
@@ -12,17 +12,17 @@ Los pesos se asignan a las capacidades mínimas que aparecen en la issue #1 y en
 |---|---:|---:|---|
 | B0: infraestructura, SSH operativo, herramientas, snapshot y rollback base | 12 | **12** | VMware/Ubuntu/Docker/Git, VMnet8/IP fija, SSH con clave, reinicio y snapshot; cuestiones de hardening final en #38 pendientes |
 | B1: topología e IPAM/SoT inicial | 10 | **8** | YAML draft validado, 3 sedes/9 VLAN/2 WAN previstas, sin solapamientos; diseño no desplegado/aprobado |
-| B2-L2: VLAN/trunks/ACL de primer dominio | 10 | **3** | prueba VLAN 110/120 y retorno con Linux bridge; sin trunk real, inter-VLAN, ACL ni integración entre sedes |
+| B2-L2: VLAN/trunks/ACL de primer dominio | 10 | **3** | smoke VLAN 110 y retorno Linux bridge, código 0; **auditoría B2_L2_01 halló 3/3 recibidos bajo rótulo de prueba negativa**, por lo que el aislamiento debe cotejarse con log/script antes de usar esa imagen como prueba; sin trunk, inter-VLAN, ACL ni integración |
 | B2-L3: FRR/OSPF, WAN primaria/respaldo, convergencia y failover | 18 | **17** | FRR/OSPF Full, FIB WAN-P→WAN-B→WAN-P, 30/30 ICMP bidireccional; ensayo posterior de sondeos continuos con 76/76 ICMP, 0 pérdidas observadas incluso en 30 muestras de transición; primer cambio FIB detectado a 0.186 s y retorno a 10.147 s (sondeo, NO tiempo exacto de convergencia). Falta servicio/hosts reales |
 | Redundancia LAG/LACP, equipos, servidor dual-NIC | 10 | **0** | sin laboratorio implementado |
 | IaC y compliance (OpenTofu + Ansible) | 10 | **1** | herramientas instaladas y operativas, sin automatización de la topología NETLAB360 |
-| B3: telemetría/API/dashboard/alertas, eventos reales | 15 | **0** | no implementados |
+| B3: telemetría/API/dashboard/alertas, eventos reales | 15 | **2** | JSON histórico 76/76 y exposición .prom validados; servicio API HTTP solo lectura en 127.0.0.1:8765 probado (200/404/405), panel NOC histórico inspeccionado visualmente B3_03, postcheck 16:09:58 puerto libre. SIN telemetría viva, Prometheus scrape, incidentes ni alarmas |
 | B4: anomalías/datos/IA evaluada | 5 | **0** | no existe prototipo con evaluación |
 | Documentación académica, evidencia, CI/PR y regresión | 5 | **2** | bitácoras/logs/commits y capturas tomadas; faltan informe APA, manual, auditoría visual de PNG, CI, regresión integrada |
 | B5: release y OVA sanitizada importada, SHA-256 | 5 | **0** | sin exportación, reimportación ni tag/release demostrable |
-| **TOTAL** | **100** | **43** | **43% estimado, 57% pendiente** |
+| **TOTAL** | **100** | **45** | **45% estimado, 55% pendiente** |
 
-**Criterio de cálculo:** total de puntos acreditados / 100. Del 30% al 40% al comprobar doble OSPF Full/FIB/retorno, y **del 40% al 42%** por +2 puntos B2-L3 al acreditar **30/30 paquetes ICMP entre las LAN simuladas** en tres estados; **del 42% al 43%** por +1 punto al observar un nuevo ensayo de 76/76 sondeos ICMP de ~0.37 s, con 0 pérdidas observadas incluso durante dos ventanas de cambio y tiempos de primera observación de FIB (0.186/10.147 s), sin prometer exactitud temporal ni disponibilidad absoluta entre sondas. No confundir este indicador de avance físico-técnico con el cumplimiento **binario** del checklist de aceptación de #1: en la fecha de corte todavía no están cerrados los 11 criterios integrales de esa issue. Los avances parciales de cada dominio no cierran su criterio integral.
+**Criterio de cálculo:** total de puntos acreditados / 100. Del 30% al 40% al comprobar doble OSPF Full/FIB/retorno, y **del 40% al 42%** por +2 puntos B2-L3 al acreditar **30/30 paquetes ICMP entre las LAN simuladas** en tres estados; **del 42% al 43%** por +1 punto al observar un nuevo ensayo de 76/76 sondeos ICMP de ~0.37 s, con 0 pérdidas observadas incluso durante dos ventanas de cambio y tiempos de primera observación de FIB (0.186/10.147 s), sin prometer exactitud temporal ni disponibilidad absoluta entre sondas. Se acredita **del 43% al 45% (+2 puntos B3)** tras comprobar realmente el JSON/.prom retrospectivo, servidor HTTP local, API, HTML visual (B3_03) y liberación final del puerto. Son componentes de prototipo histórico, **no** telemetría WAN en vivo, ni recolección Prometheus ni alertas. No confundir este indicador de avance físico-técnico con el cumplimiento **binario** del checklist de aceptación de #1: en la fecha de corte todavía no están cerrados los 11 criterios integrales de esa issue. Los avances parciales de cada dominio no cierran su criterio integral.
 
 ## 2. Estado de GitHub
 
@@ -41,7 +41,7 @@ Consulta del repositorio `recm0708/netlab360` realizada el 12/10/2026: **43 issu
 - [#38 — Ubuntu y SSH seguro](https://github.com/recm0708/netlab360/issues/38): acceso por clave funciona; hardening/revisión y documentación formal pendientes.
 - [#10 — inventario de recursos](https://github.com/recm0708/netlab360/issues/10) y [#34 — matriz versiones](https://github.com/recm0708/netlab360/issues/34): información sustantiva comprobada, quedan verificaciones de compatibilidad y cierre formal.
 
-**Auditoría nueva:** [#43 — revisión visual de evidencias PNG](https://github.com/recm0708/netlab360/issues/43): abierta hasta recibir el lote y verificar su correspondencia con logs, fecha/hostname, comandos y resultados.
+**Auditoría nueva:** [#43 — revisión visual de evidencias PNG](https://github.com/recm0708/netlab360/issues/43): ABIERTA: 19 PNG B1/B2 + 5 B3 **recibidos y visualmente auditados** con hashes; binarios aún pendientes de commit y push; restan otras evidencias y cierre.
 
 **No cerrar todavía:** [#1 S01](https://github.com/recm0708/netlab360/issues/1), #11, #12, #42, #38, #10, #34. Ninguna issue posterior de S02–S08 se cierra por resultados de smoke local.
 
