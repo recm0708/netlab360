@@ -1,5 +1,36 @@
 # NETLAB360 — Registro de inicialización de GitHub
 
+## REANUDACIÓN PRIORITARIA — 2026-10-12, 19:08 Panamá: FRR SMOKE V1 FALLÓ, LIMPIEZA CORRECTA
+
+**ESTADO VIGENTE. Leer antes de registros antiguos.** NETLAB360 S01 abierta: Ubuntu/Docker/Git/SSH sanos, IPAM B1 OK, B2-L2 VLAN aislada funcionando y restaurada, FRRouting 10.7.1 descargado, **pero el primer intento de arrancar zebra y ospfd falló**. **NO ejecutar otra vez el mismo script hasta diagnosticar.** Sin adyacencias OSPF ni WAN creada.
+
+- **Entorno:** VMware Workstation Pro, Ubuntu Desktop 26.04.1 LTS, `netlab360-lab`, usuario `rc-aa-ec`, 8 vCPU/16 GB RAM, disco 160GB, interfaz protegida `ens33 192.168.47.40/24` gateway `192.168.47.2`. Windows PowerShell `ssh netlab360` con llave Ed25519. Herramientas Docker 29.9.0/Compose 5.6.0, OpenTofu 1.13.1, Ansible Core 2.20.1, Node 24.21.0, GitHub CLI 2.102.0.
+- **Snapshot:** `NETLAB360-BASE-HERRAMIENTAS` **CONFIRMADO EXPLÍCITAMENTE POR USUARIO** desde la primera indicación; issue [#41](https://github.com/recm0708/netlab360/issues/41) **cerrada**. No volver a preguntar por su existencia. No publicar snapshot/OVA con tokens.
+- **Resultados previos válidos:** IPAM propuesto 3 sedes (S2 reservada), 9 VLAN, 2 WAN; no colisiones entre las 14 redes virtuales y 3 rutas/subredes activas; módulos Linux L2 presentes. B2-L2 bridge/VLAN 110: 3/3 ping, VLAN 120 aislamiento, restauración 3/3; cleanup, exit 0. Capturas B1_01, B1_02, B2_L2_01 entregadas.
+- **Imagen FRR:** `quay.io/frrouting/frr:10.7.1` amd64 digest `sha256:e995beaa50fdc9edb35eadcfefa29b7f062cc06f2b812613789b68fa541554d2`. Entrypoint tini -> docker-start -> watchfrr; daemons de fábrica `ospfd=no`. Precheck del entrypoint 18:47 exit 0. Capturas B2_03 (2 partes) correctas.
+- **Prueba smoke fallida 19:07:27:** `bash scripts/laboratorio/b2-frr-smoke-aislado.sh --snapshot-confirmado` creó directorio temporal con `zebra=yes`, `ospfd=yes` y `frr.conf` mínimo, inició contenedor aislado Docker `--network none`, `--cap-drop ALL` y solo NET_ADMIN/NET_RAW. `vtysh -c 'show ip ospf'` no respondió en 10 intentos: `RESULTADO_SMOKE_FRR=4` (`RESULTADO_LANZAMIENTO_FRR=4`). **No se conocen aún causa precisa ni logs internos**: container `--rm` pudo salir antes y Docker no retuvo diagnóstico. Captura `B2_04_Arranque_Zebra_OSPFD.png` muestra FALLO; nombrar `B2_04_Diagnostico_Arranque_FRR.png`, no prueba de éxito.
+- **Postcheck demostrado:** `sudo docker ps -a` vacío, `sudo ip netns list` vacío, `ens33=.40/24`, gateway `.2`, docker/ssh/open-vm-tools activos, Git `## main...origin/main` limpio al final (antes de nuevos commits remotos).
+- **Evidencia:** `~/netlab360-bootstrap/evidencias/09-b2-frr-smoke-20261012-190727.log`; bitácora `docs/sesiones/2026-10-12-smoke-frr-primer-intento.md`; issue [#42](https://github.com/recm0708/netlab360/issues/42) con diagnóstico, [#12](https://github.com/recm0708/netlab360/issues/12) incidente observable pendiente, #1 S01 abierta.
+- **Hipótesis no verificadas:** el script guardó `daemons` y `frr.conf` como propiedad del usuario normal del host en vez de UID100/GID101 frr, modo 0644; además `--cap-drop ALL` + NET_ADMIN/NET_RAW podría ser insuficiente. La documentación oficial FRR especifica permisos apropiados. NO declarar causa raíz sin pruebas.
+- **Siguiente script versionado (SOLO LECTURA, sin iniciar FRR):** `scripts/diagnostico/diagnosticar-smoke-frr-b2.sh`. Inspecciona `frrcommon.sh`, `docker-start`, `/etc/frr/daemons`, propiedades y capacidades del proceso de inspección, en contenedor temporal sin red. Logs bajo `~/netlab360-bootstrap/evidencias/10-b2-frr-diagnostico-estatico-*.log`.
+- **PRÓXIMAS ÓRDENES:**
+  ```bash
+  cd ~/proyectos/netlab360
+  GIT_TERMINAL_PROMPT=0 git pull --ff-only origin main
+  bash -n scripts/diagnostico/diagnosticar-smoke-frr-b2.sh
+  bash scripts/diagnostico/diagnosticar-smoke-frr-b2.sh
+  echo "RESULTADO_DIAGNOSTICO_ESTATICO=$?"
+  sudo docker ps -a
+  sudo ip netns list
+  ip -4 -br address show ens33
+  git status --short --branch
+  ```
+- Tras salida, **editar prueba v2** con ficheros de propiedad y permisos FRR correctos, capacidades justificadas y persistencia de logs/estado de contenedor (no borrar antes de diagnosticar). Revisar script y volver a probar una sola vez. Mantener SSH y VMnet8 intactos, luego avanzar a OSPF dual WAN y observabilidad.
+- **Regla usuario:** registrar hitos/errors en repo e issues, dar varios pasos por mensaje, no hacer pausas cada microtarea, sí checkpoint tras avance sustancial. Capturas deben mostrar fecha/hostname/comando/salida real. No subir tokens/códigos/credenciales.
+
+---
+
+
 ## ANCLA ACTUAL — 12/10/2026 18:49 Panamá: FRR precheck OK y snapshot CONFIRMADO
 
 **Leer esta sección primero en cualquier conversación nueva.** Usuario confirmó personalmente que creó al principio el snapshot `NETLAB360-BASE-HERRAMIENTAS`; issue #41 de preparación cerrada. **No pedir otra vez snapshot.** Los apagados `sudo systemctl poweroff` y los arranques por SSH también están comprobados. No hay routers FRR ni enlaces WAN ejecutados.
