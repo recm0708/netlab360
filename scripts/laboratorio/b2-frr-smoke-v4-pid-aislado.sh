@@ -72,7 +72,7 @@ sudo docker run --rm --network none --cap-drop ALL \
 if grep -q '^zebra=' "$TMP/daemons"; then
   sed -i 's/^zebra=.*/zebra=yes/' "$TMP/daemons"
 else
-  printf 'zebra=yes\\n' >> "$TMP/daemons"
+  printf 'zebra=yes\n' >> "$TMP/daemons"
 fi
 sed -i 's/^ospfd=.*/ospfd=yes/' "$TMP/daemons"
 cat > "$TMP/frr.conf" <<'EOF'
