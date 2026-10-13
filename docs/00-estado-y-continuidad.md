@@ -1,5 +1,32 @@
 # NETLAB360 — Registro de inicialización de GitHub
 
+## ESTADO INMEDIATO — 2026-10-12, 22:35 Panamá | SMOKE FRR V2 FALLÓ ANTES DE DOCKER; CORREGIDO EN GITHUB
+
+**Leer primero al retomar.** Usuario quiere actualización periódica de GitHub/issues y comandos agrupados con instrucciones **exactas desde/hasta** para cada captura.
+
+- **Último resultado observado:** `b2-frr-smoke-v2-con-logs.sh --snapshot-confirmado` a las 20:48:17 preparó archivos `/tmp/nl360-smoke-v2.*/daemons` con UID/GID 100:101 y modo `640`, `frr.conf` UID/GID 100:102 modo `660`, directorio modo 755. El script ejecutó luego `grep` como usuario Linux `rc-aa-ec`; **`Permiso denegado`** al intentar leer `daemons`. Resultado `RESULTADO_SMOKE_FRR_V2=2`, ejecución =2. **No llegó a `docker run -d`: NO es una prueba fallida del arranque de FRR en v2.** Estado posprueba: 0 contenedores, 0 namespaces, `ens33 192.168.47.40/24`, default `192.168.47.2`, Docker/SSH/open-vm-tools activos, Git limpio.
+- **Evidencia local:** `~/netlab360-bootstrap/evidencias/11-b2-frr-smoke-v2-20261012-204817.log`. Consulta del mismo log a las 22:35:00, no nuevo ensayo. Usuario **tomó** captura `B2_06_Diagnostico_FRR_V2.png` desde `INICIO CAPTURA B2_06` a `FIN CAPTURA B2_06`. El PNG no consta subido al repositorio. Bitácora `docs/sesiones/2026-10-12-smoke-frr-v2-error-permisos.md`.
+- **Corrección YA COMPROMETIDA EN GITHUB:** dentro de `scripts/laboratorio/b2-frr-smoke-v2-con-logs.sh`, leer `daemons` con `sudo grep` después de `chown/chmod`, sin cambiar los permisos seguros. El script corregido **NO SE HA EJECUTADO TODAVÍA**. No repetir versión anterior. Issue [#42](https://github.com/recm0708/netlab360/issues/42) actualizada, abierta; #12 incidente observable abierta; snapshot VMware `NETLAB360-BASE-HERRAMIENTAS` confirmado anteriormente por el usuario; #41 cerrado.
+- **Próximos comandos para la VM:** 
+  ```bash
+  cd ~/proyectos/netlab360
+  GIT_TERMINAL_PROMPT=0 git pull --ff-only origin main
+  bash -n scripts/laboratorio/b2-frr-smoke-v2-con-logs.sh
+  grep -n 'sudo grep' scripts/laboratorio/b2-frr-smoke-v2-con-logs.sh
+  bash scripts/laboratorio/b2-frr-smoke-v2-con-logs.sh --snapshot-confirmado
+  echo "RESULTADO_FRR_V2_CORREGIDO=$?"
+  sudo docker ps -a
+  sudo ip netns list
+  ip -4 -br addr show ens33
+  ip -4 route show default
+  ```
+  Ejecutar solo una vez; si Docker/vtysh falla, registrar logs retenidos, no repetir ciegamente.
+- **Captura siguiente:** generar vista SIN `clear` delimitada `========== INICIO CAPTURA B2_07 ==========` hasta `========== FIN CAPTURA B2_07 ==========`, con fecha, hostname, log 11-b2 más reciente, líneas del éxito/error y del postcheck. Nombrar `B2_07_Arranque_FRR_Verificado.png` **solo si el log confirma arranque y resultado 0**; en caso contrario `B2_07_Diagnostico_Arranque_FRR.png`. Fecha de consulta diferente a fecha original del ensayo, conservar ambas.
+- **Estado de fondo:** Ubuntu Desktop 26.04.1 LTS en VMware, VM `netlab360-lab`, gestión fija .40, GitHub CLI autenticado como recm0708; Docker 29.9.0/Compose5.6, OpenTofu1.13.1, Ansible Core2.20, Node24; B1 IPAM/switch L2 probado, VLAN 110 3/3 ping, VLAN 120 aislada, restauración 3/3. FRR `quay.io/frrouting/frr:10.7.1` amd64 descargado, digest `sha256:e995beaa50fdc9edb35eadcfefa29b7f062cc06f2b812613789b68fa541554d2`. OSPF routers, doble WAN, failover, dashboard y alarmas todavía pendientes. No cambiar `ens33`, NetworkManager ni rutas del host; no guardar tokens/OVA en GitHub.
+
+---
+
+
 ## ÚLTIMO CHECKPOINT — 12/10/2026 19:59: B2_05 LISTA Y SMOKE FRR V2 REVISADO
 
 **Leer este bloque primero al retomar**: S01 sigue abierta; #42 es la issue activa para iniciar zebra/ospfd. El snapshot VMware `NETLAB360-BASE-HERRAMIENTAS` fue confirmado por usuario y #41 quedó cerrada. La red de administración fija `ens33 192.168.47.40/24`, gateway `.2`, no debe tocarse.
