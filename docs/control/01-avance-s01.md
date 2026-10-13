@@ -1,7 +1,7 @@
 # NETLAB360 — Control de avance y cierre de Fase S01
 
-**Corte técnico actualizado:** 2026-10-13 11:24 (Panamá, UTC−05:00).  
-**Versión de seguimiento:** v1.2. **Fase:** [#1](https://github.com/recm0708/netlab360/issues/1) **ABIERTA**.  
+**Corte técnico actualizado:** 2026-10-13 11:52 (Panamá, UTC−05:00).  
+**Versión de seguimiento:** v1.3. **Fase:** [#1](https://github.com/recm0708/netlab360/issues/1) **ABIERTA**.  
 **Estado oficial de la rúbrica:** pendiente de ratificación con la docente. **Porcentaje provisional; no es nota, auditoría de cumplimiento oficial ni valor calculado por GitHub.**
 
 ## 1. Estimación ponderada del avance S01
@@ -13,16 +13,16 @@ Los pesos se asignan a las capacidades mínimas que aparecen en la issue #1 y en
 | B0: infraestructura, SSH operativo, herramientas, snapshot y rollback base | 12 | **12** | VMware/Ubuntu/Docker/Git, VMnet8/IP fija, SSH con clave, reinicio y snapshot; cuestiones de hardening final en #38 pendientes |
 | B1: topología e IPAM/SoT inicial | 10 | **8** | YAML draft validado, 3 sedes/9 VLAN/2 WAN previstas, sin solapamientos; diseño no desplegado/aprobado |
 | B2-L2: VLAN/trunks/ACL de primer dominio | 10 | **3** | prueba VLAN 110/120 y retorno con Linux bridge; sin trunk real, inter-VLAN, ACL ni integración entre sedes |
-| B2-L3: FRR/OSPF, WAN primaria/respaldo, convergencia y failover | 18 | **16** | FRR v5, dos routers y dos Full/OSPF por router, FIB WAN-P→WAN-B→WAN-P; 13/10 30/30 ICMP entre interfaces LAN simuladas, 0% pérdida en 3 estados, rollback; faltan pérdida/transitorio medidos durante fallo y hosts/servicios reales |
+| B2-L3: FRR/OSPF, WAN primaria/respaldo, convergencia y failover | 18 | **17** | FRR/OSPF Full, FIB WAN-P→WAN-B→WAN-P, 30/30 ICMP bidireccional; ensayo posterior de sondeos continuos con 76/76 ICMP, 0 pérdidas observadas incluso en 30 muestras de transición; primer cambio FIB detectado a 0.186 s y retorno a 10.147 s (sondeo, NO tiempo exacto de convergencia). Falta servicio/hosts reales |
 | Redundancia LAG/LACP, equipos, servidor dual-NIC | 10 | **0** | sin laboratorio implementado |
 | IaC y compliance (OpenTofu + Ansible) | 10 | **1** | herramientas instaladas y operativas, sin automatización de la topología NETLAB360 |
 | B3: telemetría/API/dashboard/alertas, eventos reales | 15 | **0** | no implementados |
 | B4: anomalías/datos/IA evaluada | 5 | **0** | no existe prototipo con evaluación |
 | Documentación académica, evidencia, CI/PR y regresión | 5 | **2** | bitácoras/logs/commits y capturas tomadas; faltan informe APA, manual, auditoría visual de PNG, CI, regresión integrada |
 | B5: release y OVA sanitizada importada, SHA-256 | 5 | **0** | sin exportación, reimportación ni tag/release demostrable |
-| **TOTAL** | **100** | **42** | **42% estimado, 58% pendiente** |
+| **TOTAL** | **100** | **43** | **43% estimado, 57% pendiente** |
 
-**Criterio de cálculo:** total de puntos acreditados / 100. Del 30% al 40% al comprobar doble OSPF Full/FIB/retorno, y **del 40% al 42%** por +2 puntos B2-L3 al acreditar **30/30 paquetes ICMP entre las LAN simuladas** en tres estados; no acreditar medición de pérdidas durante la transición. No confundir este indicador de avance físico-técnico con el cumplimiento **binario** del checklist de aceptación de #1: en la fecha de corte todavía no están cerrados los 11 criterios integrales de esa issue. Los avances parciales de cada dominio no cierran su criterio integral.
+**Criterio de cálculo:** total de puntos acreditados / 100. Del 30% al 40% al comprobar doble OSPF Full/FIB/retorno, y **del 40% al 42%** por +2 puntos B2-L3 al acreditar **30/30 paquetes ICMP entre las LAN simuladas** en tres estados; **del 42% al 43%** por +1 punto al observar un nuevo ensayo de 76/76 sondeos ICMP de ~0.37 s, con 0 pérdidas observadas incluso durante dos ventanas de cambio y tiempos de primera observación de FIB (0.186/10.147 s), sin prometer exactitud temporal ni disponibilidad absoluta entre sondas. No confundir este indicador de avance físico-técnico con el cumplimiento **binario** del checklist de aceptación de #1: en la fecha de corte todavía no están cerrados los 11 criterios integrales de esa issue. Los avances parciales de cada dominio no cierran su criterio integral.
 
 ## 2. Estado de GitHub
 
@@ -68,6 +68,8 @@ Consulta del repositorio `recm0708/netlab360` realizada el 12/10/2026: **43 issu
 El usuario indica que **todas las capturas solicitadas se asumen tomadas**, salvo que señale una excepción. Posteriormente remitirá PNG para revisión; **no afirmar que están visualmente aprobadas o subidas a GitHub**. Cada nueva captura debe tener nombre exacto, comando de presentación sin `clear`, marcadores `INICIO CAPTURA`/`FIN CAPTURA`, fecha/hostname y resultado literal. Preservar históricos fallidos como diagnóstico, no como prueba de éxito.
 
 Nunca publicar tokens, claves privadas, credenciales, carpetas `~/.config/gh/hosts.yml` ni OVA no sanitizada. No alterar la red de gestión `ens33 192.168.47.40/24` ni VMware VMnet8 desde la topología de laboratorio.
+
+**Evidencia adicional de medición temporal por sondeo:** [bitácora 76/76 ICMP durante dos transiciones](../sesiones/2026-10-13-b2-convergencia-icmp-continuo-verificada.md), archivos locales `17-b2-convergencia-20261013-115141.log/.csv`, captura B2_16 tomada según protocolo del usuario, aún sin revisión gráfica.
 
 **Evidencia ICMP de LAN simulada validada:** [bitácora de 30/30 pings](../sesiones/2026-10-13-b2-lan-icmp-tres-estados-verificado.md); logs locales `16-b2-lan-ping-{normal,respaldo,restaurada}-20261013-*.log`, captura B2_15 tomada según convención, auditoría visual pendiente. 
 
