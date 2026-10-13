@@ -1,5 +1,16 @@
 # NETLAB360 — Registro de inicialización de GitHub
 
+## SUBHITO 13/10/2026 10:57 PANAMÁ — PRECHECK DUALWAN OK; DESPLIEGUE AÚN NO EJECUTADO
+
+**Estado más reciente, prevalece sobre entrada 10:47:** `bash -n scripts/laboratorio/b2-dualwan-ospf.sh` => `RESULTADO_SINTAXIS=0`; `bash scripts/laboratorio/b2-dualwan-ospf.sh precheck` => `RESULTADO_B2_DUALWAN_PRECHECK=0` y `RESULTADO_PRECHECK_DUALWAN=0`; validador IPAM B1 OK y imagen FRR 10.7.1 amd64 en caché. `sudo docker ps -a` sin contenedores, `sudo ip netns list` sin namespaces; `ens33=192.168.47.40/24` con default `192.168.47.2`; Git limpio hasta commit `ba809da` **antes del commit remoto posterior**. Log local `~/netlab360-bootstrap/evidencias/15-b2-dualwan-precheck-20261013-105732.log`; captura `B2_11_Precheck_Despliegue_DualWAN.png` asumida tomada, pendiente de revisión visual #43.
+
+**Actualización remota posterior al precheck:** `scripts/laboratorio/b2-dualwan-ospf.sh` reforzado para verificar la **ruta real** `dev wan-b` después de failover y `dev wan-p` después de restauración, sondeos acotados. Usuario debe hacer `git pull --ff-only` y `bash -n` ANTES de `up`; no declarar implementada una prueba no realizada. El comando `up` incluye su propio precheck y, si falla durante inicialización, registra diagnóstico y limpia recursos marcados propios. Mantener fail/restore condicionados a `up` correcto, 2 vecinos Full y rutas OSPF. Una vez acabada la prueba invocar `down`, verificar cero contenedores/netns y ens33 intacta.
+
+**Ventana de cierre:** iniciar preservación de logs/commits/issues y sincronización a las 12:00, `sync; sudo systemctl poweroff` aproximadamente 12:10, Windows apagado antes 12:15. No iniciar pruebas nuevas desde 12:00. El usuario pidió **más pasos agrupados por respuesta**, idealmente 7–9 pasos, sin saturar ni perder puntos de corte seguros. Todas las capturas indicadas se asumen tomadas salvo negativa expresa del usuario, pero no revisadas/subidas.
+
+---
+
+
 ## REANUDACIÓN VERIFICADA — 2026-10-13 10:47 PANAMÁ | B2 ORQUESTADOR PREPARADO, NO EJECUTADO
 
 **PREVALECE SOBRE NOTAS DE LAS 10:42:** Usuario arrancó VM `NETLAB360-Ubuntu-Desktop`, desde PowerShell `ssh netlab360` con llave/contraseña de la clave, Ubuntu 26.04.1 LTS, kernel `7.0.0-38-generic`, hostname `netlab360-lab`, uptime 3min, red `ens33 192.168.47.40/24` y default `192.168.47.2`, servicios docker/ssh/open-vm-tools activos, **sin contenedores y sin netns**.
