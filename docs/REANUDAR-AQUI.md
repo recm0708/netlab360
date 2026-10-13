@@ -1,5 +1,18 @@
 # NETLAB360 — REANUDAR AQUÍ (checkpoint operativo)
 
+## PUNTO DE REANUDACIÓN ACTUAL — 2026-10-13 15:29 PANAMÁ | B3-01 DATOS OK; API NOC NO PROBADA
+
+**PREVALECE SOBRE LOS REGISTROS DE LAS 11:52 O ANTERIORES:** el usuario volvió a encender `NETLAB360-Ubuntu-Desktop`; SSH `netlab360-lab` OK, Ubuntu 26.04.1 kernel 7.0.0-38; `ens33 UP 192.168.47.40/24`, GW `192.168.47.2` inalterados; servicios docker/ssh/open-vm-tools activos, Docker/netns vacíos; raíz 9% ocupada, memoria disponible 13Gi; APT upgrade/autoclean 0 paquetes, dpkg audit limpio, no reboot. `git pull --ff-only` a `c53f0a6`, estado Git limpio/sincronizado **ANTES DE LOS NUEVOS COMMITS DE ESTA RESPUESTA**.
+
+**B3-01 RESULTADO REAL COMPROBADO:** CSV de `~/netlab360-bootstrap/evidencias/17-b2-convergencia-20261013-115141.csv` existe, **76 filas/76 recibidas/0 pérdidas**, `CSV_INTEGRIDAD: OK`. Se ejecutó el generador de línea base y dio **`B3_ANALISIS_RETROSPECTIVO=OK`**; produjo realmente `~/netlab360-bootstrap/evidencias/b3-linea-base/b3-resumen-convergencia.json` (1.3 KiB), `b3-metricas-retrospectivas.prom` (~653 B). Fases: normal 14, cambio_respaldo 1, respaldo 16, cambio_principal 29, restaurada 16. Rutas FIB normal WAN-P, respaldo WAN-B, retorno wan-b:27/wan-p:2, restaurada WAN-P. `python3 -m json.tool` y formato Prom revisados. Captura **`B3_01_Linea_Base_Observabilidad_ICMP.png`** a 15:28 considerada tomada, aún NO auditada visualmente/subida (#43).
+
+**Nuevo componente versionado, TODAVÍA NO EJECUTADO EN VM:** `servicios/noc-historico/app.py` y [su manual](../servicios/noc-historico/README.md). Python biblioteca estándar, `--check`, `--serve` solamente `127.0.0.1:8765`, HTML con banner **HISTÓRICO / NO EN VIVO**, API `/api/v1/baseline`, salud `/healthz` y `/metrics` de exposición estática. No es Prometheus instalado ni telemetría dinámica. Siguiente acción: `git pull --ff-only`, `ast.parse`, `--check`, ejecutar servidor en foreground de primera terminal SSH, `curl` desde segunda terminal, túnel Windows `ssh -N -L 8765:127.0.0.1:8765 netlab360` para comprobar panel, Ctrl+C túnel/servidor y postcheck. **No declarar API funcional hasta recibir resultados reales**.
+
+**GitHub:** nueva [bitácora B3](sesiones/2026-10-13-b3-linea-base-retrospectiva-validada.md), issues #1/#12/#15/#20/#21/#35/#43 actualizadas, todas abiertas. S01 **43% estimado**, sin puntos B3 adicionales hasta probar aplicación. No reejecutar B2 FRR/ping por costumbre; no modificar ens33/VMnet8, no subir credenciales, logs CSV ni PNG sin revisar y permiso. Evidencias nuevas al probar app: B3_02 API y métricas históricas; B3_03 panel NOC histórico, indicadas en manual. **La línea base NO refleja datos en vivo ni alarma real**.
+
+---
+
+
 ## ACTUALIZACIÓN DEFINITIVA DEL ENSAYO — 13/10/2026 11:52 | MEDICIÓN REAL TERMINADA
 
 **El mensaje anterior de que el ensayo está “NO EJECUTADO” es histórico.** El usuario SÍ ejecutó `scripts/laboratorio/b2-dualwan-medicion-continua.py --snapshot-confirmado` entre 11:51:41–11:52:40 Panamá; `RESULTADO_EJECUCION_CONVERGENCIA=0`. El nuevo registro [2026-10-13-b2-convergencia-icmp-continuo-verificada.md](sesiones/2026-10-13-b2-convergencia-icmp-continuo-verificada.md) es la referencia autorizada:
