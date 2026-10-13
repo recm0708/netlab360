@@ -1,5 +1,18 @@
 # NETLAB360 — REANUDAR AQUÍ (checkpoint operativo)
 
+## PUNTO VIGENTE — 13/10/2026 DESPUÉS DE 16:09 | 24 PNG AUDITADOS; GIT COMMIT BINARIOS PENDIENTE
+
+**Este bloque tiene prioridad sobre anotaciones antiguas dentro del archivo.** Se recibieron **19 PNG B1/B2** y **5 PNG B3**, y se inspeccionaron visualmente los **24 archivos reales**. Inventarios con SHA-256: [lote 01](evidencias/01-auditoria-visual-b1-b2-2026-10-13.md), [lote 02](evidencias/02-auditoria-visual-b3-2026-10-13.md). B3_03 partes 1/2 prueban interfaz NOC **HISTÓRICA** visible desde Windows mediante túnel SSH con 76/76 datos CSV y tabla FIB; B3_02 prueba JSON/metrics. **No confundir prototipo histórico con Prometheus real, exporter live, eventos o alarmas operativas.** S01 ahora **45% técnico estimado** (+2 puntos B3 prototipo validado) y 55% restante; issue #1 y B3 issues abiertas.
+
+**B3_04 evidencia auténtica pero INTERMEDIA:** a 15:52:24 `PUERTO_8765_LIBRE: NO`; a las **16:09:58 el usuario aportó nueva salida terminal `PUERTO_8765_LIBRE: SI`**, con Docker y netns vacíos y ens33 192.168.47.40/24 GW 192.168.47.2 intactos. Ese estado posterior corrige el pendiente técnico de puerto, pero no hay PNG de la consulta posterior; opcional nueva captura solo de lectura `B3_04_Postcheck_Servicio_NOC_Final.png`. La tercera PowerShell probablemente mantiene túnel Windows `ssh -N -L 8765:127.0.0.1:8765 netlab360`; cerrar con Ctrl+C en dicha PowerShell, sin matar procesos de Ubuntu.
+
+**Bloqueo Git REPRODUCIDO POR USUARIO:** el ZIP B1/B2 se transfirió, SHA-256 ZIP e internos OK, `CAPTURAS_VERIFICADAS:19`; se hizo `git add evidencias/capturas/B1_B2_lote01`, pero `git commit` falló `Identidad del autor desconocido` (sin `user.name/user.email`). El `git push` siguiente imprimió `Everything up-to-date`: **NINGUNO de esos PNG está commiteado ni subido aún**. `git status` muestra 20 archivos staged (19 imágenes + MANIFIESTO_SHA256.csv). **Siguiente paso:** `git config --local user.name "recm0708"`, `git config --local user.email "220997176+recm0708@users.noreply.github.com"` (identidad noreply derivada de cuenta autenticada); comprobar `git diff --cached --stat`, `git commit`, luego `git fetch origin main; git rebase origin/main; git push origin main`, verificar repo remoto. No `reset --hard`, no `push --force`. Si rebase falla, detenerse y reportar salida; no resolver a ciegas.
+
+**Lote B3 pendiente de transferencia:** se preparó ZIP `NETLAB360_Evidencias_Oficiales_B3_Lote02_2026-10-13.zip`, 5 PNG sin modificar, SHA256 ZIP `747edb1eeee115e9bcbd68c64d50c043692b0015d76781416fd74da13921695e`, CSV interno con `canonico` + `sha256`, carpeta `capturas/`. Tras pasar ZIP a Ubuntu, validarlo antes de extraer a `evidencias/capturas/B3_lote02/` y hacer un segundo commit/push. NO declarar binarios publicados hasta comprobar los commits reales. Issue #43 ABIERTA, no repetir experimentos B2.
+
+---
+
+
 ## ACTUALIZACIÓN PRIORITARIA — 13/10/2026 (DESPUÉS DE 15:52) | LOTE 01 DE 19 PNG AUDITADO; API B3 PROBADA, POSTCHECK PENDIENTE
 
 **ESTA SECCIÓN PREVALECE SOBRE LAS MENCIONES HISTÓRICAS "CAPTURAS SUPUESTAS" EN DOCUMENTOS ANTERIORES.**
