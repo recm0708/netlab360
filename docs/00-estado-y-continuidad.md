@@ -1,5 +1,20 @@
 # NETLAB360 — Registro de inicialización de GitHub
 
+## HITO CONCLUÍDO — 13/10/2026 11:11 PANAMÁ | DOS ROUTERS OSPF, FAILOVER Y RETORNO OK
+
+**Este estado sustituye planes previos que indicaban dual-WAN no desplegada.** La VM `netlab360-lab` está encendida y administrable por SSH `ssh netlab360`; gestión fija `ens33=192.168.47.40/24`, gateway `192.168.47.2`. **El despliegue dual-WAN se ejecutó Y SE LIMPIÓ**, por lo que **ahora no hay contenedores ni namespaces B2 activos**.
+
+**Prueba REAL aportada por usuario en log completo 415 líneas:** `bash scripts/laboratorio/b2-dualwan-ospf.sh up --snapshot-confirmado` a las 11:03:57, `RESULTADO_DESPLIEGUE=0`, dos routers FRRouting con veth WAN-P/WAN-B, **2 vecinos OSPF Full por router**, `RESULTADO_STATUS=0`; HQ aprendió `10.71.10.0/24` vía `wan-p` `[110/20]`. A 11:09:30 el comando `fail` bajó `wan-p` y comprobó ruta `via 10.78.0.6 dev wan-b`, `[110/110]`, `CONMUTACION_WAN_B: OK (sondeo 1)`, `RESULTADO_FAILOVER=0`. A 11:10:11 `restore` devolvió `wan-p` `via 10.78.0.2`, `RESTAURACION_WAN_P: OK (sondeo 11)`, `RESULTADO_RESTAURACION=0`; sondas no son mediciones precisas de segundos. `down` a 11:11:08 dio `RESULTADO_DOWN=0`, `RESULTADO_B2_LIMPIEZA=0`, Docker/netns vacíos, `ens33` y GW intactos, servicios activos, Git limpio en local **antes de siguientes commits del asistente**.
+
+**Documentos:** bitácora técnica completa `docs/sesiones/2026-10-13-b2-dualwan-ospf-failover-resultado.md`; control de porcentaje actualizado `docs/control/01-avance-s01.md` con **S01 40% estimado** (anterior 30%). #42 y #12 actualizadas, ambas **ABIERTAS**; #1 sigue abierta. Capturas `B2_12_Vecinos_y_Rutas_OSPF_DualWAN.png`, `B2_13_Failover_WAN_Principal_a_Respaldo.png`, `B2_14_Restauracion_WAN_Principal.png` se presumen tomadas por instrucción del usuario; no auditadas visualmente, issue #43.
+
+**Próxima prueba nueva, NO EJECUTADA:** `scripts/laboratorio/b2-dualwan-ping-lan.sh` ya versionado en GitHub para comprobar **ping bidireccional real entre LAN dummy** (`10.70.10.1` ↔ `10.71.10.1`) en estados `normal`, `respaldo`, `restaurada`, con comprobación de `ip route get` esperado y log `16-b2-lan-ping-*.log`. Requiere `up` previo, luego `fail`, luego `restore` y finalmente `down`. No hacer `ping -I lan0` (forzaría una interfaz dummy); usar `-I dirección_local` ya implementado en el script. **Ningún ping LAN ha sido ejecutado en esta sesión todavía**. Si falla: guardar logs y ejecutar rollback `down`, no repetir automáticamente. No confundir rutas FIB con entrega real de paquetes.
+
+**Horario fijo del usuario:** cesar nuevas pruebas a las **12:00** Panamá; sincronizar issues/docs/GitHub y verificar todos los recursos antes 12:10; `sync; sudo systemctl poweroff` y VMware Powered Off, luego Windows apagado antes 12:15. Si falta margen, NO iniciar ensayo. No modificar VMnet8/ens33 ni IP/rutas anfitrión; snapshot VMware base ya confirmado.
+
+---
+
+
 ## SUBHITO 13/10/2026 10:57 PANAMÁ — PRECHECK DUALWAN OK; DESPLIEGUE AÚN NO EJECUTADO
 
 **Estado más reciente, prevalece sobre entrada 10:47:** `bash -n scripts/laboratorio/b2-dualwan-ospf.sh` => `RESULTADO_SINTAXIS=0`; `bash scripts/laboratorio/b2-dualwan-ospf.sh precheck` => `RESULTADO_B2_DUALWAN_PRECHECK=0` y `RESULTADO_PRECHECK_DUALWAN=0`; validador IPAM B1 OK y imagen FRR 10.7.1 amd64 en caché. `sudo docker ps -a` sin contenedores, `sudo ip netns list` sin namespaces; `ens33=192.168.47.40/24` con default `192.168.47.2`; Git limpio hasta commit `ba809da` **antes del commit remoto posterior**. Log local `~/netlab360-bootstrap/evidencias/15-b2-dualwan-precheck-20261013-105732.log`; captura `B2_11_Precheck_Despliegue_DualWAN.png` asumida tomada, pendiente de revisión visual #43.
