@@ -1,5 +1,31 @@
 # NETLAB360 — Registro de inicialización de GitHub
 
+## ÚLTIMO CHECKPOINT — 12/10/2026 19:59: B2_05 LISTA Y SMOKE FRR V2 REVISADO
+
+**Leer este bloque primero al retomar**: S01 sigue abierta; #42 es la issue activa para iniciar zebra/ospfd. El snapshot VMware `NETLAB360-BASE-HERRAMIENTAS` fue confirmado por usuario y #41 quedó cerrada. La red de administración fija `ens33 192.168.47.40/24`, gateway `.2`, no debe tocarse.
+
+- Resultado previo: `diagnosticar-smoke-frr-b2.sh` terminó `RESULTADO_DIAGNOSTICO_ESTATICO=0` el 12/10 19:21:41. El registro local `~/netlab360-bootstrap/evidencias/10-b2-frr-diagnostico-estatico-20261012-192141.log` confirma propietarios `frr:frr` y nota de permisos FRR; contenedores y namespaces 0. **El smoke v1 falló con código 4; no repetirlo.**
+- **Evidencia:** el usuario confirmó la captura `B2_05_Diagnostico_Estatico_FRR.png`, con delimitadores `INICIO CAPTURA B2_05` y `FIN CAPTURA B2_05`, fecha de consulta 19:59:38. **El PNG no está aún en GitHub ni ha sido recibido en esta intervención**, solamente su salida textual. Se evitó repetir la prueba; fecha original del diagnóstico 19:21:41.
+- **Script v2 revisado y actualizado** en `scripts/laboratorio/b2-frr-smoke-v2-con-logs.sh`: copia `daemons` desde imagen oficial FRR 10.7.1 amd64, activa `ospfd=yes`, crea `frr.conf` con propiedades UID/GID FRR, usa un contenedor temporal `--network none` con capacidades enumeradas necesarias (incluida `SETPCAP`), guarda `docker inspect`, procesos y logs *antes* de limpieza, compara IP/rutas de gestión. `SYS_ADMIN` sigue presente y es capacidad muy poderosa; mantener solo VM lab aislada, no usar `--privileged` ni `--network host`. **No se ha ejecutado v2.**
+- **Próximos comandos:**
+  ```bash
+  cd ~/proyectos/netlab360
+  GIT_TERMINAL_PROMPT=0 git pull --ff-only origin main
+  bash -n scripts/laboratorio/b2-frr-smoke-v2-con-logs.sh
+  bash scripts/laboratorio/b2-frr-smoke-v2-con-logs.sh --snapshot-confirmado
+  echo "RESULTADO_FRR_V2=$?"
+  sudo docker ps -a
+  sudo ip netns list
+  ip -4 -br address show ens33
+  ip -4 route show default
+  ```
+- **Próxima evidencia si éxito:** imagen `B2_06_Arranque_FRR_V2_Exitoso.png` de una vista del log con marcadores INICIO/FIN y fecha original, `VTYSH_DISPONIBLE: SI`, resultado `show ip ospf`, `PRUEBA_SMOKE_FRR_V2: OK`, `RESULTADO_SMOKE_FRR_V2=0`. Si falla, capturar como `B2_06_Diagnostico_FRR_V2.png` solo con código de fallo, estado y logs; no presentar éxito imaginado.
+- Actualizar #42 y esta ancla tras el ensayo v2. **Sin OSPF, WAN ni dashboard activos todavía**. No descargar otros componentes ni reiniciar VM por este diagnóstico.
+- Normativa capturas: siempre comandos de vista delimitados INICIO/FIN, nombre PNG, desde-hasta exactos y condición de validez. Véase `docs/sesiones/2026-10-12-diagnostico-estatico-frr-y-protocolo-capturas.md`. No ejecutar `clear`; no subir tokens GH.
+
+---
+
+
 ## REANUDACIÓN PRIORITARIA — 2026-10-12, 19:08 Panamá: FRR SMOKE V1 FALLÓ, LIMPIEZA CORRECTA
 
 **ESTADO VIGENTE. Leer antes de registros antiguos.** NETLAB360 S01 abierta: Ubuntu/Docker/Git/SSH sanos, IPAM B1 OK, B2-L2 VLAN aislada funcionando y restaurada, FRRouting 10.7.1 descargado, **pero el primer intento de arrancar zebra y ospfd falló**. **NO ejecutar otra vez el mismo script hasta diagnosticar.** Sin adyacencias OSPF ni WAN creada.
