@@ -203,6 +203,8 @@ def main():
         if STATE.is_file() and STATE.read_text().strip() == "netlab360-b2-dualwan":
             rc = orchestrate("down")
             log(f"LIMPIEZA_FINAL={'OK' if rc == 0 else 'ERROR'}")
+            if rc != 0:
+                raise RuntimeError('Se requiere revisar la limpieza B2 antes del apagado')
         else:
             log("LIMPIEZA_FINAL: orquestador sin marcador activo")
         check_management()
