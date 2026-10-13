@@ -43,3 +43,26 @@ El diagnóstico de las 19:21 ya terminó, no repetirlo. Ejecutar una vista corta
 ## Próximo ensayo
 
 Versionar **smoke v2** que utilice propiedad de archivos FRR apropiada, evite `--rm` hasta guardar `docker inspect`/`docker logs`, capture estado de `vtysh`, limpie únicamente recursos etiquetados NETLAB360 y preserve `ens33` y las rutas del anfitrión. Ejecutarlo una sola vez tras `git pull` y verificación de sintaxis. El snapshot VMware `NETLAB360-BASE-HERRAMIENTAS` está confirmado por usuario; issue #41 cerrada.
+
+## Comando de evidencia corta B2_05 (12/10/2026)
+
+**Objetivo:** generar una única vista de pantalla a partir del log existente de 19:21; NO es una nueva ejecución. Se captura **desde** `========== INICIO CAPTURA B2_05 ==========` **hasta** `========== FIN CAPTURA B2_05 ==========`. Nombre: `B2_05_Diagnostico_Estatico_FRR.png`.
+
+```bash
+cd ~/proyectos/netlab360
+LOG="$HOME/netlab360-bootstrap/evidencias/10-b2-frr-diagnostico-estatico-20261012-192141.log"
+echo "========== INICIO CAPTURA B2_05 =========="
+date -Is
+hostname
+echo "========== ARCHIVOS Y PERMISOS =========="
+grep -A 5 -- "--- ficheros y propiedades ---" "$LOG"
+echo "========== REQUISITOS DE FRR =========="
+grep -A 8 -- "# ATTENTION:" "$LOG"
+echo "========== RESULTADO HISTORICO =========="
+grep -E "DIAGNOSTICO_ESTATICO:|LOG_LOCAL:" "$LOG"
+echo "========== FIN CAPTURA B2_05 =========="
+```
+
+**Nota:** `date -Is` muestra la hora de la consulta del log, no de la ejecución del experimento original (19:21). La captura debe conservar identificable la ruta del log histórico; no presentar la fecha de consulta como si fuera fecha del test.
+
+**Precaución v2:** el archivo `scripts/laboratorio/b2-frr-smoke-v2-con-logs.sh` ya está versionado pero no ejecutado. Antes de ejecutarlo, revisar el conjunto de capacidades solicitadas (`SYS_ADMIN`, `DAC_OVERRIDE`, etc.) para minimizar privilegios. No usar `--privileged` ni ejecutar prueba sin revisar seguridad y rollback.
