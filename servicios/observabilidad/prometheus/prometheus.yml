@@ -1,0 +1,21 @@
+# NETLAB360 B3 — Prometheus real local en Ubuntu (NO es Docker host network).
+# Iniciar Prometheus como proceso de usuario con --web.listen-address=127.0.0.1:9090.
+# El exporter vive en el mismo host: 127.0.0.1:9108. 
+# NO arrancar otro exporter: reutilizar el puerto 9108 cuando se prepare el próximo ensayo.
+global:
+  scrape_interval: 2s
+  scrape_timeout: 1s
+  evaluation_interval: 2s
+
+rule_files:
+  - servicios/observabilidad/prometheus/rules/*.yml
+
+scrape_configs:
+  - job_name: netlab360-frr-live
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - 127.0.0.1:9108
+        labels:
+          site: netlab360-lab
+          context: b3
