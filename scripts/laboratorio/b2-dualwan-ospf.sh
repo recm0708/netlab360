@@ -35,6 +35,16 @@ ns() {
   [[ "$p" =~ ^[1-9][0-9]*$ ]] || { echo "ERROR: PID no válido"; return 3; }
   sudo nsenter -t "$p" -n "$@"
 }
+state_guard() {
+  [[ -f "$STATE/.nl360-owner" ]] || {
+    echo "ERROR: no existe marcador de propiedad B2. No modificar ni borrar recursos."
+    return 3
+  }
+  [[ "$(cat "$STATE/.nl360-owner")" == netlab360-b2-dualwan ]] || {
+    echo "ERROR: marcador B2 inesperado. No modificar ni borrar recursos."
+    return 3
+  }
+}
 host_guard() {
   ip -4 -o addr show dev ens33 | grep -q '192\.168\.47\.40/24' ||
     { echo "ERROR: dirección ens33 inesperada"; return 3; }
@@ -161,6 +171,7 @@ cleanup() {
     if ip link show "$l" >/dev/null 2>&1; then sudo ip link delete "$l" || code=8; fi
   done
   if [[ -f "$STATE/.nl360-owner" ]]; then
+    state_guard || return 9
     cmp -s "$STATE/ens33-before" <(ip -4 -o addr show dev ens33) ||
       { echo "ALERTA: ens33 cambió"; code=9; }
     cmp -s "$STATE/routes-before" <(ip -4 route show table main) ||
@@ -186,6 +197,8 @@ on_exit() {
   exit "$rc"
 }
 trap on_exit EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
 
 case "$ACTION" in
   precheck) precheck ;;
@@ -215,6 +228,7 @@ case "$ACTION" in
     echo "RESULTADO_B2_DUALWAN_UP=0"
     ;;
   status)
+    state_guard
     for c in "$HQ" "$S1"; do
       running "$c" || { echo "ERROR: router $c no está corriendo"; exit 3; }
       echo "========== $c =========="
@@ -227,6 +241,7 @@ case "$ACTION" in
     host_guard
     ;;
   fail)
+    state_guard
     running "$HQ" && running "$S1"
     date -Is; ns "$HQ" ip link set wan-p down
     echo "WAN_PRIMARIA: DOWN"
@@ -236,6 +251,7 @@ case "$ACTION" in
     host_guard
     ;;
   restore)
+    state_guard
     running "$HQ" && running "$S1"
     date -Is; ns "$HQ" ip link set wan-p up
     echo "WAN_PRIMARIA: UP"
@@ -244,6 +260,6 @@ case "$ACTION" in
     ns "$HQ" ip -4 route get 10.71.10.1
     host_guard
     ;;
-  down) cleanup; host_guard ;;
+  down) state_guard; cleanup; host_guard ;;
 esac
 echo "RESULTADO_COMANDO_B2_DUALWAN=0"
