@@ -1,5 +1,14 @@
 # NETLAB360 — Registro de inicialización de GitHub
 
+## ÚLTIMO CHECKPOINT — 13/10/2026 11:52 PANAMÁ | CONVERGENCIA B2 COMPLETADA; CIERRE INMEDIATO
+
+**PUNTO ÚNICO DE CONTINUIDAD:** [`docs/REANUDAR-AQUI.md`](REANUDAR-AQUI.md). El usuario ejecutó con éxito `scripts/laboratorio/b2-dualwan-medicion-continua.py --snapshot-confirmado` a 11:51:41–11:52:40, `RESULTADO_EJECUCION_CONVERGENCIA=0`, 76/76 sondas ICMP exitosas (0 pérdidas observadas), OSPF dual WAN-P→WAN-B→WAN-P. Primer sondeo FIB vio respaldo **0.186s** tras inicio de acción, principal restaurada **10.147s** tras inicio (aproximaciones de sondeo ~0.37s, NO convergencia OSPF exacta). `LIMPIEZA_FINAL=OK`, `CONTENEDORES_B2_RESIDUALES=0`, Docker/netns vacíos y `ens33 192.168.47.40/24`/GW `192.168.47.2` preservados. Logs/CSV locales `17-b2-convergencia-20261013-115141.{log,csv}`, captura B2_16 asumida tomada, auditoría PNG pendiente #43. [Bitácora](sesiones/2026-10-13-b2-convergencia-icmp-continuo-verificada.md).
+
+**S01 ahora 43% técnico estimado, 57% pendiente** ([matriz](control/01-avance-s01.md)), #1/#12/#42/#43/#35 ABIERTAS. Éxito parcial de red **no equivale** a entrega del MVP completo. **Usuario solicitó cerrar SIN ESPERAR A LAS 12:00:** no iniciar pruebas; hacer `git pull --ff-only origin main`, revisar Git limpio/HEAD=origin/main, Docker/netns vacíos, red/servicios, `sync; sudo systemctl poweroff`, esperar VMware Powered Off y luego apagar Windows. **No consta apagado completado todavía.** Los registros locales/PNG no están subidos automáticamente; sus resultados se documentaron en GitHub. No repetir pruebas de hoy.
+
+---
+
+
 ## PUNTO ÚNICO DE REANUDACIÓN — 2026-10-13 11:24 PANAMÁ | S01 42% | B2-L3 ICMP 30/30
 
 **AL RETOMAR, LEER PRIMERO:** [`docs/REANUDAR-AQUI.md`](REANUDAR-AQUI.md), que contiene checklist de resultados probados, rutas exactas de logs, criterios pendientes, links a issues, comandos de sincronización y cierre de las 12:00–12:15. Este checkpoint **supera los encabezados antiguos** de este archivo que indicaban “ping pendiente” o “dual-WAN no ejecutado”.
