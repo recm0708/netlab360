@@ -1,5 +1,8 @@
 # NETLAB360 — Planificación semestral
 
+> **Corte B3 verificado — 13/10/2026 16:09 Panamá:** la API Python y el panel NOC **HISTÓRICO / NO EN VIVO** funcionaron en la VM; `GET /`, `/healthz`, `/api/v1/baseline` y `/metrics` respondieron 200, y el navegador quedó documentado mediante **dos PNG realmente recibidos e inspeccionados** (`B3_03` partes 1/2). Hubo postcheck intermedio 15:52 con puerto 8765 ocupado y **postcheck posterior 16:09:58 con puerto libre**. Se recibieron y auditaron **24 PNG (19 B1/B2 + 5 B3)**; [lote 01](docs/evidencias/01-auditoria-visual-b1-b2-2026-10-13.md) / [lote 02](docs/evidencias/02-auditoria-visual-b3-2026-10-13.md). **Los 19 archivos B1/B2 están staged en Ubuntu pero NO subidos**, pues el commit falló por identidad Git; los 5 B3 siguen empaquetados, todavía no importados. **S01 ~45% estimado** ([matriz](docs/control/01-avance-s01.md)); SIN Prometheus ni monitoreo/alarma WAN en vivo. Prioridad inmediata: corregir identidad Git solo en repo, commit/rebase/push de evidencias y empezar instrumentación viva tras revisión.
+
+
 > **Actualización de B3 (13/10/2026 15:29 Panamá):** la VM se reanudó y mantuvo con red/servicios correctos. El usuario recuperó CSV B2 (76/76 ICMP y `CSV_INTEGRIDAD: OK`) y generó realmente un **resumen JSON y métricas `.prom` retrospectivas**, `B3_ANALISIS_RETROSPECTIVO=OK`. Se versionó un nuevo prototipo de [API y panel NOC histórico](servicios/noc-historico/README.md) basado en Python estándar, **pendiente de validación y ejecución en Ubuntu**. **Prometheus, telemetría en vivo, alertas y dashboard NOC dinámico NO están desplegados.** [Bitácora B3-01](docs/sesiones/2026-10-13-b3-linea-base-retrospectiva-validada.md). S01 se mantiene en **43% estimado**, no se incrementa por preparar código.
 
 
