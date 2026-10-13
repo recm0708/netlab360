@@ -1,0 +1,34 @@
+# NETLAB360: alertas evaluables por Prometheus, no vinculadas aún a Alertmanager.
+groups:
+  - name: netlab360-wan
+    interval: 2s
+    rules:
+      - alert: NETLAB360WANPrimaryDown
+        expr: (netlab360_live_wan_primary_admin_up == 0) and on() (netlab360_live_source_up == 1)
+        for: 4s
+        labels:
+          severity: warning
+          context: laboratorio
+        annotations:
+          summary: WAN principal de HQ administrativamente caída
+          description: El exporter observa wan-p DOWN; verificar ruta de respaldo.
+
+      - alert: NETLAB360ExporterUnavailable
+        expr: up{job="netlab360-frr-live"} == 0
+        for: 10s
+        labels:
+          severity: warning
+          context: laboratorio
+        annotations:
+          summary: Scrape del exporter NETLAB360 sin respuesta
+          description: Verificar puerto 9108, servidor Python y fuente de telemetría.
+
+      - alert: NETLAB360WanBackupSelected
+        expr: (netlab360_live_wan_selected{link="wan-b"} == 1) and on() (netlab360_live_source_up == 1)
+        for: 4s
+        labels:
+          severity: info
+          context: laboratorio
+        annotations:
+          summary: WAN de respaldo seleccionada por FIB de HQ
+          description: La ruta hacia la LAN S1 utiliza la interfaz wan-b.
