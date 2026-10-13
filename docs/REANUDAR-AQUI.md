@@ -1,5 +1,18 @@
 # NETLAB360 — REANUDAR AQUÍ (checkpoint operativo)
 
+## ACTUALIZACIÓN PRIORITARIA — 2026-10-13 ~16:40 PANAMÁ | B3 LIVE PRECHECK FALLÓ POR BUG, NO FALTAN PROGRAMAS
+
+**Último usuario aportó logs completos de Terminales 1–3; este bloque prevalece sobre anteriores promesas de exporter live.** `git pull` llevó VM a `9defd03` antes de nuevas correcciones. `ast.parse` de `servicios/observabilidad/live_exporter.py` era OK, pero `python3 ... --check` devolvió **`B3_LIVE_PREFLIGHT=ERROR`, `B3_TOPOLOGIA=DEGRADED`, rc=4** al interpretar Docker `error: no such object: nl360-b2-r-hq` en minúsculas como fallo real, cuando era el estado esperado de routers apagados. El código comparaba `"No such object"` con mayúscula. Por el error, `--serve` no abrió puerto `9108`, y `curl: (7) Failed to connect` / túnel Windows `channel ... Connection refused` son consecuencias, **NO falta de programas ni paquetes**.
+
+A las **16:40:11** el usuario ejecutó realmente **un precheck B2 exitoso y un `up --snapshot-confirmado` EXITOSO**: `OSPF_DUAL_FULL: SI`, **dos adyacencias Full por router**, ruta a LAN S1 vía `wan-p`, `RESULTADO_UP_B3=0`. A las **16:40:39** ejecutó otro precheck/`up`, que devolvió `ERROR: recursos previos B2` / RC=3 porque YA había routers desplegados; esta negativa **ES CORRECTA**. **No consta `down` ni `fail/restore` posterior**: NO ejecutar `up` de nuevo ni destruir redes a ciegas; primero verificar `sudo docker ps -a --filter name=nl360-b2-`, marcador `~/netlab360-bootstrap/estado-b2-dualwan/.nl360-owner`, `bash scripts/laboratorio/b2-dualwan-ospf.sh status` solo si marker válido, ens33 y rutas. Evitar túnel Windows hasta tener `ss` mostrando LISTEN en 9108. `sudo` rechazó un primer intento de contraseña en Terminal 2; no representa software faltante.
+
+**Fix YA EN GITHUB, AÚN NO PROBADO POR USUARIO:** [`servicios/observabilidad/live_exporter.py`](../servicios/observabilidad/live_exporter.py) compara salida `.lower()` y distingue contenedor ausente (OFFLINE) de error real de permiso/daemon (DEGRADED); [pruebas unitarias](../tests/test_b3_live_exporter.py) con 5 casos; [auditoría preventiva solo lectura](../scripts/validacion/auditar-dependencias-netlab360.sh); [matriz de herramientas](operaciones/matriz-dependencias-s01.md); [bitácora de fallos y guardas](sesiones/2026-10-13-b3-exporter-preflight-docker-case.md). Primer paso: pull seguro + `bash -n`, `python3 -m unittest discover -s tests -p test_b3_live_exporter.py -v`, `sudo -v`, `bash scripts/validacion/auditar-dependencias-netlab360.sh`, `python3 servicios/observabilidad/live_exporter.py --check`. **No subir puntos del S01 45% solo por fix.**
+
+**Captura B3_05 de intento fallido:** terminal mostró `curl` al puerto sin servidor. Si el usuario la capturó, registrar como `B3_05_Diagnostico_Exporter_No_Escucha.png` y no como éxito. **NO pedir repetir despliegue para la captura**; completar ensayos B3 live con el nuevo código y capturas de éxito después. Git del usuario estaba limpio `9defd03` a las 16:40; tras commits nuevos remoto está por delante, requiere pull.
+
+---
+
+
 ## CHECKPOINT ACTUAL — 13/10/2026 16:26+, EVIDENCIAS COMPLETADAS Y EXPORTER B3 LIVE PREPARADO
 
 **PREVALECE SOBRE LAS NOTAS ANTERIORES QUE DECIAN QUE LOS PNG NO ESTABAN SUBIDOS.**
