@@ -26,7 +26,7 @@ Los pesos se asignan a las capacidades mínimas que aparecen en la issue #1 y en
 
 ## 2. Estado de GitHub
 
-Consulta del repositorio `recm0708/netlab360` realizada el 12/10/2026: **42 issues en total; 3 cerradas y 39 abiertas** antes de incorporar nuevos subregistros de evidencias.
+Consulta del repositorio `recm0708/netlab360` realizada el 12/10/2026: **43 issues en total; 3 cerradas y 40 abiertas** después de abrir #43 para la auditoría de capturas.
 
 **Issues cerradas y verificadas:**  
 - [#39 — dirección fija en VMnet8](https://github.com/recm0708/netlab360/issues/39): `192.168.47.40/24`, fuera del pool DHCP, SSH y persistencia tras reinicio.  
@@ -40,6 +40,8 @@ Consulta del repositorio `recm0708/netlab360` realizada el 12/10/2026: **42 issu
 - [#16 — Source of Truth](https://github.com/recm0708/netlab360/issues/16): existe YAML IPAM inicial, falta inventario completo/consumo Ansible/OpenTofu.
 - [#38 — Ubuntu y SSH seguro](https://github.com/recm0708/netlab360/issues/38): acceso por clave funciona; hardening/revisión y documentación formal pendientes.
 - [#10 — inventario de recursos](https://github.com/recm0708/netlab360/issues/10) y [#34 — matriz versiones](https://github.com/recm0708/netlab360/issues/34): información sustantiva comprobada, quedan verificaciones de compatibilidad y cierre formal.
+
+**Auditoría nueva:** [#43 — revisión visual de evidencias PNG](https://github.com/recm0708/netlab360/issues/43): abierta hasta recibir el lote y verificar su correspondencia con logs, fecha/hostname, comandos y resultados.
 
 **No cerrar todavía:** [#1 S01](https://github.com/recm0708/netlab360/issues/1), #11, #12, #42, #38, #10, #34. Ninguna issue posterior de S02–S08 se cierra por resultados de smoke local.
 
