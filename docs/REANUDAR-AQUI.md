@@ -1,5 +1,18 @@
 # NETLAB360 — REANUDAR AQUÍ (checkpoint operativo)
 
+## ACCIÓN VIGENTE — 13/10/2026 18:51 PANAMÁ | PRECHECK B2-L2 OK; ENSAYO TRUNK VERSIONADO NO EJECUTADO
+
+**Este bloque se añade al checkpoint del ciclo Prometheus 18:36, que continúa válido.** Usuario hizo pull a `6e6d500`; ejecutó precheck `scripts/validacion/precheck-b2-l2-trunk-acl.sh` con salida **`REQUERIDOS_FALTANTES=0`, `B2_L2_PREFLIGHT=OK`, `RESULTADO_PRECHECK_L2=0`** a 18:51:04. Herramientas `ip,bridge,nsenter,python3,ping,sudo,git` y `nftables v1.1.6` disponibles; Linux bridge módulo visible, `8021q` y `bonding` no visibles en sysfs, **no significa ausencia de soporte**. `ens33 192.168.47.40/24`, default GW `192.168.47.2`, Docker/netns vacíos, Git `main...origin/main` limpio en ese corte. Log local `~/netlab360-bootstrap/evidencias/b2-l2-precheck-20261013-185104.log`, no publicado.
+
+**Nuevo script publicado después del último pull del usuario:** [`scripts/laboratorio/b2-l2-trunk-8021q.sh`](../scripts/laboratorio/b2-l2-trunk-8021q.sh) (commit `aceefee`). Despliega solo namespaces propios, dos switches **dentro de HQ**, VLAN110 usuarios `10.70.10/24`, VLAN120 servicios `10.70.20/24`, trunk 802.1Q con ambos VID tagged, puertos access untagged; pruebas de ping positivo por VLAN y aislamiento negativo sin confundir falta de ruta IP; cleanup automático exclusivo, comparaciones ens33/ruta protegidas. **NO EJECUTADO AÚN; no otorgar puntos adicionales ni afirmar capturas existentes.** Exige `--snapshot-confirmado`, snapshot anterior ya confirmado por operador. [Bitácora de precheck y plan](sesiones/2026-10-13-b2-l2-precheck-trunk-acl-y-plan-ensayo.md).
+
+**PRÓXIMOS PASOS (varios de una sola vez):** pull ff-only, `bash -n` y grep script, `sudo -v`, comprobar namespaces prefijo `nl360-t` ausentes, red intacta, ejecutar **una sola vez** `bash scripts/laboratorio/b2-l2-trunk-8021q.sh --snapshot-confirmado`. Captura solicitada B2_L2_02 desde INICIO/FIN de trunk 110/120; B2_L2_03 desde INICIO/FIN aislamiento negativo + ping positivos; ejecutar postcheck Docker/netns/ens33/GW/git. Exigir `RESULTADO_B2_L2_TRUNK=0` antes de documentar prueba completa. Si falla, NO repetir, enviar error + `RESIDUO_NAMESPACE` y revisar. Después desarrollar ACL en namespace y cliente/servicio real sin tocar firewall del host.
+
+**S01 todavía 53% estimado**; 47 puntos pendientes repartidos B1 2, B2L2 7, L3 1, LACP/dual-NIC 10, IaC 9, B3 5, IA 5, documentación 3, release/OVA 5. El bloque de documentación teórica puede desarrollarse en paralelo, pero aceptación S01 exige requisitos completos o aprobación docente de recorte (#36). No confundir semana académica 9 con semana S01 del repositorio.
+
+---
+
+
 ## CHECKPOINT VIGENTE — 13/10/2026 18:36 PANAMÁ | PROMETHEUS ALERTAS FIRING/RESUELTAS, LABORATORIO LIMPIO
 
 **SIGUIENTE PRECHECK YA VERSIONADO, AÚN NO EJECUTADO:** `scripts/validacion/precheck-b2-l2-trunk-acl.sh` (solo lectura) para capacidades `bridge`, `ip`, módulo 8021q/bonding, disponibilidad `nft`, IPAM/ens33 y recursos de Docker/netns. Luego diseñar/trabajar trunk 802.1Q + ACL + cliente real. **No se ha desplegado esta topología nueva ni hay evidencias nuevas de L2.**
