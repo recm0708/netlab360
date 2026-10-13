@@ -1,5 +1,11 @@
 # NETLAB360 — Auditoría visual oficial de evidencias B3, lote 02
 
+## PUBLICACIÓN FÍSICA CONFIRMADA — 13/10/2026 16:26
+
+**Los 5 PNG B3 auditados y el manifiesto SHA-256 están ahora dentro de GitHub** en `evidencias/capturas/B3_lote02/`. El usuario validó hashes y `B3_CAPTURAS_VERIFICADAS: 5`, hizo commit/push y GitHub confirmó [commit `a21b8f8`](https://github.com/recm0708/netlab360/commit/a21b8f8d1b76c2f7cebfd657213bc4c7c7b21bc2) con 5 PNG + 1 CSV. Postcheck adicional de 16:25:50 confirma `PUERTO_8765_LIBRE: SI`; captura B3_04_FINAL solicitada se presume tomada pero aún no recibida visualmente. Notas antiguas de falta de publicación son históricas.
+
+---
+
 **Fecha:** 2026-10-13 Panamá. **Fuente:** cinco imágenes PNG realmente recibidas y examinadas visualmente en esta conversación, no inferidas. **Lote anterior:** [B1/B2, 19 capturas](01-auditoria-visual-b1-b2-2026-10-13.md).  
 **Estado:** 5/5 PNG recibidos, verificados y con SHA-256 registrado; **los bytes de las imágenes B3 aún NO están versionados en GitHub**. Un paquete ZIP y manifiesto CSV se prepararon para importación local segura.
 
