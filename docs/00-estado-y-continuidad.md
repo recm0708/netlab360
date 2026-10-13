@@ -1,5 +1,14 @@
 # NETLAB360 — Registro de inicialización de GitHub
 
+## REANUDACIÓN ACTUAL 13/10/2026 15:29 — B3 DATOS RETROSPECTIVOS OK; API NOC PREPARADA, NO EJECUTADA
+
+**LEER PRIORITARIAMENTE `docs/REANUDAR-AQUI.md`**: el usuario volvió a encender VM, SSH/red/servicios/almacenamiento/mantenimiento APT/Git todo validado; raíz 9%, Docker/netns vacíos, `ens33 192.168.47.40/24` GW `.2` intactos. CSV original 76/76 ICMP `CSV_INTEGRIDAD: OK`; JSON `b3-resumen-convergencia.json` y `b3-metricas-retrospectivas.prom` generados realmente con `B3_ANALISIS_RETROSPECTIVO=OK`. B3_01 tomada por convención del usuario (PNG sin auditar).
+
+**NUEVO EN GITHUB, AÚN NO PROBADO EN UBUNTU:** `servicios/noc-historico/app.py` (API/HTML local solo lectura `127.0.0.1:8765`) y manual `servicios/noc-historico/README.md`, bitácora `docs/sesiones/2026-10-13-b3-linea-base-retrospectiva-validada.md`. Necesita pull/validación/arranque/curl/túnel SSH/stop y postcheck. `/metrics` es histórico y Prometheus no está instalado ni scrapeando; no atribuir incidentes activos, alarmas ni visualización dinámica. S01 43% técnico, 57% pendiente; issues #1/#12/#15/#20/#21/#35/#43 abiertas. Último Git **local** comprobado `c53f0a6` antes de commits remotos B3 de hoy.
+
+---
+
+
 ## ÚLTIMO CHECKPOINT — 13/10/2026 11:52 PANAMÁ | CONVERGENCIA B2 COMPLETADA; CIERRE INMEDIATO
 
 **PUNTO ÚNICO DE CONTINUIDAD:** [`docs/REANUDAR-AQUI.md`](REANUDAR-AQUI.md). El usuario ejecutó con éxito `scripts/laboratorio/b2-dualwan-medicion-continua.py --snapshot-confirmado` a 11:51:41–11:52:40, `RESULTADO_EJECUCION_CONVERGENCIA=0`, 76/76 sondas ICMP exitosas (0 pérdidas observadas), OSPF dual WAN-P→WAN-B→WAN-P. Primer sondeo FIB vio respaldo **0.186s** tras inicio de acción, principal restaurada **10.147s** tras inicio (aproximaciones de sondeo ~0.37s, NO convergencia OSPF exacta). `LIMPIEZA_FINAL=OK`, `CONTENEDORES_B2_RESIDUALES=0`, Docker/netns vacíos y `ens33 192.168.47.40/24`/GW `192.168.47.2` preservados. Logs/CSV locales `17-b2-convergencia-20261013-115141.{log,csv}`, captura B2_16 asumida tomada, auditoría PNG pendiente #43. [Bitácora](sesiones/2026-10-13-b2-convergencia-icmp-continuo-verificada.md).
