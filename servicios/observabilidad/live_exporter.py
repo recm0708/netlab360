@@ -54,7 +54,10 @@ def inspect_router(name):
     r = sudo_run(["docker", "inspect", "-f",
                   "{{.State.Running}} {{.State.Pid}}", name])
     if r.returncode:
-        if "No such object" in r.stderr or "No such container" in r.stderr:
+        # Docker CLI may return "Error: No such object" or
+        # "error: no such object" depending on version/locale.
+        message = (r.stderr + "\n" + r.stdout).lower()
+        if "no such object" in message or "no such container" in message:
             return {"running": False, "pid": None}
         raise RuntimeError("No se pudo consultar Docker " + name
                            + ": " + r.stderr.strip()[:150])
