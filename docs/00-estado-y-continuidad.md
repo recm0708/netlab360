@@ -1,5 +1,44 @@
 # NETLAB360 — Registro de inicialización de GitHub
 
+## ESTADO VIGENTE Y REANUDACIÓN — S01 30% ESTIMADO, FRR V5 SUPERADO (2026-10-12 23:57 PANAMÁ)
+
+**LEER ANTES DE CUALQUIER APARTADO HISTÓRICO DE ESTA PÁGINA.** Proyecto privado GitHub `recm0708/netlab360`, rama main; Ubuntu Desktop 26.04.1 LTS en VMware Workstation Pro, VM `netlab360-lab`, usuario `rc-aa-ec`, SSH desde Windows `ssh netlab360`, `ens33=192.168.47.40/24`, gateway `192.168.47.2`. Snapshot `NETLAB360-BASE-HERRAMIENTAS` **confirmado por el usuario**, no volver a pedirlo. No modificar VMnet8, ens33, rutas host ni NetworkManager en laboratorios.
+
+### Hito nuevo observado y probado
+
+**SMOKE FRROUTING v5 SATISFACTORIO, ejecución 2026-10-12 23:57:25 (-05:00).** Script `scripts/laboratorio/b2-frr-smoke-v5-demonios-verificados.sh --snapshot-confirmado`. Verificados:
+- `FRR_MOUNT_READABLE: SI`, `FRR_CRASHLOG_WRITABLE: SI`, `FRR_PID_DIR_WRITABLE: SI`; configuraciones `daemons`/ `frr.conf`/ `vtysh.conf` con UID/GID correctos.
+- `FRR_DAEMONS_ACTIVOS: SI (zebra, ospfd; intento 1)` y procesos mgmtd/zebra/ospfd/staticd/watchfrr realmente visibles; `vtysh -b` carga configuración.
+- `OSPF_CONTROL_PLANE: OK`, `OSPF Routing Process, Router ID: 10.79.0.254`. **No hay áreas adjuntas, interfaces WAN ni vecinos; este smoke no equivale a OSPF entre routers.**
+- `PRUEBA_SMOKE_FRR_V5: OK`, `RESULTADO_SMOKE_FRR_V5=0`, `RESULTADO_EJECUCION_FRR_V5=0`; limpieza: 0 contenedores, 0 namespaces; ens33 .40 y gateway .2, docker/ssh/open-vm-tools activos, Git local limpio hasta `afbd7f5` **antes de los últimos commits remotos**.
+- Bitácora publicada `docs/sesiones/2026-10-12-smoke-frr-v5-exitoso.md`, log ORIGINAL LOCAL `~/netlab360-bootstrap/evidencias/14-b2-frr-smoke-v5-20261012-235725.log`. Evidencia `B2_10_Arranque_FRR_V5_Verificado.png` **considerada tomada por convención del usuario**, aún no auditada visualmente ni subido PNG a GitHub. Capturas anteriores también se asumen tomadas, salvo aviso del usuario.
+- Pruebas históricas smoke v1/v2/v3/v4 fallaron por disponibilidad, permisos de configuración, lectura DAC, creación PID y `CAP_SYS_ADMIN` faltante, respectivamente. **NO REEJECUTAR** versiones anteriores: v5 ya demostró arranque. Retener registros como trazabilidad.
+
+### Control formal de fases e issues
+
+**S01 sigue ABIERTA** en [#1](https://github.com/recm0708/netlab360/issues/1); estimación ponderada **30% completado / 70% pendiente**, no cifra oficial de docente. Metodología y pesos en `docs/control/01-avance-s01.md`, y checklist de fase en `backlog/semanas/01-semana-1.md`. Semanas planeadas 5–11/10, retraso registrado; no mover automáticamente S02–S08.
+
+**Al corte actual, 43 issues: 3 cerradas y 40 abiertas.**
+- **CERRADAS:** [#39](https://github.com/recm0708/netlab360/issues/39) IPv4 fija; [#40](https://github.com/recm0708/netlab360/issues/40) GitHub CLI y repositorio; [#41](https://github.com/recm0708/netlab360/issues/41) herramientas base/snapshot VMware.
+- **SUBPRUEBAS COMPLETADAS en issues ABIERTAS:** B1 IPAM YAML draft sin colisiones #11/#16; B2-L2 VLAN110/120 conectividad-aislamiento-restauración #30/#12; smoke B2 FRR local #42 (v5 code0). **No cerrar estas issues hasta cumplir sus criterios integrales.**
+- **ABIERTAS IMPORTANTES:** #42 configurar routers HQ/S1 y dual WAN OSPF con vecinos/rutas/failover; #12 incidente con telemetría, alarma y dashboard; #38 hardening SSH/documentos; #10 y #34 verificaciones de recursos/compatibilidad definitivas; #35 informe/bitácora/manual; #36 rúbrica; #43 **auditoría visual futura de capturas**. #1 S01 solo se cerrará tras criterios completos o recorte de alcance aprobado.
+- La captura debe incluir comando de consulta, fecha/hostname, log original y marcadores literales **INICIO CAPTURA / FIN CAPTURA** con nombre PNG exacto. **Todas las capturas solicitadas se consideran tomadas salvo aviso en contrario**, pero revisión gráfica y subida a GitHub siguen pendientes (#43). No usar `clear` para construirlas.
+
+### Siguiente avance funcional: B2-L3 dos routers con WAN dual
+
+1. `cd ~/proyectos/netlab360 && GIT_TERMINAL_PROMPT=0 git pull --ff-only origin main`; verificar IP/servicios/Docker y preservar VMnet8.
+2. Usar el éxito de smoke FRR v5 como patrón de permisos/capacidades para desplegar **dos contenedores aislados** `R-HQ`, `R-S1`. Versionar scripts `up/status/down` con rollback y limpieza segura por nombre prefijado `nl360-`, sin alterar interfaces del host ajenas al laboratorio.
+3. Usar WAN-P `10.78.0.0/30` (HQ .1, S1 .2; costo OSPF 10) y WAN-B `10.78.0.4/30` (HQ .5, S1 .6; costo100). Loopbacks `10.79.0.1/32` y `10.79.0.2/32` y prefijos LAN en IPAM; OSPF área0.
+4. Validar interfaces/veth, vecinos **Full**, rutas de prefijos remotos, selección primaria; cortar WAN-P, medir migración a WAN-B, restaurar; preservar logs y capturas desde/hasta. En cada subhito significativo actualizar #42 y continuidad; luego integrar alarmas/dash #12.
+5. No llamar fase terminada ni avanzar por defecto a S02–S08. No prometer disponibilidad de datos ni rutas inexistentes.
+
+**Documentos clave:** `README.md`, `docs/control/01-avance-s01.md`, `backlog/semanas/01-semana-1.md`, `docs/05-plan-operativo-y-pausas.md`. Los registros antiguos de esta misma página son cronológicos y pueden contener apartados “pendiente” ya superados: **esta ancla tiene prioridad**.
+
+**Seguridad:** credencial GitHub CLI permanece en el guest; nunca publicar tokens, claves privadas, `~/.config/gh/hosts.yml` ni OVA no sanitizada. Antes de exportar, revocar/retirar secretos y validar reimportación+SHA256.
+
+---
+
+
 ## PUNTO DE REANUDACIÓN MÁS RECIENTE — 2026-10-12 23:32, smoke v4 reveló CAP_SYS_ADMIN; v5 PREPARADA
 
 **Priorizar este bloque al retomar.** Proyecto NETLAB360 privado `recm0708/netlab360`, rama `main`. Usuario trabaja en Ubuntu Desktop 26.04.1 LTS de VMware Workstation Pro; hostname `netlab360-lab`, cuenta `rc-aa-ec`, SSH desde Windows `ssh netlab360`, gestión `ens33=192.168.47.40/24`, GW `192.168.47.2`. **NO tocar VMnet8, ens33, NetworkManager ni rutas del anfitrión.** Snapshot VMware `NETLAB360-BASE-HERRAMIENTAS` confirmado expresamente por usuario; #41 cerrada.
