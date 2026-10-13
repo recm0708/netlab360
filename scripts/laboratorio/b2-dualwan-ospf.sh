@@ -243,22 +243,58 @@ case "$ACTION" in
   fail)
     state_guard
     running "$HQ" && running "$S1"
+    echo "========== RUTA PRINCIPAL ANTES DEL CORTE =========="
+    BEFORE="$(ns "$HQ" ip -4 route get 10.71.10.1)"
+    echo "$BEFORE"
+    [[ "$BEFORE" == *"dev wan-p"* ]] || {
+      echo "ERROR: la ruta inicial no usa wan-p. No provocar corte."
+      exit 4
+    }
     date -Is; ns "$HQ" ip link set wan-p down
     echo "WAN_PRIMARIA: DOWN"
-    sleep 15
+    echo "========== ESPERAR CONMUTACION REAL A WAN-B =========="
+    SWITCHED=0
+    for TRY in $(seq 1 30); do
+      ROUTE="$(ns "$HQ" ip -4 route get 10.71.10.1 2>&1 || true)"
+      if [[ "$ROUTE" == *"dev wan-b"* ]]; then
+        echo "RUTA_RESPALDO: $ROUTE"
+        echo "CONMUTACION_WAN_B: OK (sondeo $TRY)"
+        SWITCHED=1
+        break
+      fi
+      sleep 1
+    done
     neighbors "$HQ"; routes "$HQ"
-    ns "$HQ" ip -4 route get 10.71.10.1
     host_guard
+    [[ "$SWITCHED" -eq 1 ]] || {
+      echo "ERROR: ruta por WAN-B no comprobada; restaurar WAN-P antes del cierre."
+      exit 4
+    }
     ;;
   restore)
     state_guard
     running "$HQ" && running "$S1"
+    echo "========== RESTAURAR SOLO ENLACE WAN-P =========="
     date -Is; ns "$HQ" ip link set wan-p up
     echo "WAN_PRIMARIA: UP"
-    sleep 15
+    echo "========== ESPERAR RETORNO REAL A WAN-P =========="
+    RETURNED=0
+    for TRY in $(seq 1 50); do
+      ROUTE="$(ns "$HQ" ip -4 route get 10.71.10.1 2>&1 || true)"
+      if [[ "$ROUTE" == *"dev wan-p"* ]]; then
+        echo "RUTA_PRINCIPAL: $ROUTE"
+        echo "RESTAURACION_WAN_P: OK (sondeo $TRY)"
+        RETURNED=1
+        break
+      fi
+      sleep 1
+    done
     neighbors "$HQ"; routes "$HQ"
-    ns "$HQ" ip -4 route get 10.71.10.1
     host_guard
+    [[ "$RETURNED" -eq 1 ]] || {
+      echo "ERROR: retorno por WAN-P no comprobado; proceder a down y analizar."
+      exit 4
+    }
     ;;
   down) state_guard; cleanup; host_guard ;;
 esac
