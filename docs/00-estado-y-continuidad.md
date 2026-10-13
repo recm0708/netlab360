@@ -1,5 +1,17 @@
 # NETLAB360 — Registro de inicialización de GitHub
 
+## PUNTO ÚNICO DE REANUDACIÓN — 2026-10-13 11:24 PANAMÁ | S01 42% | B2-L3 ICMP 30/30
+
+**AL RETOMAR, LEER PRIMERO:** [`docs/REANUDAR-AQUI.md`](REANUDAR-AQUI.md), que contiene checklist de resultados probados, rutas exactas de logs, criterios pendientes, links a issues, comandos de sincronización y cierre de las 12:00–12:15. Este checkpoint **supera los encabezados antiguos** de este archivo que indicaban “ping pendiente” o “dual-WAN no ejecutado”.
+
+- **Última PRUEBA REAL:** 13/10/2026 11:22–11:24, `bash scripts/laboratorio/b2-dualwan-ping-lan.sh` con 3 fases `normal/respaldo/restaurada`, dos direcciones de ICMP entre IP LAN dummy 10.70.10.1 ↔ 10.71.10.1: **5/5 + 5/5 por fase, total 30/30 y 0% pérdida durante los sondeos**. Rutas FIB correctas WAN-P→WAN-B→WAN-P, OSPF 2 vecinos Full/Router, `RESULTADO_UP=0`, `RESULTADO_FAIL=0`, `RESULTADO_RESTORE=0`, `RESULTADO_DOWN=0`.
+- **Cleanup REAL 11:23:52:** Docker y namespaces sin elementos; `ens33=192.168.47.40/24`, gateway `192.168.47.2`, servicios docker/ssh/open-vm-tools activos. Git limpio hasta checkout local `0f334dc` **antes de nuevos commits remotos**. Logs originales están en `~/netlab360-bootstrap/evidencias`, no subidos a GitHub. Captura B2_15 asumida tomada, revisión visual posterior #43.
+- **Nueva bitácora:** [B2-L3 ICMP en 3 estados](sesiones/2026-10-13-b2-lan-icmp-tres-estados-verificado.md). **Matriz:** [S01 avance técnico 42%](control/01-avance-s01.md), 58% pendiente. Fase S01 #1, #42, #12 y #43 todavía ABIERTAS. 43 issues totales, 3 cerradas (#39/#40/#41). La medición de pérdida durante el instante de failover, clientes/servicios reales, telemetría, IaC, LACP/ACL y entregables siguen pendientes.
+- **No confundir 30/30 con 0 pérdidas DURANTE cambio WAN:** pings ejecutados después de estabilizar cada ruta. No iniciar más pruebas a partir de las 12:00 Panamá; usuario pidió repo sincronizado y Ubuntu/Windows apagados a más tardar 12:15. El estado de apagado no está confirmado.
+
+---
+
+
 ## HITO CONCLUÍDO — 13/10/2026 11:11 PANAMÁ | DOS ROUTERS OSPF, FAILOVER Y RETORNO OK
 
 **Este estado sustituye planes previos que indicaban dual-WAN no desplegada.** La VM `netlab360-lab` está encendida y administrable por SSH `ssh netlab360`; gestión fija `ens33=192.168.47.40/24`, gateway `192.168.47.2`. **El despliegue dual-WAN se ejecutó Y SE LIMPIÓ**, por lo que **ahora no hay contenedores ni namespaces B2 activos**.
