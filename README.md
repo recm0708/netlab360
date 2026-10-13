@@ -1,6 +1,6 @@
 # NETLAB360 — Planificación semestral
 
-> **Estado (2026-10-12):** entorno Ubuntu Desktop/VMware preparado, Docker y herramientas IaC validadas; topología empresarial y aplicación todavía no implementadas.
+> **Estado verificado (2026-10-12, 23:57 Panamá):** S01 **abierta, ~30% estimado** (ver [control ponderado](docs/control/01-avance-s01.md)); base Ubuntu/VMware, VMnet8/SSH y snapshot completos; IPAM draft validado, ensayo VLAN L2 completado y **FRRouting v5 con zebra/ospfd/OSPF local funcionando**. Todavía no están desplegados HQ/S1, WAN dual, failover, API/dashboard, alertas, IaC del laboratorio ni IA.
 
 **Título académico:** Diseño e implementación de una plataforma virtualizada para la automatización, observabilidad y diagnóstico inteligente de redes empresariales multisede.
 
@@ -38,7 +38,9 @@ Los archivos de configuración, scripts y documentación se conservarán en Git;
 
 - [Plan operativo, fases técnicas y pausas](docs/05-plan-operativo-y-pausas.md): primero B0 (línea base y salud) y B1 (arquitectura/IPAM), después MVP funcional de falla observada, telemetría, interfaz y analítica, con pausas tras avances verificables.
 - [Estado de continuidad](docs/00-estado-y-continuidad.md) y [preparación técnica](docs/sesiones/2026-10-12-preparacion-base-validada.md).
-- [Issue #41](https://github.com/recm0708/netlab360/issues/41): base instalada; checkpoint, snapshot y pausa por definir. [Issue #11](https://github.com/recm0708/netlab360/issues/11): siguiente diseño/IPAM.
+- **Issues cerradas:** [#39](https://github.com/recm0708/netlab360/issues/39) (dirección IPv4), [#40](https://github.com/recm0708/netlab360/issues/40) (GitHub CLI y clonación) y [#41](https://github.com/recm0708/netlab360/issues/41) (herramientas y snapshot VMware confirmado). **S01 continúa abierta** en [#1](https://github.com/recm0708/netlab360/issues/1).
+- **Subhitos funcionales cerrados dentro de issues abiertas:** B1 IPAM (#11), B2-L2 VLAN aislada (#30/#12) y FRRouting v5 en un contenedor (#42) con [evidencia técnica](docs/sesiones/2026-10-12-smoke-frr-v5-exitoso.md). **Siguiente prioridad:** dos routers R-HQ/R-S1, OSPF WAN-P/WAN-B y conmutación/restauración (#42); después incidente observable (#12).
+- **Seguimiento y evidencias:** [control S01](docs/control/01-avance-s01.md), [backlog semanal S01](backlog/semanas/01-semana-1.md), [auditoría posterior de capturas #43](https://github.com/recm0708/netlab360/issues/43).
 - El archivo `NETLAB360_Planificacion_v0.2.zip` se importará solo tras revisión y **sin sobrescribir** documentos nuevos ni duplicar issues existentes; no está importado todavía.
 
 **Protección de credenciales:** el GitHub CLI autenticado dentro del invitado puede contener un token local; se debe eliminar/sanitizar antes de compartir OVA y jamás versionarlo.
