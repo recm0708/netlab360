@@ -1,5 +1,14 @@
 # NETLAB360 — Registro de inicialización de GitHub
 
+## CHECKPOINT VIGENTE — 13/10/2026 POST 16:09 | API HISTÓRICA VALIDADA; GIT IDENTIDAD PENDIENTE
+
+**PRIORIDAD DE LECTURA:** [`docs/REANUDAR-AQUI.md`](REANUDAR-AQUI.md). Lote 01 B1/B2 (19 PNG) y lote 02 B3 (5 PNG) **realmente recibidos y visualmente auditados**, registros oficiales SHA-256 `docs/evidencias/01-auditoria-visual-b1-b2-2026-10-13.md` y `docs/evidencias/02-auditoria-visual-b3-2026-10-13.md`. B3 panel NOC **histórico** mostrado en navegador; API /metrics/healthz/baseline OK. Postcheck a 15:52 `PUERTO_8765_LIBRE: NO` fue anterior al postcheck a **16:09:58 `PUERTO_8765_LIBRE: SI`**; contenedores/netns vacíos y ens33/VMnet8 intactos. Cerrar túnel PowerShell con Ctrl+C si sigue abierto.
+
+**Bloqueador actual:** PNG B1/B2 transferidos y `git add` aplicado pero `git commit` FALLÓ por identidad Git no configurada; `git push` sin commit no publicó nada. Stage contiene 19 PNG + CSV. Configurar usuario+correo noreply **solo en este repo**, `git commit`, sincronizar cambios remotos sin forzar historial y hacer push. ZIP B3 de 5 PNG pendiente de transferencia y segundo commit. **No afirmar que los binarios están ya en GitHub.** S01 **45% estimado** (B3 histórico 2/15, sin telemetry live). #1/#12/#15/#20/#35/#43 abiertas.
+
+---
+
+
 ## ACTUALIZACIÓN PRIORITARIA — 13/10/2026 (DESPUÉS DE 15:52) | LOTE 01 DE 19 PNG AUDITADO; API B3 PROBADA, POSTCHECK PENDIENTE
 
 **ESTA SECCIÓN PREVALECE SOBRE LAS MENCIONES HISTÓRICAS "CAPTURAS SUPUESTAS" EN DOCUMENTOS ANTERIORES.**
