@@ -32,7 +32,7 @@
 | 14 | `B2_12_Vecinos_y_Rutas_OSPF_DualWAN.png` | VALIDADA | Dos adyacencias Full, ruta OSPF HQ hacia S1 por WAN-P | `984e11180ea20c3e9a7c797b5df31a96b0c3c374638707d5d176b39b68e4f1b9` |
 | 15 | `B2_13_Failover_WAN_Principal_a_Respaldo.png` | VALIDADA | WAN-P DOWN, ruta por WAN-B, código 0 | `df47d84a951c5037db0b729f331b9b27aed9c34be0425f96ef668f64ff26d6a4` |
 | 16 | `B2_14_Restauracion_WAN_Principal.png` | VALIDADA | WAN-P UP, ruta restaurada por WAN-P, código 0 | `9dda4bc8784cab82d6e4757534f6515841be1e2eee5ea5edc173aad3baab20d5` |
-| 17 | `B2_L2_01_Conectividad_Aislamiento_Recuperacion.png` | VALIDADA CON OBSERVACIÓN | Resultado funcional L2 y código 0; recorte sin cabecera de captura completa | `700505d67cc93f8f8dc4f0f409e5f4dff7f84b8e8efaf8d544a4406b9d3b448e` |
+| 17 | `B2_L2_01_Conectividad_Aislamiento_Recuperacion.png` | VALIDADA CON OBSERVACIÓN | Código 0 y mensaje de aislamiento visibles, pero bajo el encabezado de prueba negativa aparecen **3/3 paquetes recibidos**; esta imagen sola NO demuestra tráfico bloqueado. Cotejar con log L2 original. Encabezado incompleto | `700505d67cc93f8f8dc4f0f409e5f4dff7f84b8e8efaf8d544a4406b9d3b448e` |
 | 18 | `B2_15_Conectividad_ICMP_DualWAN_Tres_Estados.png` | VALIDADA CON OBSERVACIÓN | 30/30 ICMP bidireccional en fases normal/respaldo/restaurada, 0% pérdida de esos pings; recorte sin marcador inicial visible | `079e7270c1192cec1765b3f4c20d799e8b6c3b49e7c53615ee9ab157177dac34` |
 | 19 | `B2_16_Medicion_Continua_Convergencia.png` | RENOMBRADA CON OBSERVACIÓN | 76/76 sondeos y cleanup correcto; primer sondeo 0.186s/10.147s NO tiempo exacto de convergencia; recorte sin INICIO/hostname visible | `45122d9226527b39a3385b834799891d6a2855ad19a97f32dc7a82d5c8bcecf0` |
 
