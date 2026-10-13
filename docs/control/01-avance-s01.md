@@ -1,7 +1,7 @@
 # NETLAB360 — Control de avance y cierre de Fase S01
 
-**Corte técnico actualizado:** 2026-10-13 16:09 (Panamá, UTC−05:00).  
-**Versión de seguimiento:** v1.4. **Fase:** [#1](https://github.com/recm0708/netlab360/issues/1) **ABIERTA**.  
+**Corte técnico actualizado:** 2026-10-13 16:26 (Panamá, UTC−05:00).  
+**Versión de seguimiento:** v1.5. **Fase:** [#1](https://github.com/recm0708/netlab360/issues/1) **ABIERTA**.  
 **Estado oficial de la rúbrica:** pendiente de ratificación con la docente. **Porcentaje provisional; no es nota, auditoría de cumplimiento oficial ni valor calculado por GitHub.**
 
 ## 1. Estimación ponderada del avance S01
@@ -18,7 +18,7 @@ Los pesos se asignan a las capacidades mínimas que aparecen en la issue #1 y en
 | IaC y compliance (OpenTofu + Ansible) | 10 | **1** | herramientas instaladas y operativas, sin automatización de la topología NETLAB360 |
 | B3: telemetría/API/dashboard/alertas, eventos reales | 15 | **2** | JSON histórico 76/76 y exposición .prom validados; servicio API HTTP solo lectura en 127.0.0.1:8765 probado (200/404/405), panel NOC histórico inspeccionado visualmente B3_03, postcheck 16:09:58 puerto libre. SIN telemetría viva, Prometheus scrape, incidentes ni alarmas |
 | B4: anomalías/datos/IA evaluada | 5 | **0** | no existe prototipo con evaluación |
-| Documentación académica, evidencia, CI/PR y regresión | 5 | **2** | bitácoras/logs/commits y capturas tomadas; faltan informe APA, manual, auditoría visual de PNG, CI, regresión integrada |
+| Documentación académica, evidencia, CI/PR y regresión | 5 | **2** | bitácoras/logs/commits y **24 PNG reales auditados y publicados** (19 B1/B2 + 5 B3, commits d62d33b/a21b8f8); faltan informe APA, manual, auditoría de nuevos lotes, CI y regresión integrada |
 | B5: release y OVA sanitizada importada, SHA-256 | 5 | **0** | sin exportación, reimportación ni tag/release demostrable |
 | **TOTAL** | **100** | **45** | **45% estimado, 55% pendiente** |
 
