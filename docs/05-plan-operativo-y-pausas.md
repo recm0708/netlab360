@@ -1,5 +1,14 @@
 # Plan operativo NETLAB360 — bloques de trabajo, control de cambios y pausas
 
+## ACTUALIZACIÓN PRIORITARIA — 13/10/2026 11:24 | OSPF/ICMP DUAL-WAN OK, S01 42%
+
+**Consultar primero [docs/REANUDAR-AQUI.md](REANUDAR-AQUI.md).** Actualización más reciente y prevalente: dos routers R-HQ/R-S1 OSPF Full por dos WAN, failover `wan-p`→`wan-b` y retorno; 30/30 ICMP bidireccionales entre IP de LAN simuladas de los routers, cinco por dirección en los estados normal, respaldo y restaurado (0% pérdida **en esos sondeos, no durante la transición**). `up/fail/restore/down` terminaron 0; limpieza dejó sin contenedores ni netns y `ens33 192.168.47.40/24` / GW `192.168.47.2` intactos. [Bitácora](sesiones/2026-10-13-b2-lan-icmp-tres-estados-verificado.md). S01 **42% estimado**, fase #1 abierta, #42 y #12 abiertas para medición transitoria, alarma/dashboard, clientes reales y resto del MVP. Logs en `~/netlab360-bootstrap/evidencias`, NO respaldados automáticamente en Git. Capturas solicitadas se asumen tomadas, revisión visual pendiente #43.
+
+**Cierre obligatorio por salida del usuario el 13/10:** desde las **12:00** no iniciar pruebas; sincronizar repo remoto/local y verificar Git limpio y hashes iguales antes 12:10; `sync; sudo systemctl poweroff`, confirmar VMware Powered Off y apagar Windows antes **12:15**. El apagado no consta confirmado.
+
+---
+
+
 ## ACTUALIZACIÓN OPERATIVA — 12/10/2026 23:57 (prioridad sobre estado inicial)
 
 - **Bloques B0 completados operativamente:** VM Ubuntu, Docker/IaC instalados, acceso SSH GitHub, IP `192.168.47.40/24` y snapshot VMware confirmado; issues #39/#40/#41 cerradas. Otros controles de hardening/documentación en #38 permanecen abiertos.
