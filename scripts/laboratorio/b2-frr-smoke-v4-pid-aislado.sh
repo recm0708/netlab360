@@ -68,6 +68,12 @@ echo "Snapshot base: confirmado por operador; no se inspecciona VMware."
 echo "========== PREPARAR ARCHIVOS FRR =========="
 sudo docker run --rm --network none --cap-drop ALL \
   --entrypoint /bin/cat "$IMAGE" /etc/frr/daemons > "$TMP/daemons"
+# Habilitar explicitamente ambos demonios requeridos por el smoke.
+if grep -q '^zebra=' "$TMP/daemons"; then
+  sed -i 's/^zebra=.*/zebra=yes/' "$TMP/daemons"
+else
+  printf 'zebra=yes\\n' >> "$TMP/daemons"
+fi
 sed -i 's/^ospfd=.*/ospfd=yes/' "$TMP/daemons"
 cat > "$TMP/frr.conf" <<'EOF'
 frr version 10.7.1
@@ -91,7 +97,7 @@ echo "--- Permisos (frr UID100; frr GID101; frrvty GID102) ---"
 stat -c '%a %u:%g %n' "$TMP" "$TMP/daemons" "$TMP/frr.conf"
 # Tras chmod 640 y chown 100:101, el usuario rc-aa-ec no puede leer daemons.
 # La inspección de este archivo es de solo lectura; no rebajar sus permisos.
-sudo grep -E '^(ospfd|bgpd|vtysh_enable)=' "$TMP/daemons"
+sudo grep -E '^(zebra|ospfd|bgpd|vtysh_enable)=' "$TMP/daemons"
 
 echo "========== VERIFICAR LECTURA REAL DE ARCHIVOS DENTRO DE DOCKER =========="
 # En frrcommon.sh se evalúa -r para daemons; si falta permiso, el mensaje dice
