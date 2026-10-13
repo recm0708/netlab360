@@ -1,5 +1,14 @@
 # B3 — Primera ejecución del servicio API / panel NOC histórico
 
+## ACTUALIZACIÓN VERIFICADA POSTERIOR A 16:09 — UI EVIDENCIADA Y PUERTO LIBRE
+
+La auditoría visual [lote 02 B3](../evidencias/02-auditoria-visual-b3-2026-10-13.md) recibió y examinó realmente `B3_01`, `B3_02`, dos capturas complementarias `B3_03` y `B3_04`. Las dos B3_03 muestran navegación real `http://127.0.0.1:8765/`, banner **HISTÓRICO / NO EN VIVO**, 76 sondas, 76 éxitos, 0 errores, gráficas de fase y tabla FIB. Ya no está pendiente revisión visual del navegador. B3_04 prueba correctamente que a 15:52 el puerto estaba todavía ocupado; una **salida posterior real de terminal a las 16:09:58** confirmó `PUERTO_8765_LIBRE: SI`, con Docker/netns vacíos y red inalterada. Se valida por tanto el **cierre operativo del servidor**, pero no hay captura PNG del postcheck final; puede tomarse una consulta sin volver a levantar la app. **El túnel SSH del cliente Windows es independiente y quizá permanece abierto**; cerrarlo con Ctrl+C si es el caso.
+
+S01 se estima en **45%** tras acreditar dos puntos B3 por API/HTML retrospectivos ejecutados realmente. NO se han implementado Prometheus scrape, exporter de FRR, alarmas ni dashboard con datos WAN live. Los cinco PNG B3 todavía no están transferidos físicamente a GitHub; se preparó ZIP/manifiesto para ello.
+
+---
+
+
 **Fuente observada:** salida real aportada por el usuario desde tres terminales el 13/10/2026 entre 15:48 y 15:52 Panamá.  
 **Estado:** **API HTTP local probada**, consultas históricas correctas; **cierre completo del proceso pendiente de verificar**. No confundir con NOC en tiempo real.
 
