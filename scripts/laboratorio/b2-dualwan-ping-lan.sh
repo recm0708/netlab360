@@ -46,15 +46,23 @@ ip -4 -br address show ens33 | grep -q '192.168.47.40/24' || {
 EXPECTED="wan-p"
 if [[ "$PHASE" == respaldo ]]; then EXPECTED="wan-b"; fi
 echo "========== RUTAS HACIA LAS LAN REMOTAS =========="
-HQR="$(ns "$HQ" ip -4 route get 10.71.10.1)"
-S1R="$(ns "$S1" ip -4 route get 10.70.10.1)"
+ROUTES_OK=0
+for TRY in $(seq 1 15); do
+  HQR="$(ns "$HQ" ip -4 route get 10.71.10.1 2>&1 || true)"
+  S1R="$(ns "$S1" ip -4 route get 10.70.10.1 2>&1 || true)"
+  if [[ "$HQR" == *"dev $EXPECTED"* && "$S1R" == *"dev $EXPECTED"* ]]; then
+    ROUTES_OK=1
+    break
+  fi
+  sleep 1
+done
 echo "HQ -> S1: $HQR"
 echo "S1 -> HQ: $S1R"
-if [[ "$HQR" != *"dev $EXPECTED"* || "$S1R" != *"dev $EXPECTED"* ]]; then
-  echo "ERROR: ambas rutas no utilizan $EXPECTED; NO ejecutar pings"
+if [[ "$ROUTES_OK" -ne 1 ]]; then
+  echo "ERROR: rutas no convergieron en ambos sentidos hacia $EXPECTED; no ejecutar ICMP"
   exit 4
 fi
-echo "RUTAS_ESPERADAS: SI ($EXPECTED)"
+echo "RUTAS_ESPERADAS: SI ($EXPECTED; intento $TRY)"
 echo "========== ICMP HQ LAN => S1 LAN =========="
 ns "$HQ" ping -n -I 10.70.10.1 -c 5 -i 0.3 -W 1 10.71.10.1
 echo "PING_HQ_S1: OK"
