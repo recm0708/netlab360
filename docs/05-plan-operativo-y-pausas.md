@@ -1,5 +1,14 @@
 # Plan operativo NETLAB360 — bloques de trabajo, control de cambios y pausas
 
+## PRIORIDAD OPERATIVA — 13/10/2026 11:52 | TERMINAR Y APAGAR AHORA
+
+**Última prueba real de B2-L3 CONCLUIDA:** `RESULTADO_EJECUCION_CONVERGENCIA=0`, 76/76 ICMP sondeos correctos, 0 fallas observadas mientras cambiaba FIB WAN-P→WAN-B→WAN-P. Primer sondeo de ruta a respaldo 0.186s; retorno a principal 10.147s desde órdenes (muestreo, **no tiempo de convergencia FRR exacto**). `down` con `LIMPIEZA_FINAL=OK`, sin Docker/netns residuales; `ens33 .40/24` y GW `.2` intactos. Bitácora [aquí](sesiones/2026-10-13-b2-convergencia-icmp-continuo-verificada.md), checkpoint [REANUDAR-AQUI](REANUDAR-AQUI.md). S01 43% estimado, 57% por realizar.
+
+**El usuario ordenó cierre inmediato SIN esperar hasta mediodía:** no iniciar nuevas pruebas. Sincronizar checkout `main`, comparar HEAD/origin/main, comprobar Git limpio, sin contenedores/netns, servicios activos, `sync; sudo systemctl poweroff`, esperar Powered Off VMware y apagar Windows antes de las 12:15. El apagado no está confirmado en GitHub. Capturas solicitadas tomadas por convención, sin revisión visual; logs originales y CSV siguen locales, no subidos automáticamente.
+
+---
+
+
 ## ACTUALIZACIÓN PRIORITARIA — 13/10/2026 11:24 | OSPF/ICMP DUAL-WAN OK, S01 42%
 
 **Consultar primero [docs/REANUDAR-AQUI.md](REANUDAR-AQUI.md).** Actualización más reciente y prevalente: dos routers R-HQ/R-S1 OSPF Full por dos WAN, failover `wan-p`→`wan-b` y retorno; 30/30 ICMP bidireccionales entre IP de LAN simuladas de los routers, cinco por dirección en los estados normal, respaldo y restaurado (0% pérdida **en esos sondeos, no durante la transición**). `up/fail/restore/down` terminaron 0; limpieza dejó sin contenedores ni netns y `ens33 192.168.47.40/24` / GW `192.168.47.2` intactos. [Bitácora](sesiones/2026-10-13-b2-lan-icmp-tres-estados-verificado.md). S01 **42% estimado**, fase #1 abierta, #42 y #12 abiertas para medición transitoria, alarma/dashboard, clientes reales y resto del MVP. Logs en `~/netlab360-bootstrap/evidencias`, NO respaldados automáticamente en Git. Capturas solicitadas se asumen tomadas, revisión visual pendiente #43.
