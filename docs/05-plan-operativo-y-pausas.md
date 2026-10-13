@@ -1,5 +1,18 @@
 # Plan operativo NETLAB360 — bloques de trabajo, control de cambios y pausas
 
+## ACTUALIZACIÓN OPERATIVA — 12/10/2026 23:57 (prioridad sobre estado inicial)
+
+- **Bloques B0 completados operativamente:** VM Ubuntu, Docker/IaC instalados, acceso SSH GitHub, IP `192.168.47.40/24` y snapshot VMware confirmado; issues #39/#40/#41 cerradas. Otros controles de hardening/documentación en #38 permanecen abiertos.
+- **B1 validado como diseño DRAFT:** IPAM YAML y colisiones B1 OK, matriz de interfaces/OSPF; #11 y #16 aún abiertas.
+- **B2-L2 completado como subprueba:** VLAN110 conectividad 3/3, aislamiento VLAN120, recuperación 3/3, limpieza, código0; trunks/ACL pendientes.
+- **B2-L3 validación de arranque local FRR COMPLETA (nuevo):** smoke v5 FRRouting 10.7.1 con `zebra`, `ospfd`, `vtysh` y OSPF local, `RESULTADO_SMOKE_FRR_V5=0`. Log `14-b2-frr-smoke-v5-20261012-235725.log`; [bitácora](sesiones/2026-10-12-smoke-frr-v5-exitoso.md). **No se han formado vecinos OSPF ni probado WAN/conmutación**.
+- **Control actualizado:** S01 **~30% estimado** (ponderación [documentada](control/01-avance-s01.md)), 43 issues: 3 cerradas y 40 abiertas; #1 permanece abierta. [Backlog S01](../backlog/semanas/01-semana-1.md).
+- **Próximo bloque que se debe ejecutar, no B0 de nuevo:** conectar R-HQ/R-S1 con WAN-P `10.78.0.0/30` costo10 y WAN-B `10.78.0.4/30` costo100; OSPF área0, rutas, failover/restauración, cleanup y evidencias. Diseñar `up/status/down` con aislamiento de VMnet8/ens33. Luego B3 telemetría/API/alarma NOC y B4 analítica.
+- **Evidencias:** todas las capturas solicitadas se consideran tomadas por instrucción del usuario; auditoría visual del lote PNG posterior en [#43](https://github.com/recm0708/netlab360/issues/43). Capturas no implican subida GitHub.
+- **El apartado "Siguiente ejecución recomendada" al final de este archivo es histórico del 12/10 temprano**, no repetir mantenimiento/bootstrap ya completado. Priorizar esta actualización y `docs/00-estado-y-continuidad.md`.
+
+---
+
 **Fecha de adopción:** 2026-10-12 (Panamá).  
 **Alcance:** propuesta de trabajo incremental a validar con el equipo; no altera por sí sola la fecha oficial de entrega ni cierra una fase.  
 **Issues:** #1 (S01), #11 (topología/IPAM), #12 (incidente), #15 (dashboard), #16 (Source of Truth), #41 (preparación).
