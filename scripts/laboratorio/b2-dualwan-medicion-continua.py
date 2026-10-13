@@ -205,9 +205,16 @@ def main():
             log(f"LIMPIEZA_FINAL={'OK' if rc == 0 else 'ERROR'}")
             if rc != 0:
                 raise RuntimeError('Se requiere revisar la limpieza B2 antes del apagado')
+        elif STATE.exists():
+            raise RuntimeError("Estado B2 no reconocido; inspeccionar sin borrar recursos")
         else:
             log("LIMPIEZA_FINAL: orquestador sin marcador activo")
         check_management()
+        residual = run(["sudo", "-n", "docker", "ps", "-a",
+                        "--filter", "name=nl360-b2-", "--format", "{{.Names}}"], 5)
+        if residual.returncode != 0 or residual.stdout.strip():
+            raise RuntimeError("No se pudo verificar limpieza de contenedores B2")
+        log("CONTENEDORES_B2_RESIDUALES=0")
         log("========== FIN ENSAYO ==========")
 
 if __name__ == "__main__":
