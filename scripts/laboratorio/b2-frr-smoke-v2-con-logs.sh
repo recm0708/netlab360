@@ -89,7 +89,9 @@ sudo chmod 640 "$TMP/daemons"
 sudo chmod 660 "$TMP/frr.conf"
 echo "--- Permisos (frr UID100; frr GID101; frrvty GID102) ---"
 stat -c '%a %u:%g %n' "$TMP" "$TMP/daemons" "$TMP/frr.conf"
-grep -E '^(ospfd|bgpd|vtysh_enable)=' "$TMP/daemons"
+# Tras chmod 640 y chown 100:101, el usuario rc-aa-ec no puede leer daemons.
+# La inspección de este archivo es de solo lectura; no rebajar sus permisos.
+sudo grep -E '^(ospfd|bgpd|vtysh_enable)=' "$TMP/daemons"
 
 echo "========== ARRANQUE DOCKER SIN --rm =========="
 # FRR watchfrr/zebra/mgmtd/ospfd necesitan capacidades concretas.
