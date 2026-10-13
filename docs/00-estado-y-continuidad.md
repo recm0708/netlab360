@@ -1,5 +1,45 @@
 # NETLAB360 — Registro de inicialización de GitHub
 
+## PUNTO DE REANUDACIÓN MÁS RECIENTE — 2026-10-12 23:32, smoke v4 reveló CAP_SYS_ADMIN; v5 PREPARADA
+
+**Priorizar este bloque al retomar.** Proyecto NETLAB360 privado `recm0708/netlab360`, rama `main`. Usuario trabaja en Ubuntu Desktop 26.04.1 LTS de VMware Workstation Pro; hostname `netlab360-lab`, cuenta `rc-aa-ec`, SSH desde Windows `ssh netlab360`, gestión `ens33=192.168.47.40/24`, GW `192.168.47.2`. **NO tocar VMnet8, ens33, NetworkManager ni rutas del anfitrión.** Snapshot VMware `NETLAB360-BASE-HERRAMIENTAS` confirmado expresamente por usuario; #41 cerrada.
+
+### Últimos resultados REALES
+- B0 Ubuntu/herramientas/GitHub/Docker verificados; B1 IPAM propuesto HQ/S1 y S2 reservada, 9 VLAN/2 WAN, sin conflictos activos. B2-L2 Linux bridge y VLAN 110: pings 3/3, aislamiento VLAN 120, retorno 3/3, limpieza. Imagen FRRouting oficial `quay.io/frrouting/frr:10.7.1` amd64 descargada.
+- Smoke v1 falló por tiempo de espera; primer v2 por grep sin sudo y segundo v2 por imposibilidad de leer `daemons`. V3 `FRR_MOUNT_READABLE: SI` pero `watchfrr.pid` no escribible. **Última prueba v4 (2026-10-12 23:32:22 Panamá):** script `b2-frr-smoke-v4-pid-aislado.sh` ejecutado, resultado `FRR_MOUNT_READABLE: SI`, `FRR_PID_DIR_WRITABLE: SI`, `VTYSH_DISPONIBLE: SI (intento 1)`. **No es éxito:** `show ip ospf` indicó `ospfd is not running`; logs mostraron `privs_init: initial cap_set_proc failed: Operation not permitted` para mgmtd/zebra/ospfd, `Wanted caps: cap_net_admin,cap_net_raw,cap_sys_admin=p`, `Have caps:` sin `cap_sys_admin`. También errores al crear `/var/tmp/frr`, falta `/etc/frr/vtysh.conf` y socket staticd denegado. `RESULTADO_SMOKE_FRR_V4=1`. FRR NO probado operativo; no hay WAN, vecinos ni failover.
+- Cleanup v4: cero contenedores y netns, `ens33 .40/24`, default vía `.2`, `docker/ssh/open-vm-tools` activos, Git local `## main...origin/main` limpio hasta `e458944` antes de commits remotos. Log `~/netlab360-bootstrap/evidencias/13-b2-frr-smoke-v4-20261012-233222.log`, bitácora GitHub `docs/sesiones/2026-10-12-smoke-frr-v4-capacidades.md`.
+- **Capturas**: el usuario estableció explícitamente que **todas las capturas solicitadas están tomadas salvo que diga lo contrario**; conserva capturas por fecha/identificador y más adelante enviará conjunto PNG para revisión de contenido, numeración, calidad y correcciones. No insistir en preguntar si fueron tomadas. Las capturas NO constan incorporadas al repositorio; no confundir declaración de toma con verificación visual/subida. B2_09 se llama `B2_09_Diagnostico_FRR_V4.png`; no nombre de éxito.
+- **Estado de GitHub**: issue #42 abierta para arranque FRR y topología R-HQ/R-S1, #12 abierta para fallo WAN y observabilidad, #1 S01 abierta, #41 cerrada. Esta ancla se actualiza después de subhitos. Cada captura: comando de vista limpia sin `clear`, INICIO y FIN literales, nombre PNG, qué resultado debe verse; si la salida no cabe, dividirla en dos capturas.
+
+### Siguiente artefacto ya versionado, **NO ejecutado**
+`scripts/laboratorio/b2-frr-smoke-v5-demonios-verificados.sh` (**NO repetir v1-v4**). Implementa:
+1. Configuración `daemons` zebra=yes/ospfd=yes y archivos `daemons`, `frr.conf`, `vtysh.conf` con propiedad/permisos FRR correctos.
+2. Verifica lectura en contenedor aislado (`FRR_MOUNT_READABLE: SI`), escritura PID en tmpfs `/run/frr` (`FRR_PID_DIR_WRITABLE: SI`) y escritura `/var/tmp/frr` por usuario frr (`FRR_CRASHLOG_WRITABLE: SI`).
+3. Smoke efímero en Docker `--network none`, sin host networking ni `--privileged`, agrega específicamente `CAP_SYS_ADMIN` por requisito demostrado de daemons, `DAC_OVERRIDE` por acceso DAC a sockets (capacidad SYS_ADMIN es amplia, solo en VM aislada).
+4. Ya NO considera `vtysh show version` suficiente: verifica procesos reales `zebra` y `ospfd` por `/proc/*/comm`, aplica `vtysh -b`, valida `show ip ospf`, captura inspect/procesos/logs antes de limpiar; no crea WAN ni L2.
+
+**Comandos para reanudar:**
+```bash
+cd ~/proyectos/netlab360
+GIT_TERMINAL_PROMPT=0 git pull --ff-only origin main
+bash -n scripts/laboratorio/b2-frr-smoke-v5-demonios-verificados.sh
+grep -nE 'CRASH_TMPFS|SYS_ADMIN|DAC_OVERRIDE|FRR_DAEMONS_ACTIVOS|RESULTADO_SMOKE_FRR_V5' scripts/laboratorio/b2-frr-smoke-v5-demonios-verificados.sh
+bash scripts/laboratorio/b2-frr-smoke-v5-demonios-verificados.sh --snapshot-confirmado
+echo "RESULTADO_EJECUCION_FRR_V5=$?"
+sudo docker ps -a
+sudo ip netns list
+ip -4 -br addr show ens33
+ip -4 route show default
+```
+Se ejecuta **UNA sola vez**, después de confirmar `bash -n`. Si da error, no repetir hasta evaluar log `~/netlab360-bootstrap/evidencias/14-b2-frr-smoke-v5-*.log`. Si funciona, no equivale aún a validar vecinos OSPF: solo plano de control local sin WAN.
+
+**Captura siguiente:** `B2_10_Arranque_FRR_V5_Verificado.png` si y solo si `FRR_MOUNT_READABLE: SI`, `FRR_PID_DIR_WRITABLE: SI`, `FRR_CRASHLOG_WRITABLE: SI`, `FRR_DAEMONS_ACTIVOS: SI`, `OSPF_CONTROL_PLANE: OK`, `RESULTADO_SMOKE_FRR_V5=0`. Si falla: `B2_10_Diagnostico_FRR_V5.png`. Mostrar marcadores exactos INICIO/FIN CAPTURA B2_10, fecha/hostname y ruta log; no presentar valores esperados como comprobados.
+
+**Continuidad:** actualizar issues #42/#12, bitácora y esta ancla tras prueba. Preferencia de usuario: varios pasos/comandos juntos, no pausas por microcomando, snapshots ya confirmados, no guardar OAuth/token/contraseñas ni publicar OVA privada. **NO instalar nuevos componentes ni crear WAN antes de smoke local OK.**
+
+---
+
+
 ## ANCLA DE REANUDACIÓN — 12/10/2026 23:18 Panamá, V3 FALLÓ EN PID, V4 PREPARADA NO EJECUTADA
 
 **ESTADO MÁS RECIENTE; LEER PRIMERO.** Proyecto NETLAB360, repo privado `recm0708/netlab360`, Fase S01 abierta, issue #42 para FRR/OSPF, issue #12 para incidente/alarma/dashboard. Snapshot privado VMware `NETLAB360-BASE-HERRAMIENTAS` **CONFIRMADO por usuario**, #41 cerrada. No solicitar repetir snapshot.
