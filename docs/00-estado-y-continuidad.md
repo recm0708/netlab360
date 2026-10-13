@@ -1,5 +1,39 @@
 # NETLAB360 — Registro de inicialización de GitHub
 
+## ANCLA DE REANUDACIÓN — 12/10/2026 23:18 Panamá, V3 FALLÓ EN PID, V4 PREPARADA NO EJECUTADA
+
+**ESTADO MÁS RECIENTE; LEER PRIMERO.** Proyecto NETLAB360, repo privado `recm0708/netlab360`, Fase S01 abierta, issue #42 para FRR/OSPF, issue #12 para incidente/alarma/dashboard. Snapshot privado VMware `NETLAB360-BASE-HERRAMIENTAS` **CONFIRMADO por usuario**, #41 cerrada. No solicitar repetir snapshot.
+
+**Última prueba REAL (v3, 12/10/2026 23:17:30):** `bash scripts/laboratorio/b2-frr-smoke-v3-verificacion-acceso.sh --snapshot-confirmado`, IPAM válido, `FRR_MOUNT_READABLE: SI` con `daemons` 0640 frr:frr y `frr.conf` 0660 frr:frrvty. Pero Docker `exited ExitCode=1`, error textual `WATCHFRR: Can't create pid lock file /var/run/frr/watchfrr.pid (Permission denied), exiting`, `RESULTADO_SMOKE_FRR_V3=4`. **NO hay zebra/ospfd/vtysh funcionando ni vecinos OSPF**. Rollback correcto: Docker sin contenedores, cero namespaces; `ens33=192.168.47.40/24`, gateway `192.168.47.2`, docker/ssh/open-vm-tools activos, Git local limpio hasta `7cc979a` antes de nuevos commits.
+ 
+**Pruebas anteriores:** B0 herramientas instaladas/validadas, B1 IPAM HQ+S1, S2 reservado, VLAN/IPAM sin choques; B2-L2 VLAN 110 conectividad 3/3, aislamiento VLAN 120, restauración 3/3. FRR `quay.io/frrouting/frr:10.7.1` amd64 imagen descargada. Smoke v1 timeout, primer v2 falló lectura grep sin sudo, segundo v2 falló lectura `daemons` dentro del contenedor; v3 corrigió lectura pero reveló fallo de escritura de PID. No repetir v1/v2/v3. No tocar ens33/VMnet8/NetworkManager.
+
+**Log v3:** `~/netlab360-bootstrap/evidencias/12-b2-frr-smoke-v3-20261012-231730.log`. Usuario mostró en terminal marcadores `INICIO CAPTURA B2_08` y `FIN CAPTURA B2_08` con código 4 y montaje sí legible; **NO confirmó que guardara captura PNG B2_08**. Si se tomó debe nombrarse `B2_08_Diagnostico_FRR_V3.png`. Bitácora GitHub `docs/sesiones/2026-10-12-smoke-frr-v3-error-pid.md`. Repositorio GitHub contiene RESÚMENES, no los logs locales ni las capturas PNG.
+
+**Nueva variante v4 (EN GITHUB, todavía no ejecutada):** `scripts/laboratorio/b2-frr-smoke-v4-pid-aislado.sh`. Monta tmpfs exclusivo **del contenedor** en `/run/frr`, UID0/GID101 modo0770 para permitir que lanzador root y grupo frr creen archivos PID; verifica primero `FRR_MOUNT_READABLE: SI`, luego escritura real `FRR_PID_DIR_WRITABLE: SI`. Solo entonces crea contenedor temporal `--network none` y habilita `zebra=yes`, `ospfd=yes`. Retira capacidad `SYS_ADMIN` del smoke; conserva capacidades explícitas restantes, guarda docker inspect/logs antes de limpiar; no configura WAN ni altera `/run/frr` del host. Esta es **propuesta de corrección**, no éxito demostrado.
+
+**PASOS AL RETOMAR EN UBUNTU:**
+```bash
+cd ~/proyectos/netlab360
+GIT_TERMINAL_PROMPT=0 git pull --ff-only origin main
+bash -n scripts/laboratorio/b2-frr-smoke-v4-pid-aislado.sh
+grep -nE 'PID_TMPFS|FRR_PID_DIR_WRITABLE|FRR_MOUNT_READABLE|RESULTADO_SMOKE_FRR_V4' scripts/laboratorio/b2-frr-smoke-v4-pid-aislado.sh
+bash scripts/laboratorio/b2-frr-smoke-v4-pid-aislado.sh --snapshot-confirmado
+echo "RESULTADO_EJECUCION_FRR_V4=$?"
+sudo docker ps -a
+sudo ip netns list
+ip -4 -br addr show ens33
+ip -4 route show default
+```
+**Si falla:** no repetir. Revisar `~/netlab360-bootstrap/evidencias/13-b2-frr-smoke-v4-*.log`, estado y error original; actualizar #42 y esta ancla antes de otro ensayo.
+
+**Captura siguiente:** `B2_09_Arranque_FRR_V4_Verificado.png` solo con `FRR_MOUNT_READABLE: SI`, `FRR_PID_DIR_WRITABLE: SI`, `VTYSH_DISPONIBLE: SI`, `RESULTADO_SMOKE_FRR_V4=0`; si error, `B2_09_Diagnostico_FRR_V4.png`. Mostrar comando de consulta, fecha/hora, hostname, ruta al log original, marcadores exactos INICIO/FIN. No usar `clear`. Usuario desea instrucciones **desde tal línea hasta tal línea**. En respuestas dar varios pasos/comandos agrupados y documentación frecuente.
+ 
+**Siguiente hito:** solo si smoke v4 correcto, implementar dos routers R-HQ y R-S1 con FRR en espacios aislados, WAN-P `10.78.0.0/30` costo10, WAN-B `10.78.0.4/30` costo100, loopbacks `10.79.0.1/32` y `10.79.0.2/32`, OSPF área0, pruebas de fallo/restauración; telemetría/dashboard aparte. No declarar S01 terminada. No almacenar credenciales GitHub/OVA en repo.
+
+---
+
+
 ## ÚLTIMA SITUACIÓN — 2026-10-12 23:09 (Panamá) — smoke FRR v2 ExitCode=1; v3 PREPARADA, NO EJECUTADA
 
 **Esta sección tiene prioridad al retomar una conversación.** Proyecto NETLAB360, repositorio privado recm0708/netlab360; fase S01 ABIERTA. Usuario requiere conservar en GitHub la trazabilidad y recibir **múltiples pasos por respuesta**, delimitando cada captura INICIO/FIN con nombre PNG y qué debe verse. Snapshot VMware `NETLAB360-BASE-HERRAMIENTAS` **CONFIRMADO por usuario**, issue #41 cerrada. No volver a preguntar ni crear de nuevo.
