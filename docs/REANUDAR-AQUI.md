@@ -1,5 +1,15 @@
 # NETLAB360 — REANUDAR AQUÍ (checkpoint operativo)
 
+## ACTUALIZACIÓN DEFINITIVA DEL ENSAYO — 13/10/2026 11:52 | MEDICIÓN REAL TERMINADA
+
+**El mensaje anterior de que el ensayo está “NO EJECUTADO” es histórico.** El usuario SÍ ejecutó `scripts/laboratorio/b2-dualwan-medicion-continua.py --snapshot-confirmado` entre 11:51:41–11:52:40 Panamá; `RESULTADO_EJECUCION_CONVERGENCIA=0`. El nuevo registro [2026-10-13-b2-convergencia-icmp-continuo-verificada.md](sesiones/2026-10-13-b2-convergencia-icmp-continuo-verificada.md) es la referencia autorizada:
+- `up` OSPF dual Full correcto, 14/14 muestras ICMP normal por WAN-P; en el corte 1/1 muestra ICMP en respaldo; 16/16 estable por WAN-B; durante retorno 29/29 muestras ICMP (cambio WAN-B→WAN-P en muestra #59); y 16/16 final por WAN-P. **76/76 muestras correctas, 0 pérdidas observadas**. Origen HQ LAN dummy `10.70.10.1`→destino LAN dummy S1 `10.71.10.1`.
+- Primera observación FIB `wan-b` **0.186 s** después del inicio de acción de falla; primera observación del regreso `wan-p` **10.147 s** después de acción de restauración. Intervalo muestreo ~0.37s. **NO son segundos exactos de convergencia FRR ni prometen cero pérdidas fuera de las ventanas muestreadas.**
+- `down` código 0, `LIMPIEZA_FINAL=OK`, `CONTENEDORES_B2_RESIDUALES=0`, host protegido, postcheck Docker/netns vacíos y `ens33` con GW intactos. Archivo local `~/netlab360-bootstrap/evidencias/17-b2-convergencia-20261013-115141.log` + `.csv` (~76 filas); PNG `B2_16_Medicion_Continua_Convergencia.png` asumido tomado y pendiente auditoría #43.
+- **S01 nuevo avance estimado 43/100**, antes 42/100; +1 punto B2-L3 por observación de transición, total 17/18 de B2-L3, quedan clientes y servicios finales. Issues #1, #12, #42, #43, #35 permanecen abiertas. No aumentar % solamente por documentación.
+- **USUARIO SOLICITÓ CIERRE INMEDIATO (SIN ESPERAR A LAS 12:00)**: detener pruebas, traer commits GitHub a Ubuntu con `git pull --ff-only`, verificar hashes HEAD/origin/main, git limpio, Docker/netns vacíos, ens33/GW/servicios OK; `sync; sudo systemctl poweroff`, esperar VMware Powered Off y apagar Windows. Apagado todavía NO confirmado. No empezar nuevos ensayos.
+---
+
 ## NUEVO ENSAYO PREPARADO — 13/10/2026 ~11:46 | TODAVÍA NO EJECUTADO
 
 **No sustituye el último hito real de 11:24:** el laboratorio dual-WAN con 30/30 ICMP entre LAN simuladas SÍ fue probado y limpiado. Aún **NO se ha medido** la pérdida durante la transición.
