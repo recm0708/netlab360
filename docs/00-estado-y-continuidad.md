@@ -1,5 +1,32 @@
 # NETLAB360 — Registro de inicialización de GitHub
 
+## REANUDACIÓN VERIFICADA — 2026-10-13 10:47 PANAMÁ | B2 ORQUESTADOR PREPARADO, NO EJECUTADO
+
+**PREVALECE SOBRE NOTAS DE LAS 10:42:** Usuario arrancó VM `NETLAB360-Ubuntu-Desktop`, desde PowerShell `ssh netlab360` con llave/contraseña de la clave, Ubuntu 26.04.1 LTS, kernel `7.0.0-38-generic`, hostname `netlab360-lab`, uptime 3min, red `ens33 192.168.47.40/24` y default `192.168.47.2`, servicios docker/ssh/open-vm-tools activos, **sin contenedores y sin netns**.
+
+Mantenimiento preventivo del invitado a las 10:47: `sudo apt update` OK, `apt list --upgradable` sin entradas, `apt-get -s upgrade` 0 actualizaciones, `dpkg --audit` vacío y **no se requiere reinicio**. Aviso 4 ESM Apps opcionales no interfiere con APT ordinario. `git pull --ff-only origin main` adelantó `c519a02..e9460ee`; `git status --short --branch` mostró `## main...origin/main`, sin cambios. Esto fue **antes de nuevos commits de GitHub**: repetir pull al retomar.
+
+**Nuevo artefacto GitHub, todavía NO probado en Ubuntu:** `scripts/laboratorio/b2-dualwan-ospf.sh`. Acciones `precheck`, `up --snapshot-confirmado`, `status`, `fail`, `restore`, `down`. Recupera permisos/capacidades del smoke FRR v5, contenedores `nl360-b2-r-hq`/`nl360-b2-r-s1`, `--network none`, pares veth exclusivos, loopbacks `10.79.0.1/.2`, WAN-P `10.78.0.1/.2/30` costo10, WAN-B `10.78.0.5/.6/30` costo100, dummy LAN HQ/S1 y OSPF área0. Incluye guardia de propietario para `down`, rollback del `up` fallido y comprobación ens33/gateway. Su sintaxis y ejecución **aún deben comprobarse por el usuario**, no declarar adyacencias ni rutas comprobadas.
+
+**Comandos INMEDIATOS para el usuario (solo precheck):**
+```bash
+cd ~/proyectos/netlab360
+GIT_TERMINAL_PROMPT=0 git pull --ff-only origin main
+bash -n scripts/laboratorio/b2-dualwan-ospf.sh
+grep -nE 'precheck\)|up\)|status\)|fail\)|restore\)|down\)|snapshot-confirmado|RESULTADO_B2_DUALWAN_PRECHECK' scripts/laboratorio/b2-dualwan-ospf.sh
+bash scripts/laboratorio/b2-dualwan-ospf.sh precheck
+echo "RESULTADO_PRECHECK_DUALWAN=$?"
+git status --short --branch
+```
+El `precheck` es de lectura y **no crea routers ni WAN**. Revisar su salida antes de autorizar `up`. Log generado `~/netlab360-bootstrap/evidencias/15-b2-dualwan-precheck-*.log`.
+
+**Ventana de cierre:** cesar pruebas nuevas 12:00 Panamá, dejar GitHub sincronizado local/remoto y evidencias guardadas ~12:10, apagar `sync; sudo systemctl poweroff`, comprobar VMware Powered Off y apagar Windows antes de las 12:15. Se programó recordatorio 12:00. S01 ~30% ponderado, #1 ABIERTA, #42 ABIERTA, #12 y #43 ABIERTAS; #39/#40/#41 CERRADAS. Última validación funcional: FRR v5 local exitoso, no repetir por rutina.
+
+**Guía de capturas:** todas las capturas indicadas se presumen tomadas salvo aviso del usuario; dar comandos y límites INICIO/FIN y nombre PNG por prueba. PNG aún no auditados visualmente ni subidos. Bitácora `docs/sesiones/2026-10-13-reanudacion-precheck-y-dualwan.md`.
+
+---
+
+
 ## SESIÓN EN CURSO — 2026-10-13 10:42 PANAMÁ | CIERRE OBLIGATORIO ANTES DE 12:15
 
 **Última instrucción del usuario:** continuar NETLAB360 ahora, pero salir a las **12:15 p. m.**; todo debe quedar sincronizado en GitHub y Ubuntu/Windows apagados. Se creó un aviso puntual para **12:00**, momento en que **DEJAMOS DE INICIAR PRUEBAS**. Esta nota **NO significa que el equipo haya sido encendido o que los comandos hayan sido ejecutados**, porque aún faltan sus salidas del arranque de hoy.
