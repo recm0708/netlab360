@@ -1,5 +1,35 @@
 # NETLAB360 — Registro de inicialización de GitHub
 
+## ÚLTIMA SITUACIÓN — 2026-10-12 23:09 (Panamá) — smoke FRR v2 ExitCode=1; v3 PREPARADA, NO EJECUTADA
+
+**Esta sección tiene prioridad al retomar una conversación.** Proyecto NETLAB360, repositorio privado recm0708/netlab360; fase S01 ABIERTA. Usuario requiere conservar en GitHub la trazabilidad y recibir **múltiples pasos por respuesta**, delimitando cada captura INICIO/FIN con nombre PNG y qué debe verse. Snapshot VMware `NETLAB360-BASE-HERRAMIENTAS` **CONFIRMADO por usuario**, issue #41 cerrada. No volver a preguntar ni crear de nuevo.
+
+- Infraestructura validada: Ubuntu Desktop 26.04.1 LTS en VMware Workstation Pro, VM `netlab360-lab`, usuario `rc-aa-ec`, SSH desde Windows PowerShell `ssh netlab360`, `ens33 192.168.47.40/24` gateway `192.168.47.2`. Docker 29.9.0, Compose 5.6.0, Ansible 2.20.1, OpenTofu 1.13.1, Node 24, GitHub CLI autenticado. Nunca tocar ens33/NetworkManager/VMnet8 durante ensayos.
+- B1 IPAM válido: HQ y S1 propuestas, S2 reservada, 9 VLAN y WAN dual; B2-L2 Linux bridge: VLAN 110 conectividad 3/3, VLAN 120 aislamiento, restauración 3/3; rollback OK. Evidencias PNG de B1/B2-L2 previamente informadas por usuario, no aseguradas como subidas a Git.
+- Imagen `quay.io/frrouting/frr:10.7.1` amd64 descargada; binarios zebra/ospfd/vtysh presentes, entrypoint tini/docker-start. OSPF aún no operativo.
+- Smoke v1 histórico falló tiempo de espera `RESULTADO_SMOKE_FRR=4`. Primer v2 falló antes de Docker con `grep: Permiso denegado`, código 2; corregido con `sudo grep`. **Segundo v2 ejecutado 12/10 23:08:48:** archivos temporales `daemons` 640, UID100/GID101, `frr.conf` 660, UID100/GID102. Docker inició contenedor `nl360-frr-smoke-v2`, que salió inmediato `ExitCode=1`; log: `cannot run : /etc/frr/daemons does not exist`; `RESULTADO_SMOKE_FRR_V2=4`. Postcheck 0 contenedores y namespaces, IP y ruta ens33 intactas, servicios activos y Git `main...origin/main` limpio antes de commits remotos.
+- **Causa probable basada en fuente 10.7.1**: `/usr/lib/frr/frrcommon.sh` comprueba `[ -r "$C_PATH/daemons" ]`; informa inexistencia si no legible. El proceso de entrada corre como root pero el contenedor fue lanzado con `--cap-drop ALL` sin capacidades DAC para leer fichero 640 propiedad frr. **No atribuir fallo definitivamente al montaje físico sin comprobar lectura.** Fuente: https://fossies.org/linux/frr/tools/frrcommon.sh.in y https://docs.frrouting.org/en/latest/setup.html.
+- Evidencia log local `~/netlab360-bootstrap/evidencias/11-b2-frr-smoke-v2-20261012-230848.log`, vista `INICIO CAPTURA B2_07` a `FIN CAPTURA B2_07` producida en consola; **usuario no confirmó PNG B2_07**. Bitácora GitHub `docs/sesiones/2026-10-12-smoke-frr-v2-salida-exit1.md`.
+- **Nueva script v3 EN GITHUB, AÚN NO EJECUTADA:** `scripts/laboratorio/b2-frr-smoke-v3-verificacion-acceso.sh` agrega primero contenedor de lectura `--network none` con bind mount readonly y `CAP_DAC_READ_SEARCH`, exige `FRR_MOUNT_READABLE: SI`, mantiene permisos 640/660; arranque FRR aislado con `CAP_DAC_READ_SEARCH` adicional; observa `vtysh`, OSPF, docker inspect/logs antes de cleanup. `CAP_SYS_ADMIN` presente (amplio, restringir a VM propia y revisar posteriormente).
+- **INSTRUCCIONES PARA CONTINUAR:**
+  ```bash
+  cd ~/proyectos/netlab360
+  GIT_TERMINAL_PROMPT=0 git pull --ff-only origin main
+  bash -n scripts/laboratorio/b2-frr-smoke-v3-verificacion-acceso.sh
+  grep -nE 'FRR_MOUNT_READABLE|DAC_READ_SEARCH|RESULTADO_SMOKE_FRR_V3' scripts/laboratorio/b2-frr-smoke-v3-verificacion-acceso.sh
+  bash scripts/laboratorio/b2-frr-smoke-v3-verificacion-acceso.sh --snapshot-confirmado
+  echo "RESULTADO_EJECUCION_V3=$?"
+  sudo docker ps -a
+  sudo ip netns list
+  ip -4 -br addr show ens33
+  ```
+- **Captura a indicar explícitamente:** `B2_08_Arranque_FRR_V3_Verificado.png` solo si lectura+vtysh+OSPFD+resultado 0; de lo contrario `B2_08_Diagnostico_FRR_V3.png`. Vista de log `12-b2-frr-smoke-v3-*.log` delimitada INICIO/FIN, fecha/hostname, test de montaje y resultado. Si falla, no repetir sin analizar log.
+- Issues #42 (FRR OSPF WAN dual) y #12 (incidente WAN/dashboard) ABIERTAS, #1 S01 ABIERTA, #41 CERRADA. No crear topologías ni redes nuevas aún. Documentar tras siguiente hito real.
+- Política de pausas: después de hitos sustanciales, no cada comando. Nunca subir tokens OAuth ni distribuir snapshot/OVA privado sin sanitizar.
+
+---
+
+
 ## ESTADO INMEDIATO — 2026-10-12, 22:35 Panamá | SMOKE FRR V2 FALLÓ ANTES DE DOCKER; CORREGIDO EN GITHUB
 
 **Leer primero al retomar.** Usuario quiere actualización periódica de GitHub/issues y comandos agrupados con instrucciones **exactas desde/hasta** para cada captura.
