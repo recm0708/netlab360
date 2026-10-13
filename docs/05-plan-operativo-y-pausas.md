@@ -1,5 +1,15 @@
 # Plan operativo NETLAB360 — bloques de trabajo, control de cambios y pausas
 
+## CONTINUIDAD VIGENTE — 13/10/2026 18:36 PANAMÁ | REEMPLAZA ÓRDENES HORARIAS ANTIGUAS
+
+**Las instrucciones antiguas de las 12:00/12:15, apagado, no desplegar laboratorios y estados incompletos corresponden a otra ventana del mismo día y NO son órdenes vigentes ahora.** El usuario decidió continuar y después ejecutó correctamente el ciclo B3 completo. Último postcheck: `down=0`, Docker/netns vacíos, exporter y Prometheus cerrados, puertos `9090`/`9108` libres, `ens33 192.168.47.40/24`, gateway `192.168.47.2` intactos, `git main...origin/main` limpio en la VM antes de nuevos commits.
+
+El prototipo ya tiene OSPF dual-WAN probado, exporter de eventos real, Prometheus scrape/TSDB y tres reglas funcionales. Prueba **`NETLAB360WANPrimaryDown=firing`** y **`NETLAB360WanBackupSelected=firing`** durante conmutación a WAN-B, **0 alertas WAN activas** tras WAN-P restore, todo verificado el 13/10 entre 18:29 y 18:36. [Bitácora](sesiones/2026-10-13-b3-prometheus-alertas-firing-y-resolucion-verificadas.md).
+
+**S01 53% técnico estimado, todavía ABIERTA**; faltan principalmente redes L2/ACL y servicio extremo-a-extremo, LACP/dual-NIC, IaC OpenTofu+Ansible, IA evaluable, entregables académicos y release/OVA. [Plan de recuperación semana académica 9](control/02-plan-recuperacion-semana-09.md) y [matriz](control/01-avance-s01.md). Dejar de repetir OSPF o alerta Prometheus ya superados sin causa técnica. Toda intervención debe iniciar con lectura de `docs/REANUDAR-AQUI.md` y prechecks; mantener `ens33`, VMnet8 y default gateway intactos.
+
+---
+
 ## PRIORIDAD OPERATIVA — 13/10/2026 11:52 | TERMINAR Y APAGAR AHORA
 
 **Última prueba real de B2-L3 CONCLUIDA:** `RESULTADO_EJECUCION_CONVERGENCIA=0`, 76/76 ICMP sondeos correctos, 0 fallas observadas mientras cambiaba FIB WAN-P→WAN-B→WAN-P. Primer sondeo de ruta a respaldo 0.186s; retorno a principal 10.147s desde órdenes (muestreo, **no tiempo de convergencia FRR exacto**). `down` con `LIMPIEZA_FINAL=OK`, sin Docker/netns residuales; `ens33 .40/24` y GW `.2` intactos. Bitácora [aquí](sesiones/2026-10-13-b2-convergencia-icmp-continuo-verificada.md), checkpoint [REANUDAR-AQUI](REANUDAR-AQUI.md). S01 43% estimado, 57% por realizar.
