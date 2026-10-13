@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # NETLAB360 B2-L3: smoke FRR v2 con logs, permisos y rollback.
+# Capacidades concretas FRR revisadas; SYS_ADMIN tiene alcance amplio dentro del contenedor.
 # NO crea WAN, no usa network host, no toca ens33.
 set -Eeuo pipefail
 
@@ -91,11 +92,14 @@ stat -c '%a %u:%g %n' "$TMP" "$TMP/daemons" "$TMP/frr.conf"
 grep -E '^(ospfd|bgpd|vtysh_enable)=' "$TMP/daemons"
 
 echo "========== ARRANQUE DOCKER SIN --rm =========="
+# FRR watchfrr/zebra/mgmtd/ospfd necesitan capacidades concretas.
+# CAP_SYS_ADMIN es poderosa, pero requerida por los procesos FRR indicados;
+# CAP_SETPCAP es necesaria para gestionar capacidades tras bajar privilegios.
+# Este contenedor carece de red y no comparte network namespace del anfitrion.
 sudo docker run -d --name "$NAME" --network none \
   --cap-drop ALL --cap-add NET_ADMIN --cap-add NET_RAW \
-  --cap-add SYS_ADMIN --cap-add SETUID --cap-add SETGID \
-  --cap-add CHOWN --cap-add DAC_OVERRIDE --cap-add NET_BIND_SERVICE \
-  --security-opt no-new-privileges \
+  --cap-add SYS_ADMIN --cap-add NET_BIND_SERVICE --cap-add SETPCAP \
+  --cap-add SETUID --cap-add SETGID --cap-add CHOWN \
   --pids-limit 128 --memory 512m \
   --mount "type=bind,source=$TMP,target=/etc/frr" "$IMAGE"
 
