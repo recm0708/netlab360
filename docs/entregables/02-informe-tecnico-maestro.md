@@ -1,6 +1,6 @@
 # NETLAB360 — Documento 02: Manual técnico integral de implementación, administración y uso
 
-**Versión propuesta V0.2; aprobación del usuario pendiente.** Entregable ÚNICO que reúne el antiguo informe de laboratorio y el antiguo manual de usuario. Debe permitir que un operador autorizado **reproduzca desde cero** la plataforma y luego la utilice. Redacción técnica impersonal y operativa, similar a un manual empresarial. **Portada institucional preparada por el usuario** y un índice general automático único.
+**Índice V0.2 APROBADO por el usuario el 14/10/2026, sujeto a cambios si la profesora lo indica.** Entregable ÚNICO que reúne el antiguo informe de laboratorio y el antiguo manual de usuario. Debe permitir que un operador autorizado **reproduzca desde cero** la plataforma y luego la utilice. Redacción técnica impersonal y operativa, similar a un manual empresarial. **Portada institucional preparada por el usuario** y un índice general automático único.
 
 ## Preliminares
 - Portada institucional (usuario).
@@ -107,4 +107,4 @@
 - En la edición académica, redactar en tercera persona o instrucción profesional («compruebe», «ejecute», «se obtiene»), no en primera persona autobiográfica.
 - El documento final cubre **hasta la última fase realmente concluida**, sin capítulos vacíos de etapas que no se realizaron; no falsear el plan original del repositorio ni cambiar la rúbrica sin acuerdo docente.
 
-**Próximo inicio después de aprobación:** 1. Introducción y finalidad del manual técnico. La prioridad inicial del usuario será comenzar la redacción del Documento 01.
+**Próximo inicio editorial:** 1. Introducción y finalidad del manual técnico, después de que el usuario avance con el Documento 01. La prioridad inicial del usuario será comenzar la redacción del Documento 01.
