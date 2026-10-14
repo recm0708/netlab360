@@ -1,5 +1,7 @@
 # NETLAB360 — Auditoría visual del lote 03: B2-L2, B2-L3 y B3 vivo/Prometheus
 
+> **Ubicación VIGENTE desde el commit [570088c](https://github.com/recm0708/netlab360/commit/570088c5ed3fd7ce3b888facecfe79c39e78005f):** los PNG ya versionados se consultan directamente en [`evidencias/capturas/`](../../evidencias/capturas/) y sus CSV en [`evidencias/manifiestos/`](../../evidencias/manifiestos/). 20 capturas del lote03; CSV actual `../../evidencias/manifiestos/MANIFIESTO_SHA256_NETLAB360_LOTE03_20PNG.csv`. Cualquier ruta antigua `.../lote0X/` que figure a continuación describe su **ubicación histórica**, no la actual. La migración conservó los bytes (Git detectó 100% de similitud). El lote05 aún no figura físicamente en GitHub.
+
 > **Actualización posterior verificada:** los 20 PNG y su manifiesto CSV **FUERON PUBLICADOS EN GITHUB** el 13/10/2026 por el usuario, commit [`0d749df`](https://github.com/recm0708/netlab360/commit/0d749dff5a27c4c108aea7cdec8ddb5723394bb1), `PUBLICACION_GITHUB=OK`, `COMMIT_LOCAL=COMMIT_REMOTO=0d749dff5a27c4c108aea7cdec8ddb5723394bb1`, total 21 archivos. Las menciones de “pendiente” abajo describen el estado histórico de las 20:52 y no el vigente.
 
 **Corte:** 13 de octubre de 2026, 20:52 Panamá (UTC−05).  
