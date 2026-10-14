@@ -1,10 +1,13 @@
 # NETLAB360 — Control de avance y cierre de Fase S01
 
-**Corte técnico actualizado:** 2026-10-13 20:51 (Panamá, UTC−05:00).  
+**Corte técnico actualizado:** 2026-10-13 21:20 (Panamá, UTC−05:00).  
 **Versión de seguimiento:** v2.2. **Fase:** [#1](https://github.com/recm0708/netlab360/issues/1) **ABIERTA**.  
 **Estado oficial de la rúbrica:** pendiente de ratificación con la docente. **Porcentaje provisional; no es nota, auditoría de cumplimiento oficial ni valor calculado por GitHub.**
 
 ## 1. Estimación ponderada del avance S01
+
+**Estado más reciente (prevalece):** lote03 20 PNG + CSV publicados a GitHub en `0d749df`, lote04 13 PNG LACP recibidos, auditados y pendientes de push; ensayo active-backup dualNIC **abortado antes de HTTP por bug de variable** y corregido a `5a4569f` en GitHub. No sumar puntos hasta nueva ejecución validada, por lo que S01 **permanece 63/100**. [Auditoría lote04](../evidencias/05-auditoria-visual-lote04-lacp-2026-10-13.md).
+
 
 Los pesos se asignan a las capacidades mínimas que aparecen en la issue #1 y en `docs/05-plan-operativo-y-pausas.md`. Se acredita solo lo comprobado en la VM, no la mera instalación de software ni el diseño no desplegado.
 
@@ -14,11 +17,11 @@ Los pesos se asignan a las capacidades mínimas que aparecen en la issue #1 y en
 | B1: topología e IPAM/SoT inicial | 10 | **8** | YAML draft validado, 3 sedes/9 VLAN/2 WAN previstas, sin solapamientos; diseño no desplegado/aprobado |
 | B2-L2: VLAN/trunks/ACL de primer dominio | 10 | **8** | Trunk 802.1Q VLAN110/120 validado; **19:14 router-on-a-stick** `eth0.110=10.70.10.1/24` y `eth0.120=10.70.20.1/24`, cliente `10.70.10.10`→servidor HTTP `10.70.20.20`: baseline TCP8080 y TCP8081 OK; ACL `nft` en namespace router permite 8080, deniega 8081 (curl timeout esperado, contadores 1 paquete accept/2 drop), servicio 8081 activo en destino. Código0, cleanup y gestión intactos. Falta integración de sede/servicio WAN y cierre de arquitectura L2 completa |
 | B2-L3: FRR/OSPF, WAN primaria/respaldo, convergencia y failover | 18 | **18** | FRR/OSPF Full, FIB WAN-P→WAN-B→WAN-P, 30/30 ICMP y 76/76 muestras anteriores; **+1** por cliente namespace HQ `10.70.10.10/32` y servidor HTTP S1 `10.71.10.20/32:8080` reales con HTTP exitoso vía WAN-P, WAN-B y WAN-P restaurada, rutas simétricas en ambos routers, limpieza código0 a 19:44. Hosts conectados por veth P2P, no integrados a VLAN/switches anteriores; sin garantía demostrada de cero cortes durante conmutación |
-| Redundancia LAG/LACP, equipos, servidor dual-NIC | 10 | **4** | **20:43–20:51 LACP IEEE 802.3ad REAL en dos namespaces aislados:** bonds A/B negocian 2 puertos activos; al desactivar a1 permaneció 1 en ambos extremos y HTTP `NETLAB360_LACP_HTTP_OK`; al restaurar a1 volvieron a 2 activos y HTTP OK. `LACP_8023AD_TRES_ESTADOS=OK`, `RESULTADO_B2_LACP=0`, Docker/netns limpios, ens33/GW intactos. No se probó redundancia física de NIC VMware, de equipo/switch ni tasa de pérdidas durante el cambio. Fotos LACP pendientes de recibir |
+| Redundancia LAG/LACP, equipos, servidor dual-NIC | 10 | **4** | **20:43–20:51 LACP IEEE 802.3ad REAL en dos namespaces aislados:** bonds A/B negocian 2 puertos activos; al desactivar a1 permaneció 1 en ambos extremos y HTTP `NETLAB360_LACP_HTTP_OK`; al restaurar a1 volvieron a 2 activos y HTTP OK. `LACP_8023AD_TRES_ESTADOS=OK`, `RESULTADO_B2_LACP=0`, Docker/netns limpios, ens33/GW intactos. No se probó redundancia física de NIC VMware, de equipo/switch ni tasa de pérdidas durante el cambio. Fotos LACP **recibidas y auditadas** (13 PNG en 4 secuencias), pendientes de push binario |
 | IaC y compliance (OpenTofu + Ansible) | 10 | **1** | herramientas instaladas y operativas, sin automatización de la topología NETLAB360 |
 | B3: telemetría/API/dashboard/alertas, eventos reales | 15 | **10** | Histórico 2pt + exporter live/eventos reales 3pt + Prometheus TSDB/scrape 2pt + **3pt nuevos**: glob absoluto y tres reglas cargadas (B3_11), WAN-P DOWN y respaldo WAN-B con **ambas alertas Prometheus firing** (B3_12), WAN-P restaurada y **0 alertas WAN activas** (B3_13), limpieza B3_14: puertos 9090/9108 libres, Docker/netns vacíos, Git y red intactos. Aún sin Alertmanager/receptor, NOC multisede integral ni SLI/SLO |
 | B4: anomalías/datos/IA evaluada | 5 | **0** | no existe prototipo con evaluación |
-| Documentación académica, evidencia, CI/PR y regresión | 5 | **2** | bitácoras/logs/commits y **24 PNG originales auditados/publicados** (19 B1/B2 + 5 B3); **20 PNG nuevos lote03 auditados y con SHA-256, AÚN NO publicados como binarios en GitHub**. Faltan 4 fotos LACP, informe APA, manual, CI y regresión integrada |
+| Documentación académica, evidencia, CI/PR y regresión | 5 | **2** | bitácoras/logs/commits y **24 PNG originales auditados/publicados** (19 B1/B2 + 5 B3); **20 PNG nuevos del lote03 auditados y publicados** como binarios en GitHub (commit `0d749df`); 13 capturas LACP auditadas y empaquetadas, pendientes de push. Faltan informe APA, manual, CI y regresión integrada |
 | B5: release y OVA sanitizada importada, SHA-256 | 5 | **0** | sin exportación, reimportación ni tag/release demostrable |
 | **TOTAL** | **100** | **63** | **63% estimado, 37% pendiente** |
 
