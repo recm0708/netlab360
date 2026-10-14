@@ -1,5 +1,8 @@
 # NETLAB360 — Planificación semestral
 
+> **ESTADO VIGENTE 13/10/2026 23:35 (cierre documental iniciado):** lote06 **PUBLICADO y auditado** en commit `b410548`, **86 PNG planos y 7 CSV**, Git local/remoto idénticos, VM gestión intacta, CI run `38511477595` exitoso. S01 **72/100 técnico estimado; NO CERRADA**. Preparados tres **borradores editables** de [informe](docs/entregables/s01/01-informe-academico-borrador.md), [bitácora](docs/entregables/s01/02-bitacora-tecnica-borrador.md) y [manual](docs/entregables/s01/03-manual-usuario-borrador.md), además del [checklist de cierre](docs/entregables/s01/00-checklist-cierre-y-entrega.md). Quedan validación de rúbrica, selección de figuras, evidencia complementaria y pruebas de entrega/OVA. Las notas antiguas de 62 PNG y documentos no iniciados son HISTÓRICAS, no representan el estado actual.
+
+
 > **Checkpoint 13/10 23:24:** B4 reglas deterministas sobre CSV real (76 sondeos, 0 pérdidas/alertas, cuatro transiciones operativas), 24 tests exitosos y GitHub Actions Node24 run 38510552044 exitosa. **IA/ML NO entrenada ni evaluada.** Auditoría de **24 PNG** IaC/B4 y ZIP lote06 lista, pero aún pendiente importación física al clon Ubuntu y push (62 PNG antes; 86 después). Cuatro capturas IAC incompletas se recuperarán de logs sin repetir apply. S01 **72% estimado**. [Auditoría lote06](docs/evidencias/08-auditoria-lote06-iac-b4-2026-10-13.md).
 
 
