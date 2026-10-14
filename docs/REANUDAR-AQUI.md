@@ -1,6 +1,6 @@
 # NETLAB360 — REANUDAR AQUÍ
 
-**Checkpoint editorial 14/10/2026.** El usuario redefinió la entrega: **DOS documentos maestros consolidados, no tres**. No comenzar S02 antes de terminar contenido S01 y brechas técnicas exigibles. Próxima acción: presentar índices 01/02 para aprobación del usuario; **no comenzar la redacción hasta que diga «comencemos»**. Las portadas las crea el usuario en su formato institucional.
+**Checkpoint editorial 14/10/2026.** El usuario redefinió la entrega: **DOS documentos maestros consolidados, no tres**. No comenzar S02 antes de terminar contenido S01 y brechas técnicas exigibles. **Los índices 01/02 fueron APROBADOS por el usuario el 14/10/2026**, salvo modificaciones solicitadas después por la profesora. **No comenzar la redacción hasta que diga «comencemos».** Las portadas las crea el usuario en su formato institucional.
 
 ## Política documental actual
 
@@ -14,7 +14,7 @@
 
 **S01 sigue ABIERTA (72/100 estimación interna, NO nota docente).** B0 VM/VMnet8, IPAM B1, VLAN/ACL HTTP y FRR OSPF dual WAN HQ–S1, LACP/bonding virtual, SoT/OpenTofu→Ansible FRR con reconciliación **de archivos**, exporter/NOC básico y Prometheus firing/resuelto, perfil y diagnóstico determinista B4 sin ML. **86 PNG y 7 CSV** publicados, lote06 b410548; **24 pruebas unitarias**, CI GitHub 38511477595 exitosa. Postcheck 13/10 23:35:02: Docker/netns vacíos; ens33 192.168.47.40/24 y gateway 192.168.47.2, servicios activos.
 
-**Pendientes S01:** guía/rúbrica y alcance, contenido de ambos documentos, cuatro fotos IaC desde logs y captura postcheck adicional; componentes L2–WAN integrados, redundancia de equipo, NOC/receptor, ML evaluable, release/OVA **solo cuando rúbrica exija su cierre en S01**. Consulte [once criterios S01](control/03-matriz-aceptacion-y-decisions-s01.md). IaC avanzada se planificó S03 y ML S06 en issues independientes.
+**Pendientes S01:** guía/rúbrica y alcance (índices ya aprobados), contenido de ambos documentos, cuatro fotos IaC desde logs y captura postcheck adicional; componentes L2–WAN integrados, redundancia de equipo, NOC/receptor, ML evaluable, release/OVA **solo cuando rúbrica exija su cierre en S01**. Consulte [once criterios S01](control/03-matriz-aceptacion-y-decisions-s01.md). IaC avanzada se planificó S03 y ML S06 en issues independientes.
 
 ## Si se reanuda Ubuntu
 
