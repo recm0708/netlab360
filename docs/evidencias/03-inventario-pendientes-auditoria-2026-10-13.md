@@ -1,5 +1,16 @@
 # NETLAB360 — Inventario consolidado de capturas pendientes de auditoría
 
+## ACTUALIZACIÓN VIGENTE — 13/10/2026 20:52 PANAMÁ | LOS 20 PNG YA FUERON RECIBIDOS Y AUDITADOS
+
+**Esta sección sustituye el estado 'pendiente de recibir' de las tablas históricas siguientes.** El usuario adjuntó de verdad **20 PNG** (B2-L2 seis, B2-L3 cuatro, B3 live/Prometheus diez). Se inspeccionaron visualmente y cotejaron con logs, 20/20 aceptadas: **18 VÁLIDAS y 2 VÁLIDAS CON OBSERVACIÓN** (B2_L2_06 por líneas nft divididas; B3_09_FINAL por prompt sudo sin contraseña). Se calcularon SHA-256 por archivo. [Auditoría y 20 hashes completos](04-auditoria-visual-lote03-2026-10-13.md).
+
+**NO PUBLICADOS COMO PNG BINARIOS EN GITHUB TODAVÍA:** está preparado ZIP `NETLAB360_LOTE03_20PNG_AUDITADOS_2026-10-13.zip` con 20 originales, manifest y README, SHA256 del ZIP `9e11e1c3181ba62f53b1bde894f77ae4af0c6417beba1ebf10e578b90a342585`. Usuario debe transferirlo al clon `~/proyectos/netlab360/evidencias/capturas/B2_B3_lote03/`, validar los 20 hashes, commit/push, y compartir salida; hasta entonces **24 PNG anteriores publicados + 20 PNG nuevos auditados pero no publicados**.
+
+**LABORATORIO LACP AHORA PROBADO (antes futuro):** el 13/10 20:43–20:51 `802.3ad` negoció 2→1→2 miembros activos por ambos extremos, HTTP respondió en tres estados, cleanup `RESULTADO_B2_LACP=0`, gestión intacta. [Bitácora LACP](../sesiones/2026-10-13-b2-lacp-8023ad-verificado.md). **SOLO ESTÁN PENDIENTES DE RECEPCIÓN VISUAL LAS 4 CAPTURAS LACP_01/02/03/04_FINAL**; resultados textuales ya comprobados. Las 3 opcionales históricas se mantienen opcionales. S01 matriz técnica ahora **63% estimado**. No repetir pruebas.
+
+---
+
+
 **Corte consolidado:** 13/10/2026 después de 19:45 (Panamá, UTC−05).  
 **Estado verificado contra registro GitHub:** 24 PNG anteriores **ya publicados y auditados visualmente**, 19 en `evidencias/capturas/B1_B2_lote01/` (commit `d62d33b`) y 5 en `evidencias/capturas/B3_lote02/` (commit `a21b8f8`). **Omitirlos de cualquier nueva solicitud de fotos.** Enlace [auditoría B1/B2](01-auditoria-visual-b1-b2-2026-10-13.md) y [auditoría B3 histórico](02-auditoria-visual-b3-2026-10-13.md). Estas rutas/conteos se basan en la verificación de publicación documentada anteriormente; esta edición no incorpora nuevos PNG.
 
