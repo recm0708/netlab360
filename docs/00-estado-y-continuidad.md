@@ -1,20 +1,20 @@
 # NETLAB360 — Estado actual y continuidad
 
-**Actualización editorial:** 14/10/2026. **Documento operativo canónico:** [REANUDAR AQUÍ](REANUDAR-AQUI.md). En caso de conflicto, consultar GitHub commits y las bitácoras de sesión. El historial completo de esta página está preservado en Git.
+**Revisión editorial 14/10/2026.** Fuentes canónicas: [REANUDAR AQUÍ](REANUDAR-AQUI.md) y [matriz de aceptación S01](control/03-matriz-aceptacion-y-decisions-s01.md).
 
-## Estado validado
-- S01 permanece abierta, **72/100 de avance técnico estimado**; rúbrica/alcance docente sin ratificar.
-- B0–B4 tienen subpruebas funcionales comprobadas (VM/VMnet8, IPAM, L2 VLAN/ACL, FRR OSPF dual WAN, LACP/active-backup virtual, IaC→FRR, exporter/Prometheus, reglas descriptivas B4), sin integración integral ni modelo IA evaluado.
-- 86 PNG planos y 7 manifiestos CSV SHA256 en GitHub. Lote06 commit b410548 y Git local/remoto iguales tras push del operador.
-- CI offline exitosa run 38511477595, 24 unit tests locales. Host postcheck 13/10 23:35:02: Docker/netns vacíos, ens33 192.168.47.40/24, gateway 192.168.47.2, servicios docker/ssh/open-vm-tools activos.
-- Archivos posteriores de documentación en GitHub pueden requerir git pull --ff-only en Ubuntu; no existe actividad de laboratorio pendiente de cleanup.
+## Estado operativo
 
-## Política vigente de documentación y calendario
-El usuario ha establecido **tres documentos maestros únicos S01–S08**: proyecto académico, implementación/laboratorios y manual usuario. En plantilla Word institucional, texto por secciones, APA 7 y referencias citadas; **un índice automático por documento**. [Política de entrega](entregables/00-politica-editorial-y-entrega-acumulativa.md). Los borradores V0.1 anteriores no se utilizarán. **No iniciar S02** hasta terminar la sección S01 de los tres maestros y resolver brechas de S01 según guía/rúbrica.
+S01 ABIERTA, 72/100 interno, guía/rúbrica docente pendiente. El usuario prohíbe iniciar S02 hasta terminar los textos S01 y las exigencias técnicas verificables. Los bloques B0–B4 tienen subpruebas funcionales; no presentar topologías separadas como una red integral ni detector por reglas como IA entrenada.
 
-## Riesgos y obligaciones pendientes
-- La matriz de once criterios S01 contiene elementos marcados en otras issues como S03 (IaC avanzada) y S06 (dataset/ML). No modificar alcance unilateralmente; validar con guía docente [#36](https://github.com/recm0708/netlab360/issues/36).
-- Faltan integración de topologías L2→WAN→servicio/NOC, respaldo real de equipo/servidor, evolución IaC/alertas y evaluación ML si se exigen todos los criterios de S01; falta release/OVA cuando corresponda.
-- Cuatro capturas IaC desde logs originales y postcheck lote06 nuevo siguen pendientes de incorporación física. No repetir apply por imágenes.
+Evidencia: 86 PNG planos, 7 CSV hash, commit lote06 b410548, 24/24 tests y CI run 38511477595. Último postcheck sin Docker/netns, gestión ens33 192.168.47.40/24 y gateway .2, tres servicios activos. Commits editoriales posteriores requieren pull ff-only de Ubuntu.
 
-**Rutas de trabajo:** [matriz S01](control/01-avance-s01.md), [aceptación](control/03-matriz-aceptacion-y-decisions-s01.md), [índices maestros](entregables/00-politica-editorial-y-entrega-acumulativa.md), [checkpoint](REANUDAR-AQUI.md).
+## Entregables oficiales del trabajo: dos documentos
+
+1. [Documento 01 — Diseño, desarrollo y evaluación académica](entregables/01-proyecto-investigacion-maestro.md): fundamentos, arquitectura, resultados e incidentes técnicos reales con su mitigación **dentro del desarrollo**.
+2. [Documento 02 — Manual técnico integral](entregables/02-informe-tecnico-maestro.md): instalación desde cero, requisitos, comandos corregidos, pruebas, capturas, puesta en marcha, uso y administración; **posibles fallos y solución preventiva**, sin cronología de equivocaciones históricas.
+
+Portadas hechas por usuario. Redacción por secciones; un índice automático por documento, APA7 y referencias realmente citadas, figuras y tablas presentadas/interpretadas. Al finalizar, describir fases realmente completadas sin capítulos ficticios ni ocultar roadmap original.
+
+## Pendientes
+
+Aprobar dos índices antes de comenzar Documento 01; confirmar guía/rúbrica oficial, completar S01 y fotografías IaC pendientes, no crear nuevos laboratorios salvo aceptación estricta. Documento 03 de manual separado fue retirado y su contenido incorporado al 02.
