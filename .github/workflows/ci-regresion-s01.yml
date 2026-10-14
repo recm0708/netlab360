@@ -1,0 +1,64 @@
+name: NETLAB360 - CI regresion B1 B2 B3 IaC B4
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/**'
+      - 'servicios/**'
+      - 'inventario/**'
+      - 'ansible/**'
+      - 'iac/**'
+      - 'tests/**'
+      - '.github/workflows/ci-regresion-s01.yml'
+  pull_request:
+    paths:
+      - 'scripts/**'
+      - 'servicios/**'
+      - 'inventario/**'
+      - 'ansible/**'
+      - 'iac/**'
+      - 'tests/**'
+      - '.github/workflows/ci-regresion-s01.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  offline-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Obtener codigo
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Dependencias minimas para IPAM
+        run: python -m pip install --disable-pip-version-check PyYAML==6.0.2
+
+      - name: Compilar sintaxis Python
+        run: python -m compileall -q scripts servicios tests
+
+      - name: Validar IPAM declarativo
+        run: python scripts/validacion/validar-ipam.py inventario/ipam/topologia-b1.yaml
+
+      - name: Ejecutar regresiones offline
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+
+      - name: Validar sintaxis Bash
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' f; do bash -n "$f"; done \
+            < <(find scripts -type f -name '*.sh' -print0)
+          echo "CI_BASH_SINTAXIS=OK"
+
+      - name: Delimitar alcance
+        run: |
+          echo "CI_OFFLINE_REGRESION=OK"
+          echo "AVISO: sin Docker/FRRouting real, sin VMware, sin validacion de entregables APA u OVA."
