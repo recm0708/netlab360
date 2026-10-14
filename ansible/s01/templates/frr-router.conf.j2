@@ -1,0 +1,34 @@
+! NETLAB360 {{ item.value.router }} - candidato declarativo de SoT via OpenTofu y Ansible
+! No aplicado a routers ni redes del host
+frr version 10.7.1
+frr defaults traditional
+hostname {{ item.value.router }}
+log stdout
+service integrated-vtysh-config
+!
+{% for link in model.wan_links | sort(attribute='ospf_cost') %}
+{% set iface = 'wan-p' if 'PRIMARIA' in link.id else 'wan-b' %}
+{% set addr = link.a.address if link.a.router == item.value.router else link.b.address %}
+{% set peer_site = 'S1' if item.key == 'HQ' else 'HQ' %}
+interface {{ iface }}
+ description WAN {{ 'primaria' if iface == 'wan-p' else 'respaldo' }} {{ item.key }}-{{ peer_site }} ({{ addr }})
+ ip ospf area 0
+ ip ospf network point-to-point
+ ip ospf cost {{ link.ospf_cost }}
+!
+{% endfor %}
+interface lo
+ ip ospf area 0
+!
+interface lan0
+ description LAN {{ item.key }} {{ item.value.vlans[0].subnet }} (dummy aislada)
+ ip ospf area 0
+!
+router ospf
+ ospf router-id {{ item.value.loopback.split('/')[0] }}
+ passive-interface default
+ no passive-interface wan-p
+ no passive-interface wan-b
+!
+line vty
+!
