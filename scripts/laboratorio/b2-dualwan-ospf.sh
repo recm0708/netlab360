@@ -6,6 +6,7 @@ ACTION=""; CONF=""
 if (( $# > 0 )); then ACTION="$1"; fi
 if (( $# > 1 )); then CONF="$2"; fi
 ROOT="$HOME/proyectos/netlab360"
+IAC_CONF_DIR="${NETLAB360_IAC_CONFIG_DIR:-}" # opcional; sin definir mantiene baseline B2
 STATE="$HOME/netlab360-bootstrap/estado-b2-dualwan"
 EVID="$HOME/netlab360-bootstrap/evidencias"
 IMAGE="quay.io/frrouting/frr:10.7.1"
@@ -67,6 +68,15 @@ precheck() {
   for l in nl2hp nl2sp nl2hb nl2sb; do
     if ip link show "$l" >/dev/null 2>&1; then echo "ERROR: veth $l ya existe"; return 3; fi
   done
+  if [[ -n "$IAC_CONF_DIR" ]]; then
+    [[ "$IAC_CONF_DIR" == "$HOME/netlab360-bootstrap/iac/s01/rendered" ]] || {
+      echo "ERROR: IAC_CONFIG_DIR fuera de directorio externo permitido"; return 3;
+    }
+    python3 scripts/validacion/precheck-iac-b2.py || return 3
+    echo "B2_ORIGEN_CONFIG=IAC_OPENTOFU_ANSIBLE"
+  else
+    echo "B2_ORIGEN_CONFIG=BASELINE_REPOSITORIO"
+  fi
   echo "RESULTADO_B2_DUALWAN_PRECHECK=0"
 }
 prepare_config() {
@@ -84,7 +94,10 @@ prepare_config() {
   else
     printf 'ospfd=yes\n' >> "$d/daemons"
   fi
-  cp "$ROOT/topologias/b2-frr/configs/$router.frr.conf" "$d/frr.conf"
+  local config_dir="$ROOT/topologias/b2-frr/configs"
+  if [[ -n "$IAC_CONF_DIR" ]]; then config_dir="$IAC_CONF_DIR"; fi
+  echo "B2_FUENTE_CONFIG_${router}=$config_dir/$router.frr.conf"
+  cp "$config_dir/$router.frr.conf" "$d/frr.conf"
   printf 'service integrated-vtysh-config\nhostname %s\n' "$router" > "$d/vtysh.conf"
   sudo chown 100:101 "$d" "$d/daemons"
   sudo chown 100:102 "$d/frr.conf" "$d/vtysh.conf"
