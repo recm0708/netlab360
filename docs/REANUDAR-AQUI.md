@@ -1,5 +1,18 @@
 # NETLAB360 — REANUDAR AQUÍ (checkpoint operativo)
 
+## CHECKPOINT VIGENTE — 13/10/2026 POSTERIOR A 21:39 | APLANADO PUBLICADO, LOTE05 PENDIENTE
+
+**Fuente: salida real de Ubuntu y árbol GitHub verificado.** El operador corrió `aplanar-capturas.py --plan`: 57 PNG, 4 CSV, 0 colisiones, 61 movimientos. `--aplicar` **sí movió los 61 archivos y generó el mapa SHA256**, pero terminó con código1 porque `git mv` dejó físicamente las cuatro carpetas originales (vacías o por verificar). El usuario **ya hizo commit/push** de esos 61 movimientos + mapa: commit [`570088c`](https://github.com/recm0708/netlab360/commit/570088c5ed3fd7ce3b888facecfe79c39e78005f), `GITHUB_SINCRONIZADO=SI`, SHAs local/remoto iguales. Todos los PNG fueron reportados con similitud Git 100%. En **GitHub** ya NO hay cuatro subcarpetas: **57 PNG directos** en `evidencias/capturas/`, **4 CSV históricos + 1 mapa** en `evidencias/manifiestos/`. El clon Ubuntu aún muestra cuatro carpetas físicas residuales, no versionadas.
+
+**Lote05:** ZIP local `~/NETLAB360_LOTE05_DUALNIC_NOC_5PNG_2026-10-13.zip` con SHA256 verificado `9e57057e402a9a87e1c2e91997ad59dd88cb136d6329f75ba50721181959cdfa`. El importador anterior abortó en guardia de carpetas y **NO añadió 5 PNG ni CSV**; por ello el commit `570088c` usa un mensaje que menciona lote05 prematuramente. **No alterar/revertir ese commit; completar mediante nuevo commit.** Avance técnico S01 sigue 65/100 estimado, no sumar por organización.
+
+**Corrección ya publicada en GitHub después del commit del operador:** `scripts/mantenimiento/aplanar-capturas.py` elimina carpetas viejas solo si están vacías al finalizar movimientos (no repetir `--aplicar`); `scripts/mantenimiento/importar-lote05.py` ahora reconoce **exclusivamente** las cuatro carpetas antiguas si están vacías y las retira de modo seguro **después** de validar ZIP, manifiesto, hashes, nombres y antes de escribir los 5 PNG. Nuevo auditor no destructivo `scripts/validacion/validar-capturas-unificadas.py` verifica mapa de 61 entradas y cinco capturas nuevas. **Próxima tanda:** Git limpio + `git pull --ff-only`, inspeccionar físicamente el contenido de las cuatro carpetas, verificar nuevos scripts, reejecutar SOLO `importar-lote05.py` (no aplanado), auditar 62 PNG + 6 CSV, stage solo `evidencias/capturas` + `evidencias/manifiestos`, commit/push nuevo, comparar SHAs y recuento remoto, postcheck Git limpio. Si queda cualquier archivo oculto o directorio con datos, abortar sin forzar borrado. **No** tocar VMware, VMnet8, ens33, gateway, rutas/firewall, Docker, servicios ni logs fuera del clon. Documentación de auditoría de lotes 01–05 ya tiene rutas actuales y distingue historial.
+
+**Pendientes posteriores:** normalizar referencias de acceso en README/checkpoint, cierre issue #43 según alcance de próximas evidencias y comenzar IaC OpenTofu/Ansible integrado, sin repetir LACP/dualNIC/OSPF ya validados.
+
+---
+
+
 ## CHECKPOINT VIGENTE — 13/10/2026 21:39 PANAMÁ | DUAL-NIC APROBADO, LOTE04 PUBLICADO, APLANADO PREPARADO
 
 **Esta sección prevalece sobre menciones previas de “dualNIC pendiente” y de lote04 no publicado.** El operador publicó lote04 con **13 PNG LACP + CSV** y confirmó `LOTE04_PUBLICADO=OK`; commit `2af7a8054a87bc10db1195f5f54d92b2dbc04c8f`, `main...origin/main` limpio. En total GitHub tiene **57 PNG** en cuatro carpetas, antes del lote05.
