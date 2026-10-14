@@ -17,4 +17,4 @@ Portadas hechas por usuario. Redacción por secciones; un índice automático po
 
 ## Pendientes
 
-Aprobar dos índices antes de comenzar Documento 01; confirmar guía/rúbrica oficial, completar S01 y fotografías IaC pendientes, no crear nuevos laboratorios salvo aceptación estricta. Documento 03 de manual separado fue retirado y su contenido incorporado al 02.
+Dos índices aprobados el 14/10/2026; comenzar Documento 01 sólo cuando el usuario lo indique; confirmar guía/rúbrica oficial, completar S01 y fotografías IaC pendientes, no crear nuevos laboratorios salvo aceptación estricta. Documento 03 de manual separado fue retirado y su contenido incorporado al 02.
