@@ -1,5 +1,16 @@
 # NETLAB360 — REANUDAR AQUÍ (checkpoint operativo)
 
+## ESTADO FOTOGRÁFICO VIGENTE — 13/10/2026 | NO PEDIR ARCHIVOS YA PUBLICADOS
+
+Se creó y se verificó en GitHub el [inventario maestro de evidencias pendientes](https://github.com/recm0708/netlab360/blob/main/docs/evidencias/03-inventario-pendientes-auditoria-2026-10-13.md): **24 PNG B1/B2+B3 histórico ya inspeccionados y alojados físicamente** en `evidencias/capturas/B1_B2_lote01` (19) y `evidencias/capturas/B3_lote02` (5), excluidos expresamente de nuevas solicitudes.
+
+**20 PNG prioritarios pendientes de recepción visual:** B2_L2_02–07 (6), B2_L3_01/02/03/04_FINAL (4), B3_05/06/07/08/09_FINAL/10/11/12/13/14 (10). El usuario enviará fotos junto con las salidas del próximo laboratorio. **3 opcionales históricas:** B3_04_Final, B3_09 intermedio y B2_L3_04 del intento fallido; no repetir ensayos para obtenerlas. **4 LACP futuras:** B2_LACP_01/02/03/04, no contarlas hasta ejecutar la prueba. B3_08 navegador debe confirmarse si existe. El hecho de haber recibido resultados de consola solo acredita la prueba, **no revisión de píxeles ni publicación de PNG**.
+
+**Ultimo hito realmente probado:** B2-L3 HTTP HQ→S1 correcto en tres WAN y rollback 19:44; S01 59% estimado; Git sincronizado a `6a3e50f` antes de commits posteriores. **Próximo paso operativo 105–114:** pull Git ff-only, revisión de sintaxis del LACP script y de módulos/red, precheck no hay namespaces, luego único ensayo LACP 802.3ad modo 2→1→2 puertos con HTTP y rollback; inspeccionar log sin reejecutar, capturas LACP_01–03 y final LACP_04. Si falla, enviar resultados y no repetir a ciegas. No tocar ens33 `192.168.47.40/24`, default `192.168.47.2`, VMnet8, firewall ni IPAM del host. **Issue #43** actualizada con inventario y distinción pendiente/pub.
+
+---
+
+
 ## CHECKPOINT ACTUAL — 2026-10-13 19:45 PANAMÁ | HTTP HQ-S1 REAL SUPERADO, LACP SIGUIENTE
 
 **PREVALECE sobre notas anteriores que decían HTTP E2E fallido o pendiente.** El usuario ejecutó el script corregido `b2-l3-http-clientes-wan.sh --snapshot-confirmado` y mostró: `OSPF_DUAL_FULL: SI`, `RUTAS_OSPF_BIDIRECCIONALES_WAN_P=OK`, `RESULTADO_B2_DUALWAN_UP=0`. Dos hosts namespace (cliente HQ `10.70.10.10/32`, servidor S1 `10.71.10.20/32:8080` unidos vía veth P2P al FRR, sin integración a trunk VLAN) se comunicaron HTTP correctamente tras seleccionar **WAN-P → WAN-B → WAN-P**. Marcadores `HTTP_WAN_PRINCIPAL=OK`, `HTTP_WAN_RESPALDO=OK`, `HTTP_WAN_RESTAURADA=OK`, `B2_L3_HTTP_TRES_ESTADOS=OK`, `RESULTADO_B2_L3_HTTP_WAN=0`, `RESULTADO_EJECUCION_E2E=0`, limpieza B2 código0. **No se probó ausencia absoluta de interrupciones HTTP durante la transición**. [Bitácora real](sesiones/2026-10-13-b2-l3-http-hq-s1-wan-tres-estados-verificados.md).
