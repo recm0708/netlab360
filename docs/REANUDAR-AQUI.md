@@ -1,5 +1,18 @@
 # NETLAB360 — REANUDAR AQUÍ (checkpoint operativo)
 
+## CHECKPOINT VIGENTE 13/10/2026 23:00 PANAMÁ — B4 AUDITORÍA EJECUTADA Y CI VERDE
+
+El operador terminó **pasos 181–191** con Git sincronizado (`a6eaa91` al cierre de ensayo), 11/11 pruebas unitarias correctas, auditoría de fuente real B4 exit0, reporte JSON de 2,4 KB permisos 0600, postcheck 23:00 con Docker/netns vacíos, ens33 `192.168.47.40/24`, GW `192.168.47.2`, servicios activos y Git limpio. **CI GitHub comprobada** run `38508522760`, job `offline-regression` id `115671442438` completado **success** en todos los pasos. El error del usuario al intentar `gh run view --workflow`/usar literalmente `ID_DE_EJECUCION` es solo sintaxis CLI; comando correcto `gh run view 38508522760 -R recm0708/netlab360 --exit-status`. [Bitácora B4 ejecutada](sesiones/2026-10-13-b4-auditoria-datos-ci-ejecutada.md).
+
+**Datos auditados:** 1 CSV ICMP original `17-b2-convergencia-20261013-115141.csv`, 76 muestras; 1 resumen derivado de **los mismos 76**, NO fuente independiente; 2 JSONL `b3-wan-live-events*.jsonl`, 12 eventos (1 started, 2 stopped, 2 primary down, 2 primary restored, 5 route changed). SHA256 y esquema inspeccionados; fuentes B2 y B3 son sesiones distintas, no alinear filas. **Sin etiquetas independientes de normalidad o incidentes, sin ML entrenado, sin precision/recall/F1**. Disponibilidad Python 3.14.4, numpy existente, pandas/sklearn/matplotlib no instalados; no instalar sin necesidad.
+
+**PROGRESO** S01 **72/100 estimado** (71→72 **+1 por CI offline realmente ejecutada y validada**, documentación/regresión 2→3/5; B4 permanece 0/5 hasta disponer de diagnóstico evaluado). IaC–FRR live 22:48 sigue validada; issue S01 abierta, rúbrica docente no ratificada. Evidencias nuevas B4/IaC: usuario enviará capturas MÁS ADELANTE, **no pedirlas ahora**, ni crear ZIP incompleto. En GitHub aún 62 PNG originales y seis CSV.
+
+**PRÓXIMO BLOQUE PREPARADO, AÚN NO EJECUTADO:** `scripts/analitica/b4-perfil-estadistico-real.py` y `tests/test_b4_perfil_estadistico.py`, para estadísticas por fase de muestras reales ICMP y conteo de ruta FIB usando hash del inventario auditado, sin datos sintéticos ni modelos ML. Se espera pull limpio, regresión 16/16 si los nuevos 5 pasan, corrida `--save` y JSON resultante con permisos 0600 fuera del repo, comprobación de cifras contra 76 filas, CI de nuevo por ver, postcheck de VM. Si hay CSV inválido, no forzar/editar fuente, reportar error. Luego diseñar adquisición de muestras independientes etiquetadas por ensayo.
+
+---
+
+
 ## CHECKPOINT MÁS RECIENTE — 13/10/2026 22:48 PANAMÁ | IaC EN FRR REAL VERIFICADA; B4 PREPARADA
 
 **Fase S01: 71/100 técnico estimado, ABIERTA** (sube 68→71: IaC 4→7/10). Fuente real recibida del operador: los pasos 169–180 fueron exitosos. En copia FRR candidata: R-HQ OSPF WAN-P cost 10→50, detector NON_COMPLIANT (rc1 esperado), Ansible reconcilió changed1, luego changed0, hashes originales intactos, `RESULTADO_DRIFT_RECONCILIACION=0`. Gate IaC–B2 protegió VMnet8 y confirmó SoT: `IAC_B2_PRECHECK=0`, origen `IAC_OPENTOFU_ANSIBLE`, configuración R-HQ/R-S1 desde `~/netlab360-bootstrap/iac/s01/rendered/`.
