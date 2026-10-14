@@ -1,5 +1,8 @@
 # NETLAB360 — Checklist S01: dos documentos consolidados y cierre técnico
 
+> **Revisión de seguimiento:** [auditoría issues/milestones 14/10](../../control/04-auditoria-issues-milestones-2026-10-14.md) verificada: 43 totales, 38 abiertas/5 cerradas y 0 abiertas sin milestone. Cierre técnico de #33 CI y #42 OSPF no implica S01 finalizada. #38 SSH requiere hardening y rollback; las pruebas de acceso remoto ya están acreditadas. Dos índices maestros aprobados y textos pendientes.
+
+
 **Estado 14/10/2026:** S01 ABIERTA; **72/100 estimación técnica interna**, no nota ni aceptación docente. Portadas: las prepara el usuario. Documento 03 manual independiente ELIMINADO; sus temas se integran al 02. No comenzar S02 hasta cerrar contenido S01 y brechas técnicas exigibles.
 
 ## Documentos maestros únicos
