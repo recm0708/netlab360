@@ -1,5 +1,7 @@
 # NETLAB360 — Registro oficial de evidencias recibidas y auditadas visualmente (lote 01)
 
+> **Ubicación VIGENTE desde el commit [570088c](https://github.com/recm0708/netlab360/commit/570088c5ed3fd7ce3b888facecfe79c39e78005f):** los PNG ya versionados se consultan directamente en [`evidencias/capturas/`](../../evidencias/capturas/) y sus CSV en [`evidencias/manifiestos/`](../../evidencias/manifiestos/). 19 capturas del lote01; CSV actual `../../evidencias/manifiestos/MANIFIESTO_SHA256_LOTE01.csv`. Cualquier ruta antigua `.../lote0X/` que figure a continuación describe su **ubicación histórica**, no la actual. La migración conservó los bytes (Git detectó 100% de similitud). El lote05 aún no figura físicamente en GitHub.
+
 ## PUBLICACIÓN FÍSICA CONFIRMADA — 13/10/2026 16:26
 
 **Los 19 PNG auditados y el manifiesto SHA-256 están ahora dentro de GitHub** en `evidencias/capturas/B1_B2_lote01/`. El usuario verificó `CAPTURAS_VERIFICADAS: 19`, SHA256 internos, hizo commit/rebase/push exitosos, y GitHub confirmó [commit `d62d33b`](https://github.com/recm0708/netlab360/commit/d62d33b3dd5876a795ca2dadc47b2a1474c86104) con exactamente 19 PNG + 1 CSV. Los párrafos históricos que mencionan “todavía NO subidos” son anteriores al commit y quedan superados por esta actualización. La issue #43 sigue abierta solo para nuevas capturas y futuras auditorías.
