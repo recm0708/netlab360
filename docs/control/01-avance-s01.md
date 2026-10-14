@@ -12,7 +12,7 @@
 | IaC y compliance OpenTofu/Ansible/FRR | 10 | 7 | 3 | Terraform_data metadatos, candidatos FRR aplicados a B2, idempotencia y drift de archivos; no drift FRR vivo |
 | B3 telemetría/API/NOC/alertas | 15 | 10 | 5 | Exporter, Prometheus y alertas reales; no receptor/SLI/NOC multisede integral |
 | B4 analítica IA evaluable | 5 | 0 | 5 | Perfil + reglas descriptivas reales, sin entrenamiento/evaluación ML |
-| Documentación/evidencias/CI | 5 | 3 | 2 | 86 PNG y 7 CSV SHA, tests/CI aprobadas; tres documentos maestros aún sin redacción final |
+| Documentación/evidencias/CI | 5 | 3 | 2 | 86 PNG y 7 CSV SHA, tests/CI aprobadas; dos documentos maestros aún sin redacción final |
 | B5 Release/exportación VM/OVA | 5 | 0 | 5 | No tag/release ni exportación/reimportación verificadas |
 | **Total** | **100** | **72** | **28** | **S01 NO CERRADA** |
 
@@ -27,7 +27,7 @@
 - **No incrementar** por preparar scripts sin ejecutarlos, por un Word no final, por fotos ya acreditadas ni por repetir CI verde.
 - El motor por reglas de B4 no satisface ML supervisado/no supervisado evaluable; sin etiquetas independientes no se calcularán precision, recall, F1.
 - La puntuación interna sirve para priorizar, **no prueba** aceptación de los 11 criterios integrales de S01. No modificar condiciones de S01 para simular cierre.
-- La línea base de documentación es [tres maestros S01–S08](../entregables/00-politica-editorial-y-entrega-acumulativa.md), redactados con el usuario en su plantilla institucional y APA7.
+- La línea base de documentación es [dos maestros consolidados](../entregables/00-politica-editorial-y-entrega-acumulativa.md), redactados por secciones en la plantilla institucional del usuario y APA7; el Documento 01 recoge incidentes técnicos reales y el Documento 02 soluciones preventivas posibles.
 - Resolver con docente las actividades inter-fase (OpenTofu avanzado S03, dataset/ML S06, OVA final S08) en [#9](https://github.com/recm0708/netlab360/issues/9) y [#36](https://github.com/recm0708/netlab360/issues/36).
 
 **Archivo histórico:** los progresos anteriores de 30%, 43%, 53%, 63%, 68%, 71% y 72%, junto a su cronología detallada, permanecen consultables en Git, comentarios de issues y `docs/sesiones/`. Este documento deliberadamente NO apila encabezados con estados contradictorios.
