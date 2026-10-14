@@ -1,5 +1,8 @@
 # NETLAB360 — Estado actual y continuidad
 
+> **Actualización de control 14/10:** auditoría íntegra de issues y milestones ([informe](control/04-auditoria-issues-milestones-2026-10-14.md)): 43 totales, 38 abiertas, 5 cerradas, 0 abiertas sin milestone. Cerradas ahora #33 (CI offline) y #42 (FRR/OSPF dual-WAN). Sigue abierta #38 SSH hasta validar hardening y recuperación, sin reconfiguraciones a ciegas. Índices de dos documentos aprobados por usuario. Ubuntu aún pendiente de sincronizar.
+
+
 **Revisión editorial 14/10/2026.** Fuentes canónicas: [REANUDAR AQUÍ](REANUDAR-AQUI.md) y [matriz de aceptación S01](control/03-matriz-aceptacion-y-decisions-s01.md).
 
 ## Estado operativo
