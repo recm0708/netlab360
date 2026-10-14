@@ -8,11 +8,11 @@
 | C02 | LAG dos puertos, dual NIC, SoT/OpenTofu/Ansible | LACP virtual 2→1→2, active-backup virtual, IPAM YAML y IaC→FRR | Redundancia de equipo/servidor y ownership/reconciliación vivo exigibles | Parcial |
 | C03 | API/dashboard e incidente real, métricas, alarma y tiempo | Exporter live, Prometheus tres reglas, dos firing/resuelta; NOC inicial | Integración de alarmas al NOC multisitio, receptor/SLI según alcance | Parcial |
 | C04 | Prototipo evaluable de anomalía scikit-learn, distinto de reglas | 76 ICMP y 12 eventos de otras sesiones; perfil y reglas | Dataset etiquetado independientemente; modelo ML y evaluación fuera de muestra | Pendiente |
-| C05 | Borradores de investigación, bitácora y manual | Borradores V0.1 anteriores RECHAZADOS como formato; nuevos índices maestros S01–S08 creados | Redactar por secciones en plantilla institucional, APA7 y capturas | En preparación |
+| C05 | Dos documentos finales integrados: investigación y manual técnico de implementación/uso | Borradores V0.1 anteriores RECHAZADOS como formato; dos índices maestros activos creados | Redactar por secciones en plantilla institucional, APA7 y capturas | En preparación |
 | C06 | Pre/postcheck, recuperación, regresión integrada reproducible | Pre/postchecks, rollback y 24 tests offline | Prueba integral reproducible L2+WAN+servicio+NOC cuando requerida | Parcial |
 | C07 | Integración red, automatización, observabilidad, analítica y dashboard | Módulos separados verificados, IaC alimentó FRR real | Flujo unificado de componentes | Parcial |
 | C08 | Capturas trazables fecha/commit/resultados | 86 PNG, 7 CSV SHA256 en GitHub; lotes auditados | Cuatro fotos IaC recuperadas por logs aún no recibidas; captura postcheck nueva pendiente de incorporación | Parcial avanzado |
-| C09 | Actualización de 3 documentos y compatibilidad | Política e índices maestros nuevos, bitácoras de sesiones | Contenido final revisado de tres documentos | En preparación |
+| C09 | Actualización de documentación integral según alcance aprobado | Política y dos índices maestros nuevos; registro de sesiones preservado | Contenido final revisado de ambos documentos | En preparación |
 | C10 | Commit/PR y tag/release demostrable | GitHub sincronizado y CI exitosa | Tag/release validado, PR si requerido | Pendiente |
 | C11 | VM sanitizada, exportada/reimportada y SHA256 | VM funcional, snapshot conocido, gestión estable | Sanitización, exportación, reimportación y hash | Pendiente |
 
