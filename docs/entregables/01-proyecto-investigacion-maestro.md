@@ -1,6 +1,6 @@
 # NETLAB360 — Documento 01: Diseño, desarrollo y evaluación del proyecto
 
-**Versión propuesta de índice V0.2, pendiente de aprobación por el usuario.** Documento académico ÚNICO, acumulativo desde S01 hasta la última fase efectivamente completada. **La portada institucional la prepara el usuario**. Índice general automático único en Word. Redacción académica desde el trabajo del equipo y referencias APA 7 que efectivamente se citan.
+**Índice V0.2 APROBADO por el usuario el 14/10/2026, sujeto a indicaciones futuras de la profesora.** Documento académico ÚNICO, acumulativo desde S01 hasta la última fase efectivamente completada. **La portada institucional la prepara el usuario**. Índice general automático único en Word. Redacción académica desde el trabajo del equipo y referencias APA 7 que efectivamente se citan.
 
 ## Preliminares
 - Portada de la institución (responsabilidad del usuario).
@@ -70,4 +70,4 @@
 - En caso de que el semestre se cierre en la última fase completada (p. ej. S06), escribir el documento final con **cobertura real S01–S06**, sin anexar subcapítulos ficticios S07/S08 ni mentir sobre planes históricos o exigencias docentes.
 - Cotejar y aprobar referencias antes de introducir citas APA7; no inventar bibliografía.
 
-**La redacción inicia solo cuando el usuario apruebe estos dos índices**; primera sección: 1. Introducción.
+**Índices aprobados.** La redacción comenzará cuando el usuario indique «comencemos»; primera sección: 1. Introducción.
