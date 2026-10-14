@@ -75,9 +75,9 @@ def main():
     print("BASELINE_COMPLIANCE=OK (ambos routers)")
     hq = DEST / "R-HQ.frr.conf"
     before_text = hq.read_text(encoding="utf-8")
-    antiguo = " ip ospf cost 10"
+    antiguo = "\n ip ospf cost 10\n"
     assert before_text.count(antiguo) == 1, "No se puede identificar costo unico"
-    hq.write_text(before_text.replace(antiguo, " ip ospf cost 50", 1), encoding="utf-8")
+    hq.write_text(before_text.replace(antiguo, "\n ip ospf cost 50\n", 1), encoding="utf-8")
     hq.chmod(0o600)
     print("DRIFT_CONTROLADO=R-HQ WAN-P OSPF cost 10 -> 50 (SOLO COPIA)")
     check = run(["python3",str(VALIDADOR),str(DEST)], check=False)
