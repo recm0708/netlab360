@@ -1,5 +1,8 @@
 # NETLAB360 — Matriz ponderada de seguimiento S01
 
+> **Control de issues y milestones (14/10):** 43 issues totales, 38 abiertas/5 cerradas, cero abiertas sin milestone, según [auditoría canónica](04-auditoria-issues-milestones-2026-10-14.md). #33 CI y #42 OSPF cerradas por pruebas específicas; sus cierres **no aumentan 72/100** ni acreditan aceptación de S01 integral. #38 SSH permanece abierta por hardening/rollback. Dos índices documentales aprobados, textos pendientes.
+
+
 **Corte técnico:** 13/10/2026 23:35 Panamá. **Consolidación de control:** 14/10/2026. **Estado:** S01 ABIERTA; porcentaje interno, **no rúbrica docente**. Guía oficial y distribución S01–S08 pendientes de ratificación. [Matriz de 11 criterios](03-matriz-aceptacion-y-decisions-s01.md).
 
 | Componente | Peso | Acreditado | Pendiente | Evidencia representativa / límite |
