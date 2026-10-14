@@ -1,5 +1,8 @@
 # NETLAB360
 
+**Control de issues 14/10/2026:** [auditoría de las 43 issues](docs/control/04-auditoria-issues-milestones-2026-10-14.md): **38 abiertas, 5 cerradas, 0 abiertas sin milestone**. Se cerraron #33 (CI offline) y #42 (FRR/OSPF y HTTP tres estados) tras cotejar pruebas; #38 SSH continúa abierta por hardening del servidor y rollback no verificados. Índices del Documento 01/02 aprobados por usuario, sujetos a instrucciones docentes. Próxima sincronización de Ubuntu todavía pendiente.
+
+
 **Proyecto:** diseño e implementación de una plataforma virtualizada para la automatización, observabilidad y diagnóstico inteligente de redes empresariales multisede.
 
 **Política editorial vigente (14/10/2026): exactamente DOS documentos finales únicos**: (01) investigación, diseño, resultados e incidentes técnicos reales mitigados; (02) manual técnico integral para reproducir desde cero, implementar, verificar, operar y solucionar posibles problemas. Las portadas institucionales las crea el usuario; el asistente entrega contenido sección por sección. **No hay un tercer manual independiente**. La edición final se ajustará a las fases realmente implementadas, conservando el roadmap interno S01–S08 como historial verificable.
