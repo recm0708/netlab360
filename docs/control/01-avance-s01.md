@@ -1,10 +1,13 @@
 # NETLAB360 — Control de avance y cierre de Fase S01
 
-**Corte técnico actualizado:** 2026-10-13 23:00 (Panamá, UTC−05:00).  
+**Corte técnico actualizado:** 2026-10-13 23:12 (Panamá, UTC−05:00).  
 **Versión de seguimiento:** v2.2. **Fase:** [#1](https://github.com/recm0708/netlab360/issues/1) **ABIERTA**.  
 **Estado oficial de la rúbrica:** pendiente de ratificación con la docente. **Porcentaje provisional; no es nota, auditoría de cumplimiento oficial ni valor calculado por GitHub.**
 
 ## 1. Estimación ponderada del avance S01
+
+**NUEVO CORTE VIGENTE 13/10 23:12: S01 72/100 sin incremento.** Perfil B4 estadístico efectivamente ejecutado y contrastado con CSV SHA256: 76/76 ICMP OK, 0 inconsistencias FIB en fases estables, 5 medias/p95 RTT, 16/16 unit tests, reporte real JSON externo modo0600, administración y Git intactos. Análisis solo descriptivo, sin prueba independiente de anomalías ni ML. Dos ejecuciones CI previas verdes observadas; migración a Node24 preparada, por validar. Preparado detector por reglas B4 **sin ejecutar**, no asignar puntaje por código. [Bitácora](../sesiones/2026-10-13-b4-perfil-estadistico-verificado.md).
+
 
 **EVALUACIÓN VIGENTE 13/10 23:00: S01 72/100 estimado (+1 documentación/CI).** Auditoría B4 real ejecutada con `AUDITORIA_B4_DATOS=OK`, 1 CSV (76 ICMP) + 2 JSONL (12 eventos) + resumen derivado no independiente, hashes SHA256, JSON 0600 y postcheck sin cambios. Suite Python `11/11` satisfactoria. GitHub Actions [run 38508522760](https://github.com/recm0708/netlab360/actions/runs/38508522760) verificado `offline-regression: completed/success`: todos los pasos IPAM, Python, unittest y Bash correctos. +1 SOLO en documentación/CI (2→3/5); **B4 0/5 sin detector evaluado** ni datos normales etiquetados independientemente. Quedan 28 puntos técnicos estimados. [Bitácora B4](../sesiones/2026-10-13-b4-auditoria-datos-ci-ejecutada.md). El perfil estadístico B4 siguiente está versionado pero NO ejecutado. Las actualizaciones cronológicas inferiores se preservan como historial.
 
