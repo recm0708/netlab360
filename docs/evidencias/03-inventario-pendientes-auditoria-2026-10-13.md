@@ -1,5 +1,7 @@
 # NETLAB360 — Inventario consolidado de capturas pendientes de auditoría
 
+> **Ubicación VIGENTE desde el commit [570088c](https://github.com/recm0708/netlab360/commit/570088c5ed3fd7ce3b888facecfe79c39e78005f):** los PNG ya versionados se consultan directamente en [`evidencias/capturas/`](../../evidencias/capturas/) y sus CSV en [`evidencias/manifiestos/`](../../evidencias/manifiestos/). Índice maestro: los 57 PNG de lotes 01–04 fueron reubicados; los 5 nuevos del lote05 NO han sido importados todavía. Cualquier ruta antigua `.../lote0X/` que figure a continuación describe su **ubicación histórica**, no la actual. La migración conservó los bytes (Git detectó 100% de similitud). El lote05 aún no figura físicamente en GitHub.
+
 > **ACTUALIZACIÓN VIGENTE 13/10 ~21:20:** lote01/02 = 24 PNG publicados; lote03 = 20 PNG originales + CSV **publicados** commit `0d749df`, verificación remota OK; lote04 = **13 PNG LACP recibidos y auditados visualmente** (4+4+4+1), ZIP con SHA256 preparado pero **no publicados todavía**. [Auditoría lote04](05-auditoria-visual-lote04-lacp-2026-10-13.md). El contenido histórico posterior que menciona pendientes ya superados se conserva como registro cronológico.
 
 ## ACTUALIZACIÓN VIGENTE — 13/10/2026 20:52 PANAMÁ | LOS 20 PNG YA FUERON RECIBIDOS Y AUDITADOS
