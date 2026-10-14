@@ -1,109 +1,33 @@
-# NETLAB360 — Control de avance y cierre de Fase S01
+# NETLAB360 — Matriz ponderada de seguimiento S01
 
-**Corte técnico actualizado:** 2026-10-13 23:24 (Panamá, UTC−05:00).  
-**Versión de seguimiento:** v2.2. **Fase:** [#1](https://github.com/recm0708/netlab360/issues/1) **ABIERTA**.  
-**Estado oficial de la rúbrica:** pendiente de ratificación con la docente. **Porcentaje provisional; no es nota, auditoría de cumplimiento oficial ni valor calculado por GitHub.**
+**Corte técnico:** 13/10/2026 23:35 Panamá. **Consolidación de control:** 14/10/2026. **Estado:** S01 ABIERTA; porcentaje interno, **no rúbrica docente**. Guía oficial y distribución S01–S08 pendientes de ratificación. [Matriz de 11 criterios](03-matriz-aceptacion-y-decisions-s01.md).
 
-## 1. Estimación ponderada del avance S01
+| Componente | Peso | Acreditado | Pendiente | Evidencia representativa / límite |
+|---|---:|---:|---:|---|
+| B0 Infraestructura VMware/Ubuntu, SSH, herramientas y snapshot | 12 | 12 | 0 | VM y VMnet8 operativas; hardening final de exportación pendiente |
+| B1 Topología/IPAM Source of Truth | 10 | 8 | 2 | YAML válido sin solapamientos; diseño draft, S2 reservada |
+| B2-L2 VLAN, trunks, ACL, HTTP | 10 | 8 | 2 | 802.1Q y router-on-stick HQ; aún sin unión a la topología WAN efectiva |
+| B2-L3 FRR/OSPF, WAN primaria/respaldo, HTTP HQ–S1 | 18 | 18 | 0 | Dos Full por router y conmutación/restauración; no continuidad sin pérdida demostrada |
+| Redundancia LACP/equipo/servidor | 10 | 6 | 4 | LACP 2→1→2 y active-backup virtual, no falla de equipo/VM dual NIC física |
+| IaC y compliance OpenTofu/Ansible/FRR | 10 | 7 | 3 | Terraform_data metadatos, candidatos FRR aplicados a B2, idempotencia y drift de archivos; no drift FRR vivo |
+| B3 telemetría/API/NOC/alertas | 15 | 10 | 5 | Exporter, Prometheus y alertas reales; no receptor/SLI/NOC multisede integral |
+| B4 analítica IA evaluable | 5 | 0 | 5 | Perfil + reglas descriptivas reales, sin entrenamiento/evaluación ML |
+| Documentación/evidencias/CI | 5 | 3 | 2 | 86 PNG y 7 CSV SHA, tests/CI aprobadas; tres documentos maestros aún sin redacción final |
+| B5 Release/exportación VM/OVA | 5 | 0 | 5 | No tag/release ni exportación/reimportación verificadas |
+| **Total** | **100** | **72** | **28** | **S01 NO CERRADA** |
 
-**ESTADO EDITORIAL MÁS RECIENTE 13/10 23:35:** 86 PNG y siete CSV **ya publicados** (SHA256 OK, commit `b410548` y SHA remoto/local iguales), GitHub Actions run `38511477595` éxito, host limpio. Se comenzaron los **tres borradores documentales** S01 en `docs/entregables/s01/`, junto con un checklist de cierre; requieren formalización institucional APA 7, figuras seleccionadas y revisión docente antes de acreditarse como entregables. Cuatro fotografías IaC complementarias ya tienen salidas de log restauradas, pendientes de recepción de PNG. **72/100 técnico estimado, sin sumar solo por redactar.** Los párrafos inferiores de 62 PNG/ausencia de informes son HISTÓRICOS. [Checklist vigente](../entregables/s01/00-checklist-cierre-y-entrega.md).
+## Control de evidencias verificadas
+- Capturas 86 PNG originales aplanados; 7 CSV; validador final `AUDITORIA_CAPTURAS_PLANAS=OK`.
+- Commit de lote06 `b410548f9338233c8dc23816ce78a11d67bb2896`; SHA local/remoto iguales después de push.
+- CI GitHub Actions [38511477595](https://github.com/recm0708/netlab360/actions/runs/38511477595) exitosa, suite local de 24 pruebas.
+- Cuatro resúmenes IaC 01/03/04/06 recuperados de logs originales con códigos cero; fotos nuevas no recibidas. Postcheck lote06 adicional recibido en chat; falta publicación.
+- Último control host: 13/10 23:35:02, Docker/netns vacíos, gestión `ens33 192.168.47.40/24`, GW `192.168.47.2`, servicios activos.
 
+## Políticas de cómputo y cierre
+- **No incrementar** por preparar scripts sin ejecutarlos, por un Word no final, por fotos ya acreditadas ni por repetir CI verde.
+- El motor por reglas de B4 no satisface ML supervisado/no supervisado evaluable; sin etiquetas independientes no se calcularán precision, recall, F1.
+- La puntuación interna sirve para priorizar, **no prueba** aceptación de los 11 criterios integrales de S01. No modificar condiciones de S01 para simular cierre.
+- La línea base de documentación es [tres maestros S01–S08](../entregables/00-politica-editorial-y-entrega-acumulativa.md), redactados con el usuario en su plantilla institucional y APA7.
+- Resolver con docente las actividades inter-fase (OpenTofu avanzado S03, dataset/ML S06, OVA final S08) en [#9](https://github.com/recm0708/netlab360/issues/9) y [#36](https://github.com/recm0708/netlab360/issues/36).
 
-**VIGENTE 13/10 23:24: S01 72/100 sin incremento.** Motor B4 determinista **ejecutado**: 24/24 unit tests, análisis 76 sondeos ICMP reales y SHA original, sin pérdidas, sin rutas estables inesperadas ni RTT sobre 0.147ms (factor3) o 0.245ms (factor5); 4 transiciones de fase correctamente separadas de alarmas, JSON externo modo0600, Docker/netns/red/Git intactos. Referencia estadística in-sample no demuestra precisión de detección ni IA. CI Node24 run [38510552044](https://github.com/recm0708/netlab360/actions/runs/38510552044) confirmado `offline-regression=success`. **24 PNG IaC+B4 recibidos/aceptados para el lote06**, ZIP/manifiesto SHA256 preparados, pero bytes **PENDIENTES de importar/publicar**: GitHub sigue con 62 PNG y 6 CSV antes del push. Faltan 4 fotos IAC suplementarias desde logs. [Auditoría](../evidencias/08-auditoria-lote06-iac-b4-2026-10-13.md). Mantener B4 0/5 (falta detector IA evaluado).\n\n
-**NUEVO CORTE VIGENTE 13/10 23:12: S01 72/100 sin incremento.** Perfil B4 estadístico efectivamente ejecutado y contrastado con CSV SHA256: 76/76 ICMP OK, 0 inconsistencias FIB en fases estables, 5 medias/p95 RTT, 16/16 unit tests, reporte real JSON externo modo0600, administración y Git intactos. Análisis solo descriptivo, sin prueba independiente de anomalías ni ML. Dos ejecuciones CI previas verdes observadas; migración a Node24 preparada, por validar. Preparado detector por reglas B4 **sin ejecutar**, no asignar puntaje por código. [Bitácora](../sesiones/2026-10-13-b4-perfil-estadistico-verificado.md).
-
-
-**EVALUACIÓN VIGENTE 13/10 23:00: S01 72/100 estimado (+1 documentación/CI).** Auditoría B4 real ejecutada con `AUDITORIA_B4_DATOS=OK`, 1 CSV (76 ICMP) + 2 JSONL (12 eventos) + resumen derivado no independiente, hashes SHA256, JSON 0600 y postcheck sin cambios. Suite Python `11/11` satisfactoria. GitHub Actions [run 38508522760](https://github.com/recm0708/netlab360/actions/runs/38508522760) verificado `offline-regression: completed/success`: todos los pasos IPAM, Python, unittest y Bash correctos. +1 SOLO en documentación/CI (2→3/5); **B4 0/5 sin detector evaluado** ni datos normales etiquetados independientemente. Quedan 28 puntos técnicos estimados. [Bitácora B4](../sesiones/2026-10-13-b4-auditoria-datos-ci-ejecutada.md). El perfil estadístico B4 siguiente está versionado pero NO ejecutado. Las actualizaciones cronológicas inferiores se preservan como historial.
-
-
-**EVALUACIÓN VIGENTE 13/10 22:48: S01 71/100 técnico estimado (+3 puntos IaC).** Operador completó (a) drift controlado y reconciliación Ansible **en copias de FRR**: cambio OSPF cost 10→50, `NON_COMPLIANT` esperado, primera reconciliación `changed=1`, segunda `changed=0` y hash igual a origen; (b) **FRR realmente ejecutado desde archivos IaC**: gate SoT/hash0, fuente `IAC_OPENTOFU_ANSIBLE`, OSPF dos `Full` por router, FIB WAN-P, failover a WAN-B, retorno a WAN-P, `up/fail/restore/down=0`, postcheck 22:48 sin residuos/gestión intacta. IaC **4→7/10** (+1 reconciliación candidatos, +2 carga y prueba de FRR vivo). Sigue pendiente drift de configuración en FRR vivo y ownership completo del ciclo de recursos; ni el despliegue ni la reconciliación se deben confundir con aprovisionamiento Docker/VMware por OpenTofu. Los PNG nuevos de esta tanda todavía **NO recibidos ni publicados**; el usuario los enviará luego con las capturas de recuperación. [Bitácora nueva](../sesiones/2026-10-13-iac-b2-frr-live-y-drift-verificado.md). **B4** auditor de datos reales preparado, aún sin ejecutar ni puntos.
-
-
-**ACTUALIZACIÓN TÉCNICA VIGENTE 13/10 22:30: S01 68/100 estimado (+3 IaC).** El operador ejecutó OpenTofu 1.13.1 sobre `terraform_data`: `init=0`, `validate=0`, plan `5 add/0 change/0 destroy`, apply 5/0/0, manifiesto JSON SoT HQ/S1 con S2 reservada y VMnet8 protegida. Ansible Core 2.20.1 renderizó dos FRR candidatos (primera `changed=2`), comparador HQ/S1 `COMPLIANT`, segunda ejecución `changed=0`, y OpenTofu plan posterior “No changes” con código0; postcheck 22:30 red Docker/netns/Git intactos. Se acreditan 3 puntos en IaC por consumo SoT, estado OpenTofu local, render Ansible, compliance de archivos e idempotencia; **no** supone aprovisionamiento de FRR vivo, switch/servidor real ni cierre de IaC. Evidencias: 9 PNG recibidos/analizados, se requieren cuatro complementos de mejor encuadre a partir de logs sin repetir apply. [Auditoría IaC](../evidencias/07-auditoria-visual-iac-s01-2026-10-13.md). Los avisos inferiores de 65/100 son históricos.
-
-
-**Corte administrativo posterior, 13/10 22:16:** 62 PNG en carpeta única y 6 CSV publicados, `RESULTADO_AUDITORIA=0`, commit `328591a` con SHA local/remoto igual. **Estado S01 65/100 inalterado**. Comenzó preparación documental/código de vertical IaC: `terraform_data` desde SoT (sin gestión de red), plantilla Ansible candidata FRR y verificador de compliance. **Aún no ejecutado ni puntuable**; validar en Ubuntu plan/apply, config candidate, idempotencia antes de atribuir avance IaC. [Runbook](../sesiones/2026-10-13-iac-s01-opentofu-ansible-preparado.md).
-
-
-**Actualización documental posterior al commit `570088c` (no altera el 65/100):** 57 PNG de lotes 01–04 y sus cuatro manifiestos **reubicados y publicados** en carpeta plana; se generó el mapa origen/destino con SHA256. Los 5 PNG auditados del lote05 **no se importaron**: quedaron carpetas físicas antiguas después de `git mv` y falló una guardia; scripts corregidos, pendientes pull y nueva ejecución del importador exclusivamente. No se ha acreditado nueva técnica ni se ha publicado lote05.
-
-
-**ÚLTIMA EVALUACIÓN 13/10 21:39:** 65/100 técnico estimado. +2 puntos por prueba virtual bond active-backup 3 estados HTTP + cleanup; redundancia 6/10 (4 LACP + 2 active-backup). **No acredita NICs VMware, switch secundario ni equipo redundante.** Lote04 ya está publicado (`2af7a80`), 13 capturas; lote05 cinco nuevos PNG recibidos y auditados pero **pendientes de publicar**; migración a raíz plana **preparada, sin ejecutar**. Las menciones históricas de 63/100, LACP no recibido y lote04 pendiente más abajo han sido superadas. [Auditoría lote05](../evidencias/06-auditoria-lote05-dualnic-noc-2026-10-13.md).
-
-**Estado histórico del 13/10 21:20 (superado por el checkpoint 21:39):** lote03 20 PNG + CSV publicados a GitHub en `0d749df`, lote04 13 PNG LACP recibidos, auditados y pendientes de push; ensayo active-backup dualNIC **abortado antes de HTTP por bug de variable** y corregido a `5a4569f` en GitHub. No sumar puntos hasta nueva ejecución validada, por lo que S01 **permanece 63/100**. [Auditoría lote04](../evidencias/05-auditoria-visual-lote04-lacp-2026-10-13.md).
-
-
-Los pesos se asignan a las capacidades mínimas que aparecen en la issue #1 y en `docs/05-plan-operativo-y-pausas.md`. Se acredita solo lo comprobado en la VM, no la mera instalación de software ni el diseño no desplegado.
-
-| Bloque de trabajo S01 | Peso | Puntos acreditados | Fundamento verificable |
-|---|---:|---:|---|
-| B0: infraestructura, SSH operativo, herramientas, snapshot y rollback base | 12 | **12** | VMware/Ubuntu/Docker/Git, VMnet8/IP fija, SSH con clave, reinicio y snapshot; cuestiones de hardening final en #38 pendientes |
-| B1: topología e IPAM/SoT inicial | 10 | **8** | YAML draft validado, 3 sedes/9 VLAN/2 WAN previstas, sin solapamientos; diseño no desplegado/aprobado |
-| B2-L2: VLAN/trunks/ACL de primer dominio | 10 | **8** | Trunk 802.1Q VLAN110/120 validado; **19:14 router-on-a-stick** `eth0.110=10.70.10.1/24` y `eth0.120=10.70.20.1/24`, cliente `10.70.10.10`→servidor HTTP `10.70.20.20`: baseline TCP8080 y TCP8081 OK; ACL `nft` en namespace router permite 8080, deniega 8081 (curl timeout esperado, contadores 1 paquete accept/2 drop), servicio 8081 activo en destino. Código0, cleanup y gestión intactos. Falta integración de sede/servicio WAN y cierre de arquitectura L2 completa |
-| B2-L3: FRR/OSPF, WAN primaria/respaldo, convergencia y failover | 18 | **18** | FRR/OSPF Full, FIB WAN-P→WAN-B→WAN-P, 30/30 ICMP y 76/76 muestras anteriores; **+1** por cliente namespace HQ `10.70.10.10/32` y servidor HTTP S1 `10.71.10.20/32:8080` reales con HTTP exitoso vía WAN-P, WAN-B y WAN-P restaurada, rutas simétricas en ambos routers, limpieza código0 a 19:44. Hosts conectados por veth P2P, no integrados a VLAN/switches anteriores; sin garantía demostrada de cero cortes durante conmutación |
-| Redundancia LAG/LACP, equipos, servidor dual-NIC | 10 | **6** | **20:43–20:51 LACP IEEE 802.3ad REAL en dos namespaces aislados:** bonds A/B negocian 2 puertos activos; al desactivar a1 permaneció 1 en ambos extremos y HTTP `NETLAB360_LACP_HTTP_OK`; al restaurar a1 volvieron a 2 activos y HTTP OK. `LACP_8023AD_TRES_ESTADOS=OK`, `RESULTADO_B2_LACP=0`, Docker/netns limpios, ens33/GW intactos. No se probó redundancia física de NIC VMware, de equipo/switch ni tasa de pérdidas durante el cambio. Fotos LACP **recibidas, auditadas y publicadas** (13 PNG en 4 secuencias, commit `2af7a80`); a las 21:37 ensayo dualNIC active-backup validado, 3 estados y HTTP OK, captura de cierre a las 21:39; no equipa NICs físicas VMware ni servidores redundantes |
-| IaC y compliance (OpenTofu + Ansible) | 10 | **7** | OpenTofu `terraform_data` registra SoT HQ/S1 y las dos WAN en estado local fuera del repo; manifiesto JSON alimenta Ansible, dos candidatos FRR `COMPLIANT`, segunda ejecución Ansible `changed=0`, segundo plan OpenTofu sin cambios (`exit=0`). **Posteriormente validado FRR vivo desde los archivos IaC**, OSPF Full y FIB WAN-P→WAN-B→WAN-P, up/fail/restore/down exit0. Drift sobre copias corregido Ansible `changed=1`→`changed=0`. **Pendiente reconciliación de FRR vivo y ownership completo de equipos** |
-| B3: telemetría/API/dashboard/alertas, eventos reales | 15 | **10** | Histórico 2pt + exporter live/eventos reales 3pt + Prometheus TSDB/scrape 2pt + **3pt nuevos**: glob absoluto y tres reglas cargadas (B3_11), WAN-P DOWN y respaldo WAN-B con **ambas alertas Prometheus firing** (B3_12), WAN-P restaurada y **0 alertas WAN activas** (B3_13), limpieza B3_14: puertos 9090/9108 libres, Docker/netns vacíos, Git y red intactos. Aún sin Alertmanager/receptor, NOC multisede integral ni SLI/SLO |
-| B4: anomalías/datos/IA evaluada | 5 | **0** | no existe prototipo con evaluación |
-| Documentación académica, evidencia, CI/PR y regresión | 5 | **3** | bitácoras y SHA-256; **62 PNG auditados/publicados** en carpeta plana (`evidencias/capturas/`), 6 CSV y mapa de origen/destino (commit `328591a`), Git remoto/local validado. IaC: 9 PNG originales visualmente inspeccionados, faltan 4 complementos antes de publicarlos. CI offline **ejecutada/exitosa** (run `38508522760`), 11/11 unit tests. Faltan informe APA, manual, release y regresión integrada de red real |
-| B5: release y OVA sanitizada importada, SHA-256 | 5 | **0** | sin exportación, reimportación ni tag/release demostrable |
-| **TOTAL** | **100** | **72** | **72% estimado, 28% pendiente** |
-
-**Del 65% al 68% (+3 en IaC)** por aplicación declarativa local desde YAML, Ansible render candidato y segunda ejecución idempotente, todas comprobadas en el laboratorio 22:27–22:30. No se ha validado aplicación de estas configuraciones a routers vivos.
-
-**Criterio de cálculo:** total de puntos acreditados / 100. Del 30% al 40% al comprobar doble OSPF Full/FIB/retorno, y **del 40% al 42%** por +2 puntos B2-L3 al acreditar **30/30 paquetes ICMP entre las LAN simuladas** en tres estados; **del 42% al 43%** por +1 punto al observar un nuevo ensayo de 76/76 sondeos ICMP de ~0.37 s, con 0 pérdidas observadas incluso durante dos ventanas de cambio y tiempos de primera observación de FIB (0.186/10.147 s), sin prometer exactitud temporal ni disponibilidad absoluta entre sondas. Se acredita **del 43% al 45% (+2 puntos B3)** tras comprobar realmente el JSON/.prom retrospectivo, servidor HTTP local, API, HTML visual (B3_03) y liberación final del puerto. Son componentes de prototipo histórico, **no** telemetría WAN en vivo, ni recolección Prometheus ni alertas. El **45% → 48% (+3 puntos B3)** se acredita ahora por la lectura actual del exporter y por el ciclo real de incidencia WAN-P DOWN + FIB WAN-B + WAN-P RESTORED + retorno FIB WAN-P, ver [bitácora del ciclo](../sesiones/2026-10-13-b3-live-ciclo-incidente-wan-verificado.md). El protocolo de monitoreo fue con sondeo discreto, **no** tasa ni tiempo exacto de convergencia, **no** Prometheus aún. El postcheck de 17:45:10 mostró puerto 9108 todavía ocupado, se verifica aparte al detener servicio. **Del 48% al 50% (+2 puntos B3)** al verificar Prometheus 3.7.0 activo, TSDB y scrape real `up=1` y `netlab360_live_source_up=1` desde su API; `/api/v1/rules` mostró `groups: []`, por tanto reglas/alerting todavía NO acreditados ([bitácora](../sesiones/2026-10-13-b3-prometheus-scrape-real-sin-reglas.md)). **Del 50% al 53% (+3 puntos B3)** por [la ejecución integral de Prometheus con reglas](../sesiones/2026-10-13-b3-prometheus-alertas-firing-y-resolucion-verificadas.md): `/api/v1/rules` confirmó 3 reglas activas a 18:29:34; ante corte real ambas alertas WAN `firing` a 18:33:35; tras retorno hubo **0 activas** a 18:34:36; `down` B2 código0, ambos servidores detenidos y puertos libres a 18:36:03. **Falta Alertmanager/receptor, NOC y SLA integral.** Las descripciones anteriores de `groups: []` y puertos pendientes se refieren a cortes históricos y están superadas. **Del 53% al 55% (+2 puntos B2-L2)** al comprobar [trunk etiquetado real y aislamiento on-link](../sesiones/2026-10-13-b2-l2-trunk-8021q-verificado-y-acl-preparada.md): dos VLAN con 3/3 ICMP cada una, tráfico inter-VLAN negativo 0/3, tráfico intravlan restaurado 2/2 por VLAN, sin recursos residuales y administración intacta. **No acreditar aún ACL/routing inter-VLAN ni tráfico entre sedes**; el script siguiente de ACL/HTTP está versionado, pero sin ejecutar. **Del 55% al 58% (+3 puntos B2-L2)** al verificar [el servicio HTTP inter-VLAN y ACL de router](../sesiones/2026-10-13-b2-l2-acl-http-real-validado.md): dos puertos HTTP accesibles antes de política, TCP8080 permitido después, TCP8081 denegado desde cliente pero servicio destino activo, contadores nftables de aceptación y descarte, rollback código0 sin cambios de gestión. Esta validación es intra-HQ, no verifica todavía HTTP HQ–S1 a través de WAN. **Del 58% al 59% (+1 B2-L3)** por [HTTP real HQ→S1 probado sobre WAN-P, WAN-B y WAN-P restaurada](../sesiones/2026-10-13-b2-l3-http-hq-s1-wan-tres-estados-verificados.md), rutas FIB simétricas, respuesta del servidor en tres estados y rollback cero residuos. **No demuestra continuidad HTTP sin pérdida durante transición ni integración de VLAN/switches con ambos hosts.** **Del 59% al 63% (+4 del bloque redundancia de 10)** por LACP negociado IEEE802.3ad, miembros agregados 2→1→2 en ambos extremos y HTTP válido en los tres estados, rollback sin residuos a 20:51; aún faltan servidor dual-NIC y redundancia de equipos reales/virtuales, por lo que se conservan 6 puntos pendientes de ese bloque. **Además, 20 nuevos PNG reales ya se auditaron visualmente** según [registro lote03](../evidencias/04-auditoria-visual-lote03-2026-10-13.md), **pero faltan importar sus bytes a GitHub; esto no modifica los 2/5 puntos del bloque documental**. No confundir este indicador de avance físico-técnico con el cumplimiento **binario** del checklist de aceptación de #1: en la fecha de corte todavía no están cerrados los 11 criterios integrales de esa issue. Los avances parciales de cada dominio no cierran su criterio integral.
-
-## 2. Estado de GitHub
-
-Consulta del repositorio `recm0708/netlab360` realizada el 12/10/2026: **43 issues en total; 3 cerradas y 40 abiertas** después de abrir #43 para la auditoría de capturas.
-
-**Issues cerradas y verificadas:**  
-- [#39 — dirección fija en VMnet8](https://github.com/recm0708/netlab360/issues/39): `192.168.47.40/24`, fuera del pool DHCP, SSH y persistencia tras reinicio.  
-- [#40 — GitHub CLI y clonación](https://github.com/recm0708/netlab360/issues/40): autenticación, Git HTTPS y sincronización de repositorio.  
-- [#41 — herramientas base y snapshot](https://github.com/recm0708/netlab360/issues/41): Docker/IaC/herramientas y `NETLAB360-BASE-HERRAMIENTAS` confirmado por operador, reinicio/postcheck.
-
-**Subhitos técnicos completados pero issues mayores aún ABIERTAS:**
-- [#11 — IPAM y topología](https://github.com/recm0708/netlab360/issues/11): B1 YAML validador + pruebas sin conflictos; diseño `draft`.
-- [#12 — PoC incidente observable](https://github.com/recm0708/netlab360/issues/12): B2-L2 prueba VLAN conexión/aislamiento/restauración funcional; falta incidente WAN + alarma.
-- [#42 — FRRouting OSPF dual WAN](https://github.com/recm0708/netlab360/issues/42): FRR v5 **subprueba de arranque local** aprobada; **13/10 enrutamiento R-HQ/R-S1 con dos vecinos Full por router, failover a wan-b, retorno a wan-p y cleanup realizados exitosamente**, y **ping bidireccional 30/30 con LAN de routers** en los tres estados; sigue pendiente tráfico continuo durante corte, clientes reales y medición temporal estricta.
-- [#16 — Source of Truth](https://github.com/recm0708/netlab360/issues/16): existe YAML IPAM inicial, falta inventario completo/consumo Ansible/OpenTofu.
-- [#38 — Ubuntu y SSH seguro](https://github.com/recm0708/netlab360/issues/38): acceso por clave funciona; hardening/revisión y documentación formal pendientes.
-- [#10 — inventario de recursos](https://github.com/recm0708/netlab360/issues/10) y [#34 — matriz versiones](https://github.com/recm0708/netlab360/issues/34): información sustantiva comprobada, quedan verificaciones de compatibilidad y cierre formal.
-
-**Auditoría nueva:** [#43 — revisión visual de evidencias PNG](https://github.com/recm0708/netlab360/issues/43): ABIERTA: 19 PNG B1/B2 + 5 B3 **recibidos y visualmente auditados** con hashes; binarios aún pendientes de commit y push; restan otras evidencias y cierre.
-
-**No cerrar todavía:** [#1 S01](https://github.com/recm0708/netlab360/issues/1), #11, #12, #42, #38, #10, #34. Ninguna issue posterior de S02–S08 se cierra por resultados de smoke local.
-
-## 3. Pendientes por bloque y secuencia recomendada
-
-### B2 — Convertir la PoC local en red real aislada (prioridad inmediata)
-1. **CONCLUIDO 13/10:** orquestador `scripts/laboratorio/b2-dualwan-ospf.sh` ejecutado sobre R-HQ/R-S1; aislamiento `--network none`, dos pares veth, `up/status/fail/restore/down` y cleanup exitosos, host ens33 intacto.
-2. **CONCLUIDO 13/10:** WAN-P `10.78.0.0/30` OSPF costo 10, WAN-B `10.78.0.4/30` costo 100, loopbacks `10.79.0.1/32` y `.2/32` y LAN dummy HQ/S1 anunciadas en OSPF área 0; vecinos dos Full por router.
-3. **CONCLUIDO 13/10, 11:24:** tráfico ICMP real entre IP LAN de R-HQ y R-S1 con orígenes `10.70.10.1`/`10.71.10.1`: 5/5 por dirección en los tres estados (normal, respaldo, restaurada), 30/30 y 0% pérdida en esos sondeos. **PENDIENTE:** medir pérdida y tiempo de convergencia durante el instante de falla con tráfico continuo; incluir clientes y servicios reales y una serie temporal.
-4. Completar VLAN trunk/ACL mínimas y prueba de agregación/redundancia o someter recorte de alcance a rúbrica aprobada.
-
-### B3/B4 — El MVP transversal exigido por S01
-5. Exportar eventos reales de caída, reconvergencia, restauración a métricas con timestamp; integrar exporter/Prometheus, API y una vista NOC con alarma.
-6. Incorporar OpenTofu y Ansible en recursos acotados de la topología (estado deseado, plan, comprobación, idempotencia).
-7. Capturar un baseline de eventos y probar un prototipo de anomalía supervisado/no supervisado con métricas, evaluación y limitaciones. No atribuirle IA validada sin evaluación.
-
-### B5 — Cierre formal de S01
-8. Completar informe académico APA 7, bitácora y manual de usuario; revisar visualmente capturas PNG después de que el usuario las envíe; enlazar cada evidencia con fecha, comando, resultado y commit.
-9. Confirmar con docente rúbrica definitiva y negociar cambios de alcance/calendario si procede; S01 estaba prevista para **5–11/10/2026** y a este corte sigue abierta.
-10. Implementar CI local/PR adecuado sin ejecutar topologías privilegiadas en runners compartidos; generar etiqueta/release y exportación OVA **sanitizada** (revocar/borrar token CLI local antes de distribuir); comprobar checksum SHA-256 e importación en VM de prueba.
-
-## 4. Política de control de evidencias y privacidad
-
-El usuario indica que **todas las capturas solicitadas se asumen tomadas**, salvo que señale una excepción. Posteriormente remitirá PNG para revisión; **no afirmar que están visualmente aprobadas o subidas a GitHub**. Cada nueva captura debe tener nombre exacto, comando de presentación sin `clear`, marcadores `INICIO CAPTURA`/`FIN CAPTURA`, fecha/hostname y resultado literal. Preservar históricos fallidos como diagnóstico, no como prueba de éxito.
-
-Nunca publicar tokens, claves privadas, credenciales, carpetas `~/.config/gh/hosts.yml` ni OVA no sanitizada. No alterar la red de gestión `ens33 192.168.47.40/24` ni VMware VMnet8 desde la topología de laboratorio.
-
-**Evidencia adicional de medición temporal por sondeo:** [bitácora 76/76 ICMP durante dos transiciones](../sesiones/2026-10-13-b2-convergencia-icmp-continuo-verificada.md), archivos locales `17-b2-convergencia-20261013-115141.log/.csv`, captura B2_16 tomada según protocolo del usuario, aún sin revisión gráfica.
-
-**Evidencia ICMP de LAN simulada validada:** [bitácora de 30/30 pings](../sesiones/2026-10-13-b2-lan-icmp-tres-estados-verificado.md); logs locales `16-b2-lan-ping-{normal,respaldo,restaurada}-20261013-*.log`, captura B2_15 tomada según convención, auditoría visual pendiente. 
-
-**Evidencia R-HQ/S1 dual-WAN validada:** [bitácora de failover](../sesiones/2026-10-13-b2-dualwan-ospf-failover-resultado.md), logs locales `15-b2-dualwan-{up,status,fail,restore,down}-20261013-*.log`, capturas B2_12–B2_14 presuntamente tomadas, aún no auditadas. 
-
-**Evidencia FRR local exitosa:** `~/netlab360-bootstrap/evidencias/14-b2-frr-smoke-v5-20261012-235725.log`; [bitácora FRR v5](../sesiones/2026-10-12-smoke-frr-v5-exitoso.md).
-
-**Actualizar este archivo y #1 cuando cambie una prueba funcional o el alcance oficial; no aumentar el porcentaje solo por escribir documentación o abrir issues.**
+**Archivo histórico:** los progresos anteriores de 30%, 43%, 53%, 63%, 68%, 71% y 72%, junto a su cronología detallada, permanecen consultables en Git, comentarios de issues y `docs/sesiones/`. Este documento deliberadamente NO apila encabezados con estados contradictorios.
