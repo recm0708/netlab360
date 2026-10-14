@@ -1,0 +1,41 @@
+---
+# NETLAB360 — renderiza configuraciones FRRouting desde OpenTofu, sin aplicarlas.
+- name: NETLAB360 SoT a FRRouting para HQ y S1
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    model: "{{ lookup('ansible.builtin.file', manifest_path) | from_json }}"
+  tasks:
+    - name: Verificar proteccion de administracion y alcance
+      ansible.builtin.assert:
+        that:
+          - model.topology_status == 'candidate_only'
+          - model.management_guard.locked | bool
+          - model.management_guard.interface == 'ens33'
+          - model.management_guard.network == '192.168.47.0/24'
+          - model.management_guard.host_ip == '192.168.47.40'
+          - model.management_guard.gateway == '192.168.47.2'
+          - model.s2_reserved | bool
+          - model.sites.keys() | list | sort == ['HQ', 'S1']
+          - model.wan_links | length == 2
+          - model.inventory_sha256 | length == 64
+          - model.sites.HQ.router == 'R-HQ'
+          - model.sites.S1.router == 'R-S1'
+        fail_msg: "El manifiesto OpenTofu no cumple las guardas del MVP."
+        success_msg: "IAC_MANIFIESTO_VALIDADO=SI"
+
+    - name: Crear directorio externo al repositorio
+      ansible.builtin.file:
+        path: "{{ output_dir }}"
+        state: directory
+        mode: "0700"
+
+    - name: Generar configuraciones FRRouting candidatas desde OpenTofu
+      ansible.builtin.template:
+        src: templates/frr-router.conf.j2
+        dest: "{{ output_dir }}/{{ item.value.router }}.frr.conf"
+        mode: "0600"
+      loop: "{{ model.sites | dict2items | sort(attribute='key') }}"
+      loop_control:
+        label: "{{ item.value.router }}"
