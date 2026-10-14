@@ -6,6 +6,9 @@
 
 ## 1. Estimación ponderada del avance S01
 
+**Actualización documental posterior al commit `570088c` (no altera el 65/100):** 57 PNG de lotes 01–04 y sus cuatro manifiestos **reubicados y publicados** en carpeta plana; se generó el mapa origen/destino con SHA256. Los 5 PNG auditados del lote05 **no se importaron**: quedaron carpetas físicas antiguas después de `git mv` y falló una guardia; scripts corregidos, pendientes pull y nueva ejecución del importador exclusivamente. No se ha acreditado nueva técnica ni se ha publicado lote05.
+
+
 **ÚLTIMA EVALUACIÓN 13/10 21:39:** 65/100 técnico estimado. +2 puntos por prueba virtual bond active-backup 3 estados HTTP + cleanup; redundancia 6/10 (4 LACP + 2 active-backup). **No acredita NICs VMware, switch secundario ni equipo redundante.** Lote04 ya está publicado (`2af7a80`), 13 capturas; lote05 cinco nuevos PNG recibidos y auditados pero **pendientes de publicar**; migración a raíz plana **preparada, sin ejecutar**. Las menciones históricas de 63/100, LACP no recibido y lote04 pendiente más abajo han sido superadas. [Auditoría lote05](../evidencias/06-auditoria-lote05-dualnic-noc-2026-10-13.md).
 
 **Estado histórico del 13/10 21:20 (superado por el checkpoint 21:39):** lote03 20 PNG + CSV publicados a GitHub en `0d749df`, lote04 13 PNG LACP recibidos, auditados y pendientes de push; ensayo active-backup dualNIC **abortado antes de HTTP por bug de variable** y corregido a `5a4569f` en GitHub. No sumar puntos hasta nueva ejecución validada, por lo que S01 **permanece 63/100**. [Auditoría lote04](../evidencias/05-auditoria-visual-lote04-lacp-2026-10-13.md).
