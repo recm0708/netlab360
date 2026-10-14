@@ -1,5 +1,16 @@
 # NETLAB360 — REANUDAR AQUÍ (checkpoint operativo)
 
+## CHECKPOINT MÁS RECIENTE — 13/10/2026 22:16 PANAMÁ | 62 CAPTURAS PUBLICADAS + IAC PREPARADA
+
+**Evidencia binaria / GitHub:** el usuario ejecutó exitosamente la importación corregida del lote05, `RESULTADO_IMPORTACION_LOTE05=0`, `LOTE05_IMPORTADO=SI`, `SHA256_INDIVIDUALES=OK`. El auditor de todos los originales dio `PNG_DIRECTOS=62`, `CSV_VERIFICADOS=6`, `SHA256_ORIGINALES=OK`, `AUDITORIA_CAPTURAS_PLANAS=OK`, exit0. Commit `328591acaed06431457b903dec6c7a2b91c39b25` publicado, SHA local y remoto **idénticos**, `GITHUB_SINCRONIZADO=SI`, rama limpia, **cero subdirectorios** de capturas en Ubuntu y GitHub. Confirmado también por árbol remoto real. **Reorganización COMPLETADA; no repetir ni solicitar lotes 01–05.** [Auditoría lote05](evidencias/06-auditoria-lote05-dualnic-noc-2026-10-13.md) · [capturas](../evidencias/capturas/) · [manifiestos](../evidencias/manifiestos/). Issue #43 sigue abierta para futuras evidencias del semestre, no por lotes 01–05.
+
+**S01 65/100 técnico estimado** (no es calificación). LACP y dual-NIC active-backup veth están validados, **no** duplicidad de hardware. Los 62 PNG son evidencia auditada y publicada, no incremento adicional a puntuación.
+
+**NUEVA VERTICAL IAC PREPARADA EN GITHUB, NO EJECUTADA:** `iac/s01/main.tf` (OpenTofu terraform_data built-in con 1 guarda VMnet8, 2 sitios activos HQ/S1 y 2 WAN; S2 reservada), `ansible/s01/render-frr.yml` con plantilla `templates/frr-router.conf.j2` para configs candidatas R-HQ/R-S1, `scripts/validacion/validar-iac-frr.py` y `tests/test_iac_frr.py`. [Runbook completo](sesiones/2026-10-13-iac-s01-opentofu-ansible-preparado.md). **OpenTofu state y salida Ansible FUERA del clon** en `~/netlab360-bootstrap/iac/s01/`. Ni OpenTofu ni Ansible de esta PoC tocan interfaces de red, Docker, rutas o FRR en ejecución; solo registran estado declarativo y crean archivos candidatos. No sumar puntos sin ejecutar y verificar `plan/apply`, consumo del manifiesto, compliance e idempotencia. Los pasos próximos comienzan con pull `main` limpio, precheck red/SoT/herramientas y unit tests. El recurso built-in **no** supone despliegue de routers; la integración activa B2 vendrá después, con guardas y rollback. Si falla una fase, no reejecutar a ciegas, enviar salida.
+
+---
+
+
 ## CHECKPOINT VIGENTE — 13/10/2026 POSTERIOR A 21:39 | APLANADO PUBLICADO, LOTE05 PENDIENTE
 
 **Fuente: salida real de Ubuntu y árbol GitHub verificado.** El operador corrió `aplanar-capturas.py --plan`: 57 PNG, 4 CSV, 0 colisiones, 61 movimientos. `--aplicar` **sí movió los 61 archivos y generó el mapa SHA256**, pero terminó con código1 porque `git mv` dejó físicamente las cuatro carpetas originales (vacías o por verificar). El usuario **ya hizo commit/push** de esos 61 movimientos + mapa: commit [`570088c`](https://github.com/recm0708/netlab360/commit/570088c5ed3fd7ce3b888facecfe79c39e78005f), `GITHUB_SINCRONIZADO=SI`, SHAs local/remoto iguales. Todos los PNG fueron reportados con similitud Git 100%. En **GitHub** ya NO hay cuatro subcarpetas: **57 PNG directos** en `evidencias/capturas/`, **4 CSV históricos + 1 mapa** en `evidencias/manifiestos/`. El clon Ubuntu aún muestra cuatro carpetas físicas residuales, no versionadas.
