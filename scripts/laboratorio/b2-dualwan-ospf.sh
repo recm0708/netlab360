@@ -149,6 +149,32 @@ wait_full() {
   done
   echo "ERROR: no hubo dos vecinos Full"; return 4
 }
+# La vecindad Full precede a veces la instalacion de rutas OSPF en zebra/FIB.
+# Esperar las DOS rutas remotas antes de declarar UP exitoso.
+# La comprobacion solo lee namespaces de los routers, no toca rutas del host.
+wait_remote_routes() {
+  local try hq_route s1_route
+  echo "========== ESPERAR FIB OSPF WAN PRINCIPAL EN AMBOS ROUTERS =========="
+  for try in $(seq 1 60); do
+    running "$HQ" && running "$S1" || return 4
+    hq_route="$(ns "$HQ" ip -4 route get 10.71.10.1 2>/dev/null || true)"
+    s1_route="$(ns "$S1" ip -4 route get 10.70.10.1 2>/dev/null || true)"
+    if [[ "$hq_route" == *"dev wan-p"* && "$s1_route" == *"dev wan-p"* ]]; then
+      echo "FIB_HQ_S1=$hq_route"
+      echo "FIB_S1_HQ=$s1_route"
+      echo "RUTAS_OSPF_BIDIRECCIONALES_WAN_P=OK (sondeo $try)"
+      return 0
+    fi
+    if (( try == 1 || try % 5 == 0 )); then
+      echo "RUTAS_OSPF_PENDIENTES: sondeo $try/60; esperar instalacion en FIB"
+    fi
+    sleep 1
+  done
+  echo "ERROR: OSPF Full pero sin rutas remotas simetricas por WAN-P"
+  echo "FIB_HQ=$hq_route"
+  echo "FIB_S1=$s1_route"
+  return 4
+}
 diagnostic() {
   for c in "$HQ" "$S1"; do
     if exists "$c"; then
@@ -219,6 +245,7 @@ case "$ACTION" in
     apply_config "$HQ"
     apply_config "$S1"
     wait_full
+    wait_remote_routes
     neighbors "$HQ"; neighbors "$S1"
     routes "$HQ"; routes "$S1"
     ns "$HQ" ip -4 route get 10.71.10.1
