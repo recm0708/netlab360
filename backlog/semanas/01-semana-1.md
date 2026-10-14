@@ -1,10 +1,12 @@
 # S01 — Semana 1: MVP transversal y viabilidad
 
 **Calendario previsto:** 5–11 de octubre de 2026.  
-**Corte de situación actualizado:** 13 de octubre de 2026, 19:44 Panamá.  
+**Corte de situación actualizado:** 13 de octubre de 2026, 20:51 Panamá.  
 **Estado de fase:** ABIERTA, con retraso respecto al plan inicial; no trasladar automáticamente fechas de S02–S08.  
 **Issue:** [#1](https://github.com/recm0708/netlab360/issues/1).  
-**Avance estimado:** **59%** según pesos y evidencias de [docs/control/01-avance-s01.md](../../docs/control/01-avance-s01.md). No es avance oficial de GitHub ni calificación de docente.
+**Avance estimado:** **63%** según pesos y evidencias de [docs/control/01-avance-s01.md](../../docs/control/01-avance-s01.md). No es avance oficial de GitHub ni calificación de docente.
+
+**Nuevo resultado 20:51:** LACP IEEE802.3ad en dos namespaces con agregador activo 2→1→2 y HTTP correcto en tres estados, sin residuos ni cambios a red de administración, +4 puntos técnicos (59→63). **20 PNG posteriores recibidos y auditados visualmente** con SHA-256, pero aún NO importados a GitHub como binarios; conservar los 24 anteriores físicamente publicados y pedir únicamente cuatro fotos LACP (no recibidas todavía). **Preparado (NO ejecutado):** ensayo de redundancia dual-NIC virtual `scripts/laboratorio/b2-dualnic-activebackup-http.sh`, ver [bitácora LACP](../../docs/sesiones/2026-10-13-b2-lacp-8023ad-verificado.md), [auditoría lote03](../../docs/evidencias/04-auditoria-visual-lote03-2026-10-13.md). No confundir LACP veth con NIC/switch físico real.
 
 ## Criterios integrales de aceptación (copiados de issue #1; sin aprobar aún)
 
