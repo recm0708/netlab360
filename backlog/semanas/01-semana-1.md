@@ -15,8 +15,8 @@
 El issue [#1](https://github.com/recm0708/netlab360/issues/1) conserva once criterios originales, detallados con evidencia y brechas en [matriz canónica](../../docs/control/03-matriz-aceptacion-y-decisions-s01.md). Ningún criterio integral se aprueba por un solo componente de laboratorio. IaC avanzada aparece también en S03 y ML en S06; la rúbrica docente decidirá si se exige antes.
 
 ## Orden vigente
-1. Definir estructura editorial definitiva y tres documentos maestros acumulativos S01–S08 en la plantilla institucional.
-2. Redactar S01 de investigación, memoria técnica y manual con capturas seleccionadas y citas verificadas.
+1. Definir estructura editorial definitiva y dos documentos maestros consolidados, uno académico y otro de instalación/uso en la plantilla institucional.
+2. Redactar S01 del proyecto académico (incidentes reales) y del manual técnico integral (instalación desde cero, operación y solución preventiva de problemas), con capturas y citas verificadas.
 3. Obtener guía/rúbrica docente, definición exacta de entrega de S01, extensión y obligatoriedad de OVA/ML.
 4. Cubrir sólo brechas técnicas exigidas por esa rúbrica, con una prueba integrada por criterio y pre/postcheck.
 5. Sanitizar/validar exportación/reimportación de VM si obligatoria, versionar release y cerrar issues al cumplir requisitos.
