@@ -1,66 +1,73 @@
-# NETLAB360 — Documento 01: investigación y desarrollo del proyecto
+# NETLAB360 — Documento 01: Diseño, desarrollo y evaluación del proyecto
 
-**Propuesta de índice V0.1 para aprobación del usuario.** **Documento único y acumulativo S01–S08.** La presentación final se hará en la plantilla institucional aportada por el usuario, no en este Markdown. Insertar UN SOLO índice automático en Word. Toda cita externa tendrá referencia APA 7 comprobada.
+**Versión propuesta de índice V0.2, pendiente de aprobación por el usuario.** Documento académico ÚNICO, acumulativo desde S01 hasta la última fase efectivamente completada. **La portada institucional la prepara el usuario**. Índice general automático único en Word. Redacción académica desde el trabajo del equipo y referencias APA 7 que efectivamente se citan.
 
-## Preliminares (no repetir por fase)
-- Portada institucional: universidad, facultad/carrera, asignatura, proyecto, integrantes, docente, grupo, lugar y fecha, según plantilla aportada.
-- Resumen y palabras clave (en versión global actualizable).
+## Preliminares
+- Portada de la institución (responsabilidad del usuario).
+- Resumen y palabras clave; sintetizar alcance comprobado, metodología y resultados del **corte final**, actualizable durante el semestre.
 - Índice general automático único.
 
-## Cuerpo general del proyecto
-1. **Introducción** (visión del semestre completo; describir S01 como MVP inicial).
-2. **Planteamiento del problema** (contexto, problema central, pregunta orientadora).
-3. **Justificación** (académica, técnica, operativa y viabilidad).
-4. **Objetivos**
-   - 4.1 Objetivo general (uno, permanente).
-   - 4.2 Objetivos específicos (medibles y compatibles con S01–S08).
-5. **Alcance, delimitaciones y criterios de éxito**
-   - 5.1 Alcance global del proyecto semestral.
-   - 5.2 Alcance efectivamente ejecutado S01; no equiparar diseño a despliegue.
-   - 5.3 Supuestos, riesgos y límites.
-6. **Marco conceptual y tecnológico** (se amplía al utilizar realmente tecnologías)
-   - 6.1 Virtualización, contenedores, namespaces y redes definidas por software.
-   - 6.2 VLAN, switching L2 y enrutamiento OSPF.
-   - 6.3 Redundancia WAN, LACP y active-backup (diferencias y límites).
-   - 6.4 Source of Truth, IaC, OpenTofu y Ansible.
-   - 6.5 Observabilidad, Prometheus, API y telemetría.
-   - 6.6 Diagnóstico determinista versus IA/AIOps (sin atribuir modelos).
-   - 6.7 Tecnologías adicionales S02–S08: incluir sólo cuando corresponda.
-7. **Metodología y criterios de validación**
-   - 7.1 Enfoque de prototipo incremental y evidencia.
-   - 7.2 Diseño por fases S01–S08 y trazabilidad.
-   - 7.3 Variables, métricas, precheck/postcheck y límites de medición.
-8. **Diseño general de la plataforma NETLAB360**
-   - 8.1 Arquitectura lógica/física virtualizada y segregación de gestión.
-   - 8.2 Red empresarial HQ–S1, S2 prevista y direccionamiento.
-   - 8.3 Componentes de automatización, observabilidad, NOC y analítica.
-   - 8.4 Seguridad, recuperación, decisiones de arquitectura.
-9. **Desarrollo e integración por fases** (un capítulo, ocho subcapítulos crecientes; NO 8 informes separados)
-   - 9.1 Fase S01: fundamentos operativos, segmento mínimo multisede y validaciones iniciales.
-   - 9.2 Fase S02: reservado según desarrollo y rúbrica.
-   - 9.3 Fase S03: reservado según desarrollo y rúbrica.
-   - 9.4 Fase S04: reservado.
-   - 9.5 Fase S05: reservado.
-   - 9.6 Fase S06: reservado.
-   - 9.7 Fase S07: reservado.
-   - 9.8 Fase S08: reservado.
-10. **Resultados y análisis crítico**
-    - 10.1 Resultados comprobados de S01 (OSPF, ACL, LACP, IaC, NOC, reglas).
-    - 10.2 Resultados adicionales de S02–S08 (se completan progresivamente).
-    - 10.3 Comparación entre objetivos, observaciones y límites.
-11. **Recomendaciones** (globales y revisables).
-12. **Conclusiones** (globales y revisables).
-13. **Referencias** (única lista global, APA 7, obras citadas en el texto).
-14. **Anexos pertinentes** (solo si la institución los permite; enlazar inventarios/figuras).
+## Índice general propuesto
 
-## Reglas específicas
+1. **Introducción.** Presentación del proyecto, motivación y vínculo entre redes multisede, automatización, observabilidad y diagnóstico; anticipar lo que se ha implementado, sin prometer que lo futuro funciona.
+2. **Planteamiento del problema.**
+   - 2.1 Contexto y situación problemática.
+   - 2.2 Problema que busca atender NETLAB360.
+   - 2.3 Pregunta orientadora del proyecto.
+3. **Justificación.**
+   - 3.1 Justificación técnica.
+   - 3.2 Justificación académica y formativa.
+   - 3.3 Viabilidad y beneficios esperados, diferenciados de beneficios probados.
+4. **Objetivos del proyecto.**
+   - 4.1 Objetivo general único.
+   - 4.2 Objetivos específicos medibles, adaptables al corte real del proyecto.
+5. **Alcance, delimitaciones y requisitos.**
+   - 5.1 Alcance funcional de la plataforma.
+   - 5.2 Alcance del prototipo virtualizado y supuestos.
+   - 5.3 Requisitos funcionales y no funcionales.
+   - 5.4 Delimitaciones, riesgos y criterios de aceptación.
+6. **Marco teórico y tecnológico.** Integrar fuentes verificadas APA7 en cada tópico:
+   - 6.1 Virtualización, redes virtuales y contenedores.
+   - 6.2 Redes empresariales multisede, VLAN y switching 802.1Q.
+   - 6.3 Enrutamiento dinámico, OSPF y redundancia de WAN.
+   - 6.4 Agregación de enlaces LACP y active-backup.
+   - 6.5 Source of Truth, infraestructura como código y automatización (OpenTofu/Ansible).
+   - 6.6 Observabilidad, métricas, telemetría, Prometheus y alertas.
+   - 6.7 Diagnóstico por reglas, análisis de datos y fundamentos de AIOps; añadir modelos ML SOLO cuando existan implementados/evaluados.
+   - 6.8 Nuevas tecnologías realmente incorporadas en fases posteriores (no rellenar anticipadamente).
+7. **Metodología de diseño, implementación y evaluación.**
+   - 7.1 Enfoque incremental, fases y gestión de cambios.
+   - 7.2 Selección de herramientas y entorno controlado.
+   - 7.3 Procedimiento de precheck, ejecución, medición y postcheck.
+   - 7.4 Gestión de riesgos, calidad, trazabilidad y tratamiento de evidencias.
+8. **Diseño y arquitectura de NETLAB360.**
+   - 8.1 Arquitectura general y componentes.
+   - 8.2 Topología de sedes HQ, S1 y sedes incorporadas.
+   - 8.3 Plan de direccionamiento, VLAN, WAN y segmentación de gestión.
+   - 8.4 Arquitectura de automatización, NOC, telemetría y analítica.
+   - 8.5 Decisiones de arquitectura y justificación.
+9. **Desarrollo del proyecto y decisiones técnicas.** Organizar en subcapítulos por las fases **realmente ejecutadas**; no crear ocho informes separados.
+   - 9.1 Fase S01 — Preparación inicial y arquitectura de referencia, IPAM, pruebas de segmentación, FRRouting/OSPF, redundancia virtual, IaC inicial, observabilidad y diagnóstico de referencia.
+   - 9.2 Fases posteriores **realmente completadas**, añadidas secuencialmente hasta el corte final; no reservar capítulos vacíos en el documento que se entregue.
+   - **Dentro de cada subcapítulo correspondiente, integrar incidentes técnicos REALES y mitigaciones pertinentes**: contexto, síntoma, impacto, causa comprobada (o hipótesis señalada), decisión correctiva y verificación de la resolución. NO recopilar errores personales ni relegarlos a un anexo de incidentes.
+10. **Resultados obtenidos y evaluación.**
+    - 10.1 Resultados técnicos por criterio/objetivo, métricas y evidencias.
+    - 10.2 Comparación diseño previsto–resultado realmente probado.
+    - 10.3 Valoración de seguridad, reproducibilidad y cobertura funcional.
+11. **Discusión y limitaciones.** Interpretación crítica, consideraciones de validez interna, restricciones reales y oportunidades de evolución justificadas.
+12. **Recomendaciones.** Acciones recomendadas a partir de hallazgos, sin afirmar que ya fueron implementadas.
+13. **Conclusiones.** Cumplimiento de objetivos del alcance final, síntesis respaldada por evidencia.
+14. **Referencias.** Lista única APA 7 de todas y sólo las fuentes externas citadas dentro del documento.
+15. **Anexos, únicamente si resultan necesarios.** Diagramas de lectura compleja, matrices extensas o inventarios; no desviar aquí las mitigaciones.
 
-- No repetir los mismos comandos extensos del Documento 02; aquí se explica el sentido técnico y se analizan resultados.
-- Describir OpenTofu como metadata/manifest, no aprovisionador de contenedores; Ansible produjo configs FRR usadas en B2.
-- Precisar que las pruebas VLAN-L2, WAN-L3, LACP y active-backup fueron subtopologías separadas y que S2 está reservada.
-- **Figuras/tablas:** siempre párrafo introductorio, mención explícita Figura N/Tabla N, número y título APA 7, **Nota.** de interpretación/fuente cuando proceda. Numeración continua por documento.
-- No completar una bibliografía con obras no consultadas ni inventar DOI.
-- No escribir todavía contenido S02–S08; sólo se reservan estos apartados como esquema editorial para futuras fases.
-- El usuario copiará cada sección a su plantilla institucional después de revisar el texto entregado en el chat.
+## Reglas editoriales específicas del Documento 01
 
-**Próxima sección a redactar con el usuario:** 1. Introducción de NETLAB360, con contexto del proyecto completo y alcance inicial de S01.
+- Redactar como producto del equipo: «el equipo implementó», «se verificó», «se estableció», «nuestra propuesta» cuando corresponda. No voz de IA, tampoco confesiones personales.
+- Documentar incidentes técnicos reales durante el desarrollo **inmediatamente después del procedimiento/decisión afectado**, sin reescribir comandos completos ni narrar descuidos de operador. Marcar las causas no demostradas como hipótesis, no certezas.
+- Explicar POR QUÉ se eligieron configuraciones y qué resultados se obtuvieron; comandos paso a paso y guía de usuario van al Documento 02.
+- Figuras y tablas con preámbulo y referencia textual previa, título, número y **Nota.** si es pertinente; numeración continua.
+- S01: distinguir que las pruebas L2, OSPF, LACP, bonding, IaC y B4 se desarrollaron en subtopologías o sesiones diferentes; no presentar como arquitectura única integrada si no se validó.
+- En caso de que el semestre se cierre en la última fase completada (p. ej. S06), escribir el documento final con **cobertura real S01–S06**, sin anexar subcapítulos ficticios S07/S08 ni mentir sobre planes históricos o exigencias docentes.
+- Cotejar y aprobar referencias antes de introducir citas APA7; no inventar bibliografía.
+
+**La redacción inicia solo cuando el usuario apruebe estos dos índices**; primera sección: 1. Introducción.
