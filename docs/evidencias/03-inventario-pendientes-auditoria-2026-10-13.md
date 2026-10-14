@@ -1,5 +1,7 @@
 # NETLAB360 — Inventario consolidado de capturas pendientes de auditoría
 
+> **ACTUALIZACIÓN VIGENTE 13/10 ~21:20:** lote01/02 = 24 PNG publicados; lote03 = 20 PNG originales + CSV **publicados** commit `0d749df`, verificación remota OK; lote04 = **13 PNG LACP recibidos y auditados visualmente** (4+4+4+1), ZIP con SHA256 preparado pero **no publicados todavía**. [Auditoría lote04](05-auditoria-visual-lote04-lacp-2026-10-13.md). El contenido histórico posterior que menciona pendientes ya superados se conserva como registro cronológico.
+
 ## ACTUALIZACIÓN VIGENTE — 13/10/2026 20:52 PANAMÁ | LOS 20 PNG YA FUERON RECIBIDOS Y AUDITADOS
 
 **Esta sección sustituye el estado 'pendiente de recibir' de las tablas históricas siguientes.** El usuario adjuntó de verdad **20 PNG** (B2-L2 seis, B2-L3 cuatro, B3 live/Prometheus diez). Se inspeccionaron visualmente y cotejaron con logs, 20/20 aceptadas: **18 VÁLIDAS y 2 VÁLIDAS CON OBSERVACIÓN** (B2_L2_06 por líneas nft divididas; B3_09_FINAL por prompt sudo sin contraseña). Se calcularon SHA-256 por archivo. [Auditoría y 20 hashes completos](04-auditoria-visual-lote03-2026-10-13.md).
