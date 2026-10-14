@@ -1,5 +1,8 @@
 # NETLAB360 — Planificación semestral
 
+> **Checkpoint 13/10 23:24:** B4 reglas deterministas sobre CSV real (76 sondeos, 0 pérdidas/alertas, cuatro transiciones operativas), 24 tests exitosos y GitHub Actions Node24 run 38510552044 exitosa. **IA/ML NO entrenada ni evaluada.** Auditoría de **24 PNG** IaC/B4 y ZIP lote06 lista, pero aún pendiente importación física al clon Ubuntu y push (62 PNG antes; 86 después). Cuatro capturas IAC incompletas se recuperarán de logs sin repetir apply. S01 **72% estimado**. [Auditoría lote06](docs/evidencias/08-auditoria-lote06-iac-b4-2026-10-13.md).
+
+
 > **Estado 13/10 23:12:** **72/100** provisional. Perfil descriptivo B4 real: 16/16 tests; 76 ICMP (76 OK), rutas estables coherentes, RTT por fases, JSON 0600. CI previa verde; actualización de runtime Node24 pendiente de comprobar. Preparado motor de **reglas diagnósticas contextual, NO IA entrenada**. Capturas IaC/B4 nuevas se remitirán después. [Registro](docs/sesiones/2026-10-13-b4-perfil-estadistico-verificado.md).
 
 
