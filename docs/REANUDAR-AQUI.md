@@ -1,5 +1,18 @@
 # NETLAB360 — REANUDAR AQUÍ (checkpoint operativo)
 
+## CHECKPOINT MÁS RECIENTE — 13/10/2026 ~21:20 PANAMÁ | LOTE03 PUBLICADO, LACP FOTOGRÁFICO AUDITADO, DUALNIC ABORTADO Y CORREGIDO
+
+**Prevalece sobre el historial posterior de este documento:** el usuario realizó `git commit` y `git push` del lote03: commit `0d749dff5a27c4c108aea7cdec8ddb5723394bb1`, **20 PNG originales + 1 CSV ya físicamente publicados en GitHub**, `PUBLICACION_GITHUB=OK`, refs local/remoto iguales. El lote 03 deja de estar pendiente de publicación.
+
+**LACP:** recibidos y auditados 13 PNG (4 segmentos del bloque 01, 4 del 02, 4 del 03, 1 del 04), todos válidos como secuencias; manifiesto SHA256 individual, ZIP `NETLAB360_LOTE04_LACP_13PNG_AUDITADOS_2026-10-13.zip` (726693 bytes, SHA256 `085cfb84dd6926a01a0d8185be46ed09ae619c5e719175e161c73324bb2695c7`) generados para transferencia. **NO publicados aún como PNG en GitHub**. [Auditoría lote04](evidencias/05-auditoria-visual-lote04-lacp-2026-10-13.md). No repetir LACP.
+
+**Dual-NIC:** precheck 21:20 correcto (script sintaxis 0; Docker/netns vacíos, ens33 `192.168.47.40/24`, GW `192.168.47.2`, 3 servicios activos, bonding disponible); inicio de ensayo active-backup mostró modo correcto y a1/a2 up, pero falló en `bond_info` por expansión `$n_ACTIVA` en `set -u` (variable `n_ACTIVA` sin asignar), **antes de HTTP o falla controlada**. `RESULTADO_B2_DUALNIC=1`, `RED_GESTION_INTACTA=SI`; postcheck posterior necesario para confirmar namespaces vacíos. Dos líneas corregidas a `${n}_ACTIVA` y `${n}_MIEMBROS` en commit `5a4569f`. **NO aprobado; S01 mantiene 63/100**, issue #1 abierta.
+
+**CONTINUACIÓN:** primero confirmar cleanup e integridad host; `git pull --ff-only origin main` tras comprobar que la rama está limpia; `bash -n` y `grep` de expansiones corregidas; transferir ZIP de 13 imágenes al guest, validar SHA256 e importar a `evidencias/capturas/B2_LACP_lote04`, commit/push y hashes; solo con precheck/snapshot confirmado reejecutar UNA VEZ el script dualNIC corregido. Exigir HTTP por primaria, HTTP por respaldo y HTTP tras restauración, dos miembros en ambos bonds, marcadores 01/02/03, código 0 y cleanup. Si falla, no relanzar; enviar log/postcheck. Después capturas `B2_DUALNIC_01/02/03/04`, cambios documentales e IaC. No modificar VMnet8, ens33, GW, firewall o rutas del host.
+
+---
+
+
 ## CHECKPOINT VIGENTE — 13/10/2026 20:52 PANAMÁ | LACP PROBADO + 20 PNG NUEVOS AUDITADOS
 
 **Este estado prevalece sobre notas anteriores sobre LACP y fotos pendientes.** Usuario aportó salida real de Ubuntu: `b2-lacp-8023ad-dos-enlaces.sh --snapshot-confirmado` comprobó **IEEE802.3ad LACP active/fast, dos puertos en agregador de cada extremo, caída a UN puerto tras apagar a1/b1, recuperación a DOS puertos**, HTTP `NETLAB360_LACP_HTTP_OK` en los tres estados, `LACP_8023AD_TRES_ESTADOS=OK`, `RESULTADO_B2_LACP=0`, `RESULTADO_EJECUCION_LACP=0`, `RED_GESTION_INTACTA=SI`. Postcheck **20:51:35** Docker/netns vacíos, ens33 `192.168.47.40/24`, default `192.168.47.2`, docker/ssh/open-vm-tools activos, Git `main...origin/main` limpio en commit local `a8a9879` **antes de nuevos commits documentales**. Módulo bonding estaba disponible en `modinfo bonding`, se autoloadó, no hizo falta instalar programa. [Bitácora LACP](sesiones/2026-10-13-b2-lacp-8023ad-verificado.md).
