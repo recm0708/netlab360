@@ -1,5 +1,7 @@
 # NETLAB360 — Auditoría visual del lote 04: LACP IEEE 802.3ad
 
+> **Ubicación VIGENTE desde el commit [570088c](https://github.com/recm0708/netlab360/commit/570088c5ed3fd7ce3b888facecfe79c39e78005f):** los PNG ya versionados se consultan directamente en [`evidencias/capturas/`](../../evidencias/capturas/) y sus CSV en [`evidencias/manifiestos/`](../../evidencias/manifiestos/). 13 capturas del lote04 LACP; CSV actual `../../evidencias/manifiestos/MANIFIESTO_SHA256_NETLAB360_LOTE04_LACP_13PNG.csv`. Cualquier ruta antigua `.../lote0X/` que figure a continuación describe su **ubicación histórica**, no la actual. La migración conservó los bytes (Git detectó 100% de similitud). El lote05 aún no figura físicamente en GitHub.
+
 > **ACTUALIZACIÓN POSTERIOR (13/10 21:37):** 13 PNG + CSV publicados, commit `2af7a8054a87bc10db1195f5f54d92b2dbc04c8f`, `LOTE04_PUBLICADO=OK`. Referencias a publicación pendiente más abajo son históricas. [Auditoría siguiente lote](06-auditoria-lote05-dualnic-noc-2026-10-13.md).
 
 **Corte:** 13 de octubre de 2026, posterior a 21:20 (Panamá).  
