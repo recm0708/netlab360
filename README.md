@@ -2,34 +2,31 @@
 
 **Proyecto:** diseño e implementación de una plataforma virtualizada para la automatización, observabilidad y diagnóstico inteligente de redes empresariales multisede.
 
-**Estado vigente de planificación:** 14/10/2026. **Fase interna S01 ABIERTA**, 72/100 técnico estimado según matriz interna, no calificación docente. El usuario ordenó no iniciar S02 hasta organizar/terminar los tres documentos maestros y resolver el cierre de S01. La agenda académica/rúbrica definitiva está pendiente de cotejar.
+**Política editorial vigente (14/10/2026): exactamente DOS documentos finales únicos**: (01) investigación, diseño, resultados e incidentes técnicos reales mitigados; (02) manual técnico integral para reproducir desde cero, implementar, verificar, operar y solucionar posibles problemas. Las portadas institucionales las crea el usuario; el asistente entrega contenido sección por sección. **No hay un tercer manual independiente**. La edición final se ajustará a las fases realmente implementadas, conservando el roadmap interno S01–S08 como historial verificable.
 
-## Puntos de acceso vigentes
+**S01:** ABIERTA, **72/100 técnico estimado internamente**; guía docente pendiente para determinar qué criterios se exigen ahora. No iniciar S02 hasta concluir documentos S01 y brechas técnicas rubricadas.
 
-- [Checkpoint de continuidad](docs/REANUDAR-AQUI.md): estado más reciente y siguiente actividad segura.
-- [Ponderación S01](docs/control/01-avance-s01.md) y [aceptación criterio por criterio](docs/control/03-matriz-aceptacion-y-decisions-s01.md).
-- [Política editorial acumulativa](docs/entregables/00-politica-editorial-y-entrega-acumulativa.md).
-- [01 — Investigación del proyecto](docs/entregables/01-proyecto-investigacion-maestro.md).
-- [02 — Informe técnico/laboratorios](docs/entregables/02-informe-tecnico-maestro.md).
-- [03 — Manual de usuario](docs/entregables/03-manual-usuario-maestro.md).
-- [GitHub Issues S01](https://github.com/recm0708/netlab360/issues/1); [guía/rúbrica #36](https://github.com/recm0708/netlab360/issues/36); [documentos #35](https://github.com/recm0708/netlab360/issues/35); [evidencias #43](https://github.com/recm0708/netlab360/issues/43).
+## Enlaces de trabajo vigentes
 
-## Hechos validados a 13/10/2026 23:35 Panamá
+- [Checkpoint](docs/REANUDAR-AQUI.md).
+- [Política de dos documentos APA7](docs/entregables/00-politica-editorial-y-entrega-acumulativa.md).
+- [01 — Diseño, desarrollo y evaluación](docs/entregables/01-proyecto-investigacion-maestro.md).
+- [02 — Manual técnico integral de implementación, administración y uso](docs/entregables/02-informe-tecnico-maestro.md).
+- [Figuras y tablas S01](docs/entregables/04-seleccion-figuras-y-tablas-s01.md).
+- [Checklist S01](docs/entregables/s01/00-checklist-cierre-y-entrega.md).
+- [Matriz ponderada](docs/control/01-avance-s01.md) · [Once criterios](docs/control/03-matriz-aceptacion-y-decisions-s01.md).
+- [Issues #1 S01](https://github.com/recm0708/netlab360/issues/1), [#35 documentación](https://github.com/recm0708/netlab360/issues/35), [#36 rúbrica](https://github.com/recm0708/netlab360/issues/36) y [#43 evidencias](https://github.com/recm0708/netlab360/issues/43).
 
-1. VM Ubuntu Desktop en VMware con red de gestión aislada VMnet8, ens33 `192.168.47.40/24` y gateway `192.168.47.2`, servicios operativos.
-2. IPAM YAML, segmentación VLAN/trunks/ACL y HTTP local; OSPF dual-WAN HQ–S1 con HTTP por WAN-P/B/P; LACP/active-backup de interfaces virtuales.
-3. SoT→OpenTofu→Ansible→archivos FRR aplicados al laboratorio. Drift y reconciliación probados en **archivos candidatos**, no FRR vivo.
-4. Exporter live, API/NOC inicial y Prometheus con alertas WAN firing y resueltas. Analítica de 76 ICMP históricos y 12 eventos de otras sesiones con reglas deterministas: **NO IA/ML entrenada/evaluada**.
-5. **86 PNG planos y 7 CSV** en evidencias, SHA-256 auditados, publicación verificada commit `b410548` y Git local/remoto coincidentes.
-6. **24/24 pruebas unitarias locales** y GitHub Actions [run 38511477595](https://github.com/recm0708/netlab360/actions/runs/38511477595) exitosa. Último postcheck: Docker/netns vacíos, gestión y Git intactos.
+## Resultados demostrados (corte técnico 13/10/2026)
 
-## Estructura del repositorio
+1. VM Ubuntu Desktop VMware/VMnet8; gestión ens33 192.168.47.40/24, gateway 192.168.47.2, SSH y servicios operativos.
+2. IPAM YAML, VLAN/trunks/ACL y HTTP, OSPF dual WAN HQ–S1/HTTP en tres estados, LACP 2→1→2 y bonding active-backup **de enlaces virtuales**.
+3. SoT→OpenTofu metadata→Ansible candidatos FRR aplicados al entorno B2; drift/reconciliación probado **en archivos candidatos**, no FRR vivo.
+4. Exporter/NOC inicial y Prometheus con alertas WAN firing/resueltas; B4 analizó 76 ICMP y 12 eventos de otras sesiones, diagnóstico por reglas **sin ML entrenado/evaluado**.
+5. **86 PNG** planos y **7 CSV** SHA-256 en GitHub, commit de lote06 b410548; **24/24** pruebas unitarias y GitHub Actions run 38511477595 exitosa; postcheck Docker/netns vacíos y gestión intacta.
 
-- `inventario/`, `topologias/`: IPAM y topologías.
-- `iac/`, `ansible/`: configuración declarativa y automatización.
-- `scripts/`, `servicios/`, `tests/`: laboratorios, telemetría y validadores.
-- `evidencias/capturas/`: imágenes originales **en una sola carpeta**; `evidencias/manifiestos/`: manifiestos SHA-256.
-- `docs/sesiones/`, `docs/evidencias/`, `docs/decisiones/`: bitácoras históricas y trazabilidad. No confundir con estado actual.
-- `docs/entregables/`: política editorial y **tres únicos documentos maestros**, ampliados por fases S01–S08.
+## Organización
 
-**Política de continuidad:** las versiones anteriores del README y del control permanecen recuperables mediante historial Git; este archivo evita apilar checkpoints contradictorios. No ejecutar un nuevo laboratorio sin precheck y sin necesidad de aceptación demostrada.
+Los recursos técnicos residen en inventario/, topologias/, iac/, ansible/, scripts/, servicios/ y tests/. Las capturas originales están en evidencias/capturas/ sin subcarpetas y hashes en evidencias/manifiestos/. Las bitácoras permanecen en docs/sesiones/, docs/evidencias/ y el historial Git. **docs/entregables/ mantiene dos índices maestros activos.**
+
+**Pendiente inmediato:** aprobación de los dos índices y comienzo del Documento 01 por la introducción, cuando el usuario confirme.
