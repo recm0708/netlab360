@@ -40,7 +40,17 @@ def main():
     manifiestos = ROOT / "evidencias/manifiestos"
     assert destino.is_dir() and manifiestos.is_dir(), "Primero ejecutar aplanado"
     assert len(list(destino.glob("*.png"))) == 57, "Se esperaban 57 PNG historicos en carpeta plana"
-    assert not any(p.is_dir() for p in destino.iterdir()), "Aun existen subcarpetas de capturas"
+    # El primer aplanado se publico con los PNG ya trasladados,
+    # pero git mv dejo cuatro directorios fisicos VACIOS en el clon.
+    # No borrar directorios desconocidos o con datos; limpiamos solo
+    # los cuatro nombres historicos cuando estan totalmente vacios.
+    anteriores = {
+        "B1_B2_lote01", "B3_lote02", "B2_B3_lote03", "B2_LACP_lote04"
+    }
+    directorios = [p for p in destino.iterdir() if p.is_dir()]
+    assert all(p.name in anteriores and not p.is_symlink() and
+               not any(p.iterdir()) for p in directorios), (
+               "Subcarpeta desconocida o con archivos: NO eliminar ni importar")
     for name in EXPECTED:
         assert not (destino / name).exists(), f"Archivo ya existe: {name}"
     assert not (manifiestos / CSV_NAME).exists(), "Manifiesto del lote05 ya existe"
@@ -63,6 +73,11 @@ def main():
             assert sha(data) == EXPECTED[name] == row["sha256"], f"PNG alterado: {name}"
             assert len(data) == int(row["bytes"]), f"Longitud incorrecta: {name}"
             payload[name] = data
+
+    # Tras validar por completo el paquete, retirar solo carpetas antiguas VACIAS.
+    for antigua in directorios:
+        antigua.rmdir()
+    assert not any(p.is_dir() for p in destino.iterdir())
 
     creados = []
     try:
