@@ -1,5 +1,8 @@
 # NETLAB360 — Planificación semestral
 
+> **Checkpoint 13/10 22:48:** progreso estimado **71/100**, IaC configuró realmente FRRouting mediante candidatos Ansible: OSPF WAN dual Full, failover y restore con rc0, cleanup y gestión intacta; drift reconciliado en copia de archivos, NO en routers vivos. Nueva prueba B4 de inventario de datos reales y CI offline versionadas pero pendientes de ejecución. Fotografías IaC de esta tanda pendientes de recepción; **62 PNG históricos ya publicados**. [Bitácora](docs/sesiones/2026-10-13-iac-b2-frr-live-y-drift-verificado.md) · [B4](docs/sesiones/2026-10-13-b4-auditoria-fuentes-preparada.md).
+
+
 > **ACTUALIZACIÓN REAL 13/10 22:30:** S01 **68/100 estimado**. OpenTofu `terraform_data` aplicado (5 registros metadata), Ansible dos candidatos FRR `COMPLIANT`, segunda corrida `changed=0`, segundo plan OpenTofu código0, VM intacta. **9 PNG IaC recibidos; 4 necesitan mejor encuadre**, desde logs sin repetir apply. Preparada próxima prueba de drift en copias y gate para usar configs IaC en B2, **NO ejecutadas aún**. [Bitácora](docs/sesiones/2026-10-13-iac-s01-ejecutado.md) · [Auditoría fotográfica](docs/evidencias/07-auditoria-visual-iac-s01-2026-10-13.md). Notas anteriores de 65/100 son históricas.
 
 
