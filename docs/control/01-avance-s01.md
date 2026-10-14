@@ -1,10 +1,13 @@
 # NETLAB360 — Control de avance y cierre de Fase S01
 
-**Corte técnico actualizado:** 2026-10-13 22:48 (Panamá, UTC−05:00).  
+**Corte técnico actualizado:** 2026-10-13 23:00 (Panamá, UTC−05:00).  
 **Versión de seguimiento:** v2.2. **Fase:** [#1](https://github.com/recm0708/netlab360/issues/1) **ABIERTA**.  
 **Estado oficial de la rúbrica:** pendiente de ratificación con la docente. **Porcentaje provisional; no es nota, auditoría de cumplimiento oficial ni valor calculado por GitHub.**
 
 ## 1. Estimación ponderada del avance S01
+
+**EVALUACIÓN VIGENTE 13/10 23:00: S01 72/100 estimado (+1 documentación/CI).** Auditoría B4 real ejecutada con `AUDITORIA_B4_DATOS=OK`, 1 CSV (76 ICMP) + 2 JSONL (12 eventos) + resumen derivado no independiente, hashes SHA256, JSON 0600 y postcheck sin cambios. Suite Python `11/11` satisfactoria. GitHub Actions [run 38508522760](https://github.com/recm0708/netlab360/actions/runs/38508522760) verificado `offline-regression: completed/success`: todos los pasos IPAM, Python, unittest y Bash correctos. +1 SOLO en documentación/CI (2→3/5); **B4 0/5 sin detector evaluado** ni datos normales etiquetados independientemente. Quedan 28 puntos técnicos estimados. [Bitácora B4](../sesiones/2026-10-13-b4-auditoria-datos-ci-ejecutada.md). El perfil estadístico B4 siguiente está versionado pero NO ejecutado. Las actualizaciones cronológicas inferiores se preservan como historial.
+
 
 **EVALUACIÓN VIGENTE 13/10 22:48: S01 71/100 técnico estimado (+3 puntos IaC).** Operador completó (a) drift controlado y reconciliación Ansible **en copias de FRR**: cambio OSPF cost 10→50, `NON_COMPLIANT` esperado, primera reconciliación `changed=1`, segunda `changed=0` y hash igual a origen; (b) **FRR realmente ejecutado desde archivos IaC**: gate SoT/hash0, fuente `IAC_OPENTOFU_ANSIBLE`, OSPF dos `Full` por router, FIB WAN-P, failover a WAN-B, retorno a WAN-P, `up/fail/restore/down=0`, postcheck 22:48 sin residuos/gestión intacta. IaC **4→7/10** (+1 reconciliación candidatos, +2 carga y prueba de FRR vivo). Sigue pendiente drift de configuración en FRR vivo y ownership completo del ciclo de recursos; ni el despliegue ni la reconciliación se deben confundir con aprovisionamiento Docker/VMware por OpenTofu. Los PNG nuevos de esta tanda todavía **NO recibidos ni publicados**; el usuario los enviará luego con las capturas de recuperación. [Bitácora nueva](../sesiones/2026-10-13-iac-b2-frr-live-y-drift-verificado.md). **B4** auditor de datos reales preparado, aún sin ejecutar ni puntos.
 
@@ -35,9 +38,9 @@ Los pesos se asignan a las capacidades mínimas que aparecen en la issue #1 y en
 | IaC y compliance (OpenTofu + Ansible) | 10 | **7** | OpenTofu `terraform_data` registra SoT HQ/S1 y las dos WAN en estado local fuera del repo; manifiesto JSON alimenta Ansible, dos candidatos FRR `COMPLIANT`, segunda ejecución Ansible `changed=0`, segundo plan OpenTofu sin cambios (`exit=0`). **Posteriormente validado FRR vivo desde los archivos IaC**, OSPF Full y FIB WAN-P→WAN-B→WAN-P, up/fail/restore/down exit0. Drift sobre copias corregido Ansible `changed=1`→`changed=0`. **Pendiente reconciliación de FRR vivo y ownership completo de equipos** |
 | B3: telemetría/API/dashboard/alertas, eventos reales | 15 | **10** | Histórico 2pt + exporter live/eventos reales 3pt + Prometheus TSDB/scrape 2pt + **3pt nuevos**: glob absoluto y tres reglas cargadas (B3_11), WAN-P DOWN y respaldo WAN-B con **ambas alertas Prometheus firing** (B3_12), WAN-P restaurada y **0 alertas WAN activas** (B3_13), limpieza B3_14: puertos 9090/9108 libres, Docker/netns vacíos, Git y red intactos. Aún sin Alertmanager/receptor, NOC multisede integral ni SLI/SLO |
 | B4: anomalías/datos/IA evaluada | 5 | **0** | no existe prototipo con evaluación |
-| Documentación académica, evidencia, CI/PR y regresión | 5 | **2** | bitácoras y SHA-256; **62 PNG auditados/publicados** en carpeta plana (`evidencias/capturas/`), 6 CSV y mapa de origen/destino (commit `328591a`), Git remoto/local validado. IaC: 9 PNG originales visualmente inspeccionados, faltan 4 complementos antes de publicarlos. Faltan informe APA, manual, CI y regresión integrada |
+| Documentación académica, evidencia, CI/PR y regresión | 5 | **3** | bitácoras y SHA-256; **62 PNG auditados/publicados** en carpeta plana (`evidencias/capturas/`), 6 CSV y mapa de origen/destino (commit `328591a`), Git remoto/local validado. IaC: 9 PNG originales visualmente inspeccionados, faltan 4 complementos antes de publicarlos. CI offline **ejecutada/exitosa** (run `38508522760`), 11/11 unit tests. Faltan informe APA, manual, release y regresión integrada de red real |
 | B5: release y OVA sanitizada importada, SHA-256 | 5 | **0** | sin exportación, reimportación ni tag/release demostrable |
-| **TOTAL** | **100** | **71** | **71% estimado, 29% pendiente** |
+| **TOTAL** | **100** | **72** | **72% estimado, 28% pendiente** |
 
 **Del 65% al 68% (+3 en IaC)** por aplicación declarativa local desde YAML, Ansible render candidato y segunda ejecución idempotente, todas comprobadas en el laboratorio 22:27–22:30. No se ha validado aplicación de estas configuraciones a routers vivos.
 
