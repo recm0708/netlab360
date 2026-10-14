@@ -1,5 +1,8 @@
 # NETLAB360 — Planificación semestral
 
+> **Estado 13/10 23:12:** **72/100** provisional. Perfil descriptivo B4 real: 16/16 tests; 76 ICMP (76 OK), rutas estables coherentes, RTT por fases, JSON 0600. CI previa verde; actualización de runtime Node24 pendiente de comprobar. Preparado motor de **reglas diagnósticas contextual, NO IA entrenada**. Capturas IaC/B4 nuevas se remitirán después. [Registro](docs/sesiones/2026-10-13-b4-perfil-estadistico-verificado.md).
+
+
 > **Actualización 13/10 23:00:** S01 **72/100 provisional** por primera CI offline demostrada en GitHub (run `38508522760`, success). Auditoría B4 de 76 muestras ICMP y 12 eventos WAN reales finalizada, JSON protegido, 11 tests correctos; **no** existen etiquetas independientes para ML supervisado ni métricas de clasificación. Se preparó perfil estadístico real sin ejecutarlo. Capturas nuevas pendientes de envío posterior, no repetir ensayos. [Bitácora B4](docs/sesiones/2026-10-13-b4-auditoria-datos-ci-ejecutada.md).
 
 
