@@ -85,6 +85,21 @@ check_bond() {
   }
   echo "BOND_8023AD_$ns=OK"
 }
+# Consultar el agregador ACTIVO (no solo cantidad de veth configurados).
+wait_active_ports() {
+  local ns="$1" wanted="$2" i report
+  for i in $(seq 1 20); do
+    report="$(sudo ip netns exec "$ns" cat /proc/net/bonding/bond0 2>/dev/null || true)"
+    if grep -Eq "^[[:space:]]*Number of ports:[[:space:]]*$wanted[[:space:]]*$" <<< "$report"; then
+      echo "LACP_AGREGADOR_$ns PUERTOS_ACTIVOS=$wanted (sondeo $i)"
+      return 0
+    fi
+    sleep 1
+  done
+  echo "ERROR_AGREGADOR_$ns: puertos activos esperados=$wanted"
+  echo "$report" | grep -E 'Bonding Mode:|Aggregator ID:|Number of ports:|Slave Interface:|MII Status:' || true
+  return 5
+}
 http_check() {
   local label="$1" i response
   for i in $(seq 1 20); do
@@ -154,6 +169,8 @@ echo "========== BOND A MODE Y 2 SLAVES =========="
 check_bond "$A"
 echo "========== BOND B MODE Y 2 SLAVES =========="
 check_bond "$B"
+wait_active_ports "$A" 2
+wait_active_ports "$B" 2
 echo "========== HTTP A TRAVES DEL BOND =========="
 http_check DOS_ENLACES
 echo "========== FIN CAPTURA B2_LACP_01 =========="
@@ -166,6 +183,8 @@ date -Is
 echo "========== SLAVES DESPUES DE FALLA =========="
 check_bond "$A"
 check_bond "$B"
+wait_active_ports "$A" 1
+wait_active_ports "$B" 1
 echo "========== SERVICIO CON UN ENLACE SOBREVIVIENTE =========="
 http_check UN_ENLACE
 echo "========== FIN CAPTURA B2_LACP_02 =========="
@@ -178,6 +197,8 @@ date -Is
 echo "========== AMBOS ENLACES DE NUEVO PRESENTES =========="
 check_bond "$A"
 check_bond "$B"
+wait_active_ports "$A" 2
+wait_active_ports "$B" 2
 http_check ENLACE_RESTAURADO
 echo "========== FIN CAPTURA B2_LACP_03 =========="
 echo "LACP_8023AD_TRES_ESTADOS=OK"
