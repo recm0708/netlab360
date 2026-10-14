@@ -1,5 +1,7 @@
 # NETLAB360 — Auditoría visual del lote 04: LACP IEEE 802.3ad
 
+> **ACTUALIZACIÓN POSTERIOR (13/10 21:37):** 13 PNG + CSV publicados, commit `2af7a8054a87bc10db1195f5f54d92b2dbc04c8f`, `LOTE04_PUBLICADO=OK`. Referencias a publicación pendiente más abajo son históricas. [Auditoría siguiente lote](06-auditoria-lote05-dualnic-noc-2026-10-13.md).
+
 **Corte:** 13 de octubre de 2026, posterior a 21:20 (Panamá).  
 **Material recibido:** 13 archivos PNG auténticos, sin edición, de 4 bloques de evidencia: 4 fragmentos B2_LACP_01, 4 de B2_LACP_02, 4 de B2_LACP_03 y 1 de B2_LACP_04. **Auditoría: 13/13 válidos como secuencias complementarias**, no 13 pruebas independientes. El texto de terminal está cotejado con el log original 20:43 y el postcheck 20:51; cada fragmento aporta una parte de una salida larga.
 
