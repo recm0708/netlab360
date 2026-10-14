@@ -1,3 +1,5 @@
+> **Actualización vigente 13/10 21:39:** dualNIC veth active-backup 3 estados y HTTP validados, código0; S01 técnico **65% estimado** (+2, redundancia 6/10). 57 capturas ya publicadas (incluidas 13 LACP en commit 2af7a80). Cinco nuevas auditadas, pendientes de publicar. Aplanado de 4 carpetas hacia `evidencias/capturas/` preparado mediante `scripts/mantenimiento/aplanar-capturas.py`, **sin ejecutar todavía**. [Checkpoint](REANUDAR-AQUI.md) · [Auditoría lote05](evidencias/06-auditoria-lote05-dualnic-noc-2026-10-13.md).
+
 > **Actualización 13/10 21:20 (prevalece):** lote03 de 20 PNG + CSV **publicado** commit `0d749df`. LACP 13 PNG recibidos/auditados en lote04, **pendientes de publicación binaria**. DualNIC primer intento abortó por expansión Bash de variable, con `RED_GESTION_INTACTA=SI`, corrección en GitHub `5a4569f`; pendiente postcheck y repetir ensayo corregido. Avance S01 permanece **63/100**. [Checkpoint](REANUDAR-AQUI.md) · [Auditoría LACP](evidencias/05-auditoria-visual-lote04-lacp-2026-10-13.md).
 
 # NETLAB360 — Registro de inicialización de GitHub
