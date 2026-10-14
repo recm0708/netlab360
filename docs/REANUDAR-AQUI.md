@@ -1,5 +1,18 @@
 # NETLAB360 — REANUDAR AQUÍ (checkpoint operativo)
 
+## CHECKPOINT MÁS RECIENTE — 13/10/2026 22:48 PANAMÁ | IaC EN FRR REAL VERIFICADA; B4 PREPARADA
+
+**Fase S01: 71/100 técnico estimado, ABIERTA** (sube 68→71: IaC 4→7/10). Fuente real recibida del operador: los pasos 169–180 fueron exitosos. En copia FRR candidata: R-HQ OSPF WAN-P cost 10→50, detector NON_COMPLIANT (rc1 esperado), Ansible reconcilió changed1, luego changed0, hashes originales intactos, `RESULTADO_DRIFT_RECONCILIACION=0`. Gate IaC–B2 protegió VMnet8 y confirmó SoT: `IAC_B2_PRECHECK=0`, origen `IAC_OPENTOFU_ANSIBLE`, configuración R-HQ/R-S1 desde `~/netlab360-bootstrap/iac/s01/rendered/`.
+
+**Despliegue REAL en contenedores FRRouting:** 22:46 up0, OSPF 2 vecinos Full por router, FIB WAN-P; 22:47 status0, fail0 WAN-P→WAN-B por OSPF, restore0 WAN-B→WAN-P; 22:48 down0 y postcheck limpio (Docker/netns vacíos; ens33 `192.168.47.40/24`, GW `192.168.47.2`, 3 servicios activos y Git limpio). **NO** sostener que OpenTofu creó routers ni que Ansible reconcilió drift de router vivo: el primero registra `terraform_data`, el drift fue sobre **archivos copiados** y el script B2 consumió los candidatos para arrancar FRR. Todavía no se probó modificación/reconciliación en FRR en ejecución, ni conmutación de equipo físico. [Bitácora IaC–B2](sesiones/2026-10-13-iac-b2-frr-live-y-drift-verificado.md).
+
+**EVIDENCIAS:** el usuario indicó que enviará las capturas nuevas y los complementos juntos en un mensaje posterior. **No se han recibido los PNG de esta tanda ni publicado lote nuevo.** Los 62 PNG anteriores y 6 CSV ya permanecen en GitHub con integridad comprobada. No repetir up/fail/restore/down para tomar fotos; el log original respalda el nuevo hito. Posibles capturas a recuperar después desde logs de fail y restore sin ejecutar fallas.
+
+**SIGUIENTE BLOQUE PREPARADO EN GITHUB:** `scripts/analitica/b4-auditar-fuentes-reales.py` y test `tests/test_b4_fuentes_reales.py`, análisis SOLO de lectura sobre CSV ICMP B2 y eventos JSONL reales B3, archivo resumen fuera del repo bajo `~/netlab360-bootstrap/analitica/b4/`, NO entrena ML. [Plan B4](sesiones/2026-10-13-b4-auditoria-fuentes-preparada.md). `.github/workflows/ci-regresion-s01.yml` creado para regresiones offline; **estado CI por comprobar**, no contar como ejecutado sin ver el run. Próximo: pull limpio, tests, captura B4_01 delimitada, auditar dataset y determinar plan de etiquetas/modelo, comprobar CI. Sin instalar librerías ML preventivamente, ni provocar nueva caída WAN, ni tocar ens33/VMnet8/rutas host.
+
+---
+
+
 ## CHECKPOINT VIGENTE — 13/10/2026 22:30 PANAMÁ | IAC APLICADA EN ESTADO LOCAL, COMPLIANCE E IDEMPOTENCIA OK
 
 **Ejecutado y verificado realmente en Ubuntu** por el operador (pasos 156–168): IPAM rc0, OpenTofu 1.13.1 `init=0,validate=0,plan=0,apply=0` con **5 registros `terraform_data`** (guarda ens33/VMnet8, HQ/S1, 2 WAN); estado físico y manifiesto FUERA del repo bajo `~/netlab360-bootstrap/iac/s01/`. `manifest.json` válido (HQ/S1, S2 reservada, dos WAN, gestión protegida); Ansible 2.20.1 generó R-HQ/R-S1 candidatos modo0600, `ok=3 changed=2 failed=0`; comparador FRR `COMPLIANT` ambos; segunda ejecución Ansible `changed=0,failed=0`; `tofu plan -detailed-exitcode` devolvió 0 `No changes`. Postcheck 22:30:22 Docker/netns vacíos, ens33 `192.168.47.40/24`, GW `192.168.47.2`, servicios activos, Git limpio. **S01 65→68/100 estimado, IaC 1→4/10.** Esto es **estado de metadatos y archivos candidatos**, no provisioning de red/FRR vivo. [Bitácora de ejecución](sesiones/2026-10-13-iac-s01-ejecutado.md).
