@@ -1,5 +1,8 @@
 # S01 — Semana 1: MVP transversal y viabilidad
 
+> **ACTUALIZACIÓN VIGENTE 13/10 23:35:** S01 **72/100 técnico estimado**, abierta; lote06 publicado con **86 PNG y 7 CSV**, CI correcta y VM intacta. El estado detallado inferior que presenta S01 al 63% es HISTÓRICO. Ya se iniciaron [informe, bitácora y manual V0.1](../../docs/entregables/s01/00-checklist-cierre-y-entrega.md); no seguir ampliando B4 hasta priorizar documentación y criterios de cierre. El carácter obligatorio de los 11 criterios integrales requiere confirmación docente.
+
+
 **Calendario previsto:** 5–11 de octubre de 2026.  
 **Corte de situación actualizado:** 13 de octubre de 2026, 20:51 Panamá.  
 **Estado de fase:** ABIERTA, con retraso respecto al plan inicial; no trasladar automáticamente fechas de S02–S08.  
