@@ -22,13 +22,13 @@
 - **D02:** si la OVA se entrega cada fase, como snapshot en S01 o solo al cierre S08; no borrar credenciales sin plan de recuperación.
 - **D03:** alcance de integración de S01: si es obligatorio un único escenario que conecte VLAN↔WAN↔servicio↔NOC y redundancia de equipo o si los MVP separados bastan como demostración inicial.
 - **D04:** si en S01 se necesita ML evaluado o únicamente baseline por reglas, ya que issues #25/#26 corresponden a S06.
-- **D05:** metadatos institucionales, autores, docente, fecha oficial, norma de portada y extensiones, para redactar los tres maestros.
+- **D05:** metadatos institucionales, autores, docente, fecha oficial, norma de portada y extensiones, para redactar los dos documentos maestros, con portadas elaboradas por el usuario.
 
 ## Bloqueos y plan prudente
 
 1. Conservar S01 ABIERTA, congelar S02 y nuevas funciones B4 mientras se aprueban índices y se redactan partes S01.
 2. No repetir pruebas OSPF, IaC ni alertas sólo para capturas; reconstruir cuatro fotografías IaC desde logs ya validados.
-3. Trabajar sobre TRES documentos maestros con capítulos por fase y UNA bibliografía/índice por documento.
+3. Trabajar sobre DOS documentos maestros (01 académico y 02 manual técnico integral), con capítulos por fases realmente completadas, UN índice automático y UNA bibliografía por documento.
 4. Preparar una única regresión integral adicional sólo si criterio S01 la requiere; preferir prueba mínima con pre/postcheck, nunca tocar ens33.
 5. Acordar alcance docente; ejecutar exclusivamente las brechas rubricadas; terminar documentación, release/OVA si obligatorio y cerrar con trazabilidad.
 
