@@ -1,36 +1,33 @@
 # NETLAB360 — REANUDAR AQUÍ
 
-**Checkpoint canónico actualizado:** 14/10/2026, tras preparar estructura documental acumulativa. **Próximo trabajo:** obtener aprobación de índices y redactar Documento 01 por secciones en chat para que el usuario lo copie en su plantilla Word institucional. **No iniciar S02 ni nuevos ensayos AIOps.**
+**Checkpoint editorial 14/10/2026.** El usuario redefinió la entrega: **DOS documentos maestros consolidados, no tres**. No comenzar S02 antes de terminar contenido S01 y brechas técnicas exigibles. Próxima acción: presentar índices 01/02 para aprobación del usuario; **no comenzar la redacción hasta que diga «comencemos»**. Las portadas las crea el usuario en su formato institucional.
 
-## Estado técnico real al último postcheck 13/10 23:35:02 (Panamá)
-- En Ubuntu: `~/proyectos/netlab360`, rama `main...origin/main` limpia al commit `b410548` **antes de los commits documentales posteriores**.
-- Lote06 importado y publicado: **86 PNG** directamente en `evidencias/capturas/`, **7 CSV**, SHA-256 y unicidad validados, subdirectorios=0; local/remoto idénticos.
-- CI [38511477595](https://github.com/recm0708/netlab360/actions/runs/38511477595) `offline-regression` exitosa.
-- Docker y namespaces vacíos, ens33 `192.168.47.40/24`, gateway `192.168.47.2`, servicios docker/ssh/open-vm-tools activos.
-- IaC capturas históricas `IAC_S01_01/03/04/06` extraídas desde logs con rc0, pero **cuatro PNG nuevos todavía no recibidos ni publicados**. `LOTE06_Postcheck_Publicacion.png` fue recibido en chat y está pendiente de incorporación posterior.
-- S01 **ABIERTA**, **72/100 técnico estimado** según [matriz](control/01-avance-s01.md); no confundir laboratorios aislados funcionales con criterios integrales aceptados.
+## Política documental actual
 
-## Principales capacidades demostradas
-IPAM draft HQ/S1/S2 reservada; VLAN 802.1Q y ACL HTTP dentro de HQ; FRRouting OSPF dos WAN y HTTP HQ–S1 por estados estables WAN-P/B/P; LACP 2→1→2 y virtual NIC active-backup; OpenTofu metadata→Ansible configs FRR usadas en contenedores; exporter/API/NOC inicial; Prometheus con dos alertas firing y resolución; B4 reglas descriptivas sobre 76 ICMP sin pérdida, cuatro transiciones operativas, sin entrenamiento ML; 24 tests offline verdes.
+- [01 — Investigación y evaluación](entregables/01-proyecto-investigacion-maestro.md): informe académico de lo realizado por el equipo, introducción, objetivos, marco teórico, diseño, desarrollo, resultados, recomendaciones, conclusiones y APA7. **Incidentes técnicos reales y mitigaciones integrados en el subcapítulo afectado**; descuidos personales no se documentan.
+- [02 — Manual técnico integral](entregables/02-informe-tecnico-maestro.md): preparación del host, VM, Ubuntu, dependencias, instalación desde cero, scripts/comandos validados, capturas, pruebas, operación, interfaz, mantenimiento, seguridad, troubleshooting **de problemas posibles**; no narrar cronología de errores reales.
+- [Política editorial](entregables/00-politica-editorial-y-entrega-acumulativa.md): portada hecha por usuario, **índice automático único por documento**, APA7 citas y referencias, preámbulos de figuras/tablas y notas según necesidad; asistente dará textos listos para copiar en la plantilla institucional.
+- Si el proyecto se detiene tras una fase efectiva (ejemplo S06), los dos documentos finales cubrirán **solo ese alcance implementado**, sin capítulos ficticios posteriores; no mentir sobre la planificación histórica S01–S08 ni sobre requisitos docentes.
+- El tercer documento independiente se elimina; su contenido de uso forma parte del Documento 02. Antiguos borradores rechazados y archivos del Documento 03 quedan accesibles únicamente en historial Git.
 
-## Brechas antes de cierre rubricado
-Integración L2↔WAN↔servicio/NOC en topología única, failover de equipo/servidor no demostrado, reconciliación de FRR vivo no demostrada, Alertmanager/receptor y NOC multisede por completar, dataset/modelo ML evaluable pendiente, tag/release y OVA sanitizada/reimportada no acreditados. La necesidad de cubrir **todos** estos aspectos en S01 o distribuirlos S03/S06/S08 depende de la guía docente aún no aportada. [Matriz criterios 11](control/03-matriz-aceptacion-y-decisions-s01.md).
+## Estado técnico verificado
 
-## Reglas documentales obligatorias
-- Sólo **tres documentos maestros únicos** y acumulativos para S01–S08: [investigación](entregables/01-proyecto-investigacion-maestro.md), [memoria técnica](entregables/02-informe-tecnico-maestro.md), [manual](entregables/03-manual-usuario-maestro.md).
-- El usuario trabaja en **su plantilla institucional Word**. El asistente envía texto aprobado sección por sección, con APA7, citas en texto y referencias reales verificadas; **un índice automático por documento**.
-- Párrafos previos a todas las figuras/tablas, identificación con título/nota APA 7 cuando aplique; no insertar imágenes indiscriminadamente.
-- No generar ni reciclar como finales los tres borradores V0.1 rechazados. [Política](entregables/00-politica-editorial-y-entrega-acumulativa.md).
-- No seguir a S02 hasta resolver documentos y cierre S01; no confundir porcentaje con aprobación oficial.
+**S01 sigue ABIERTA (72/100 estimación interna, NO nota docente).** B0 VM/VMnet8, IPAM B1, VLAN/ACL HTTP y FRR OSPF dual WAN HQ–S1, LACP/bonding virtual, SoT/OpenTofu→Ansible FRR con reconciliación **de archivos**, exporter/NOC básico y Prometheus firing/resuelto, perfil y diagnóstico determinista B4 sin ML. **86 PNG y 7 CSV** publicados, lote06 b410548; **24 pruebas unitarias**, CI GitHub 38511477595 exitosa. Postcheck 13/10 23:35:02: Docker/netns vacíos; ens33 192.168.47.40/24 y gateway 192.168.47.2, servicios activos.
 
-## Reanudación en Ubuntu (sólo cuando se requiera)
+**Pendientes S01:** guía/rúbrica y alcance, contenido de ambos documentos, cuatro fotos IaC desde logs y captura postcheck adicional; componentes L2–WAN integrados, redundancia de equipo, NOC/receptor, ML evaluable, release/OVA **solo cuando rúbrica exija su cierre en S01**. Consulte [once criterios S01](control/03-matriz-aceptacion-y-decisions-s01.md). IaC avanzada se planificó S03 y ML S06 en issues independientes.
+
+## Si se reanuda Ubuntu
+
+Ejecutar desde terminal sólo cuando haga falta sincronización editorial:
 
     cd ~/proyectos/netlab360
     git status --short --branch
     GIT_TERMINAL_PROMPT=0 git pull --ff-only origin main
 
-No hacer git reset --hard ni push --force. Verificar red ens33/gateway y Docker/netns antes de ejecutar futuros ensayos; preservar snapshot y logs. No se necesitan nuevos comandos Ubuntu para comenzar a redactar los tres documentos.
+No ejecutar reset destructivo, push force, nuevos cortes WAN ni apply por capturas; no hace falta un laboratorio nuevo para comenzar redacción.
 
-**Issues prioritarias:** [#1 S01](https://github.com/recm0708/netlab360/issues/1), [#35 documentación](https://github.com/recm0708/netlab360/issues/35), [#36 guía](https://github.com/recm0708/netlab360/issues/36), [#43 evidencias](https://github.com/recm0708/netlab360/issues/43), [#29 OVA](https://github.com/recm0708/netlab360/issues/29).
+## Issues canónicas
 
-**Historia y evidencia intactas:** `docs/sesiones/`, `docs/evidencias/`, `docs/decisiones/`, GitHub commits y comentarios de issues preservan la evolución y explican salidas antiguas.
+[#1 cierre S01](https://github.com/recm0708/netlab360/issues/1) · [#9 requisitos](https://github.com/recm0708/netlab360/issues/9) · [#35 DOS documentos](https://github.com/recm0708/netlab360/issues/35) · [#36 guía docente](https://github.com/recm0708/netlab360/issues/36) · [#43 evidencias](https://github.com/recm0708/netlab360/issues/43) · [#29 OVA](https://github.com/recm0708/netlab360/issues/29).
+
+Evidencias históricas, commits y sesiones preservados; no volver a resumir estados antiguos como actuales.
