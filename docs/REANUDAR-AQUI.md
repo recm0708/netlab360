@@ -1,5 +1,18 @@
 # NETLAB360 — REANUDAR AQUÍ (checkpoint operativo)
 
+## CHECKPOINT VIGENTE 13/10/2026 23:12:45 PANAMÁ — B4 PERFIL ESTADÍSTICO VERIFICADO
+
+**Fuente:** transcripción del operador pasos 192–201. Regresión local Python **16/16 OK**, CSV B2 original SHA256 verificado (349643e93c3e5f69cd529508d2349be0ef570a3e0291d144344413fc2b373eb5); perfil real creado `~/netlab360-bootstrap/analitica/b4/perfil-estadistico-real.json`, válido, `0600`, código0. **76/76 ICMP correctos, 0 fallas, 0 desvíos FIB en fases estables**, RTT medias/P95 por cinco fases documentadas en [bitácora B4 perfil](sesiones/2026-10-13-b4-perfil-estadistico-verificado.md). Eventos B3 separados (12 JSONL), no sumar a 76 ni presentarlos como etiquetas independientes. Postcheck 23:12:45 sin Docker/netns, ens33 `192.168.47.40/24`, GW `192.168.47.2`, tres servicios activos, Git limpio.
+
+**CI:** runs GitHub `38509420496` y `38509454510` presentados ✓ en `gh run list`; run previo `38508522760` confirmado con `gh run view --exit-status`. Advertencia Node20 no causó fallo; workflow actualizado a `checkout@v5` / `setup-python@v6` (Node24), nueva ejecución AUN POR COMPROBAR. Comando correcto para seleccionar run sin literal de ejemplo: `RUN_ID=$(gh run list -R recm0708/netlab360 --workflow ci-regresion-s01.yml --limit 1 --json databaseId --jq '.[0].databaseId'); gh run view "$RUN_ID" -R recm0708/netlab360 --exit-status`.
+
+**ESTADO S01=72/100 estimado** (sin nuevos puntos por estadística únicamente); B4 IA/ML aún **NO entrenada ni evaluada**. Capturas nuevas de B4/IaC se enviarán después a voluntad del usuario, no solicitarlas ahora.
+
+**SIGUIENTE BLOQUE preparado en GitHub, NO ejecutado:** `scripts/analitica/b4-diagnostico-reglas.py` (solo lectura, SHA256 vinculados, tres reglas ICMP/FIB/RTT >3×P95 normal, transiciones operativas diferenciadas; referencia basada en misma sesión, NO clasificación ni false-positive rate); `tests/test_b4_diagnostico_reglas.py` ocho tests nuevos (24 tests globales esperados). Reporte futuro externo al repo `~/netlab360-bootstrap/analitica/b4/diagnostico-reglas-real.json`, 0600. Próximo: pull Git limpio, tests, ejecutar --save, auditar reporte vs perfil, sensibilidad factor5 SIN guardar, CI actualizado, postcheck. Ninguna falla WAN, aplicación FRR, cambio VMware ni instalación sklearn en esta tanda. [Bitácora](sesiones/2026-10-13-b4-perfil-estadistico-verificado.md).
+
+---
+
+
 ## CHECKPOINT VIGENTE 13/10/2026 23:00 PANAMÁ — B4 AUDITORÍA EJECUTADA Y CI VERDE
 
 El operador terminó **pasos 181–191** con Git sincronizado (`a6eaa91` al cierre de ensayo), 11/11 pruebas unitarias correctas, auditoría de fuente real B4 exit0, reporte JSON de 2,4 KB permisos 0600, postcheck 23:00 con Docker/netns vacíos, ens33 `192.168.47.40/24`, GW `192.168.47.2`, servicios activos y Git limpio. **CI GitHub comprobada** run `38508522760`, job `offline-regression` id `115671442438` completado **success** en todos los pasos. El error del usuario al intentar `gh run view --workflow`/usar literalmente `ID_DE_EJECUCION` es solo sintaxis CLI; comando correcto `gh run view 38508522760 -R recm0708/netlab360 --exit-status`. [Bitácora B4 ejecutada](sesiones/2026-10-13-b4-auditoria-datos-ci-ejecutada.md).
