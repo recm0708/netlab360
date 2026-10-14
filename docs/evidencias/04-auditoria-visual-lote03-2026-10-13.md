@@ -1,5 +1,7 @@
 # NETLAB360 — Auditoría visual del lote 03: B2-L2, B2-L3 y B3 vivo/Prometheus
 
+> **Actualización posterior verificada:** los 20 PNG y su manifiesto CSV **FUERON PUBLICADOS EN GITHUB** el 13/10/2026 por el usuario, commit [`0d749df`](https://github.com/recm0708/netlab360/commit/0d749dff5a27c4c108aea7cdec8ddb5723394bb1), `PUBLICACION_GITHUB=OK`, `COMMIT_LOCAL=COMMIT_REMOTO=0d749dff5a27c4c108aea7cdec8ddb5723394bb1`, total 21 archivos. Las menciones de “pendiente” abajo describen el estado histórico de las 20:52 y no el vigente.
+
 **Corte:** 13 de octubre de 2026, 20:52 Panamá (UTC−05).  
 **Fuente:** **20 imágenes PNG realmente adjuntadas por usuario en conversación** e inspeccionadas visualmente; cálculo SHA256 y dimensiones mediante PIL sobre sus archivos binarios reales, sin OCR y sin modificar bytes. **Dictamen: 18 VÁLIDAS y 2 VÁLIDAS CON OBSERVACIÓN, 0 rechazadas.** Los resultados están respaldados por salidas anteriores de terminal (B2-L2 19:00/19:14, B2-L3 19:43, B3 live 17:38-18:36).
 
