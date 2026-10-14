@@ -1,5 +1,8 @@
 # NETLAB360 — S01 IaC vertical mínimamente integrada (preparada, sin ejecutar)
 
+> **EJECUCIÓN POSTERIOR CONFIRMADA 13/10 22:30:** el usuario completó todas las fases: plan/apply 5 terraform_data, manifest validado, Ansible FRR candidatos COMPLIANT, segunda ejecución changed=0, Tofu plan sin cambios (rc0), postcheck intacto. **Este documento se conserva como plan previo; estado vigente en [bitácora](2026-10-13-iac-s01-ejecutado.md).** Puntaje provisional S01 68/100. No ejecutar apply nuevamente para tomar fotografías.
+
+
 **Corte documental:** 13/10/2026 después de la auditoría de 62 PNG. **Estado:** archivos versionados en GitHub; la VM Ubuntu aún debe verificar/ejecutar por primera vez. **No incrementar 65/100** solo por código.
 
 ## Contrato técnico y seguridad
