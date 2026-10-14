@@ -1,5 +1,18 @@
 # NETLAB360 — REANUDAR AQUÍ (checkpoint operativo)
 
+## CHECKPOINT VIGENTE — 13/10/2026 21:39 PANAMÁ | DUAL-NIC APROBADO, LOTE04 PUBLICADO, APLANADO PREPARADO
+
+**Esta sección prevalece sobre menciones previas de “dualNIC pendiente” y de lote04 no publicado.** El operador publicó lote04 con **13 PNG LACP + CSV** y confirmó `LOTE04_PUBLICADO=OK`; commit `2af7a8054a87bc10db1195f5f54d92b2dbc04c8f`, `main...origin/main` limpio. En total GitHub tiene **57 PNG** en cuatro carpetas, antes del lote05.
+
+**DUAL-NIC REALMENTE EJECUTADO 21:37–21:39:** ensayo `b2-dualnic-activebackup-http.sh` corregido, bonding active-backup en namespaces virtuales, **a1/b1 → a2/b2 → a1/b1 disponibles con a2/b2 aún activo**, HTTP `NETLAB360_DUAL_NIC_HTTP_OK` en los 3 estados estabilizados, `DUALNIC_ACTIVE_BACKUP_TRES_ESTADOS=OK`, `RESULTADO_B2_DUALNIC=0`, `RESULTADO_EJECUCION_DUALNIC=0`, `RED_GESTION_INTACTA=SI`. Postcheck 21:39:13: Docker/netns vacíos, `ens33 192.168.47.40/24`, GW `192.168.47.2`, servicios activos y Git limpio. **4/4 PNG dualNIC recibidos, válidos, NO publicados binariamente aún**. Límite: veth, no VMware dual NIC real ni equipo redundante. **S01 sube 63→65% técnico estimado (+2, redundancia 4→6/10)**, #1 abierta.
+
+**Otros 4 PNG adjuntos:** `B3_04_Postcheck_Servicio_NOC_Final.png` es complemento útil **nuevo**, 8765 libre; `B3_04_Postcheck_Servicio_NOC(1).png` duplicado exacto de captura Git existente; `B3_09_Postcheck_Telemetria_Viva.png` intermedio reemplazado por FINAL; `B2_L3_04_Postcheck_HTTP_WAN.png` primer intento fallido reemplazado por FINAL. **Solo 5 nuevos a publicar**, no los 3 excluidos. [Auditoría lote05](evidencias/06-auditoria-lote05-dualnic-noc-2026-10-13.md).
+
+**CAMBIO ORGANIZATIVO A SOLICITUD DEL USUARIO:** los 57 PNG actualmente en cuatro carpetas por lotes se migrarán por `git mv` directamente a **`evidencias/capturas/`**, manteniendo nombres de PNG y bytes; 4 CSV se trasladarán a `evidencias/manifiestos/`, renombrando los dos `MANIFIESTO_SHA256.csv` colisionantes a `...LOTE01.csv` y `...LOTE02.csv`. Script versionado **`scripts/mantenimiento/aplanar-capturas.py`**, con `--plan` y `--aplicar`, guarda mapa SHA256 de origen-destino. **Migración todavía NO EJECUTADA.** Después añadir ZIP lote05 con cinco PNG directos + CSV de integridad, `commit/push`, comprobar **62 PNG directos y 5 CSV de lote + mapa** en el clon y remoto. Mantener 2–3 capturas históricas excluidas fuera del nuevo lote. No tocar `~/netlab360-bootstrap/evidencias` (logs fuera del clon), VMnet8, ens33, rutas, gateway, Docker ni firewall. Luego avanzar IaC OpenTofu/Ansible y topología integrada; no repetir pruebas completadas.
+
+---
+
+
 ## CHECKPOINT MÁS RECIENTE — 13/10/2026 ~21:20 PANAMÁ | LOTE03 PUBLICADO, LACP FOTOGRÁFICO AUDITADO, DUALNIC ABORTADO Y CORREGIDO
 
 **Prevalece sobre el historial posterior de este documento:** el usuario realizó `git commit` y `git push` del lote03: commit `0d749dff5a27c4c108aea7cdec8ddb5723394bb1`, **20 PNG originales + 1 CSV ya físicamente publicados en GitHub**, `PUBLICACION_GITHUB=OK`, refs local/remoto iguales. El lote 03 deja de estar pendiente de publicación.
