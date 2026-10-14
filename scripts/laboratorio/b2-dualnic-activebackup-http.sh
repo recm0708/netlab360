@@ -75,8 +75,8 @@ bond_info() {
  local num
  num="$(grep -c '^Slave Interface:' <<< "$output")"
  [[ "$num" -eq 2 ]] || { echo "ERROR_SLAVES=$n num=$num"; return 5; }
- echo "DUAL_NIC_$n_ACTIVA=$expected"
- echo "DUAL_NIC_$n_MIEMBROS=$num"
+ echo "DUAL_NIC_${n}_ACTIVA=$expected"
+ echo "DUAL_NIC_${n}_MIEMBROS=$num"
 }
 http_test() {
  local phase="$1" n result
