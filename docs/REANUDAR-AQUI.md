@@ -1,5 +1,17 @@
 # NETLAB360 — REANUDAR AQUÍ (checkpoint operativo)
 
+## CORTE MÁS RECIENTE 13/10 23:35 — PRIORIZAR ENTREGABLES S01
+
+- Lote06 **realmente publicado**: commit `b410548f9338233c8dc23816ce78a11d67bb2896`, Git local/remoto igual; 86 PNG y 7 CSV, SHA256 correctos, sin subcarpetas.
+- Cuatro resúmenes IaC 01/03/04/06 generados desde logs con códigos 0, fotos de reemplazo aún pendientes de recibir; postcheck `LOTE06_Postcheck_Publicacion.png` recibido y por auditar/publicar posteriormente.
+- CI `38511477595` exitosa. VM postcheck 23:35:02 Docker/netns vacíos, ens33 `192.168.47.40/24`, gateway `.2` y tres servicios activos.
+- **S01 continúa ABIERTA (72/100 técnico estimado)**. Pausar funciones nuevas B4/AIOps para terminar primero documentación e identificar alcance rubricado de las pruebas imprescindibles.
+- Borradores académicos versionados en `docs/entregables/s01/`: informe, bitácora, manual y checklist crítico. Sus archivos Word editables se generaron fuera del repo para revisión y no deben confundirse con DOCX versionados.
+- **Próximo objetivo:** confirmar guía/criterios docentes, metadatos de portada y formato; completar figuras; decidir pruebas de integración mínimas y necesidad actual de OVA/reimportación. [Checklist operativo](entregables/s01/00-checklist-cierre-y-entrega.md).
+
+---
+
+
 ## CHECKPOINT ACTUAL — 13/10/2026 23:24 PANAMÁ | B4 REGLAS OPERATIVAS, LOTE06 AUDITADO
 
 **Datos REALES del operador pasos 202–212:** sincronizó a `12a9d2f`, sintaxis0, suite **24/24 tests OK**, CSV 76 ICMP SHA256 verificado, `b4-diagnostico-reglas.py --save` exit0, 0 pérdidas, 0 desviaciones FIB en fases estables, 0 señales RTT; umbral exploratorio 3×P95 normal = 0.147 ms; umbral 5×P95=0.245 ms también 0 señales; **4 transiciones operativas** (sondeos 15/16/32/61) no consideradas incidentes. Reporte externo `~/netlab360-bootstrap/analitica/b4/diagnostico-reglas-real.json` JSON válido y modo0600. **No ML entrenado**, no métricas precision/recall/F1, baseline derivado de **MISMA** sesión histórica, nunca llamar a 0 señales `100% acierto`. Postcheck 23:23:26: Docker/netns vacíos, ens33 `192.168.47.40/24`, GW `192.168.47.2`, servicios activos, Git limpio. [Auditoría fotográfica actual](evidencias/08-auditoria-lote06-iac-b4-2026-10-13.md).
