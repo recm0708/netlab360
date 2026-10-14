@@ -3,7 +3,7 @@
 **Vigente 14/10/2026.** La última sesión de red terminó con postcheck válido 13/10 23:35:02. La VM se encontraba sin contenedores ni namespaces, gestión ens33 192.168.47.40/24, gateway 192.168.47.2 y servicios activos. No se ha ordenado apagado en este turno.
 
 ## Prioridad actual
-No empezar S02 ni introducir funcionalidades B4/AIOps adicionales: acordar y redactar tres únicos documentos acumulativos S01–S08 en el formato institucional del usuario. Resolver rúbrica y brechas S01 exigibles. [Checkpoint](REANUDAR-AQUI.md) y [documentación](entregables/00-politica-editorial-y-entrega-acumulativa.md).
+No empezar S02 ni introducir funcionalidades B4/AIOps adicionales: acordar y redactar dos documentos únicos acumulativos: investigación y manual técnico integral (implementación + uso), en el formato institucional del usuario. Resolver rúbrica y brechas S01 exigibles. [Checkpoint](REANUDAR-AQUI.md) y [documentación](entregables/00-politica-editorial-y-entrega-acumulativa.md).
 
 ## Método de trabajo
 - Agrupar pasos sustanciales, sin instrucciones repetitivas de un comando por turno.
