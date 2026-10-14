@@ -29,4 +29,4 @@
 
 Los recursos técnicos residen en inventario/, topologias/, iac/, ansible/, scripts/, servicios/ y tests/. Las capturas originales están en evidencias/capturas/ sin subcarpetas y hashes en evidencias/manifiestos/. Las bitácoras permanecen en docs/sesiones/, docs/evidencias/ y el historial Git. **docs/entregables/ mantiene dos índices maestros activos.**
 
-**Pendiente inmediato:** aprobación de los dos índices y comienzo del Documento 01 por la introducción, cuando el usuario confirme.
+**Índices 01 y 02 aprobados por el usuario el 14/10/2026**, sujetos a cualquier cambio docente. Próximo: comenzar Documento 01 por la Introducción cuando el usuario confirme «comencemos».
