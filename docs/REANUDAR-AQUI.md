@@ -1,5 +1,16 @@
 # NETLAB360 — REANUDAR AQUÍ
 
+## AUDITORÍA FINAL DE ISSUES (14/10/2026) — ANTES DE SINCRONIZAR UBUNTU
+
+- [Auditoría completa de 43 issues](control/04-auditoria-issues-milestones-2026-10-14.md): **38 abiertas, 5 cerradas, 0 abiertas sin milestone**. Issues #33 CI offline y #42 FRRouting dual-WAN/HTTP fueron cerradas con evidencias y límites; #39, #40, #41 ya estaban cerradas.
+- Se asignaron milestones: #27/#28/#29 S08, #35/#38/#42/#43 S01. Las demás ya estaban asignadas; fases S02–S08 no se han declarado ejecutadas.
+- **Issue #38 / tarea [030] SSH segura sigue abierta** por política sshd en servidor/rollback no verificados. Conexión por clave Ed25519 desde Windows SÍ está probada; no modificar `sshd_config` sin acceso de recuperación. [Issue actualizada](https://github.com/recm0708/netlab360/issues/38).
+- #12 PoC observable, #30 VLAN→WAN y #31 LACP capacidad fueron actualizadas con hechos actuales y brechas genuinas, sin añadir ensayos innecesarios. La guía docente decidirá qué hace falta para S01.
+- **Índices 01/02 APROBADOS 14/10/2026 por usuario**, sujetos a indicaciones de profesora. El usuario aún no sincronizó Ubuntu tras esta auditoría; próxima acción técnica solo `git pull --ff-only` limpio y verificar `main...origin/main`. **NO comenzar la redacción del Documento 01 hasta que el usuario diga «comencemos»**.
+
+---
+
+
 **Checkpoint editorial 14/10/2026.** El usuario redefinió la entrega: **DOS documentos maestros consolidados, no tres**. No comenzar S02 antes de terminar contenido S01 y brechas técnicas exigibles. **Los índices 01/02 fueron APROBADOS por el usuario el 14/10/2026**, salvo modificaciones solicitadas después por la profesora. **No comenzar la redacción hasta que diga «comencemos».** Las portadas las crea el usuario en su formato institucional.
 
 ## Política documental actual
