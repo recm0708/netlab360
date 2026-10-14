@@ -1,5 +1,22 @@
 # NETLAB360 — REANUDAR AQUÍ (checkpoint operativo)
 
+## CHECKPOINT VIGENTE — 13/10/2026 20:52 PANAMÁ | LACP PROBADO + 20 PNG NUEVOS AUDITADOS
+
+**Este estado prevalece sobre notas anteriores sobre LACP y fotos pendientes.** Usuario aportó salida real de Ubuntu: `b2-lacp-8023ad-dos-enlaces.sh --snapshot-confirmado` comprobó **IEEE802.3ad LACP active/fast, dos puertos en agregador de cada extremo, caída a UN puerto tras apagar a1/b1, recuperación a DOS puertos**, HTTP `NETLAB360_LACP_HTTP_OK` en los tres estados, `LACP_8023AD_TRES_ESTADOS=OK`, `RESULTADO_B2_LACP=0`, `RESULTADO_EJECUCION_LACP=0`, `RED_GESTION_INTACTA=SI`. Postcheck **20:51:35** Docker/netns vacíos, ens33 `192.168.47.40/24`, default `192.168.47.2`, docker/ssh/open-vm-tools activos, Git `main...origin/main` limpio en commit local `a8a9879` **antes de nuevos commits documentales**. Módulo bonding estaba disponible en `modinfo bonding`, se autoloadó, no hizo falta instalar programa. [Bitácora LACP](sesiones/2026-10-13-b2-lacp-8023ad-verificado.md).
+
+**S01 ahora 63% técnico estimado (+4 LACP, de 0/10 a 4/10; 37 pts totales pendientes), #1 aún ABIERTA**; no confundir LACP con dual-NIC VMware, switch/host de respaldo ni disponibilidad sin cortes.
+
+**EVIDENCIAS VISUALES RECIBIDAS 20/20:** Usuario adjuntó todos los PNG B2_L2_02–07 (6), B2_L3_01–04_FINAL (4), B3_05–14 (10). **18 VÁLIDAS y 2 VÁLIDAS CON OBSERVACIÓN** (B2_L2_06 líneas nftwrap; B3_09_FINAL prompt sudo sin contraseña); 0 rechazadas, 20 SHA256 individuales registrados en [auditoría lote03](evidencias/04-auditoria-visual-lote03-2026-10-13.md). Paquete ZIP descargable en la conversación `NETLAB360_LOTE03_20PNG_AUDITADOS_2026-10-13.zip` (1,011,954 bytes, SHA256 `9e11e1c3181ba62f53b1bde894f77ae4af0c6417beba1ebf10e578b90a342585`) y CSV manifiesto SHA256 generado. **ATENCIÓN: los 20 PNG están recibidos y auditados, pero NO FUERON subidos binariamente a GitHub aún**; transferir ZIP al clon Ubuntu, verificar SHA256, extraer 20 nuevos PNG a `evidencias/capturas/B2_B3_lote03` y commit/push verificado. **Los 24 PNG anteriores (lotes 01/02) SÍ están subidos**, no volver a solicitarlos ni duplicarlos.
+
+**ÚNICAS FOTOS OBLIGATORIAS PENDIENTES DE RECEPCIÓN INMEDIATA:** `B2_LACP_01_Agregacion_Dos_Enlaces.png`, `B2_LACP_02_Falla_Un_Enlace.png`, `B2_LACP_03_Restauracion_Dos_Enlaces.png`, `B2_LACP_04_Postcheck_Final.png`. Fueron ejecutados los bloques de terminal LACP_01–03 y postcheck 04, pero **no se han recibido estas cuatro imágenes PNG para auditoría visual**. Tres fotos antiguas opcionales siguen opcionales. [Inventario actualizado](evidencias/03-inventario-pendientes-auditoria-2026-10-13.md), issue #43.
+
+**SIGUIENTE SCRIPT PREPARADO EN REPO, NO EJECUTADO:** `scripts/laboratorio/b2-dualnic-activebackup-http.sh` dos namespaces propios, bond `mode active-backup`, dos NIC veth por extremo, HTTP en primaria → falla primaria → HTTP por secundaria → recuperación de primaria disponible; limpieza en trap y prechecks de ens33/GW. [Diseño](sesiones/2026-10-13-b2-dualnic-activebackup-preparado.md). **NO** atribuir puntos dualNIC al mero script. NO es dual NIC física VMware, ni redundancia de equipo real.
+
+**SIGUIENTE RESPUESTA CON 10 PASOS** por preferencia del usuario, cubrir descarga ZIP Windows, SCP al guest, verificación SHA256, extracción segura/importación sólo 20 PNG, commit/push y verificación, 4 fotos LACP desde log, precheck y ejecución del ensayo dual-NIC si entorno libre. Si script falla, abortar pasos dependientes y hacer postcheck sin relanzar. Nunca tocar VMnet8/ens33/firewall/rutas de host.
+
+---
+
+
 ## ESTADO FOTOGRÁFICO VIGENTE — 13/10/2026 | NO PEDIR ARCHIVOS YA PUBLICADOS
 
 Se creó y se verificó en GitHub el [inventario maestro de evidencias pendientes](https://github.com/recm0708/netlab360/blob/main/docs/evidencias/03-inventario-pendientes-auditoria-2026-10-13.md): **24 PNG B1/B2+B3 histórico ya inspeccionados y alojados físicamente** en `evidencias/capturas/B1_B2_lote01` (19) y `evidencias/capturas/B3_lote02` (5), excluidos expresamente de nuevas solicitudes.
