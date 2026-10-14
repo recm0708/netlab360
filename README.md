@@ -1,5 +1,7 @@
 # NETLAB360 — Planificación semestral
 
+> **Estado vigente (13/10/2026 21:39):** S01 65% técnico estimado, LACP y active-backup virtual validados. 57 capturas PNG auditadas y publicadas, 5 nuevas pendientes. Migración segura para aplanar `evidencias/capturas/` preparada pero **no ejecutada**. Las notas antiguas inferiores con cifras/carpeta previas son históricas. [Continuidad](docs/REANUDAR-AQUI.md) · [Auditoría lote05](docs/evidencias/06-auditoria-lote05-dualnic-noc-2026-10-13.md).
+
 ## CHECKPOINT VIGENTE — 13/10/2026 20:52 PANAMÁ | LACP PROBADO + 20 PNG NUEVOS AUDITADOS
 
 **Este estado prevalece sobre notas anteriores sobre LACP y fotos pendientes.** Usuario aportó salida real de Ubuntu: `b2-lacp-8023ad-dos-enlaces.sh --snapshot-confirmado` comprobó **IEEE802.3ad LACP active/fast, dos puertos en agregador de cada extremo, caída a UN puerto tras apagar a1/b1, recuperación a DOS puertos**, HTTP `NETLAB360_LACP_HTTP_OK` en los tres estados, `LACP_8023AD_TRES_ESTADOS=OK`, `RESULTADO_B2_LACP=0`, `RESULTADO_EJECUCION_LACP=0`, `RED_GESTION_INTACTA=SI`. Postcheck **20:51:35** Docker/netns vacíos, ens33 `192.168.47.40/24`, default `192.168.47.2`, docker/ssh/open-vm-tools activos, Git `main...origin/main` limpio en commit local `a8a9879` **antes de nuevos commits documentales**. Módulo bonding estaba disponible en `modinfo bonding`, se autoloadó, no hizo falta instalar programa. [Bitácora LACP](docs/sesiones/2026-10-13-b2-lacp-8023ad-verificado.md).
