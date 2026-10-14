@@ -1,5 +1,8 @@
 # NETLAB360 — Planificación semestral
 
+> **Actualización 13/10 23:00:** S01 **72/100 provisional** por primera CI offline demostrada en GitHub (run `38508522760`, success). Auditoría B4 de 76 muestras ICMP y 12 eventos WAN reales finalizada, JSON protegido, 11 tests correctos; **no** existen etiquetas independientes para ML supervisado ni métricas de clasificación. Se preparó perfil estadístico real sin ejecutarlo. Capturas nuevas pendientes de envío posterior, no repetir ensayos. [Bitácora B4](docs/sesiones/2026-10-13-b4-auditoria-datos-ci-ejecutada.md).
+
+
 > **Checkpoint 13/10 22:48:** progreso estimado **71/100**, IaC configuró realmente FRRouting mediante candidatos Ansible: OSPF WAN dual Full, failover y restore con rc0, cleanup y gestión intacta; drift reconciliado en copia de archivos, NO en routers vivos. Nueva prueba B4 de inventario de datos reales y CI offline versionadas pero pendientes de ejecución. Fotografías IaC de esta tanda pendientes de recepción; **62 PNG históricos ya publicados**. [Bitácora](docs/sesiones/2026-10-13-iac-b2-frr-live-y-drift-verificado.md) · [B4](docs/sesiones/2026-10-13-b4-auditoria-fuentes-preparada.md).
 
 
