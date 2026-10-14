@@ -12,7 +12,7 @@
 | Observabilidad | exporter Python, API HTTP, Prometheus 3.7.0 | Scrape/TSDB y dos alertas firing/resueltas observadas | Alertmanager receptor/NOC multisede final pendientes |
 | Analítica | Python 3.14.4, numpy disponible | JSON de 76 sondeos y 12 eventos distintos, reglas/estadística ejecutadas | sklearn/pandas/matplotlib no instalados al corte; ML no evaluada |
 | Pruebas/CI | unittest y GitHub Actions Node24 | 24 tests locales, run 38511477595 success | No prueba fallas integrales del hipervisor |
-| Documentos | Tres índices maestros Markdown + Word institucional del usuario | Política y esquema creados | Redacción APA 7 de S01 pendiente |
+| Documentos | Dos índices maestros Markdown + Word institucional del usuario | Política 2 documentos e índices propuestos, pendientes de aprobación | Redacción APA 7 de S01 pendiente |
 
 ## Antes de futuras operaciones de red
 1. Confirmar snapshot de la VM e intención del ensayo.
