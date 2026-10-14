@@ -1,6 +1,6 @@
 # NETLAB360 — Selección editorial de figuras y tablas para DOS documentos
 
-**Corte 14/10/2026:** 86 PNG publicados y siete CSV; lista basada en rutas reales del repositorio. **No insertar automáticamente todos los PNG.** Las numeraciones de «Figura N» y «Tabla N» serán continuas pero **independientes para cada documento**, a lo largo de las fases ejecutadas. Las portadas son responsabilidad del usuario.
+**Corte 14/10/2026; índices de los dos documentos aprobados por el usuario:** 86 PNG publicados y siete CSV; lista basada en rutas reales del repositorio. **No insertar automáticamente todos los PNG.** Las numeraciones de «Figura N» y «Tabla N» serán continuas pero **independientes para cada documento**, a lo largo de las fases ejecutadas. Las portadas son responsabilidad del usuario.
 
 ## Documento 01 — Diseño, desarrollo y evaluación del proyecto
 
