@@ -1,5 +1,8 @@
 # NETLAB360 — Planificación semestral
 
+> **ACTUALIZACIÓN REAL 13/10 22:30:** S01 **68/100 estimado**. OpenTofu `terraform_data` aplicado (5 registros metadata), Ansible dos candidatos FRR `COMPLIANT`, segunda corrida `changed=0`, segundo plan OpenTofu código0, VM intacta. **9 PNG IaC recibidos; 4 necesitan mejor encuadre**, desde logs sin repetir apply. Preparada próxima prueba de drift en copias y gate para usar configs IaC en B2, **NO ejecutadas aún**. [Bitácora](docs/sesiones/2026-10-13-iac-s01-ejecutado.md) · [Auditoría fotográfica](docs/evidencias/07-auditoria-visual-iac-s01-2026-10-13.md). Notas anteriores de 65/100 son históricas.
+
+
 > **Estado vigente 13/10 22:16:** 62 PNG + 6 CSV **publicados en carpeta plana**, integridad SHA256 auditada, commit **[`328591a`](https://github.com/recm0708/netlab360/commit/328591acaed06431457b903dec6c7a2b91c39b25)**. S01 **65/100 técnico estimado**; IaC SoT OpenTofu/Ansible preparada **sin ejecutar**. [Runbook de siguiente fase](docs/sesiones/2026-10-13-iac-s01-opentofu-ansible-preparado.md). Los estados anteriores a este aviso son históricos.
 
 
