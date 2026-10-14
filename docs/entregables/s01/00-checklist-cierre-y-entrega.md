@@ -1,35 +1,39 @@
-# NETLAB360 — Matriz de cierre de Fase S01
+# NETLAB360 — Cierre de documentos y aceptación S01
 
-**Fecha de corte:** 13/10/2026 después de 23:35. **Avance técnico estimado:** 72/100, no nota oficial. **Criterio:** documentación creada ≠ criterio rubricado aprobado.
+**Corte organizativo 14/10/2026.** La redacción de S01 se realizará en tres documentos maestros acumulativos S01–S08, bajo el formato institucional del usuario. Las primeras versiones Word/Markdown del 13/10 quedaron **descontinuadas** como formato de entrega. No se redactarán tres documentos independientes por fase; tampoco se avanzará a S02 antes de cerrar los correspondientes a S01.
 
-## Verificado
-- Lote06 publicado, commit b410548f9338233c8dc23816ce78a11d67bb2896; 86 PNG y 7 CSV; SHA256 e integridad OK, Git sincronizado, cero subcarpetas.
-- Regresión 24/24 tests y GitHub Actions exitosa, incluido run 38511477595.
-- Último postcheck 23:35:02: Docker/netns vacíos; gestión ens33 .40/24, gateway .2, tres servicios activos.
-- Resúmenes desde logs originales de IaC 01/03/04/06 generados con código0; las imágenes finales todavía por recibir.
-- Borradores versionados informe académico, bitácora técnica y manual; pendientes de edición académica final.
+## Documentos maestros únicos
 
-## Ruta crítica, en orden de entrega
-1. **Confirmación docente:** cotejar la guía oficial, extensión de documentos y obligatoriedad de los 11 criterios del issue #1 para S01. No reducir unilateralmente.
-2. **Documentación:** portada, integrantes/grupo/docente, esquema APA 7 real, referencias verificadas, selección e inserción de capturas con pies; actualizar Word de los tres documentos.
-3. **Evidencia faltante:** cuatro fotografías IaC recuperadas y postcheck LOTE06 adicional; auditarlas y publicarlas sin repetir ensayos.
-4. **Pruebas técnicas indispensables:** consolidar el ejercicio L2→WAN→servicio y evento visible si la guía lo exige; cubrir respaldo de equipo/servidor si es obligatorio, o registrar restricción de alcance aprobada.
-5. **Diagnóstico IA:** si es criterio exigido en S01, reunir sesiones independientes etiquetadas y evaluar modelo separado de reglas; no inventar precision/recall/F1.
-6. **Observabilidad:** si se exige, completar receptor/Alertmanager y estado por sede. De otro modo registrar pendiente planificado, condicionado a autorización docente.
-7. **Release/VM:** sanitizar tokens e historial sensible, verificar archivos y versión, crear tag/release y exportar/reimportar la VM; comprobar SHA256, si requerido ahora.
-8. **Cierre formal:** actualizar matriz con evidencia del alcance exacto, informe/manual definitivos y issue #1 solo tras verificación y aceptación.
+- [00 — Política editorial y APA 7](../00-politica-editorial-y-entrega-acumulativa.md).
+- [01 — Investigación/desarrollo del proyecto](../01-proyecto-investigacion-maestro.md).
+- [02 — Memoria técnico-práctica/laboratorios](../02-informe-tecnico-maestro.md).
+- [03 — Manual de usuario y operación](../03-manual-usuario-maestro.md).
+- [Matriz oficial interna de S01](../../control/03-matriz-aceptacion-y-decisions-s01.md).
 
-## Distinciones obligatorias
-- Informe borrador no es entrega con normas APA terminadas.
-- Captura de resultado histórico no es nueva ejecución del laboratorio.
-- Cero señales en una sesión sana no prueba precisión de detector ML.
-- LACP/active-backup con veth no demuestra NIC o switch físico duplicado.
-- OpenTofu registra metadata; el script B2 despliega routers con archivos Ansible.
-- Estado de Git limpio y VM de laboratorio limpia no equivalen a imagen OVA sanitaria lista.
+## Lista operativa de S01
 
-## Decisiones pendientes del usuario
-- Plantilla/rúbrica docente de S01, fechas exactas de entrega y extensión máxima/mínima.
-- Datos institucionales y autoría de portada.
-- Si la OVA debe entregarse por S01 o únicamente al final de semestre.
+- [x] Publicación y validación de 86 PNG planos y siete CSV SHA256; commit `b410548` local/remoto iguales.
+- [x] Regresión offline 24/24 y GitHub Actions `38511477595` exitosa.
+- [x] Recuperación de cuatro bloques de evidencia IaC 01/03/04/06 desde logs originales con exit0 (sin repetir apply).
+- [x] Crear la política editorial acumulativa y los tres índices maestros (pendiente de aprobación final por el usuario).
+- [x] Retirar de circulación editorial los borradores rechazados sin romper enlaces históricos.
+- [ ] Confirmar con docente/guía cuáles son las exigencias **realmente obligatorias de S01** frente a temas S03/S06/S08, páginas, fecha y entregables.
+- [ ] Recibir aprobación de los índices y datos de portada/plantilla institucional.
+- [ ] Redactar Documento 01 **sección por sección** con citas autor-fecha y referencias APA 7 verificadas; integrar lo correspondiente a S01.
+- [ ] Redactar Documento 02 con instrucciones, comandos reales, capturas comentadas, salidas, tablas y postchecks.
+- [ ] Redactar Documento 03 según funciones disponibles del producto, con tutoriales por casos de uso y capturas de interfaz.
+- [ ] Recibir/auditar las cuatro nuevas fotografías IaC y postcheck `LOTE06_Postcheck_Publicacion.png` sin repetir pruebas.
+- [ ] Verificar si se exige una sola red L2→WAN→servicio/NOC y redundancia de equipo en S01; realizar únicamente pruebas rubricadas pendientes.
+- [ ] Verificar exigencia de modelo IA/ML ya en S01 (issues #25/#26 asociadas S06); si obligatorio, diseño/adquisición/evaluación externa honestos.
+- [ ] Determinar exigencia de sanitizar/exportar/reimportar OVA en S01; si corresponde ejecutarlo, obtener hash y evidencia.
+- [ ] Preparar release/tag y cierre con la aceptación exigible; dejar issue #1 ABIERTA hasta terminar.
 
-**Política desde este corte:** suspender desarrollo B4 extra y trabajar por entregables S01, con una sola tanda de pruebas indispensables antes de release. Mantener pendientes documentados honestamente.
+## Convenciones académicas
+
+- **Un solo índice automático por documento**. Numeración única y continua de tablas y figuras por documento a lo largo de S01–S08.
+- **Preambulo obligatorio** a toda tabla/figura, referencia en párrafo previo y Nota. conforme APA 7 cuando sea necesaria.
+- **Única bibliografía final** por documento, sólo para trabajos citados en texto y verificados; sin inventar referencias.
+- El asistente entregará texto por secciones, y el usuario lo incorporará en su propia plantilla institucional. No generar Word arbitrariamente ni exigir que copie los antiguos.
+- No rellenar S02–S08 con trabajo todavía no realizado; por ahora sólo escribir S01 y las partes globales justificadas.
+
+**Pendiente crítico antes de declarar S01 terminada:** cotejar la guía/rúbrica docente, porque 72/100 es un indicador propio y varios requisitos de S01 se solapan con fases de otras issues. [Checkpoint](../../REANUDAR-AQUI.md).
