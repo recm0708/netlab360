@@ -112,6 +112,14 @@ def main():
 
     finales = list((ROOT / CAPTURAS).glob("*.png"))
     assert len(finales) == 57, f"Esperados 57 PNG en raiz; reales {len(finales)}"
+    # git mv mueve archivos, pero Git no gestiona carpetas vacias en el
+    # filesystem de Ubuntu. Eliminarlas solamente si estan vacias.
+    for nombre in LOTE_DIRS:
+        carpeta = ROOT / CAPTURAS / nombre
+        if carpeta.exists():
+            assert carpeta.is_dir() and not carpeta.is_symlink(), f"Ruta inesperada: {carpeta}"
+            assert not any(carpeta.iterdir()), f"Carpeta NO vacia: {carpeta}"
+            carpeta.rmdir()
     assert not any((ROOT / CAPTURAS / nombre).exists() for nombre in LOTE_DIRS)
     print("MIGRACION_REALIZADA=SI")
     print("PNG_DIRECTOS=57")
