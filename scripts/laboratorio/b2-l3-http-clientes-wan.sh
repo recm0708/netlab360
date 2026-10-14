@@ -122,23 +122,23 @@ printf 'NETLAB360_HTTP_S1_SERVICIO_REAL_OK\n' > "$WEB/index.html"
 sudo ip netns exec "$SS" python3 -m http.server 8080 --bind 10.71.10.20 \
   --directory "$WEB" > "$EVID/b2-l3-http-s1-server.log" 2>&1 &
 sleep 1
-check_route wan-p
 echo "========== INICIO CAPTURA B2_L3_01 =========="
 date -Is
+check_route wan-p
 sudo ip -n "$HC" -4 -br addr
 sudo ip -n "$SS" -4 -br addr
 check_http WAN_PRINCIPAL
 echo "========== FIN CAPTURA B2_L3_01 =========="
 bash scripts/laboratorio/b2-dualwan-ospf.sh fail
-check_route wan-b
 echo "========== INICIO CAPTURA B2_L3_02 =========="
 date -Is
+check_route wan-b
 check_http WAN_RESPALDO
 echo "========== FIN CAPTURA B2_L3_02 =========="
 bash scripts/laboratorio/b2-dualwan-ospf.sh restore
-check_route wan-p
 echo "========== INICIO CAPTURA B2_L3_03 =========="
 date -Is
+check_route wan-p
 check_http WAN_RESTAURADA
 echo "========== FIN CAPTURA B2_L3_03 =========="
 echo "B2_L3_HTTP_TRES_ESTADOS=OK"
