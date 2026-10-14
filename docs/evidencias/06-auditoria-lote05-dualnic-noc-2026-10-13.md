@@ -1,5 +1,7 @@
 # NETLAB360 — Auditoría lote05: dual-NIC y cierre NOC
 
+> **Ubicación VIGENTE desde el commit [570088c](https://github.com/recm0708/netlab360/commit/570088c5ed3fd7ce3b888facecfe79c39e78005f):** los PNG ya versionados se consultan directamente en [`evidencias/capturas/`](../../evidencias/capturas/) y sus CSV en [`evidencias/manifiestos/`](../../evidencias/manifiestos/). 5 capturas del lote05 dualNIC/NOC siguen pendientes de subir; las otras 57 ya están aplanadas y publicadas. Cualquier ruta antigua `.../lote0X/` que figure a continuación describe su **ubicación histórica**, no la actual. La migración conservó los bytes (Git detectó 100% de similitud). El lote05 aún no figura físicamente en GitHub.
+
 **Corte:** 13/10/2026, después de 21:39 Panamá.  
 **Fuente:** 8 PNG recibidos y salida íntegra real de Ubuntu con pasos 125–136. **4 PNG dual-NIC + 1 PNG NOC final aceptados para publicación**; 3 adjuntos adicionales excluidos por duplicación o por ser cierres intermedios superados. Ninguna imagen fue editada.
 
