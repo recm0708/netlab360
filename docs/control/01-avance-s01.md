@@ -1,11 +1,12 @@
 # NETLAB360 — Control de avance y cierre de Fase S01
 
-**Corte técnico actualizado:** 2026-10-13 23:12 (Panamá, UTC−05:00).  
+**Corte técnico actualizado:** 2026-10-13 23:24 (Panamá, UTC−05:00).  
 **Versión de seguimiento:** v2.2. **Fase:** [#1](https://github.com/recm0708/netlab360/issues/1) **ABIERTA**.  
 **Estado oficial de la rúbrica:** pendiente de ratificación con la docente. **Porcentaje provisional; no es nota, auditoría de cumplimiento oficial ni valor calculado por GitHub.**
 
 ## 1. Estimación ponderada del avance S01
 
+**VIGENTE 13/10 23:24: S01 72/100 sin incremento.** Motor B4 determinista **ejecutado**: 24/24 unit tests, análisis 76 sondeos ICMP reales y SHA original, sin pérdidas, sin rutas estables inesperadas ni RTT sobre 0.147ms (factor3) o 0.245ms (factor5); 4 transiciones de fase correctamente separadas de alarmas, JSON externo modo0600, Docker/netns/red/Git intactos. Referencia estadística in-sample no demuestra precisión de detección ni IA. CI Node24 run [38510552044](https://github.com/recm0708/netlab360/actions/runs/38510552044) confirmado `offline-regression=success`. **24 PNG IaC+B4 recibidos/aceptados para el lote06**, ZIP/manifiesto SHA256 preparados, pero bytes **PENDIENTES de importar/publicar**: GitHub sigue con 62 PNG y 6 CSV antes del push. Faltan 4 fotos IAC suplementarias desde logs. [Auditoría](../evidencias/08-auditoria-lote06-iac-b4-2026-10-13.md). Mantener B4 0/5 (falta detector IA evaluado).\n\n
 **NUEVO CORTE VIGENTE 13/10 23:12: S01 72/100 sin incremento.** Perfil B4 estadístico efectivamente ejecutado y contrastado con CSV SHA256: 76/76 ICMP OK, 0 inconsistencias FIB en fases estables, 5 medias/p95 RTT, 16/16 unit tests, reporte real JSON externo modo0600, administración y Git intactos. Análisis solo descriptivo, sin prueba independiente de anomalías ni ML. Dos ejecuciones CI previas verdes observadas; migración a Node24 preparada, por validar. Preparado detector por reglas B4 **sin ejecutar**, no asignar puntaje por código. [Bitácora](../sesiones/2026-10-13-b4-perfil-estadistico-verificado.md).
 
 
