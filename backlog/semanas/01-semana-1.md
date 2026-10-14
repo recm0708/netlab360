@@ -1,10 +1,10 @@
 # S01 — Semana 1: MVP transversal y viabilidad
 
 **Calendario previsto:** 5–11 de octubre de 2026.  
-**Corte de situación actualizado:** 13 de octubre de 2026, 18:36 Panamá.  
+**Corte de situación actualizado:** 13 de octubre de 2026, 19:01 Panamá.  
 **Estado de fase:** ABIERTA, con retraso respecto al plan inicial; no trasladar automáticamente fechas de S02–S08.  
 **Issue:** [#1](https://github.com/recm0708/netlab360/issues/1).  
-**Avance estimado:** **53%** según pesos y evidencias de [docs/control/01-avance-s01.md](../../docs/control/01-avance-s01.md). No es avance oficial de GitHub ni calificación de docente.
+**Avance estimado:** **55%** según pesos y evidencias de [docs/control/01-avance-s01.md](../../docs/control/01-avance-s01.md). No es avance oficial de GitHub ni calificación de docente.
 
 ## Criterios integrales de aceptación (copiados de issue #1; sin aprobar aún)
 
@@ -28,7 +28,7 @@
 |---|---|---|
 | B0 — Base Ubuntu/VMware/VMnet8/SSH/GitHub/Docker/snapshot | **Cerrado a nivel operacional** | Issues [#39](https://github.com/recm0708/netlab360/issues/39), [#40](https://github.com/recm0708/netlab360/issues/40), [#41](https://github.com/recm0708/netlab360/issues/41) cerradas; hardening/documentos de #38 abiertos |
 | B1 — Diseño multisede/IPAM y SoT inicial | **Validación preliminar completa, diseño draft** | IPAM 3 sedes, 9 VLAN, 2 WAN sin solapamientos; #11 y #16 abiertos |
-| B2-L2 — Primer experimento de segmentación | **Subprueba terminada** | VLAN 110 conectividad, aislamiento VLAN 120 y recuperación, código 0; faltan trunks/ACL #30 |
+| B2-L2 — VLAN y trunk 802.1Q entre switches HQ | **Trunk y aislamiento probados; ACL/HTTP pendiente** | Nuevo ensayo real 19:00: VID 110/120 tagged en troncales, 3/3 por VLAN, negativo inter-VLAN con ruta on-link 0/3, 2/2 intravlan de control; cleanup y gestión OK. Preparado script ACL/HTTP en namespace, NO ejecutado #30 |
 | B2-L3 — Plano de control FRR en contenedor aislado | **Subprueba terminada** | `FRR_DAEMONS_ACTIVOS: SI`, `OSPF_CONTROL_PLANE: OK`, `RESULTADO_SMOKE_FRR_V5=0`; base de despliegue #42 |
 | B2 red dual-WAN e incidente | **Enrutamiento, failover y alertas WAN integradas probadas; clientes reales pendientes** | OSPF Full/Full por dos WAN, FIB WAN-P→WAN-B→WAN-P y sondeos ICMP previos. Prometheus ahora genera alertas reales `firing`/resueltas con la falla. No hay clientes/servicios de extremo reales ni prueba integral de continuidad de aplicación #42/#12 |
 | B3 observabilidad/API/NOC | **Exporter y alertas Prometheus reales verificadas; extensión B3 pendiente** | NOC HTML histórico inspeccionado y exporter en vivo FRR; Prometheus 3.7.0 TSDB, scrape up=1, 3 reglas cargadas; WAN-P DOWN→WAN-B provocó 2 alertas firing, WAN-P restaurada dejó 0 activas. Postcheck 9090/9108 libres, Docker/netns vacíos. Falta Alertmanager/receptor, panel multisede y SLI/SLO #12/#15/#20/#21 |
