@@ -1,6 +1,6 @@
 # NETLAB360 — Política editorial vigente: DOS documentos únicos acumulativos
 
-**Fecha de decisión:** 14/10/2026. **Fuente:** instrucciones directas del usuario. **Estado:** estructura propuesta, pendiente de aprobación definitiva del usuario antes de empezar la redacción. **Portadas:** las confecciona el usuario usando su formato institucional. No emitir documentos Word por iniciativa propia.
+**Fecha de decisión:** 14/10/2026. **Fuente:** instrucciones directas del usuario. **Estado:** estructura APROBADA por el usuario el 14/10/2026 como línea base editorial, sujeta a cualquier indicación posterior de la profesora. Pendiente de empezar redacción hasta la orden del usuario. **Portadas:** las confecciona el usuario usando su formato institucional. No emitir documentos Word por iniciativa propia.
 
 ## 1. Entregables finales: exactamente dos documentos
 
@@ -53,7 +53,7 @@ En este momento S01 sigue **ABIERTA (72/100 técnico estimado)** según matriz i
 
 ## 6. Estado y próximas decisiones
 
-- El usuario revisará/aprobará los dos índices antes de iniciar la redacción.
+- El usuario APROBÓ los dos índices como línea base de trabajo el 14/10/2026; si la profesora comunica nuevos requisitos se revisarán conservando trazabilidad.
 - Luego comenzar por **Documento 01, Introducción**, y avanzar sección por sección según aprobaciones; desarrollar posteriormente Documento 02 en paralelo con las pruebas verificadas.
 - No iniciar tareas técnicas nuevas ni S02 por impulso; solo pruebas de cierre S01 que la guía docente realmente exija.
 - **Cierre académico final:** dos documentos consolidados que describen el proyecto hasta la última fase terminada, sin afirmar implementado lo no realizado. El estado interno histórico permanece en GitHub.
