@@ -1,5 +1,8 @@
 # NETLAB360 — Planificación semestral
 
+> **Estado vigente 13/10 22:16:** 62 PNG + 6 CSV **publicados en carpeta plana**, integridad SHA256 auditada, commit **[`328591a`](https://github.com/recm0708/netlab360/commit/328591acaed06431457b903dec6c7a2b91c39b25)**. S01 **65/100 técnico estimado**; IaC SoT OpenTofu/Ansible preparada **sin ejecutar**. [Runbook de siguiente fase](docs/sesiones/2026-10-13-iac-s01-opentofu-ansible-preparado.md). Los estados anteriores a este aviso son históricos.
+
+
 > **Estado actual posterior al commit 570088c:** 57 PNG **publicados directamente** en [`evidencias/capturas/`](evidencias/capturas/); CSV de lotes 01–04 y mapa en [`evidencias/manifiestos/`](evidencias/manifiestos/). La VM Ubuntu conserva 4 directorios físicos antiguos tras `git mv`; el lote05 (5 PNG + CSV) **todavía NO está publicado**. Scripts corregidos en GitHub, pendiente sincronización y nueva importación. Progreso S01 **65% técnico estimado**, sin cambios. [Checkpoint](docs/REANUDAR-AQUI.md).
 
 
