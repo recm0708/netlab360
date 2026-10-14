@@ -1,5 +1,8 @@
 # NETLAB360 — Planificación semestral
 
+> **Estado actual posterior al commit 570088c:** 57 PNG **publicados directamente** en [`evidencias/capturas/`](evidencias/capturas/); CSV de lotes 01–04 y mapa en [`evidencias/manifiestos/`](evidencias/manifiestos/). La VM Ubuntu conserva 4 directorios físicos antiguos tras `git mv`; el lote05 (5 PNG + CSV) **todavía NO está publicado**. Scripts corregidos en GitHub, pendiente sincronización y nueva importación. Progreso S01 **65% técnico estimado**, sin cambios. [Checkpoint](docs/REANUDAR-AQUI.md).
+
+
 > **Estado vigente (13/10/2026 21:39):** S01 65% técnico estimado, LACP y active-backup virtual validados. 57 capturas PNG auditadas y publicadas, 5 nuevas pendientes. Migración segura para aplanar `evidencias/capturas/` preparada pero **no ejecutada**. Las notas antiguas inferiores con cifras/carpeta previas son históricas. [Continuidad](docs/REANUDAR-AQUI.md) · [Auditoría lote05](docs/evidencias/06-auditoria-lote05-dualnic-noc-2026-10-13.md).
 
 ## CHECKPOINT VIGENTE — 13/10/2026 20:52 PANAMÁ | LACP PROBADO + 20 PNG NUEVOS AUDITADOS
