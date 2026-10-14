@@ -6,6 +6,9 @@
 
 ## 1. Estimación ponderada del avance S01
 
+**Corte administrativo posterior, 13/10 22:16:** 62 PNG en carpeta única y 6 CSV publicados, `RESULTADO_AUDITORIA=0`, commit `328591a` con SHA local/remoto igual. **Estado S01 65/100 inalterado**. Comenzó preparación documental/código de vertical IaC: `terraform_data` desde SoT (sin gestión de red), plantilla Ansible candidata FRR y verificador de compliance. **Aún no ejecutado ni puntuable**; validar en Ubuntu plan/apply, config candidate, idempotencia antes de atribuir avance IaC. [Runbook](../sesiones/2026-10-13-iac-s01-opentofu-ansible-preparado.md).
+
+
 **Actualización documental posterior al commit `570088c` (no altera el 65/100):** 57 PNG de lotes 01–04 y sus cuatro manifiestos **reubicados y publicados** en carpeta plana; se generó el mapa origen/destino con SHA256. Los 5 PNG auditados del lote05 **no se importaron**: quedaron carpetas físicas antiguas después de `git mv` y falló una guardia; scripts corregidos, pendientes pull y nueva ejecución del importador exclusivamente. No se ha acreditado nueva técnica ni se ha publicado lote05.
 
 
