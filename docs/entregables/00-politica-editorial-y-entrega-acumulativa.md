@@ -1,6 +1,6 @@
 # NETLAB360 — Política académica vigente tras guías oficiales (16/10/2026)
 
-**Esta versión REV0.3 sustituye la decisión anterior de DOS informes entregables.** Fundamento: tres PDFs oficiales proporcionados por el usuario el 16/10 y decisión explícita del mismo. En caso de conflicto consultar [requisitos docentes](../academico/00-requisitos-oficiales-2026-10-16.md). La transcripción de la reunión puede ampliar/aclarar esta política sin alterar el historial Git.
+**Esta versión REV0.3 sustituye la decisión anterior de DOS informes entregables.** Fundamento: tres criterios docentes proporcionados por el usuario el 16/10 y decisión explícita del mismo. En caso de conflicto consultar [requisitos docentes](../academico/00-criterios-docentes-y-hitos.md). Las instrucciones orales ya están convertidas a criterios operativos sin publicar la transcripción. Las revisiones grupales del escrito están fechadas **30/10 y 13/11**; la demostración final será en vivo.
 
 ## Entrega principal obligatoria: UN solo informe escrito
 
@@ -11,7 +11,7 @@ El borrador anterior del Documento 01 tiene **65 páginas**, revisadas previamen
 ## Entregas adicionales
 
 - **PowerPoint y demostración técnica obligatorios**, diseñados **después** de cerrar el informe principal; los escenarios deben mostrar baseline, operación/falla y contraste esperado/real, con razonamiento técnico. [Plan](../academico/03-anexos-y-demostracion.md).
-- **Anexos técnicos**: fuente de código completo, YAML, OpenTofu, Ansible, Python, scripts, configuraciones y salidas relevantes. El usuario propone un ZIP con manifiesto de integridad y estructura; aceptación explícita de **ZIP separado no consta** en los PDFs, pendiente de reunión/docente.
+- **Anexos técnicos**: fuente de código completo, YAML, OpenTofu, Ansible, Python, scripts, configuraciones y salidas relevantes. Se permite un ZIP de anexos separado, junto al informe, con manifiesto de integridad y estructura interna; confirmar solo límites de tamaño y carga.
 - [Documento 02 — manual técnico integral](02-informe-tecnico-maestro.md): **DIFERIDO para después del proyecto**; no es requerido en las tres guías y no bloquea S02, informe, demo ni entrega. Conservar issue #28 como proyecto futuro, sin crear contenido nuevo por ahora.
 
 ## Reglas editoriales
@@ -25,7 +25,7 @@ El borrador anterior del Documento 01 tiene **65 páginas**, revisadas previamen
 
 ## Prioridad de ejecución (revisada)
 
-1. Actualizar GitHub/guía/índice y decidir dudas tras la transcripción.
+1. Comprobar envío del título a Teams y preparar con el grupo la revisión del **30/10** de Introducción, Objetivos y Planteamiento del problema.
 2. **Retomar implementación técnica integrada S02** usando prácticas S01 probadas y la VM protegida; dejar la issue original S01 abierta por brechas sin usarla como bloqueo global.
 3. Incorporar progresivamente contenido verificado al ÚNICO informe académico-técnico; reestructurar Word vigente con el mapa oficial.
 4. Preparar anexos y verificación final; luego PPT+demo. Manual 02 después.
