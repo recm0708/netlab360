@@ -21,4 +21,4 @@
 - Las capturas adicionales pueden usarse en PPT final solo después de cerrar informe.
 - No publicar contraseñas, claves, tokens ni datos privados en el informe o ZIP.
 
-[Plan de migración](../academico/01-migracion-borrador-a-formato-docente.md) · [Guía oficial](../academico/00-requisitos-oficiales-2026-10-16.md).
+[Plan de migración](../academico/01-migracion-borrador-a-formato-docente.md) · [Guía oficial](../academico/00-criterios-docentes-y-hitos.md).
