@@ -18,3 +18,6 @@ Falla y restauración WAN/servicio con fuente de tiempo coherente, NOC/alerta y 
 - Demostrar solo capacidades efectivamente probadas. No alterar VMnet8/ens33 de gestión ni eliminar recursos de laboratorios ajenos.
 
 **Estado inicial de esta fase: PENDIENTE DE VALIDACIÓN ESPECÍFICA; no equiparar prototipos parciales S01 con implementación integral.**
+
+
+**Corte académico obligatorio durante el proyecto:** título al chat Teams, primera revisión **30/10/2026** (Introducción, Objetivos, Planteamiento), segunda revisión **13/11/2026** (Fundamento técnico y Diseño). Ambas muestran el **mismo borrador en Teams**, representante designado; no requieren diapositivas. ZIP de anexos externos autorizado con el informe, demo final EN VIVO. [Criterios aplicables](../../docs/academico/00-criterios-docentes-y-hitos.md).
