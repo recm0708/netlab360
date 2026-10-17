@@ -1,7 +1,0 @@
-# Archivo histórico descontinuado — 01: investigación
-
-**No usar como texto ni formato de entrega.** El usuario rechazó la estructura/formato de los borradores V0.1 del 13/10/2026 y ordenó mantener **DOS documentos maestros consolidados, con incidentes reales en el Documento 01 y guía preventiva en el Documento 02**, redactados por secciones en su plantilla institucional con APA 7.
-
-Documento vigente: [01: investigación](../01-proyecto-investigacion-maestro.md).
-
-La versión anterior sigue recuperable en el historial Git; se conserva esta ruta como redirección para evitar enlaces rotos en las issues históricas.
