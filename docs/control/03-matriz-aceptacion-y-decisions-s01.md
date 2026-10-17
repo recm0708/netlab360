@@ -19,7 +19,7 @@
 ## Confirmaciones y decisiones
 
 - Guía docente ahora conocida: **un solo documento escrito de al menos 40 páginas**, PowerPoint y demostración. Requisitos narrativos y de pruebas documentados con precisión en [guía transcrita](../academico/00-criterios-docentes-y-hitos.md).
-- **No se conoce** fecha exacta oficial, límites de diapositivas, aceptación ZIP ni obligación de OVA por esos tres PDFs. Esperar transcripción y ejemplo parcial prometidos.
+- **Ya se confirmaron** revisiones parciales del proyecto el **30/10/2026** y **13/11/2026**, ZIP separado de anexos permitido junto al informe y demostración final **EN VIVO**. **Todavía se desconocen** fecha y duración finales, límites de diapositivas, cómputo de las 40 páginas, tamaño máximo del ZIP y obligación de OVA; Parcial 1 se atiende en otro chat.
 - S01 continúa ABIERTA en issue #1 con resultados reales parciales; **retirada la prohibición anterior de S02 por falta de dos manuscritos**. Avanzar S02 y mantener trazabilidad de los 11 objetivos a su fase técnica lógica.
 - Reducir opcionales sólo con aprobación según exigencias confirmadas; no fingir que topología única o ML ya funcionan.
 - El manual técnico independiente #28 se mantiene como **posentrega, no parte de C05/C09 ni de la evaluación**.
