@@ -80,3 +80,18 @@ Archivos añadidos al repositorio: `scripts/automatizacion/render-frr-s02.py` y 
 **ATENCIÓN antes de redes reales:** `systemctl is-active docker ssh open-vm-tools` devolvió `active\ninactive\nactive` en 16:08, pese a sesión SSH preexistente funcional. Puede ser `ssh.socket` activo con `ssh.service` inactivo por systemd socket activation; **se debe probar, no asumir**. Primero consultar ssh.service/ssh.socket/listener/sshd -t y abrir segunda conexión nueva desde PowerShell manteniendo la actual abierta. No desplegar/ejecutar `up` hasta confirmar disponibilidad de acceso o recuperación vía consola VMware. **PasswordAuthentication yes** era pendiente histórico; no endurecerlo durante pruebas de integración.
 
 **Próxima evidencia:** `S02_03_Configuraciones_FRR_Tres_Sedes_Candidatas` (salida compacta de hash/OSPF/VLAN/generador), únicamente al validar acceso SSH y resultado del precheck. Captura física no presente en repo.
+
+ 
+## Cuarto corte — 17/10/2026 16:31 -05: SSH y precheck operativos
+
+**Verificado mediante salidas aportadas:**
+- `ssh.service=active` y `ssh.socket=active`. `/run/sshd` existe con propietario root:root y modo 0755; `ssh.service` declara `RuntimeDirectory=sshd` y `RuntimeDirectoryMode=0755`.
+- `sudo /usr/sbin/sshd -t` terminó `0`.
+- **SEGUNDA conexión SSH desde Windows** con clave Ed25519 completada: `SEGUNDA_CONEXION_SSH=OK` y `RESULTADO_SEGUNDA_CONEXION=0`.
+- `bash -n scripts/diagnostico/precheck-s02.sh` terminó `0`, `python3 scripts/validacion/validar-ipam-s02.py` terminó `0`.
+- `bash scripts/diagnostico/precheck-s02.sh` terminó `S02_PRECHECK_RESULTADO=0`. Gestión `ens33=192.168.47.40/24`, GW `.2`, imagen FRR 10.7.1 amd64 presente, 3 configuraciones con hashes esperados, IPAM 3 sedes/9 VLAN/4 WAN, colisiones 0 y Docker/netns vacíos.
+- Captura `S02_04_Precheck_Seguridad_y_FRR_Multisede` respaldada por salida completa del usuario; **no se ha recibido archivo PNG ni publicado en Git**.
+- En el momento del chequeo Git Ubuntu estaba limpio en `95e0848`. Esta documentación de GitHub se ha actualizado después.
+- El bloqueo de disponibilidad de SSH se considera **resuelto para esta sesión**. La política de autenticación por contraseña/endurecimiento permanece pendiente en #38.
+- **Despliegue de WAN S02 NO ejecutado.** El intento de publicar un orquestador nuevo en GitHub fue bloqueado por la herramienta; **NO hay un archivo `scripts/laboratorio/s02-wan-frr-multisede.sh` validado/publicado** y no debe invocarse `up`. Mantener S02 como `candidate`.
+- **Próxima actividad:** verificación de garantías de rollback y capacidades del host; después implementar el orquestador mediante un método revisable, someterlo a `bash -n`, pruebas por etapa y aprobación expresa del operador antes del primer despliegue. Nunca modificar `ens33`, `VMnet8` ni borrar recursos ajenos.
