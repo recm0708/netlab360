@@ -1,6 +1,6 @@
 # NETLAB360 — Matriz de objetivos internos históricos y criterios DOCENTES
 
-**Revisión 16/10/2026.** [Norma docente recibida](../academico/00-requisitos-oficiales-2026-10-16.md): un informe de **mínimo 40 páginas**, 12 secciones; PowerPoint y demostración técnica. **Los C01–C11 de abajo fueron inventario INTERNO de validaciones transversales anteriores, NO 11 criterios oficiales entregados por la profesora.** Su trazabilidad se conserva para no omitir funcionalidades; ya no se exige cerrar todo en S01 para autorizar S02.
+**Revisión 16/10/2026.** [Norma docente recibida](../academico/00-criterios-docentes-y-hitos.md): un informe de **mínimo 40 páginas**, 12 secciones; PowerPoint y demostración técnica. **Los C01–C11 de abajo fueron inventario INTERNO de validaciones transversales anteriores, NO 11 criterios oficiales entregados por la profesora.** Su trazabilidad se conserva para no omitir funcionalidades; ya no se exige cerrar todo en S01 para autorizar S02.
 
 | Código | Objetivo o comprobación interna | Estado técnico de evidencia al corte S01 | Pendiente/fase principal |
 |---|---|---|---|
@@ -18,7 +18,7 @@
 
 ## Confirmaciones y decisiones
 
-- Guía docente ahora conocida: **un solo documento escrito de al menos 40 páginas**, PowerPoint y demostración. Requisitos narrativos y de pruebas documentados con precisión en [guía transcrita](../academico/00-requisitos-oficiales-2026-10-16.md).
+- Guía docente ahora conocida: **un solo documento escrito de al menos 40 páginas**, PowerPoint y demostración. Requisitos narrativos y de pruebas documentados con precisión en [guía transcrita](../academico/00-criterios-docentes-y-hitos.md).
 - **No se conoce** fecha exacta oficial, límites de diapositivas, aceptación ZIP ni obligación de OVA por esos tres PDFs. Esperar transcripción y ejemplo parcial prometidos.
 - S01 continúa ABIERTA en issue #1 con resultados reales parciales; **retirada la prohibición anterior de S02 por falta de dos manuscritos**. Avanzar S02 y mantener trazabilidad de los 11 objetivos a su fase técnica lógica.
 - Reducir opcionales sólo con aprobación según exigencias confirmadas; no fingir que topología única o ML ya funcionan.
