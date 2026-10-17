@@ -1,6 +1,6 @@
 # NETLAB360 — Migración del borrador de 65 páginas al informe obligatorio único
 
-**Fuente de estructura:** tres PDFs oficiales recibidos el 16/10/2026. **Estado:** plan de edición, NO modificación del Word/PDF del usuario. El PDF S01 revisado previamente tenía 65 páginas y seis figuras/seis tablas en su versión entonces recibida; sus detalles y paginación deben volver a cotejarse cuando el usuario envíe la versión vigente.
+**Fuente de estructura:** criterios de trabajo ratificados hasta el 17/10/2026. **Estado:** plan de edición, NO modificación del Word/PDF del usuario. El PDF S01 revisado previamente tenía 65 páginas y seis figuras/seis tablas en su versión entonces recibida; sus detalles y paginación deben volver a cotejarse cuando el usuario envíe la versión vigente.
 
 | Orden oficial | Sección exigida | Material del borrador previo que se reutiliza | Corrección necesaria |
 |---|---|---|---|
@@ -15,7 +15,7 @@
 | 9 | Análisis de resultados | Discusión, limitaciones, resultados y mitigaciones dispersas | Reubicar incidentes técnicos reales y su resolución aquí, enlazar a fase; eliminar conclusiones prematuras |
 | 10 | Conclusiones y recomendaciones | Conclusiones y recomendaciones existentes | Unificar bajo encabezado oficial, contrastar objetivos con validación final, no decir que faltó plazo si se aprueba corte de alcance; no ocultar obligaciones docentes |
 | 11 | Referencias | Bibliografía actual | APA7, cotejo bidireccional cita↔referencia, solo fuentes utilizadas |
-| 12 | Anexos | Evidencias extra/archivos completos | Anexo de índice/manifiesto de ZIP propuesto; acceso claro y trazable, previa aceptación docente |
+| 12 | Anexos | Evidencias extra/archivos completos | Anexo de índice/manifiesto de ZIP propuesto; acceso claro y trazable, mediante ZIP separado autorizado por la docente |
 
 ## Resultados del material S01: preservar
 
@@ -35,4 +35,4 @@
 - **No renumerar tablas/figuras en Git arbitrariamente:** Word del usuario es la autoridad para numeración definitiva; la guía oficial rige la **jerarquía de secciones**, con tablas/figuras continuas y notas APA7.
 - Los ejemplos de slides «sistema de monitoreo» y «gestión de usuarios» no exigen construir esos productos; son didácticos.
 - Evaluar completitud técnica del informe por casos verificables, no por conteo de páginas.
-- Antes de editar 65 páginas, esperar transcripción de reunión para requisitos ambiguos, **pero iniciar avance técnico integrador entretanto** y no rehacer todo el texto en ausencia de nueva indicación.
+- Preparar para **30/10/2026** la Introducción, los Objetivos y el Planteamiento del problema; para **13/11/2026**, Fundamento técnico y Diseño. Mostrar el borrador en Teams por representante designado. Reutilizar Word de 65 páginas sin rehacerlo.
