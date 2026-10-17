@@ -1,6 +1,6 @@
 # NETLAB360 — Manual técnico integral de implementación, administración y uso (POSPUESTO)
 
-**Estado vigente 16/10/2026: DIFERIDO / POSENTREGA, NO ENTREGABLE OFICIAL EXIGIDO.** La guía docente de Proyecto Final solicita **un solo informe escrito** con implementación y pruebas integradas; otro manual independiente no aparece entre los requisitos de los tres PDFs recibidos. El usuario dispuso redactar el manual técnico completo **DESPUÉS** de que el trabajo escrito esté finalizado, el sistema funcione y se realice la entrega/demostración. Esta actividad se conserva en issue #28, pero **NO bloquea S01, S02 ni la evaluación semestral**.
+**Estado vigente 16/10/2026: DIFERIDO / POSENTREGA, NO ENTREGABLE OFICIAL EXIGIDO.** El alcance académico vigente del proyecto solicita **un solo informe escrito** con implementación y pruebas integradas; otro manual independiente no aparece entre los requisitos de los criterios académicos aplicables. El usuario dispuso redactar el manual técnico completo **DESPUÉS** de que el trabajo escrito esté finalizado, el sistema funcione y se realice la entrega/demostración. Esta actividad se conserva en issue #28, pero **NO bloquea S01, S02 ni la evaluación semestral**.
 
 El anterior índice extensivo V0.2 de 17 capítulos se conserva intacto en **Git history** previo a esta decisión. Los capítulos 1–3 redactados previamente en conversación **no se consideran entrega oficial** y sus datos útiles (entorno/VM/recursos/red) se aprovecharán en **7 Implementación** del informe principal.
 
