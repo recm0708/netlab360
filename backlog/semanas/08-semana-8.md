@@ -18,3 +18,6 @@ Artefactos verificables y sanitizados, demo explicado, pruebas finales, citas AP
 - Demostrar solo capacidades efectivamente probadas. No alterar VMnet8/ens33 de gestión ni eliminar recursos de laboratorios ajenos.
 
 **Estado inicial de esta fase: PENDIENTE DE VALIDACIÓN ESPECÍFICA; no equiparar prototipos parciales S01 con implementación integral.**
+
+
+**Revisión académica obligatoria durante el proyecto:** título por chat Teams (aprobación pendiente comprobar), borrador 30/10/2026 con Introducción, Objetivos y Planteamiento; borrador 13/11/2026 con Fundamento técnico y Diseño. Documento mostrado en Teams por representante del grupo; **NO** PowerPoint para esos cortes. ZIP de anexos externos permitido con informe. PowerPoint final del mismo informe y **demostración EN VIVO**. [Pautas aplicables](../../docs/academico/00-criterios-docentes-y-hitos.md).
