@@ -1,6 +1,15 @@
 # NETLAB360 — Repriorización de trabajo técnico/academico por 7 iteraciones restantes
 
-**Fecha de decisión:** 16/10/2026. **Prioridad:** recuperar retraso sin perder pruebas verificadas. **Advertencia:** estos son **hitos internos**, NO fechas oficiales de entrega. El roadmap original S01–S08 y milestones históricos siguen en GitHub hasta que la transcripción/docente permita replanificar fechas aprobadas; no inventar nuevo calendario.
+**Fecha de decisión:** 16/10/2026. **Prioridad:** recuperar retraso sin perder pruebas verificadas. **Advertencia:** estos son **hitos internos**, NO fechas de entrega finales del semestral; los cortes 30/10 y 13/11 SÍ son comunicados. El roadmap original S01–S08 y milestones históricos siguen en GitHub hasta que las fechas reales del semestral sean confirmadas por la docente; no inventar nuevo calendario.
+
+## Fechas académicas ya comunicadas
+
+- **Título del proyecto:** enviar a chat Teams de la asignatura, pendiente verificar entrega/aprobación.
+- **30/10/2026:** primera revisión de borrador (Introducción, Objetivo general y específicos, Planteamiento del problema), en Teams sin diapositivas; representante asignado.
+- **13/11/2026:** segunda revisión (Fundamento técnico y Diseño).
+- **Demostración final EN VIVO**: planificar escenarios recuperables; fecha/duración no comunicadas.
+- **Anexos en archivo ZIP aparte confirmados** junto al informe.
+- **Parcial individual**, plazo 25/10, se realiza fuera del proyecto NETLAB360.
 
 ## Bloqueos eliminados
 
@@ -26,7 +35,7 @@
 2. Trabajar en tandas de varios pasos con checkpoints: estado de Git y red administrativa, modificación mínima, comprobación funcional, rollback, postcheck, commit y evidencias.
 3. Por cada ensayo nuevo crear **un caso de validación apto para demo** con baseline→estímulo→esperado→observado→restauración; actualizar Documento 01 y ZIP de anexos progresivamente, aunque su edición final sea después.
 4. Proteger VMnet8 `ens33 192.168.47.40/24` y gateway `.2`, SSH; evitar cambios al host Windows. Sanitizar credenciales antes de exportar.
-5. **La numeración S02–S08 es de planificación interna, no una exigencia oficial de duración de 7 semanas**. Reajustar en cuanto se conozcan fecha docente, tiempo real para demostración y transcripción.
+5. **La numeración S02–S08 es de planificación interna, no una exigencia oficial de duración de 7 semanas**. Reajustar según fecha final de entrega y duración de defensa todavía no informadas.
 6. Priorizar resultado funcional demostrable frente a número de tecnologías prometidas. Reducir **alcance opcional** si hace falta, pero no borrar compromisos técnicos oficiales ni falsificar pruebas.
 7. Crear/actualizar el PPT **después del cierre del contenido del informe**, no antes, salvo esquema de demo que puede diseñarse previamente.
 
@@ -34,4 +43,4 @@
 
 **S02 / primer sprint de integración:** iniciar Ubuntu tras encendido de VMware, precheck seguro (Docker/netns/ens33/GW/SSH/Git), revisar documentación/scripts ya existentes, diseñar integración HQ–S1–S2 y una ruta de pruebas; NO desplegar o modificar interfaces hasta revisar el plan y conservar recovery. La VM fue apagada limpiamente por el usuario el 16/10; su estado apagada por GUI aún pendiente de observación.
 
-**Estado de documentación:** se espera transcripción de reunión y ejemplo del parcial para resolver criterios de demostración, sin tratar un ejemplo de parcial como rúbrica oficial del semestral.
+**Estado de documentación:** se dispone ya de fechas parciales y se confirmó demostración en vivo; el parcial se trabaja aparte para resolver criterios de demostración, sin tratar un ejemplo de parcial como rúbrica oficial del semestral.
