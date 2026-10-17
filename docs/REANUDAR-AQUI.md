@@ -27,13 +27,13 @@
 
 1. El **título formal ya fue enviado a Teams** (confirmado por el estudiante); esperar observaciones/aprobación de la profesora, sin reenviarlo automáticamente.
 2. Congelar los textos del corte académico **30/10** reutilizando el borrador Word del usuario (introducción, objetivos y planteamiento) y verificar encabezados/citas.
-3. Continuar con integración técnica **S02**: primero verificar precheck seguro y topologías/scripts existentes, luego planear/implementar **HQ–S1–S2** integrada (VLAN, WAN primaria/respaldo, OSPF y servicios) sin cambiar `ens33`.
+3. Continuar integración **S02**: [plan de arquitectura CANDIDATA y precheck de 17/10](sesiones/2026-10-17-s02-integracion-multisede-plan.md). Ubuntu ya fue encendido por el usuario y `git pull --ff-only` confirmó Fast-forward limpio hasta `94339de` antes de los nuevos commits de documentación. **Se debe volver a sincronizar** y ejecutar precheck de solo lectura. S2 permanece `reserved` en IPAM B1; enlaces S2 son propuestas, NO redes ya activas. No modificar `ens33`.
 4. Avanzar simultáneamente el contenido técnico de **Fundamento técnico + Diseño** para revisión **13/11**; registrar evidencias de implementación/pruebas para final.
 5. Posteriormente completar informe, validar ZIP de código, preparar **PowerPoint extraído del informe y demo EN VIVO**; manual técnico posentrega.
 
 **Índice de informe:** [maestro](entregables/01-proyecto-investigacion-maestro.md) · [mapa Word previo](academico/01-migracion-borrador-a-formato-docente.md) · [cronograma técnico](academico/02-plan-operativo-s02-s08-repriorizado.md).
 
-## Arranque seguro Ubuntu (cuando el usuario lo ordene)
+## Arranque seguro Ubuntu / precheck (VM ya encendida por el usuario 17/10)
 
 ```bash
 cd ~/proyectos/netlab360
