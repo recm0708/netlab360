@@ -1,6 +1,6 @@
 # NETLAB360 — Paquete de anexos y demostración académica
 
-**Estado 16/10/2026:** planificado; **NO se ha generado ZIP**, el formato ZIP aún requiere validación de la profesora/reunión. El entregable escrito principal debe ser autocontenido para comprender arquitectura, implementación, pruebas y resultados. No sustituirlo por código suelto.
+**Estado 16/10/2026:** planificado; **NO se ha generado ZIP**, el formato ZIP como adjunto separado confirmado por la profesora. El entregable escrito principal debe ser autocontenido para comprender arquitectura, implementación, pruebas y resultados. No sustituirlo por código suelto.
 
 ## Política para anexos de código completo
 
@@ -22,9 +22,9 @@
 
 ## Presentación oficial: desarrollar DESPUÉS del informe
 
-PowerPoint obligatorio: portada/título; introducción; objetivos; planteamiento del problema; diseño; demostración; conclusión y referencias. Guía docente de 15 páginas visuales orientativas; **no impone 15 diapositivas**. Cantidad y tiempo real aún no confirmados.
+PowerPoint obligatorio: portada/título; introducción; objetivos; planteamiento del problema; diseño; demostración; conclusión y referencias. No existe un número fijo de diapositivas comunicado; el PowerPoint será una síntesis del mismo informe. Para referencias se pueden escoger unas cinco a diez representativas, sin obligación de cantidad exacta. Cantidad y tiempo real aún no confirmados.
 
-La demostración debe explicar **por qué funcionan** los escenarios y contrastar la respuesta esperada con la real. Diseñar un recorrido técnico con fallos seguros:
+**La demostración final debe ser EN VIVO, directamente en el entorno desarrollado.** No basta reproducir imágenes ni videos sin ejecución interactiva. La demostración debe explicar **por qué funcionan** los escenarios y contrastar la respuesta esperada con la real. Diseñar un recorrido técnico con fallos seguros:
 1. Mostrar arquitectura y baseline: sedes, VLAN, dos WAN, NOC.
 2. Generar tráfico cliente VLAN HQ→servicio S1/S2 con pruebas positivas y negativas de ACL.
 3. Interrumpir WAN-P, observar OSPF ruta respaldo, verificar tráfico y NOC/alerta; restaurar y verificar retorno a estado normal.
@@ -35,6 +35,6 @@ La demostración debe explicar **por qué funcionan** los escenarios y contrasta
 
 ## Estado de otras entregas
 
-- OVA: no hay obligación explícita en estos tres PDFs. Su necesidad/fecha quedan por confirmar en transcripción; si la profesora no la exige, la OVA puede ser complemento recomendable, no requisito asumido.
+- OVA: no hay obligación explícita en estos criterios docentes. Su necesidad/fecha quedan por confirmar en transcripción; si la profesora no la exige, la OVA puede ser complemento recomendable, no requisito asumido.
 - Manual técnico 02: **no se entrega ahora**; redacción posentrega/futura conservada en issue #28.
 - El ejemplo del parcial aún no ha sido adjuntado en esta revisión; no usarlo como norma oficial ni afirmar que fue auditado.
