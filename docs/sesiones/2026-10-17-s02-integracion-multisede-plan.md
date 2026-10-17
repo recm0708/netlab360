@@ -71,3 +71,12 @@ El usuario confirmo captura `S02_02_Validacion_IPAM_Tres_Sedes_Cuatro_WAN`; la c
 Archivos añadidos al repositorio: `scripts/automatizacion/render-frr-s02.py` y `tests/test_s02_render_frr.py`. El render genera tres archivos FRR desde el inventario candidato sin interfaces ni Docker. **Antes de ejecutar topologia integrada: pruebas unitarias/compilacion, salida de 3 configs y comprobacion de costos/interfaces y snapshot VMware actualizado confirmado**.
 
 **No confundir** el éxito de IPAM con vecinos OSPF ni con conectividad inter-VLAN/WAN. La construccion y sus fallas controladas siguen pendientes.
+
+
+## Tercer corte — render y predespliegue 17/10/2026 16:08 -05
+
+**COMPROBADO POR SALIDAS DE USUARIO:** commit local `6db0fab` sincronizado; Python compila sin errores; cuatro tests de `test_s02_render_frr.py` `OK`; generador FRR produce R-HQ `1037` bytes, R-S1 `758`, R-S2 `758` en `~/netlab360-bootstrap/s02/rendered` (archivos candidatos, no red viva). Hashes SHA256: HQ `8fcc1e756c7ad026a5dfdbdf9fc0b65ec8841e9de494fe0fe543383ba2b2ac36`, S1 `345eb21fdf66c16b82c2e3b294b5c278553232907606468a02b776f8f82ad036`, S2 `7bfb8be5d642b9c52bc628af24eb238b7b445dfc0aa3ea898badfec484f4e917`. Auditoría estática: HQ 3 VLAN y 4 WAN, S1/S2 3 VLAN y 2 WAN cada una; costos OSPF principal 10/respaldo 100 verificados. S02 IPAM en Ubuntu sigue 3 sedes/9 VLAN/4 WAN/17 redes y cero solapamientos con rutas Ubuntu y Docker. `ens33=192.168.47.40/24`, gateway `.2`, cero contenedores/netns, Git limpio. **El usuario confirmó creación de instantánea VMware**; nombre y opciones no observados directamente.
+
+**ATENCIÓN antes de redes reales:** `systemctl is-active docker ssh open-vm-tools` devolvió `active\ninactive\nactive` en 16:08, pese a sesión SSH preexistente funcional. Puede ser `ssh.socket` activo con `ssh.service` inactivo por systemd socket activation; **se debe probar, no asumir**. Primero consultar ssh.service/ssh.socket/listener/sshd -t y abrir segunda conexión nueva desde PowerShell manteniendo la actual abierta. No desplegar/ejecutar `up` hasta confirmar disponibilidad de acceso o recuperación vía consola VMware. **PasswordAuthentication yes** era pendiente histórico; no endurecerlo durante pruebas de integración.
+
+**Próxima evidencia:** `S02_03_Configuraciones_FRR_Tres_Sedes_Candidatas` (salida compacta de hash/OSPF/VLAN/generador), únicamente al validar acceso SSH y resultado del precheck. Captura física no presente en repo.
