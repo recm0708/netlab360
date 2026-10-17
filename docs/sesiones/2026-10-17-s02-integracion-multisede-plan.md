@@ -36,3 +36,18 @@
 7. Actualizar Informe ÚNICO (7 Implementación, 8 Pruebas, 9 Análisis) y issues técnicas. No cerrar S01/S02 ni afirmar integración S2 antes de éxito medido.
 
 **Próximo paso exacto del usuario:** ejecutar la tanda de precheck (sin despliegue ni cambios de red) y remitir los resultados. Se decidirá entonces la asignación definitiva de nuevos enlaces y el diseño del script S02.
+
+
+## Actualizacion de comprobaciones recibidas — 17/10/2026, 15:31 -05
+
+El usuario ejecuto precheck por SSH, compartio salidas de terminal y confirmo captura `S02_01_Precheck_Inicial_Integracion_Multisede`.
+
+- `git pull --ff-only`: commit `527ca35`, limpio `main...origin/main` al momento de la prueba.
+- `ens33=192.168.47.40/24`; default via `192.168.47.2`; Docker 0 contenedores; 0 namespaces; docker/ssh/open-vm-tools activos; `systemctl --failed` 0.
+- Recursos 15 GiB totales / ~13 GiB disponibles, disco ~135 GB disponible.
+- `RESULTADO_PRECHECK_S02=0`, validador B1 `RESULTADO_IPAM=0`, sintaxis Bash `RESULTADO_SINTAXIS_LABS=0`, FRR imagen local `quay.io/frrouting/frr:10.7.1` amd64.
+- Se intento una comprobacion manual de colisiones WAN S2, pero **fallo su propio codigo** con `TypeError: 'NoneType' object is not iterable` al recorrer `Docker IPAM.Config=null` para redes sin prefijos. **Esta comprobacion NO permite declarar aun libres las subredes S2**. La captura S02_01 es valida como precheck B1, **no acredita colisiones S02**.
+- Se creo `inventario/ipam/topologia-s02.yaml` (candidato, esquema 0.2), `scripts/validacion/validar-ipam-s02.py` y `tests/test_s02_ipam.py` para corregir el manejo `null`, proteger VMnet8 y validar solapamientos de S02 con rutas Ubuntu/Docker. **No desplegado y sin resultados de ejecucion sobre Ubuntu en esta etapa**.
+- **Proxima verificacion del usuario**: pull, compilacion Python, tests unitarios, validacion estatica y live del IPAM candidato; revisar rutas IPv4 Windows/VMware/VPN antes de aprobar los dos /30 de HQ-S2.
+
+**Estado:** S02_01 CAPTURADA y precheck B1=OK; IPAM candidato S02 CREADO pero VALIDACION LIVE PENDIENTE. No se marcaran redes como activas ni se capturara evidencia falsamente exitosa.
