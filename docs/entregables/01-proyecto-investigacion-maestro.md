@@ -1,73 +1,51 @@
-# NETLAB360 — Documento 01: Diseño, desarrollo y evaluación del proyecto
+# NETLAB360 — Índice maestro OFICIAL del informe final académico-técnico
 
-**Índice V0.2 APROBADO por el usuario el 14/10/2026, sujeto a indicaciones futuras de la profesora.** Documento académico ÚNICO, acumulativo desde S01 hasta la última fase efectivamente completada. **La portada institucional la prepara el usuario**. Índice general automático único en Word. Redacción académica desde el trabajo del equipo y referencias APA 7 que efectivamente se citan.
+**Vigente desde 16/10/2026, REV0.3.** ÚNICO informe escrito requerido por las guías oficiales: **mínimo 40 páginas**. Portada institucional por el usuario. Estructura derivada de `1457-Formato Proyecto Final.pdf` y desarrollada con `1457-Elaboración del Trabajo Escrito.pdf`. El usuario preparó ya un borrador PDF de **65 páginas** bajo numeración previa; **se debe migrar sin perder contenido**, no destruir ni recrear desde cero.
 
-## Preliminares
-- Portada de la institución (responsabilidad del usuario).
-- Resumen y palabras clave; sintetizar alcance comprobado, metodología y resultados del **corte final**, actualizable durante el semestre.
-- Índice general automático único.
+**Título formal de portada:** NETLAB360: Diseño e implementación de una plataforma virtualizada para la automatización, observabilidad y diagnóstico de redes empresariales multisede.
+**Encabezado abreviado:** NETLAB360 | Redes Empresariales Multisede.
 
-## Índice general propuesto
+## Orden exigido por la profesora
 
-1. **Introducción.** Presentación del proyecto, motivación y vínculo entre redes multisede, automatización, observabilidad y diagnóstico; anticipar lo que se ha implementado, sin prometer que lo futuro funciona.
-2. **Planteamiento del problema.**
-   - 2.1 Contexto y situación problemática.
-   - 2.2 Problema que busca atender NETLAB360.
-   - 2.3 Pregunta orientadora del proyecto.
-3. **Justificación.**
-   - 3.1 Justificación técnica.
-   - 3.2 Justificación académica y formativa.
-   - 3.3 Viabilidad y beneficios esperados, diferenciados de beneficios probados.
-4. **Objetivos del proyecto.**
-   - 4.1 Objetivo general único.
-   - 4.2 Objetivos específicos medibles, adaptables al corte real del proyecto.
-5. **Alcance, delimitaciones y requisitos.**
-   - 5.1 Alcance funcional de la plataforma.
-   - 5.2 Alcance del prototipo virtualizado y supuestos.
-   - 5.3 Requisitos funcionales y no funcionales.
-   - 5.4 Delimitaciones, riesgos y criterios de aceptación.
-6. **Marco teórico y tecnológico.** Integrar fuentes verificadas APA7 en cada tópico:
-   - 6.1 Virtualización, redes virtuales y contenedores.
-   - 6.2 Redes empresariales multisede, VLAN y switching 802.1Q.
-   - 6.3 Enrutamiento dinámico, OSPF y redundancia de WAN.
-   - 6.4 Agregación de enlaces LACP y active-backup.
-   - 6.5 Source of Truth, infraestructura como código y automatización (OpenTofu/Ansible).
-   - 6.6 Observabilidad, métricas, telemetría, Prometheus y alertas.
-   - 6.7 Diagnóstico por reglas, análisis de datos y fundamentos de AIOps; añadir modelos ML SOLO cuando existan implementados/evaluados.
-   - 6.8 Nuevas tecnologías realmente incorporadas en fases posteriores (no rellenar anticipadamente).
-7. **Metodología de diseño, implementación y evaluación.**
-   - 7.1 Enfoque incremental, fases y gestión de cambios.
-   - 7.2 Selección de herramientas y entorno controlado.
-   - 7.3 Procedimiento de precheck, ejecución, medición y postcheck.
-   - 7.4 Gestión de riesgos, calidad, trazabilidad y tratamiento de evidencias.
-8. **Diseño y arquitectura de NETLAB360.**
-   - 8.1 Arquitectura general y componentes.
-   - 8.2 Topología de sedes HQ, S1 y sedes incorporadas.
-   - 8.3 Plan de direccionamiento, VLAN, WAN y segmentación de gestión.
-   - 8.4 Arquitectura de automatización, NOC, telemetría y analítica.
-   - 8.5 Decisiones de arquitectura y justificación.
-9. **Desarrollo del proyecto y decisiones técnicas.** Organizar en subcapítulos por las fases **realmente ejecutadas**; no crear ocho informes separados.
-   - 9.1 Fase S01 — Preparación inicial y arquitectura de referencia, IPAM, pruebas de segmentación, FRRouting/OSPF, redundancia virtual, IaC inicial, observabilidad y diagnóstico de referencia.
-   - 9.2 Fases posteriores **realmente completadas**, añadidas secuencialmente hasta el corte final; no reservar capítulos vacíos en el documento que se entregue.
-   - **Dentro de cada subcapítulo correspondiente, integrar incidentes técnicos REALES y mitigaciones pertinentes**: contexto, síntoma, impacto, causa comprobada (o hipótesis señalada), decisión correctiva y verificación de la resolución. NO recopilar errores personales ni relegarlos a un anexo de incidentes.
-10. **Resultados obtenidos y evaluación.**
-    - 10.1 Resultados técnicos por criterio/objetivo, métricas y evidencias.
-    - 10.2 Comparación diseño previsto–resultado realmente probado.
-    - 10.3 Valoración de seguridad, reproducibilidad y cobertura funcional.
-11. **Discusión y limitaciones.** Interpretación crítica, consideraciones de validez interna, restricciones reales y oportunidades de evolución justificadas.
-12. **Recomendaciones.** Acciones recomendadas a partir de hallazgos, sin afirmar que ya fueron implementadas.
-13. **Conclusiones.** Cumplimiento de objetivos del alcance final, síntesis respaldada por evidencia.
-14. **Referencias.** Lista única APA 7 de todas y sólo las fuentes externas citadas dentro del documento.
-15. **Anexos, únicamente si resultan necesarios.** Diagramas de lectura compleja, matrices extensas o inventarios; no desviar aquí las mitigaciones.
+1. **Portada:** UTP, facultad, carrera, asignatura, título, integrantes **nombre y cédula**, profesor, fecha.
+2. **Introducción:** contexto, importancia en redes actuales, síntesis de problema y solución implementada. Sin comandos.
+3. **Objetivos:**
+   - Objetivo general: verbo en infinitivo, finalidad y resultado medible.
+   - Objetivos específicos: diseño→implementación→comprobación, resultados verificables y vinculados con las pruebas.
+4. **Planteamiento del problema:**
+   - Situación y necesidad concreta.
+   - Impacto, consecuencias y limitaciones.
+   - Justificación de la solución propuesta; aquí se traslada la anterior sección de justificación separada.
+5. **Fundamento técnico:** tecnologías efectivamente usadas y justificación de selección; VMware/Ubuntu, contenedores/netns, VLAN/802.1Q, ACL, FRR/OSPF doble WAN, LACP/bonding, SoT/IPAM, OpenTofu/Ansible, Prometheus/NOC y diagnóstico por reglas. Fuentes bibliográficas oficiales APA7. Evitar historia genérica inconexa.
+6. **Diseño de la solución:**
+   - Arquitectura lógica por sedes HQ/S1/S2 (S2 reservada hasta implementación), red de gestión VMnet8 aislada.
+   - Componentes/roles, topología general, subredes/VLAN, dos enlaces WAN, protocolos, políticas, flujos.
+   - Planos lógico/funcional de automatización, telemetría y analítica; figuras con nota que distingan diseño de práctica.
+7. **Implementación:**
+   - Entorno anfitrión, VM Ubuntu Desktop, recursos, SO, versiones verificadas, SSH y protección de gestión.
+   - Secuencia de construcción REAL: inventario/IPAM→VLAN/ACL→routers FRR/OSPF→WAN/LACP/bonding→IaC/Ansible→telemetría/NOC→diagnóstico y siguientes módulos integrados.
+   - Explicar las **configuraciones principales y scripts** (entradas, lógica, salidas pertinentes, criterios de reversión) con fragmentos imprescindibles y nombre/ruta de archivos; código completo al anexo, si se autoriza ZIP.
+   - No narrar cada comando de error del operador.
+8. **Pruebas y validación:**
+   - Baseline de cada escenario; objetivo y condiciones.
+   - Resultado esperado; evento inducido (normal, falla o recuperación); **resultado observado cuantificado** y evidencia.
+   - Pruebas de WAN primario/respaldo/restaurado, ACL permitida/denegada, LACP dos→uno→dos, IaC idempotencia/drift de archivos, alertas firing/resueltas, datos B4 y postchecks.
+   - Distinguir pruebas de subtopologías S01 de futuras pruebas de extremo a extremo. Figuras/tablas preámbulo y nota APA7.
+9. **Análisis de resultados:**
+   - Comparación de lo esperado contra lo realmente conseguido, precisión/limitación de métricas.
+   - **Problemas técnicos reales y mitigación** (p. ej. espera FIB después de OSPF Full; reglas Prometheus que no cargaban por ruta relativa), verificación correctiva, sin inventar causalidad.
+   - Limitaciones: S2 no desplegada a la fecha del corte, falta L2→WAN en topología única, LACP virtual ≠ duplicación física, reglas deterministas ≠ IA evaluada, OVA no comprobada.
+   - Mejoras priorizadas solo cuando respaldadas.
+10. **Conclusiones y recomendaciones:** cumplimiento de objetivos, síntesis probada y recomendaciones específicas coherentes con estado final; evitar conclusiones anticipadas sobre capacidades pendientes.
+11. **Referencias:** UN único listado APA7 de fuentes citadas, revisión bidireccional cita/referencia.
+12. **Anexos:** descripción del paquete de fuentes/configuraciones/logs y evidencias, listado de archivos, versiones, SHA256 y modo de verificación; si la profesora admite ZIP separado, aportar índice dentro del escrito y ZIP físico fuera.
 
-## Reglas editoriales específicas del Documento 01
+## Reglas de actualización
 
-- Redactar como producto del equipo: «el equipo implementó», «se verificó», «se estableció», «nuestra propuesta» cuando corresponda. No voz de IA, tampoco confesiones personales.
-- Documentar incidentes técnicos reales durante el desarrollo **inmediatamente después del procedimiento/decisión afectado**, sin reescribir comandos completos ni narrar descuidos de operador. Marcar las causas no demostradas como hipótesis, no certezas.
-- Explicar POR QUÉ se eligieron configuraciones y qué resultados se obtuvieron; comandos paso a paso y guía de usuario van al Documento 02.
-- Figuras y tablas con preámbulo y referencia textual previa, título, número y **Nota.** si es pertinente; numeración continua.
-- S01: distinguir que las pruebas L2, OSPF, LACP, bonding, IaC y B4 se desarrollaron en subtopologías o sesiones diferentes; no presentar como arquitectura única integrada si no se validó.
-- En caso de que el semestre se cierre en la última fase completada (p. ej. S06), escribir el documento final con **cobertura real S01–S06**, sin anexar subcapítulos ficticios S07/S08 ni mentir sobre planes históricos o exigencias docentes.
-- Cotejar y aprobar referencias antes de introducir citas APA7; no inventar bibliografía.
+- No insertar ocho documentos dentro de uno. Agregar progreso de fases bajo 7 Implementación, 8 Pruebas, 9 Análisis; actualizar diseño y fundamentos solo si cambian tecnologías reales.
+- **No alterar directamente la copia Word institucional de usuario.** Proporcionar bloques de revisión para migrar secciones; respetar numeración de figuras/tablas hasta cotejar DOCX/PDF vigente.
+- Reporte S01 actual: base técnica aprovechable con 86 PNG/7 CSV, CI 24/24. **Quedan secciones 7 y 8 por ampliar** y orden 1–12 por ajustar. No afirmar informe final aprobado.
+- Los criterios anteriores C01–C11 son **matriz interna**, no rúbrica oficial; la guía no los enumera como tales.
+- Presentación después de cerrar informe y pruebas; manual técnico 02 **pospuesto para uso posterior**.
 
-**Índices aprobados.** La redacción comenzará cuando el usuario indique «comencemos»; primera sección: 1. Introducción.
+**Cruces:** [requisitos oficiales](../academico/00-requisitos-oficiales-2026-10-16.md) · [plan de migración](../academico/01-migracion-borrador-a-formato-docente.md) · [paquete de anexos/demostración](../academico/03-anexos-y-demostracion.md).
