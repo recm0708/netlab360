@@ -1,24 +1,21 @@
-# S01 — MVP transversal y viabilidad: backlog vigente
+# S01 — Prototipo inicial validado (registro de continuidad, 16/10)
 
-**Plan interno inicial:** 5–11/10/2026. **Último corte técnico:** 13/10/2026 23:35 Panamá. **Estado S01:** ABIERTA; **72/100 puntos internos**, no nota de docente ni criterio aprobado. El desfase calendario y reparto de requisitos pendientes requieren confirmación de guía oficial en [#36](https://github.com/recm0708/netlab360/issues/36).
+**Período del plan interno original:** 5–11/10/2026. **Estado de issue #1:** ABIERTA por alcance integral pendiente, aunque los experimentos base están documentados. **72/100** corresponde a puntaje histórico de gestión, NO aceptación/nota docente ni criterio que bloquee S02.
 
-## Logros demostrados
-- Base virtualizada operativa y segura; IPAM draft validado, tres sedes previstas con HQ–S1 bajo ensayo.
-- VLAN 802.1Q, router-on-stick, ACL HTTP y HTTP de sedes por WAN dual probados en subtopologías separadas.
-- FRR/OSPF Full y failover WAN-P→WAN-B→WAN-P, LACP 2→1→2, virtual active-backup.
-- SoT/OpenTofu/Ansible→FRR B2 realmente usado, idempotencia y drift en copias.
-- API/exporter, NOC inicial, scrape Prometheus y alertas firing/resueltas.
-- Perfil B4 y reglas deterministas de 76 ICMP y 12 eventos en sesiones distintas; no ML evaluado.
-- 86 PNG, siete CSV SHA, 24 pruebas Python, CI exitosa y host sin residuos.
+## Funciones demostradas S01
+- VM Ubuntu Desktop VMware/SSH/VMnet8 y red gestión protegida; hardening SSH servidor pendiente.
+- IPAM HQ/S1 y S2 reservada, nueve VLAN previstas y WAN doble.
+- VLAN/ACL intra-HQ; FRR/OSPF+HTTP HQ→S1 en otra topología con WAN-P→WAN-B→WAN-P.
+- LACP 2→1→2 y active-backup virtual; no redundancia real de equipo/servidor ni benchmark capacidad.
+- SoT→OpenTofu metadata→Ansible→FRR vivo, drift reconciliado en COPIAS candidatos.
+- Exporter/NOC inicial y Prometheus con alertas firing/resueltas.
+- B4 estadística/reglas sobre 76 ICMP + 12 eventos de sesiones diferentes, sin ML entrenado.
+- 86 PNG/7 CSV SHA256, 24 tests/CI correctas; apagado ordenado de VM registrado.
 
-## Criterios integrales NO cerrados
-El issue [#1](https://github.com/recm0708/netlab360/issues/1) conserva once criterios originales, detallados con evidencia y brechas en [matriz canónica](../../docs/control/03-matriz-aceptacion-y-decisions-s01.md). Ningún criterio integral se aprueba por un solo componente de laboratorio. IaC avanzada aparece también en S03 y ML en S06; la rúbrica docente decidirá si se exige antes.
+## Norma docente y nueva política
+Tres guías oficiales recibidas 16/10: **UN informe escrito >=40 páginas** con 12 apartados, PowerPoint y demostración final. Código y configuraciones en anexos; ZIP separado pendiente validación. El manuscrito institucional S01 previo tiene 65 páginas y será **reorganizado**, no descartado. **Manual 02 diferido a después**.
 
-## Orden vigente
-1. Definir estructura editorial definitiva y dos documentos maestros consolidados, uno académico y otro de instalación/uso en la plantilla institucional.
-2. Redactar S01 del proyecto académico (incidentes reales) y del manual técnico integral (instalación desde cero, operación y solución preventiva de problemas), con capturas y citas verificadas.
-3. Obtener guía/rúbrica docente, definición exacta de entrega de S01, extensión y obligatoriedad de OVA/ML.
-4. Cubrir sólo brechas técnicas exigidas por esa rúbrica, con una prueba integrada por criterio y pre/postcheck.
-5. Sanitizar/validar exportación/reimportación de VM si obligatoria, versionar release y cerrar issues al cumplir requisitos.
+## Camino para recuperar desfase
+No bloquear S02 por manual ni por un Word inconcluso; S01 queda en seguimiento para requisitos transversales pendientes. [Plan reordenado S02–S08](../../docs/academico/02-plan-operativo-s02-s08-repriorizado.md). Próximo esfuerzo: integración real HQ–S1–S2, cliente VLAN→dos WAN→servicios, seguridad/monitoreo y casos de demo con baseline esperado/real. La transcripción futura definirá calendarios y límites.
 
-**No comenzar fase S02 mientras el usuario no apruebe documentos y cierre S01.** Referencia [checkpoint](../../docs/REANUDAR-AQUI.md). Los relatos cronológicos antiguos siguen en Git y `docs/sesiones`.
+**No repetir pruebas aprobadas por capturas ni reejecutar IaC destructivo.** Red de gestión ens33 .40/24/GW .2 intacta.
