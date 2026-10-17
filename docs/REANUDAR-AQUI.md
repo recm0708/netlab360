@@ -1,3 +1,5 @@
+> **NUEVO PRECHECK 17/10/2026, 16:08 (-05):** render FRR 3/3 correcto y unit tests 4/4, snapshot VMware confirmado por usuario. SSH.service **inactive** (Docker/open-vm-tools active) pese a sesión SSH ya abierta. Antes del despliegue S02 verificar `ssh.socket`, `sshd -t`, listener y **nueva sesión SSH independiente**. No reiniciar ni cambiar daemon SSH ni modificar ens33 sin consola VMware. [Registro completo](sesiones/2026-10-17-s02-integracion-multisede-plan.md). GitHub avanzado después del commit Ubuntu `6db0fab`: sincronizar antes de siguiente prueba.
+
 # NETLAB360 — REANUDAR AQUÍ (17/10/2026)
 
 ## Decisiones y fechas efectivas
