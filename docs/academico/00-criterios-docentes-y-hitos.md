@@ -23,8 +23,8 @@
 
 ## Entrega del título (prioridad inmediata)
 
-- El grupo debe **enviar al chat de Teams** de la asignatura el título propuesto para revisión de la profesora. La indicación oral fue reiterada el 16/10/2026. **No está verificado** que el grupo NETLAB360 ya lo haya enviado ni que el título haya sido aprobado.
-- La docente indicó que revisaría lo recibido y comunicaría eventuales ajustes del **título** durante el fin de semana o el lunes siguiente. Mantener título formal propuesto **sujeto a su respuesta**, no alterar plataforma/nombre interno por una sugerencia editorial.
+- **Envío del título a Teams CONFIRMADO por el estudiante el 17/10/2026**, título comunicado: «Diseño e implementación de una plataforma virtualizada para la automatización, observabilidad y diagnóstico de redes empresariales multisede». **Aprobación u observaciones de la profesora todavía pendientes**. NETLAB360 sigue siendo el nombre técnico de la plataforma y encabezado abreviado; no añadirlo retroactivamente al mensaje enviado.
+- La docente indicó que revisaría lo recibido y comunicaría eventuales ajustes del **título** durante el fin de semana o el lunes siguiente. Mantener el título realmente comunicado **sujeto a su respuesta**, no alterar plataforma/nombre interno por una sugerencia editorial.
 
 ## Entregas parciales del proyecto (fecha y alcance definidos)
 
