@@ -6,7 +6,7 @@
 
 **Proyecto final grupal:**
 1. **UN informe académico-técnico** (>=40 páginas), 12 apartados: Portada; Introducción; Objetivos; Planteamiento del problema; Fundamento técnico; Diseño; Implementación; Pruebas y validación; Análisis de resultados; Conclusiones y recomendaciones; Referencias; Anexos.
-2. **Título propuesto enviado al chat Teams** es requisito previo a revisión docente; **envío y aprobación de NETLAB360 NO verificados**. Consultar al usuario antes de afirmar que se presentó.
+2. **El estudiante confirmó el 17/10 que el título fue enviado al chat Teams**. **La aprobación/revisión docente continúa pendiente**. Consultar al usuario antes de afirmar que se presentó.
 3. **30/10/2026**: mostrar en **Teams** el borrador con **introducción, objetivo general/específicos y planteamiento del problema**, mediante **representante del grupo**. No se pide presentación PowerPoint para este corte.
 4. **13/11/2026**: mostrar avance con **fundamento técnico y diseño de la solución**, continuidad del mismo documento.
 5. **Anexos técnicos en archivo separado permitidos expresamente**, presentados junto con informe. Crear ZIP solo con archivos propios del proyecto y manifiesto SHA256; no confundir autorización de formato con aprobación de un ZIP ya construido.
@@ -25,7 +25,7 @@
 
 ## Ruta de trabajo inmediata
 
-1. Confirmar con el equipo si el **título formal fue enviado a Teams** y si la profesora realizó observaciones; preparar mensaje de título si falta.
+1. El **título formal ya fue enviado a Teams** (confirmado por el estudiante); esperar observaciones/aprobación de la profesora, sin reenviarlo automáticamente.
 2. Congelar los textos del corte académico **30/10** reutilizando el borrador Word del usuario (introducción, objetivos y planteamiento) y verificar encabezados/citas.
 3. Continuar con integración técnica **S02**: primero verificar precheck seguro y topologías/scripts existentes, luego planear/implementar **HQ–S1–S2** integrada (VLAN, WAN primaria/respaldo, OSPF y servicios) sin cambiar `ens33`.
 4. Avanzar simultáneamente el contenido técnico de **Fundamento técnico + Diseño** para revisión **13/11**; registrar evidencias de implementación/pruebas para final.
