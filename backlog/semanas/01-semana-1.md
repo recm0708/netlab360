@@ -13,9 +13,12 @@
 - 86 PNG/7 CSV SHA256, 24 tests/CI correctas; apagado ordenado de VM registrado.
 
 ## Norma docente y nueva política
-Tres guías oficiales recibidas 16/10: **UN informe escrito >=40 páginas** con 12 apartados, PowerPoint y demostración final. Código y configuraciones en anexos; ZIP separado pendiente validación. El manuscrito institucional S01 previo tiene 65 páginas y será **reorganizado**, no descartado. **Manual 02 diferido a después**.
+Tres criterios académicos vigentes al 17/10: **UN informe escrito >=40 páginas** con 12 apartados, PowerPoint y demostración final. Código y configuraciones en anexos; ZIP externo autorizado junto con el informe. El manuscrito institucional S01 previo tiene 65 páginas y será **reorganizado**, no descartado. **Manual 02 diferido a después**.
 
 ## Camino para recuperar desfase
 No bloquear S02 por manual ni por un Word inconcluso; S01 queda en seguimiento para requisitos transversales pendientes. [Plan reordenado S02–S08](../../docs/academico/02-plan-operativo-s02-s08-repriorizado.md). Próximo esfuerzo: integración real HQ–S1–S2, cliente VLAN→dos WAN→servicios, seguridad/monitoreo y casos de demo con baseline esperado/real. La transcripción futura definirá calendarios y límites.
 
 **No repetir pruebas aprobadas por capturas ni reejecutar IaC destructivo.** Red de gestión ens33 .40/24/GW .2 intacta.
+
+
+**Corte académico obligatorio durante el proyecto:** título al chat Teams, primera revisión **30/10/2026** (Introducción, Objetivos, Planteamiento), segunda revisión **13/11/2026** (Fundamento técnico y Diseño). Ambas muestran el **mismo borrador en Teams**, representante designado; no requieren diapositivas. ZIP de anexos externos autorizado con el informe, demo final EN VIVO. [Criterios aplicables](../../docs/academico/00-criterios-docentes-y-hitos.md).
