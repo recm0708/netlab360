@@ -1,6 +1,6 @@
 # NETLAB360 — Índice maestro OFICIAL del informe final académico-técnico
 
-**Vigente desde 16/10/2026, REV0.3.** ÚNICO informe escrito requerido por las guías oficiales: **mínimo 40 páginas**. Portada institucional por el usuario. Estructura derivada de `1457-Formato Proyecto Final.pdf` y desarrollada con `1457-Elaboración del Trabajo Escrito.pdf`. El usuario preparó ya un borrador PDF de **65 páginas** bajo numeración previa; **se debe migrar sin perder contenido**, no destruir ni recrear desde cero.
+**Vigente desde 16/10/2026, REV0.3.** ÚNICO informe escrito requerido por las guías oficiales: **mínimo 40 páginas**. Portada institucional por el usuario. Estructura derivada de `1457-Formato Proyecto Final.pdf` y desarrollada con `1457-Elaboración del Trabajo Escrito.pdf`. El usuario preparó ya un borrador académico de **65 páginas** bajo numeración previa; **se debe migrar sin perder contenido**, no destruir ni recrear desde cero.
 
 **Título formal de portada:** NETLAB360: Diseño e implementación de una plataforma virtualizada para la automatización, observabilidad y diagnóstico de redes empresariales multisede.
 **Encabezado abreviado:** NETLAB360 | Redes Empresariales Multisede.
@@ -24,7 +24,7 @@
 7. **Implementación:**
    - Entorno anfitrión, VM Ubuntu Desktop, recursos, SO, versiones verificadas, SSH y protección de gestión.
    - Secuencia de construcción REAL: inventario/IPAM→VLAN/ACL→routers FRR/OSPF→WAN/LACP/bonding→IaC/Ansible→telemetría/NOC→diagnóstico y siguientes módulos integrados.
-   - Explicar las **configuraciones principales y scripts** (entradas, lógica, salidas pertinentes, criterios de reversión) con fragmentos imprescindibles y nombre/ruta de archivos; código completo al anexo, si se autoriza ZIP.
+   - Explicar las **configuraciones principales y scripts** (entradas, lógica, salidas pertinentes, criterios de reversión) con fragmentos imprescindibles y nombre/ruta de archivos; código completo al anexo, mediante ZIP autorizado.
    - No narrar cada comando de error del operador.
 8. **Pruebas y validación:**
    - Baseline de cada escenario; objetivo y condiciones.
@@ -48,4 +48,12 @@
 - Los criterios anteriores C01–C11 son **matriz interna**, no rúbrica oficial; la guía no los enumera como tales.
 - Presentación después de cerrar informe y pruebas; manual técnico 02 **pospuesto para uso posterior**.
 
-**Cruces:** [requisitos oficiales](../academico/00-requisitos-oficiales-2026-10-16.md) · [plan de migración](../academico/01-migracion-borrador-a-formato-docente.md) · [paquete de anexos/demostración](../academico/03-anexos-y-demostracion.md).
+**Cruces:** [requisitos oficiales](../academico/00-criterios-docentes-y-hitos.md) · [plan de migración](../academico/01-migracion-borrador-a-formato-docente.md) · [paquete de anexos/demostración](../academico/03-anexos-y-demostracion.md).
+
+
+## Control de entregas parciales (17/10/2026)
+
+- **Título del semestral:** enviar al chat Teams, documentar respuesta y ajuste si la docente lo solicita. **Estado de envío no confirmado**, issue #46.
+- **30/10/2026:** mostrar en Teams borrador institucional de Introducción, Objetivos y Planteamiento del problema, **sin diapositivas**. Responsable del grupo a designar (#47).
+- **13/11/2026:** presentar fundamento técnico y diseño del mismo informe (#48).
+- **Anexos por separado autorizados**; preparar ZIP de solo código/evidencias propias, sin documentos recibidos de clase ni secretos. Presentación final **EN VIVO** y posterior al informe.
