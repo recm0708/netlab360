@@ -1,4 +1,4 @@
-> **NORMA DOCENTE POSTERIOR, 16/10/2026:** esta matriz se conserva como **inventario histórico de dependencias S01**. Toda referencia a «dos documentos maestros» ya fue sustituida: la profesora exige **UN informe final >=40 páginas** y PPT+demostración; Manual 02 pospuesto. Fuente normativa actual: [guía 1457](../academico/00-requisitos-oficiales-2026-10-16.md). Las versiones de herramientas mostradas son las observadas al corte técnico y requieren nueva verificación cuando se reinicie la VM.
+> **NORMA DOCENTE POSTERIOR, 16/10/2026:** esta matriz se conserva como **inventario histórico de dependencias S01**. Toda referencia a «dos documentos maestros» ya fue sustituida: la profesora exige **UN informe final >=40 páginas** y PPT+demostración; Manual 02 pospuesto. Fuente normativa actual: [guía 1457](../academico/00-criterios-docentes-y-hitos.md). Las versiones de herramientas mostradas son las observadas al corte técnico y requieren nueva verificación cuando se reinicie la VM.
 
 # NETLAB360 — Matriz vigente de dependencias S01
 
