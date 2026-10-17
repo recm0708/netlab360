@@ -1,34 +1,37 @@
-# NETLAB360 — Plataforma Virtualizada de Redes Multisede
+# NETLAB360 — Plataforma Virtualizada de Redes Empresariales Multisede
 
-**Fecha de replanificación:** 16/10/2026. **Normativa docente recibida:** guías 1457 del informe final, elaboración escrita y presentación/demostración. [REQUISITOS OFICIALES](docs/academico/00-requisitos-oficiales-2026-10-16.md). Resumen + SHA-256 de los tres PDF; binarios originales en adjuntos de conversación, **NO en GitHub**.
+**Control del proyecto actualizado: 17/10/2026.** En este repositorio se almacenan **solo instrucciones de trabajo adaptadas al proyecto, configuraciones, scripts, pruebas y evidencias PROPIAS de NETLAB360**. No publicar materiales recibidos de la profesora (guías, documentos, grabaciones ni transcripciones), ni archivos o hashes de esos materiales. [Criterios y calendario aplicables](docs/academico/00-criterios-docentes-y-hitos.md).
 
-## Entregables vigentes y prioridad
+## Entrega semestral y fechas de control
 
-1. **UN informe escrito académico-técnico obligatorio, mínimo 40 páginas**, siguiendo exactamente 12 apartados: Portada; Introducción; Objetivos; Planteamiento del problema; Fundamento técnico; Diseño; Implementación; Pruebas y validación; Análisis de resultados; Conclusiones y recomendaciones; Referencias; Anexos. Ya existe un borrador institucional S01 de **65 páginas** que será **reordenado y ampliado**, NO eliminado. [Índice maestro oficial](docs/entregables/01-proyecto-investigacion-maestro.md).
-2. **Presentación PowerPoint y demostración obligatoria** después de completar el informe; no basta mostrar «funciona», hay que comprobar baseline/falla/recuperación con explicación técnica. [Issue #44](https://github.com/recm0708/netlab360/issues/44).
-3. **Anexos técnicos** con código, configuraciones y evidencias pertinentes. El usuario propone ZIP separado (con SHA256), **sujeto a confirmación de aceptación docente**; no consta como formato obligatorio en los PDF. [Issue #45](https://github.com/recm0708/netlab360/issues/45).
-4. **Manual técnico 02 POSPUESTO** para después del proyecto, **no entregable oficial**; se conserva su trazabilidad en [issue #28](https://github.com/recm0708/netlab360/issues/28).
+- **Un solo informe académico-técnico de mínimo 40 páginas**, con 12 apartados en orden. [Índice maestro](docs/entregables/01-proyecto-investigacion-maestro.md). Borrador previo de 65 páginas del estudiante se reorganizará y ampliará, **sin recrearlo desde cero**.
+- **Título propuesto en Teams**: enviar al chat de la asignatura y esperar aprobación/ajuste del docente. **Estado de envío/aprobación del grupo por confirmar**.
+- **30/10/2026**: revisión grupal del borrador de **introducción, objetivo general y específicos, planteamiento del problema**. Mostrar **el documento en Teams**, sin PowerPoint especial. Designar un representante del grupo.
+- **13/11/2026**: revisión grupal de **fundamento técnico y diseño de la solución**.
+- **Anexos técnicos en archivo aparte AUTORIZADOS** junto con el informe. Se preparará ZIP de configuraciones/código/evidencias del proyecto con README, índice e integridad SHA256, excluyendo secretos y archivos ajenos. [Paquete de anexos](docs/academico/03-anexos-y-demostracion.md) · [#45](https://github.com/recm0708/netlab360/issues/45).
+- **Presentación y demostración EN VIVO obligatoria** sobre infraestructura funcional, en fecha final aún no comunicada: PowerPoint derivado del informe, estados normal/falla/recuperación explicados. [#44](https://github.com/recm0708/netlab360/issues/44).
+- **Manual técnico integral 02 POSPUESTO** para después de la entrega y funcionamiento; no es obligatorio ahora ni bloquea el plan. [#28](https://github.com/recm0708/netlab360/issues/28).
+- **Parcial 1 / Laboratorio 5** es actividad individual distinta, hasta 25/10; se gestiona en **otro chat** y no se incorpora como obligación ni evidencia del semestral.
 
-## Regla de avance y cronograma
+## Estado técnico comprobado S01
 
-**No bloquear S02 por un manual técnico que dejó de ser requisito.** La fase S01 aportó evidencia experimental sustancial, pero el criterio integral original no está cerrado. Mantener [#1](https://github.com/recm0708/netlab360/issues/1) abierta y rastrear diferencias reales; avanzar con S02 de integración **HQ–S1–S2, VLAN→WAN→servicio, OSPF y dos WAN**, con precheck, postcheck y seguridad VMnet8. Las ocho etapas S01–S08 siguen como [cronograma INTERNO reordenado](docs/academico/02-plan-operativo-s02-s08-repriorizado.md) hasta conocer fechas/alcance docente en transcripción de reunión. **No reducir compromisos formales ni afirmar implementado lo pendiente.**
+- VM Ubuntu Desktop en VMware NAT VMnet8; gestión `ens33 192.168.47.40/24`, GW `192.168.47.2`, SSH clave Ed25519 operativo; hardening `PasswordAuthentication yes` pendiente en #38.
+- Inventario IPAM HQ/S1 y S2 reservada, nueve VLAN propuestas y doble WAN; VLAN/trunk/ACL HTTP de HQ comprobados en escenario aislado; FRRouting/OSPF/HTTP dual WAN HQ↔S1 comprobados en otra subtopología, WAN-P→WAN-B→WAN-P.
+- LACP `2→1→2`, bonding active-backup virtual **sin equivalencia a NIC físicas o switches redundantes**.
+- SoT/OpenTofu metadata→Ansible archivos FRR usados en B2; idempotencia/drift sobre copias de configuración **no sobre router activo**.
+- NOC/exporter inicial y Prometheus alertas firing/resueltas; B4 76 ICMP y 12 eventos de sesiones distintas, reglas estadísticas **NO modelo ML entrenado**.
+- 86 PNG planos, siete CSV con SHA256 de archivos propios de evidencias, 24/24 pruebas, CI exitosa. Ubuntu apagado de forma ordenada tras revisión de red, recursos y Git local limpio.
 
-## Estado técnico comprobado al corte 13–16/10
+**S01** continúa abierta por criterios técnicos internos y no supone una calificación docente: 72/100 fue solo avance estimado histórico. **S02 puede comenzar**, priorizando la integración de **HQ–S1–S2 en un mismo escenario**, VLAN→servicio por doble WAN, OSPF failover y recuperación sin afectar ens33/VMnet8. [Plan reordenado](docs/academico/02-plan-operativo-s02-s08-repriorizado.md). Mantener actividades del escrito paralelas a las prácticas, garantizando la revisión del 30/10.
 
-- Ubuntu Desktop VMware/VMnet8 `ens33 192.168.47.40/24` y gateway `.2`, SSH Ed25519 operativo, pero hardening servidor pendiente (#38).
-- IPAM HQ/S1, S2 reservada; VLAN 110/120, trunk 802.1Q y ACL HTTP HQ aislado; FRR/OSPF HTTP dual WAN HQ–S1 en otra topología, failover/restauración.
-- LACP veth IEEE 802.3ad 2→1→2 y bonding activo-respaldo virtual; no redundancia física de switches/equipo.
-- OpenTofu metadata→Ansible→config FRR ejecutada en B2; idempotencia/drift probado sobre **archivos candidatos**, no FRR vivo.
-- Exporter/NOC inicial, Prometheus scraping y alertas firing/resueltas; analítica estadística de 76 ICMP y 12 eventos independientes con reglas deterministas **sin IA entrenada/evaluada**.
-- **86 PNG** planos y **7 CSV SHA256**, 24/24 unit tests y CI exitosa. Último apagado Ubuntu ordenado por usuario el 16/10 tras Docker/netns vacíos y Git `main...origin/main`; el estado Powered Off por consola VMware aún no fue confirmado visualmente.
+## Navegación
 
-## Navegación principal
+- [Punto de reanudación y próxima tanda de trabajo](docs/REANUDAR-AQUI.md).
+- [Criterios docentes ya convertidos en pautas NETLAB360](docs/academico/00-criterios-docentes-y-hitos.md).
+- [Reorganización del borrador institucional](docs/academico/01-migracion-borrador-a-formato-docente.md).
+- [Plan S02–S08 reordenado](docs/academico/02-plan-operativo-s02-s08-repriorizado.md).
+- [Informe único](docs/entregables/01-proyecto-investigacion-maestro.md).
+- [Control de aceptación técnica S01](docs/control/03-matriz-aceptacion-y-decisions-s01.md).
+- [Issues académicas abiertas](https://github.com/recm0708/netlab360/issues/36).
 
-- [REANUDAR-AQUÍ](docs/REANUDAR-AQUI.md).
-- [Migración del borrador S01 de 65 páginas](docs/academico/01-migracion-borrador-a-formato-docente.md).
-- [Plan de siete iteraciones S02–S08](docs/academico/02-plan-operativo-s02-s08-repriorizado.md).
-- [Anexos y demostración](docs/academico/03-anexos-y-demostracion.md).
-- [Matriz técnica S01 histórica](docs/control/01-avance-s01.md) — **72/100 es estimación interna**, no rúbrica docente.
-- [Incidencias docentes por resolver #36](https://github.com/recm0708/netlab360/issues/36).
-
-**Título formal en portada:** NETLAB360: Diseño e implementación de una plataforma virtualizada para la automatización, observabilidad y diagnóstico de redes empresariales multisede. **Encabezado Word:** `NETLAB360 | Redes Empresariales Multisede`.
+**Portada propuesta:** NETLAB360: Diseño e implementación de una plataforma virtualizada para la automatización, observabilidad y diagnóstico de redes empresariales multisede. **Encabezado Word:** `NETLAB360 | Redes Empresariales Multisede`. Título formal **sujeto a observaciones de la profesora**.
