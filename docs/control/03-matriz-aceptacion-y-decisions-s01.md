@@ -1,35 +1,28 @@
-# NETLAB360 — Matriz de aceptación y decisiones de cierre S01
+# NETLAB360 — Matriz de objetivos internos históricos y criterios DOCENTES
 
-**Fecha del registro:** 14/10/2026. **Fase interna:** S01, originalmente prevista 5–11/10. **Estado:** ABIERTA; criterios integrales del issue #1 sin aprobación global. **Avance 72/100:** ponderación de gestión interna, no nota docente. **IMPORTANTE:** el esquema original exige capacidades de automatización/IA/exportación dentro de S01 aunque las issues especializadas de OpenTofu/Ansible y ML están etiquetadas S03 y S06. No reinterpretar o recortar sin confirmar la guía docente.
+**Revisión 16/10/2026.** [Norma docente recibida](../academico/00-requisitos-oficiales-2026-10-16.md): un informe de **mínimo 40 páginas**, 12 secciones; PowerPoint y demostración técnica. **Los C01–C11 de abajo fueron inventario INTERNO de validaciones transversales anteriores, NO 11 criterios oficiales entregados por la profesora.** Su trazabilidad se conserva para no omitir funcionalidades; ya no se exige cerrar todo en S01 para autorizar S02.
 
-| Nº | Criterio integral de S01 | Evidencia existente | Falta para aceptación integral | Dictamen |
-|---|---|---|---|---|
-| C01 | HQ + sucursal, VLAN, FRR/OSPF, WAN redundante, respaldo de equipo y servicio | VLAN/ACL aisladas, WAN HQ–S1 con OSPF+HTTP en tres estados | Integración VLAN→WAN→servicio en un mismo escenario; falla de equipo real/simulado | Parcial |
-| C02 | LAG dos puertos, dual NIC, SoT/OpenTofu/Ansible | LACP virtual 2→1→2, active-backup virtual, IPAM YAML y IaC→FRR | Redundancia de equipo/servidor y ownership/reconciliación vivo exigibles | Parcial |
-| C03 | API/dashboard e incidente real, métricas, alarma y tiempo | Exporter live, Prometheus tres reglas, dos firing/resuelta; NOC inicial | Integración de alarmas al NOC multisitio, receptor/SLI según alcance | Parcial |
-| C04 | Prototipo evaluable de anomalía scikit-learn, distinto de reglas | 76 ICMP y 12 eventos de otras sesiones; perfil y reglas | Dataset etiquetado independientemente; modelo ML y evaluación fuera de muestra | Pendiente |
-| C05 | Dos documentos finales integrados: investigación y manual técnico de implementación/uso | Borradores V0.1 anteriores RECHAZADOS como formato; dos índices maestros activos creados | Redactar por secciones en plantilla institucional, APA7 y capturas | En preparación |
-| C06 | Pre/postcheck, recuperación, regresión integrada reproducible | Pre/postchecks, rollback y 24 tests offline | Prueba integral reproducible L2+WAN+servicio+NOC cuando requerida | Parcial |
-| C07 | Integración red, automatización, observabilidad, analítica y dashboard | Módulos separados verificados, IaC alimentó FRR real | Flujo unificado de componentes | Parcial |
-| C08 | Capturas trazables fecha/commit/resultados | 86 PNG, 7 CSV SHA256 en GitHub; lotes auditados | Cuatro fotos IaC recuperadas por logs aún no recibidas; captura postcheck nueva pendiente de incorporación | Parcial avanzado |
-| C09 | Actualización de documentación integral según alcance aprobado | Política y dos índices maestros nuevos; registro de sesiones preservado | Contenido final revisado de ambos documentos | En preparación |
-| C10 | Commit/PR y tag/release demostrable | GitHub sincronizado y CI exitosa | Tag/release validado, PR si requerido | Pendiente |
-| C11 | VM sanitizada, exportada/reimportada y SHA256 | VM funcional, snapshot conocido, gestión estable | Sanitización, exportación, reimportación y hash | Pendiente |
+| Código | Objetivo o comprobación interna | Estado técnico de evidencia al corte S01 | Pendiente/fase principal |
+|---|---|---|---|
+| C01 | HQ/S1, VLAN/ACL, FRR OSPF y WAN redundante | VLAN/ACL HQ aisladas y HTTP WAN HQ–S1 por separado, correcto | Integración L2→WAN→servicio en S02; expansión S2 y redundancia equipo |
+| C02 | LACP, dual-NIC, SoT/OpenTofu/Ansible | LACP 2→1→2 y bonding activo-respaldo virtual; IaC→FRR B2 real | Mediciones multistream S02/S05 y ownership live S03; NIC física no demostrada |
+| C03 | API/NOC/Prometheus/alertas | Exporter live, reglas tres, dos alarmas firing/resueltas | Panel por sede/alertas con fuentes reales y entrega externa cuando alcance confirme |
+| C04 | IA evaluable | 76 ICMP y 12 eventos independientes, estadística/reglas | Dataset etiquetado real y evaluación ML reproducible S06, si se mantiene |
+| C05 | **UN informe académico-técnico de 12 apartados** | Borrador institucional de 65 páginas preparado, sin estructura oficial migrada | Mover capítulos según guía y ampliar Implementación y Pruebas |
+| C06 | Pre/postcheck/recuperación/regresión | Pruebas por módulo y 24 tests offline; rollback satisfactorio | Prueba integrada reproducible y contraste esperado/observado |
+| C07 | Integración redes/IaC/NOC/analítica | Módulos aislados y subconjuntos integrados | Escenario extremo a extremo, señales y datos coherentes |
+| C08 | Capturas, trazabilidad, hash | 86 PNG y 7 CSV SHA256 publicados | Cuatro fotos suplementarias IaC y postcheck no publicados, sin repetir pruebas |
+| C09 | **PowerPoint + demostración técnica y anexos** | Guía académica revisada y plan aprobado por usuario | Preparar SOLO después del informe; confirmar aceptación ZIP y entregar evidencia |
+| C10 | Control de cambios/release | Git/CI operativos | Demostración de versión/PR/release donde corresponda |
+| C11 | Portabilidad VM/OVA | VM limpia funcional y snapshot, **no OVA exportada** | Confirmar obligación OVA; sanitización/packaging cuando proceda |
 
-## Dependencias y decisiones que deben confirmarse
+## Confirmaciones y decisiones
 
-- **D01 / Prioridad bloqueante:** guía/rúbrica oficial y fecha: si 11 criterios son exigencia estricta de S01 o metas transversales semestrales. Registrar respuesta en issues #9 y #36. No cerrar por porcentaje.
-- **D02:** si la OVA se entrega cada fase, como snapshot en S01 o solo al cierre S08; no borrar credenciales sin plan de recuperación.
-- **D03:** alcance de integración de S01: si es obligatorio un único escenario que conecte VLAN↔WAN↔servicio↔NOC y redundancia de equipo o si los MVP separados bastan como demostración inicial.
-- **D04:** si en S01 se necesita ML evaluado o únicamente baseline por reglas, ya que issues #25/#26 corresponden a S06.
-- **D05:** metadatos institucionales, autores, docente, fecha oficial, norma de portada y extensiones, para redactar los dos documentos maestros, con portadas elaboradas por el usuario.
+- Guía docente ahora conocida: **un solo documento escrito de al menos 40 páginas**, PowerPoint y demostración. Requisitos narrativos y de pruebas documentados con precisión en [guía transcrita](../academico/00-requisitos-oficiales-2026-10-16.md).
+- **No se conoce** fecha exacta oficial, límites de diapositivas, aceptación ZIP ni obligación de OVA por esos tres PDFs. Esperar transcripción y ejemplo parcial prometidos.
+- S01 continúa ABIERTA en issue #1 con resultados reales parciales; **retirada la prohibición anterior de S02 por falta de dos manuscritos**. Avanzar S02 y mantener trazabilidad de los 11 objetivos a su fase técnica lógica.
+- Reducir opcionales sólo con aprobación según exigencias confirmadas; no fingir que topología única o ML ya funcionan.
+- El manual técnico independiente #28 se mantiene como **posentrega, no parte de C05/C09 ni de la evaluación**.
+- Portada Word confeccionada por el usuario; referencias APA7 y figuras/tablas contextualizadas. [Mapa de los 65p](../academico/01-migracion-borrador-a-formato-docente.md).
 
-## Bloqueos y plan prudente
-
-1. Conservar S01 ABIERTA, congelar S02 y nuevas funciones B4 mientras se aprueban índices y se redactan partes S01.
-2. No repetir pruebas OSPF, IaC ni alertas sólo para capturas; reconstruir cuatro fotografías IaC desde logs ya validados.
-3. Trabajar sobre DOS documentos maestros (01 académico y 02 manual técnico integral), con capítulos por fases realmente completadas, UN índice automático y UNA bibliografía por documento.
-4. Preparar una única regresión integral adicional sólo si criterio S01 la requiere; preferir prueba mínima con pre/postcheck, nunca tocar ens33.
-5. Acordar alcance docente; ejecutar exclusivamente las brechas rubricadas; terminar documentación, release/OVA si obligatorio y cerrar con trazabilidad.
-
-**Punto de control técnico:** commit b410548 (lote06), 86 PNG/7 CSV, CI 38511477595 exitosa, postcheck 23:35:02 del 13/10/2026 con Docker/netns vacíos y gestión intacta. Los commits nuevos documentales posteriores requieren pull ff-only de Ubuntu antes de operar.
+**Criterio de aceptación académica:** cumplimiento del informe y su estructura, defensa de diseño, evidencias reproducibles y demostración explicada. La ponderación 72/100 NO ES calificación docente.
