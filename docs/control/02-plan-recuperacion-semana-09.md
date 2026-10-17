@@ -25,7 +25,7 @@
 
 ## Bloqueos informativos
 - Fecha oficial y duración final, formato ZIP, OVA, IA/SDN obligatoria, duración y modalidad de demo.
-- La transcripción de reunión y el ejemplo de parcial **todavía están anunciados pero no analizados**.
+- Las decisiones docentes de la reunión ya fueron sintetizadas en pautas del proyecto: **30/10** borrador de Introducción/Objetivos/Problema, **13/11** Fundamento/Diseño, ZIP separado permitido y demo final en vivo. Parcial 1 es una actividad individual ajena a esta planificación.
 - La VM Ubuntu está apagada tras shutdown seguro; pendiente confirmar estado visual en VMware. GitHub cambió desde el último `git pull` Ubuntu.
 
 **Próxima autorización técnica:** el usuario decide el momento de arrancar Ubuntu; después dar varios pasos por respuesta para ahorrar tiempo.
