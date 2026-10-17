@@ -1,22 +1,31 @@
-# NETLAB360 — Plan de recuperación de cronograma S01
+# NETLAB360 — Plan de recuperación del desfase (actualizado 16/10/2026)
 
-**Corte operativo de referencia:** 13/10/2026 23:35 Panamá. **Revisión del plan:** 14/10/2026. S01 programada internamente para 5–11/10 sigue ABIERTA; la etiqueta semanal GitHub no coincide necesariamente con semana académica real. No desplazar fechas oficiales de S02–S08 por iniciativa propia.
+**Prevalencia:** [guías oficiales](../academico/00-requisitos-oficiales-2026-10-16.md) y [nuevo plan S02–S08](../academico/02-plan-operativo-s02-s08-repriorizado.md). Este documento sustituye recomendaciones antiguas de elaborar dos o tres informes.
 
 ## Situación
-B0–B4 cuentan con pruebas técnicas parciales satisfactorias, 86 PNG/7 CSV SHA, 24 tests CI/locales y VM limpia. La puntuación técnica interna 72/100 no implica aceptación de los once requisitos. Se inició política editorial acumulativa; borradores anteriores rechazados y dos índices maestros aprobados provisionalmente por el usuario el 14/10/2026 (modificables ante nuevas indicaciones docentes).
+- Desfase identificado por el usuario: aproximadamente **una semana** respecto a su planificación interna.
+- S01 produjo piezas verificadas y trazables; 72/100 es **métrica histórica de gestión**, no nota ni rúbrica docente.
+- La guía exige **un solo informe escrito de >=40 páginas**; borrador S01 del usuario tiene ~65 páginas, pero requiere estructura docente 1–12 y secciones 7/8 más demostrativas.
+- Presentación PowerPoint y demostración técnica final; anexos de fuentes, ZIP separado pendiente confirmación.
+- Manual técnico independiente pospuesto; no volver a bloquear fase S02 por redactarlo.
 
-## Recuperación priorizada, sin expansión funcional
-| Orden | Trabajo | Cierre verificable |
-|---|---|---|
-| P0 | Confirmar guía/rúbrica y relación S01↔S03/S06/S08 | Respuesta de la docente sobre alcance, formatos, páginas, fechas, OVA e IA |
-| P0 | Acordar índices de 2 documentos maestros | **COMPLETADO** por aprobación del usuario; formato Word institucional, un índice por documento, APA 7 |
-| P1 | Redactar Documento 01 de S01 | Introducción, objetivos, contexto, fundamentos y desarrollo con citas/referencias verificables |
-| P1 | Redactar Documento 02 de S01 | Instalación desde cero, comandos correctos, capturas, pruebas, recuperación, operación y uso |
-| P1 | Incorporar 4 fotos IaC desde log y postcheck lote06 | SHA256, carpeta plana, sin repetir tofu apply |
-| P2 | Ejecutar únicamente pruebas técnicas rubricadas faltantes | Precheck→prueba integral mínima→postcheck→evidencia sin afectar VMnet8 |
-| P2 | Sanitizar/exportar/reimportar OVA y release, si fecha S01 | SHA256 y entrega controlada; aceptación registrada |
-| P3 | Cerrar S01 y permitir S02 | Issue #1 documentada contra guía oficial, dos textos consolidados S01 aprobados |
+## Ruta crítica propuesta
+1. **Hoy:** registrar requisitos oficiales, reestructurar índice, issues y matriz sin destruir evidencia, fijar aclaraciones tras la transcripción.
+2. **Próxima sesión Ubuntu:** precheck seguro y plan integrador HQ–S1–S2 con al menos dos enlaces WAN y servicios; no reconstruir ensayos aprobados.
+3. **S02 integración prioritaria:** VLAN→WAN→servicio, failover y recuperación en una sola topología; solo después reforzar capacidad LACP/roles físicos por alcance.
+4. **S03–S04:** IaC en la red realmente integrada y NOC/alertas con evidencias de estado y correlación; actualizar informe en paralelo.
+5. **S05–S07:** redundancia adicional, SDN si se exige, dataset/IA si son objetivos definitivos; no atribuir capacidades no probadas.
+6. **S08 o fecha final confirmada:** ejecutar regresión, cierre de incidentes, anexos ZIP si permitido, sanitización/exportación VM según requisitos, revisión APA7; DESPUÉS preparar PowerPoint y demo.
 
-No añadir módulos nuevos B4 ni repetir convergencia/Prometheus/LACP sólo para subir porcentaje. No convertir análisis por reglas en IA evaluada. [Checklist S01](../entregables/s01/00-checklist-cierre-y-entrega.md) · [Matriz](03-matriz-aceptacion-y-decisions-s01.md).
+## Regla de no duplicación
+- Usar 86 PNG y 7 CSV ya auditados; reencuadrar evidencia en el capítulo 8, no repetir laboratorios para nuevos screenshots.
+- Reutilizar borrador institucional de 65 páginas, reorganizándolo según el [mapa oficial](../academico/01-migracion-borrador-a-formato-docente.md).
+- Llevar código completo, logs extensos y outputs a anexos externos si se autorizan; el cuerpo debe explicar proceso y resultado.
+- No mantener issue S01 bloqueada por requisitos S03/S06/S08; gestionar cierre de elementos pendientes en issues originales, sin declarar S01 formalmente cerrada.
 
-**Historial anterior de esta página:** disponible en Git, con fecha y hash de cada actualización; sus órdenes de realizar LACP o IaC ahora ya están superadas por pruebas verificadas.
+## Bloqueos informativos
+- Fecha oficial y duración final, formato ZIP, OVA, IA/SDN obligatoria, duración y modalidad de demo.
+- La transcripción de reunión y el ejemplo de parcial **todavía están anunciados pero no analizados**.
+- La VM Ubuntu está apagada tras shutdown seguro; pendiente confirmar estado visual en VMware. GitHub cambió desde el último `git pull` Ubuntu.
+
+**Próxima autorización técnica:** el usuario decide el momento de arrancar Ubuntu; después dar varios pasos por respuesta para ahorrar tiempo.
