@@ -1,43 +1,50 @@
-# NETLAB360 — CHECKPOINT CANÓNICO 16/10/2026
+# NETLAB360 — REANUDAR AQUÍ (17/10/2026)
 
-## Cambio principal: guías docentes oficiales recibidas
+## Decisiones y fechas efectivas
 
-**Un solo informe final académico-técnico** (mínimo **40 páginas**, 12 apartados oficiales), **un PowerPoint con demostración técnica** después de terminar informe, y anexos técnicos de código/configuración. El **ZIP separado** para anexos es PROPUESTA del usuario, **pendiente de confirmación**; manual técnico 02 se pospone a después de finalizar el proyecto, issue #28 conservada. Los tres PDF oficiales adjuntos están registrados por nombre/fecha/SHA en [normativa oficial](academico/00-requisitos-oficiales-2026-10-16.md) pero **sus binarios no están en GitHub**.
+**No publicar en GitHub archivos de clase, documentos docentes, grabaciones, transcripciones ni sus SHA256.** Usar solamente [criterios de trabajo resumidos](academico/00-criterios-docentes-y-hitos.md).
 
-**Índice definitivo que exige el PDF** (en ese orden): 1 Portada, 2 Introducción, 3 Objetivos, 4 Planteamiento del problema (incluye justificación), 5 Fundamento técnico, 6 Diseño, 7 Implementación, 8 Pruebas y validación, 9 Análisis de resultados (problemas reales/mitigación), 10 Conclusiones y recomendaciones, 11 Referencias, 12 Anexos.
+**Proyecto final grupal:**
+1. **UN informe académico-técnico** (>=40 páginas), 12 apartados: Portada; Introducción; Objetivos; Planteamiento del problema; Fundamento técnico; Diseño; Implementación; Pruebas y validación; Análisis de resultados; Conclusiones y recomendaciones; Referencias; Anexos.
+2. **Título propuesto enviado al chat Teams** es requisito previo a revisión docente; **envío y aprobación de NETLAB360 NO verificados**. Consultar al usuario antes de afirmar que se presentó.
+3. **30/10/2026**: mostrar en **Teams** el borrador con **introducción, objetivo general/específicos y planteamiento del problema**, mediante **representante del grupo**. No se pide presentación PowerPoint para este corte.
+4. **13/11/2026**: mostrar avance con **fundamento técnico y diseño de la solución**, continuidad del mismo documento.
+5. **Anexos técnicos en archivo separado permitidos expresamente**, presentados junto con informe. Crear ZIP solo con archivos propios del proyecto y manifiesto SHA256; no confundir autorización de formato con aprobación de un ZIP ya construido.
+6. **Presentación PowerPoint y DEMOSTRACIÓN EN VIVO** al final; derivar la presentación del informe, explicar decisiones técnicas, mostrar red, degradación/fallas, recuperación y datos reales. Fecha/duración final no comunicadas en la reunión.
+7. Manual técnico independiente #28 **POSPUESTO**, no requerido en las entregas académicas actuales.
 
-El usuario tiene borrador en formato institucional de **65 páginas** (S01) revisado en conversación; requiere reordenamiento y mayor profundidad en implementación/pruebas, no rehacer desde cero. [Mapa de migración](academico/01-migracion-borrador-a-formato-docente.md).
+**PARCIAL 1**: individual, entrega hasta 25/10/2026, también calificado como Laboratorio 5 en UNA sola carga en espacio del parcial. **Se desarrolla EN OTRO CHAT y no es parte del semestral**. Podrá inspirar ensayos técnicos más exigentes pero no autoriza mezclar evidencias, sistemas ni rúbricas.
 
-## Estado técnico y estrategia para recuperar una semana de desfase
+## Estado técnico comprobado
 
-- S01 original y su matriz de 11 criterios eran objetivos **internos**, no rúbrica docente. 72/100 era ponderación **interna**, NO nota ni cierre. Se mantiene abierta #1 para brechas, pero **NO bloquea la implementación siguiente**, en particular ya no depende de Manual 02.
-- Ya comprobados VMware Ubuntu/SSH/VMnet8, IPAM HQ/S1 y S2 reservada, VLAN/ACL intra-HQ, FRR/OSPF+HTTP dual WAN HQ–S1 en escenarios separados, LACP/dualNIC virtual, SoT→OpenTofu→Ansible FRR, exporter/NOC/Prometheus, perfil/reglas B4 (sin ML entrenado). 86 PNG/7 CSV hash, 24 tests/CI exitosos.
-- **Próximo paso operativo S02:** encender Ubuntu en VMware, verificar solo lectura Git/Docker/netns/ens33/GW/servicios y luego inspeccionar topologías/scripts existentes para planificar una **topología unificada HQ–S1–S2** con VLAN, dos WAN y servicios. No modificar todavía la red de gestión.
-- La VM fue apagada ordenadamente por el usuario el 16/10 tras postcheck limpio y `main...origin/main`; estado GUI Powered Off no confirmado. **Ubuntu no incluye estos nuevos commits** hasta ejecutar `git pull --ff-only` cuando se encienda; no usar `reset --hard`.
-- [Plan provisional reordenado S02–S08](academico/02-plan-operativo-s02-s08-repriorizado.md). No asignar nuevas fechas docentes ni renombrar milestones hasta recibir transcripción; el número de semana del curso y «S02» interno NO son intercambiables.
+- **S01 issue #1 ABIERTA**, por objetivos internos integrales pendientes; **72/100 es únicamente estimación interna histórica**, NO calificación. Las guías docentes ya permiten planificación progresiva; no bloquear S02 por manual ni por completar todas las metas S03/S06/S08 anticipadamente.
+- Ubuntu Desktop VMware / VMnet8 gestión `ens33 192.168.47.40/24` GW `.2`; SSH Ed25519 y servicios operativos, **contraseñas SSH habilitadas**, hardening #38 pendiente.
+- HQ/S1 ensayos FRR OSPF doble WAN, VLAN HQ/ACL en topología diferente; S2 reservada; LACP virtual y active-backup virtual; IaC OpenTofu/Ansible→FRR, drift **de copias**, exporter/NOC/Prometheus inicial, perfil B4 por reglas **no IA evaluada**.
+- **86 PNG y 7 CSV SHA256 de pruebas propias** en GitHub, 24 tests/CI correctas. VM apagada ordenadamente después de Docker/netns vacíos, Git local limpio y ruta de gestión estable.
+- El repositorio en GitHub **se modificó desde ese apagado**; al reiniciar el Ubuntu local se debe sincronizar mediante `git pull --ff-only`, **sin borrar cambios locales**.
 
-## Entregables/integración en paralelo
+## Ruta de trabajo inmediata
 
-- ÚNICO informe: [índice maestro oficial](entregables/01-proyecto-investigacion-maestro.md). Se amplía con **implementación, pruebas y comparación esperado vs observado por escenario**, evidencias contextualizadas, incidentes reales en análisis.
-- PPT/DEMO al final: [issue #44](https://github.com/recm0708/netlab360/issues/44).
-- ZIP de anexos propuesto: [issue #45](https://github.com/recm0708/netlab360/issues/45), pendiente aceptación docente.
-- Manual técnico independiente: [issue #28](https://github.com/recm0708/netlab360/issues/28), posentrega, NO bloquear.
-- Guía y dudas: [issue #36](https://github.com/recm0708/netlab360/issues/36), [#9](https://github.com/recm0708/netlab360/issues/9).
-- **Transcripción de reunión** y **PDF de parcial usado como ejemplo** anunciados, pero no entregados en el lote actual; analizarlos antes de crear requisitos nuevos o desplazar hitos.
-- Si el usuario decide recortar alcance, documentar fielmente lo implementado y contrastar contra rúbrica real, sin disfrazar tareas faltantes como completadas.
+1. Confirmar con el equipo si el **título formal fue enviado a Teams** y si la profesora realizó observaciones; preparar mensaje de título si falta.
+2. Congelar los textos del corte académico **30/10** reutilizando el borrador Word del usuario (introducción, objetivos y planteamiento) y verificar encabezados/citas.
+3. Continuar con integración técnica **S02**: primero verificar precheck seguro y topologías/scripts existentes, luego planear/implementar **HQ–S1–S2** integrada (VLAN, WAN primaria/respaldo, OSPF y servicios) sin cambiar `ens33`.
+4. Avanzar simultáneamente el contenido técnico de **Fundamento técnico + Diseño** para revisión **13/11**; registrar evidencias de implementación/pruebas para final.
+5. Posteriormente completar informe, validar ZIP de código, preparar **PowerPoint extraído del informe y demo EN VIVO**; manual técnico posentrega.
 
-## Reanudación mínima de Ubuntu (solo cuando usuario lo indique)
+**Índice de informe:** [maestro](entregables/01-proyecto-investigacion-maestro.md) · [mapa Word previo](academico/01-migracion-borrador-a-formato-docente.md) · [cronograma técnico](academico/02-plan-operativo-s02-s08-repriorizado.md).
+
+## Arranque seguro Ubuntu (cuando el usuario lo ordene)
 
 ```bash
 cd ~/proyectos/netlab360
 git status --short --branch
 GIT_TERMINAL_PROMPT=0 git pull --ff-only origin main
-echo "=== GESTION ==="
-ip -4 -br address show ens33; ip route show default
-echo "=== ESTADO ==="
-sudo docker ps -a; sudo ip netns list
-systemctl is-active docker ssh open-vm-tools
 git status --short --branch
+ip -4 -br addr show ens33
+ip -4 route show default
+sudo docker ps -a
+sudo ip netns list
+systemctl is-active docker ssh open-vm-tools
 ```
 
-**No iniciar de nuevo OpenTofu apply, cortes WAN o LACP para recuperar capturas.** Priorizar integración progresiva y demo reproducible.
+No correr `tofu apply`, scripts de modificación de interfaz o cortes WAN sin precheck, plan, recuperación y autorización. Reproducir pruebas anteriores **solo si hace falta integración funcional**.
