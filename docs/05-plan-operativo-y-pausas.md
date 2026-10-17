@@ -1,6 +1,6 @@
 # NETLAB360 — Operación segura y pausas (revisión 16/10)
 
-**Nuevo contrato académico:** un informe final >=40 páginas, PowerPoint+demostración obligatorios, anexos técnicos; ZIP separado pendiente de validación docente. Manual 02 pospuesto. Ver [guías](academico/00-requisitos-oficiales-2026-10-16.md) y [checkpoint](REANUDAR-AQUI.md).
+**Nuevo contrato académico:** un informe final >=40 páginas, PowerPoint+demostración obligatorios, anexos técnicos; ZIP externo autorizado junto con el informe docente. Manual 02 pospuesto. Ver [guías](academico/00-criterios-docentes-y-hitos.md) y [checkpoint](REANUDAR-AQUI.md).
 
 ## Estado seguro último
 - Ubuntu apagado ordenadamente por comando `sudo systemctl poweroff` tras `docker ps -a` y `ip netns list` vacíos, `ens33 192.168.47.40/24`, gateway `192.168.47.2` y Git `main...origin/main`, 16/10.
@@ -15,9 +15,9 @@
 5. Medir y documentar **baseline→cambio→esperado/real→restauración**, acompañando evidencia/resultado técnico.
 6. Hacer postcheck Docker/netns, servicios, red administrativa, Git y luego commit/push seguro.
 7. **No repetir** LACP, Prometheus o `tofu apply` únicamente para capturar imágenes ya auditadas.
-8. Actualizar el ÚNICO informe en sus secciones 7–9 con resultados nuevos; generar ZIP solo después de revisión de alcance y secretos.
+8. Actualizar el ÚNICO informe en sus secciones 7–9 con resultados nuevos; generar ZIP permitido, a generar tras revisión de integridad y secretos.
 
 ## Pausa y recuperación
 En sesiones largas, detener escenarios temporales, conservar logs/artefactos no secretos, verificar estado y apagar Ubuntu **desde su SO** si el operador lo ordena. No ejecutar `poweroff` automáticamente por indicación general. Reanudar desde [plan S02–S08](academico/02-plan-operativo-s02-s08-repriorizado.md).
 
-**Las fases S01–S08 son hitos internos revisables**; no son calendario oficial confirmado, la transcripción docente está pendiente.
+**Las fases S01–S08 son hitos internos revisables**; no son calendario oficial confirmado, la indicación oral ya sintetizada, pendiente solo fecha final y duración.
