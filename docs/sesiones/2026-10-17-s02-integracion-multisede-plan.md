@@ -51,3 +51,23 @@ El usuario ejecuto precheck por SSH, compartio salidas de terminal y confirmo ca
 - **Proxima verificacion del usuario**: pull, compilacion Python, tests unitarios, validacion estatica y live del IPAM candidato; revisar rutas IPv4 Windows/VMware/VPN antes de aprobar los dos /30 de HQ-S2.
 
 **Estado:** S02_01 CAPTURADA y precheck B1=OK; IPAM candidato S02 CREADO pero VALIDACION LIVE PENDIENTE. No se marcaran redes como activas ni se capturara evidencia falsamente exitosa.
+
+
+## Segundo corte de evidencia S02_02 — 17/10/2026 15:38:58 -05
+
+El usuario confirmo captura `S02_02_Validacion_IPAM_Tres_Sedes_Cuatro_WAN`; la captura fisica PNG aun NO se ha incorporado a GitHub. **Evidencia de terminal aceptada como predespliegue**:
+
+- Ubuntu `git pull --ff-only` => `0f25aa9` limpio `main...origin/main`.
+- `python3 -m py_compile` S02 y test => salida 0; `python3 -m unittest ... test_s02_ipam.py` => **4/4 OK**.
+- B1 intacto `VALIDACION B1: OK`; S02 `S02_IPAM_ESTATICO=OK`, sedes 3, VLAN 9, WAN 4, redes 17 **incluyendo VMnet8**, sin solapamientos internos.
+- `S02_REDES_HOST_DOCKER_REVISADAS=10`, `S02_COLISIONES_HOST_DOCKER=0`, `S02_VALIDACION_LIVE_UBUNTU=OK`, `RESULTADO_COLISIONES_S02=0`.
+- Estado tras prueba: red ens33 `192.168.47.40/24`, GW `192.168.47.2`, Docker sin contenedores, netns vacios y Git limpio.
+- Windows PowerShell `Get-NetRoute -AddressFamily IPv4`: las rutas activas informadas (`10.20.30.0/26`, `172.16.20.0/24`, `192.168.10.0/24`, `192.168.47.0/24`, `192.168.1.0/24`, `192.168.2.0/24`, mas rutas host) **NO incluyen solapamientos con 10.70–10.72, 10.78.0.0/28 ni 10.79.0.0/32**. La comprobacion aplica a rutas ACTIVAS del momento, no VPN futuras ni rutas fuera de Windows.
+- Capturas `S02_01` y `S02_02` declaradas tomadas por el usuario pero aun NO auditadas como archivos PNG ni publicadas: no contar en el inventario GitHub de evidencias.
+- No se ha creado ningun dispositivo S02 real: `S02_DESPLIEGUE_EJECUTADO=NO`.
+
+## Preparacion predespliegue posterior a validacion
+
+Archivos añadidos al repositorio: `scripts/automatizacion/render-frr-s02.py` y `tests/test_s02_render_frr.py`. El render genera tres archivos FRR desde el inventario candidato sin interfaces ni Docker. **Antes de ejecutar topologia integrada: pruebas unitarias/compilacion, salida de 3 configs y comprobacion de costos/interfaces y snapshot VMware actualizado confirmado**.
+
+**No confundir** el éxito de IPAM con vecinos OSPF ni con conectividad inter-VLAN/WAN. La construccion y sus fallas controladas siguen pendientes.
