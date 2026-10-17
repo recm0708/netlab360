@@ -1,26 +1,23 @@
-# NETLAB360 — Plan operativo, seguridad y pausas
+# NETLAB360 — Operación segura y pausas (revisión 16/10)
 
-**Vigente 14/10/2026.** La última sesión de red terminó con postcheck válido 13/10 23:35:02. La VM se encontraba sin contenedores ni namespaces, gestión ens33 192.168.47.40/24, gateway 192.168.47.2 y servicios activos. No se ha ordenado apagado en este turno.
+**Nuevo contrato académico:** un informe final >=40 páginas, PowerPoint+demostración obligatorios, anexos técnicos; ZIP separado pendiente de validación docente. Manual 02 pospuesto. Ver [guías](academico/00-requisitos-oficiales-2026-10-16.md) y [checkpoint](REANUDAR-AQUI.md).
 
-## Prioridad actual
-No empezar S02 ni introducir funcionalidades B4/AIOps adicionales: acordar y redactar dos documentos únicos acumulativos: investigación y manual técnico integral (implementación + uso), en el formato institucional del usuario. Resolver rúbrica y brechas S01 exigibles. [Checkpoint](REANUDAR-AQUI.md) y [documentación](entregables/00-politica-editorial-y-entrega-acumulativa.md).
+## Estado seguro último
+- Ubuntu apagado ordenadamente por comando `sudo systemctl poweroff` tras `docker ps -a` y `ip netns list` vacíos, `ens33 192.168.47.40/24`, gateway `192.168.47.2` y Git `main...origin/main`, 16/10.
+- SSH Ed25519 operativa; `sshd -T` mostró `passwordauthentication yes`, por tanto #38 permanece abierta. No endurecer sin consola VMware y rollback probado.
+- GUI VMware `Powered Off` no confirmada desde herramientas; no presumir.
 
-## Método de trabajo
-- Agrupar pasos sustanciales, sin instrucciones repetitivas de un comando por turno.
-- Después de cada práctica: precheck, ejecución una vez, observación/salida, rollback propietario y postcheck.
-- Indicar exactamente el tramo INICIO CAPTURA / FIN CAPTURA; si el texto no cabe, fragmentos numerados. Evitar repetir laboratorios aprobados por fotos.
-- Evidencias originales en carpeta plana e índices SHA256, commits reproducibles; mantener secrets fuera de Git.
-- Diferenciar diseños/prototipos y resultados reales; no presentar S01 cerrada hasta aceptación de rúbrica.
+## Regla para futuras sesiones integradoras
+1. Arrancar solo VM necesaria; verificar consola, host, Git remoto vs local y acceso SSH.
+2. Ejecutar `git status --short --branch` **antes** de `git pull --ff-only origin main`; nunca reset --hard ni push --force.
+3. Precheck de Docker/netns, ens33, GW y servicios; registrar fecha/hora, commit, entorno.
+4. Diseñar topología aislada HQ–S1–S2 con VLAN y doble WAN; **no alterar ens33/VMnet8**. Cada falla tendrá rollback localizado, no borrado global.
+5. Medir y documentar **baseline→cambio→esperado/real→restauración**, acompañando evidencia/resultado técnico.
+6. Hacer postcheck Docker/netns, servicios, red administrativa, Git y luego commit/push seguro.
+7. **No repetir** LACP, Prometheus o `tofu apply` únicamente para capturar imágenes ya auditadas.
+8. Actualizar el ÚNICO informe en sus secciones 7–9 con resultados nuevos; generar ZIP solo después de revisión de alcance y secretos.
 
-## Seguridad del entorno
-- Proteger VMnet8 y ens33; no cambiar ni puente ni default route del host por laboratorios.
-- Nunca forzar git push, borrar estado IaC, ni ejecutar docker rm globalmente por error de un escenario específico.
-- Instalar solo herramientas necesarias y justificadas por un criterio de aceptación.
-- Antes de exportar VM deben planificarse sanitización de tokens, credenciales y datos privados, snapshot y prueba de importación.
+## Pausa y recuperación
+En sesiones largas, detener escenarios temporales, conservar logs/artefactos no secretos, verificar estado y apagar Ubuntu **desde su SO** si el operador lo ordena. No ejecutar `poweroff` automáticamente por indicación general. Reanudar desde [plan S02–S08](academico/02-plan-operativo-s02-s08-repriorizado.md).
 
-## Pausas y reanudación
-- En pausas cortas: no dejar ensayos disruptivos corriendo salvo requerimiento explícito, recoger evidencias y comprobar estado Git.
-- En pausa larga o para entregar VM: detener laboratorios con sus scripts, revisar Docker/netns y puertos, validar ens33/gateway, Git limpio y respaldos antes de apagar desde Ubuntu. No ejecutar `poweroff` sin instrucción del operador.
-- Reanudar desde [REANUDAR-AQUI](REANUDAR-AQUI.md) y tabla de criterios, no desde checkpoints históricos.
-
-**Versiones previas:** Git conserva instrucciones antiguas de pausas y horarios que ya no aplican; no reutilizarlas como órdenes actuales.
+**Las fases S01–S08 son hitos internos revisables**; no son calendario oficial confirmado, la transcripción docente está pendiente.
