@@ -1,12 +1,12 @@
 # NETLAB360 — Plan de recuperación del desfase (actualizado 16/10/2026)
 
-**Prevalencia:** [guías oficiales](../academico/00-requisitos-oficiales-2026-10-16.md) y [nuevo plan S02–S08](../academico/02-plan-operativo-s02-s08-repriorizado.md). Este documento sustituye recomendaciones antiguas de elaborar dos o tres informes.
+**Prevalencia:** [guías oficiales](../academico/00-criterios-docentes-y-hitos.md) y [nuevo plan S02–S08](../academico/02-plan-operativo-s02-s08-repriorizado.md). Este documento sustituye recomendaciones antiguas de elaborar dos o tres informes.
 
 ## Situación
 - Desfase identificado por el usuario: aproximadamente **una semana** respecto a su planificación interna.
 - S01 produjo piezas verificadas y trazables; 72/100 es **métrica histórica de gestión**, no nota ni rúbrica docente.
 - La guía exige **un solo informe escrito de >=40 páginas**; borrador S01 del usuario tiene ~65 páginas, pero requiere estructura docente 1–12 y secciones 7/8 más demostrativas.
-- Presentación PowerPoint y demostración técnica final; anexos de fuentes, ZIP separado pendiente confirmación.
+- Presentación PowerPoint y demostración técnica final; anexos de fuentes, ZIP separado autorizado con el informe.
 - Manual técnico independiente pospuesto; no volver a bloquear fase S02 por redactarlo.
 
 ## Ruta crítica propuesta
