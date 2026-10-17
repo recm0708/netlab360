@@ -4,7 +4,7 @@
 
 ## Fechas académicas ya comunicadas
 
-- **Título del proyecto:** enviar a chat Teams de la asignatura, pendiente verificar entrega/aprobación.
+- **Título del proyecto:** enviado al chat Teams según confirmación del estudiante el 17/10; falta respuesta/aprobación docente.
 - **30/10/2026:** primera revisión de borrador (Introducción, Objetivo general y específicos, Planteamiento del problema), en Teams sin diapositivas; representante asignado.
 - **13/11/2026:** segunda revisión (Fundamento técnico y Diseño).
 - **Demostración final EN VIVO**: planificar escenarios recuperables; fecha/duración no comunicadas.
