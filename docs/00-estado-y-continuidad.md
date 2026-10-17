@@ -1,23 +1,13 @@
-# NETLAB360 — Estado actual y continuidad
+# NETLAB360 — Estado técnico y continuidad (16/10/2026)
 
-> **Actualización de control 14/10:** auditoría íntegra de issues y milestones ([informe](control/04-auditoria-issues-milestones-2026-10-14.md)): 43 totales, 38 abiertas, 5 cerradas, 0 abiertas sin milestone. Cerradas ahora #33 (CI offline) y #42 (FRR/OSPF dual-WAN). Sigue abierta #38 SSH hasta validar hardening y recuperación, sin reconfiguraciones a ciegas. Índices de dos documentos aprobados por usuario. Ubuntu aún pendiente de sincronizar.
+**Normativa docente NUEVA:** [tres PDF oficiales](academico/00-requisitos-oficiales-2026-10-16.md). Informe académico-técnico **ÚNICO, mínimo 40 páginas**, PowerPoint y demostración, código en anexos; ZIP separado pendiente de aceptación. Manual 02 pospuesto a después. [Checkpoint canónico](REANUDAR-AQUI.md).
 
+**Trabajo escrito:** existe borrador S01 PDF institucional revisado de 65 páginas, seis figuras y seis tablas en corte anterior, suficiente en extensión pero NO en orden docente: migrar a 12 secciones y fortalecer «Implementación»/«Pruebas». No eliminar capítulos reales, solo reorganizar con control APA7 y figuras.
 
-**Revisión editorial 14/10/2026.** Fuentes canónicas: [REANUDAR AQUÍ](REANUDAR-AQUI.md) y [matriz de aceptación S01](control/03-matriz-aceptacion-y-decisions-s01.md).
+**Estado de infraestructura:** 86 PNG/7 CSV y CI 24 tests aprobados; gestión `192.168.47.40/24`/GW `.2` preservada. Fases probadas en subtopologías independientes; redes VLAN HQ y WAN HQ–S1 no integradas, S2 reservada, LACP/dual NIC virtual no equipo físico, IaC drift solo en candidatos, no modelo ML. VM apagada limpiamente desde Ubuntu el 16/10, GUI Powered Off sin confirmación directa.
 
-## Estado operativo
+**Gestión de fases:** S01 abierta por 11 criterios internos (72/100 interno), no usar esas casillas como rúbrica oficial ni bloqueo absoluto de S02. Continuar con [integración multisede S02](academico/02-plan-operativo-s02-s08-repriorizado.md), informe único en paralelo, diapositivas después. Las fechas reales quedan por confirmar en transcripción docente.
 
-S01 ABIERTA, 72/100 interno, guía/rúbrica docente pendiente. El usuario prohíbe iniciar S02 hasta terminar los textos S01 y las exigencias técnicas verificables. Los bloques B0–B4 tienen subpruebas funcionales; no presentar topologías separadas como una red integral ni detector por reglas como IA entrenada.
+**Pendientes docentes:** ZIP permitido, fechas/duración, OVA, alcance obligatorio IA/SDN, calendario final, cómo computan las 40 páginas. [Issue #36](https://github.com/recm0708/netlab360/issues/36).
 
-Evidencia: 86 PNG planos, 7 CSV hash, commit lote06 b410548, 24/24 tests y CI run 38511477595. Último postcheck sin Docker/netns, gestión ens33 192.168.47.40/24 y gateway .2, tres servicios activos. Commits editoriales posteriores requieren pull ff-only de Ubuntu.
-
-## Entregables oficiales del trabajo: dos documentos
-
-1. [Documento 01 — Diseño, desarrollo y evaluación académica](entregables/01-proyecto-investigacion-maestro.md): fundamentos, arquitectura, resultados e incidentes técnicos reales con su mitigación **dentro del desarrollo**.
-2. [Documento 02 — Manual técnico integral](entregables/02-informe-tecnico-maestro.md): instalación desde cero, requisitos, comandos corregidos, pruebas, capturas, puesta en marcha, uso y administración; **posibles fallos y solución preventiva**, sin cronología de equivocaciones históricas.
-
-Portadas hechas por usuario. Redacción por secciones; un índice automático por documento, APA7 y referencias realmente citadas, figuras y tablas presentadas/interpretadas. Al finalizar, describir fases realmente completadas sin capítulos ficticios ni ocultar roadmap original.
-
-## Pendientes
-
-Dos índices aprobados el 14/10/2026; comenzar Documento 01 sólo cuando el usuario lo indique; confirmar guía/rúbrica oficial, completar S01 y fotografías IaC pendientes, no crear nuevos laboratorios salvo aceptación estricta. Documento 03 de manual separado fue retirado y su contenido incorporado al 02.
+**Repositorio GitHub actualizado de forma remota; Ubuntu requiere pull al volver a arrancar.** No borrar fuentes, scripts ni evidencias. Historial de reglas de «dos documentos» está en Git, ya no vigente.
