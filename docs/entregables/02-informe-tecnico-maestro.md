@@ -11,7 +11,7 @@ El futuro manual corporativo tendrá como finalidad reproducir desde cero, opera
 ## Referencias para entrega ACTUAL
 
 - [Único informe requerido](01-proyecto-investigacion-maestro.md).
-- [Normas oficiales](../academico/00-requisitos-oficiales-2026-10-16.md).
+- [Normas oficiales](../academico/00-criterios-docentes-y-hitos.md).
 - [Anexos y demostración](../academico/03-anexos-y-demostracion.md).
 
 **No añadir tareas de manual 02 al criterio de cierre del proyecto académico actual.**
