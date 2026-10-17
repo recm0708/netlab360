@@ -5,7 +5,7 @@
 ## Entrega semestral y fechas de control
 
 - **Un solo informe académico-técnico de mínimo 40 páginas**, con 12 apartados en orden. [Índice maestro](docs/entregables/01-proyecto-investigacion-maestro.md). Borrador previo de 65 páginas del estudiante se reorganizará y ampliará, **sin recrearlo desde cero**.
-- **Título propuesto en Teams**: enviar al chat de la asignatura y esperar aprobación/ajuste del docente. **Estado de envío/aprobación del grupo por confirmar**.
+- **Título propuesto en Teams**: ya enviado al chat Teams (confirmado por estudiante el 17/10); **respuesta/aprobación docente pendiente**.
 - **30/10/2026**: revisión grupal del borrador de **introducción, objetivo general y específicos, planteamiento del problema**. Mostrar **el documento en Teams**, sin PowerPoint especial. Designar un representante del grupo.
 - **13/11/2026**: revisión grupal de **fundamento técnico y diseño de la solución**.
 - **Anexos técnicos en archivo aparte AUTORIZADOS** junto con el informe. Se preparará ZIP de configuraciones/código/evidencias del proyecto con README, índice e integridad SHA256, excluyendo secretos y archivos ajenos. [Paquete de anexos](docs/academico/03-anexos-y-demostracion.md) · [#45](https://github.com/recm0708/netlab360/issues/45).
@@ -34,4 +34,4 @@
 - [Control de aceptación técnica S01](docs/control/03-matriz-aceptacion-y-decisions-s01.md).
 - [Issues académicas abiertas](https://github.com/recm0708/netlab360/issues/36).
 
-**Portada propuesta:** NETLAB360: Diseño e implementación de una plataforma virtualizada para la automatización, observabilidad y diagnóstico de redes empresariales multisede. **Encabezado Word:** `NETLAB360 | Redes Empresariales Multisede`. Título formal **sujeto a observaciones de la profesora**.
+**Título comunicado a la profesora:** Diseño e implementación de una plataforma virtualizada para la automatización, observabilidad y diagnóstico de redes empresariales multisede. Identificador del producto y encabezado Word: NETLAB360. **Encabezado Word:** `NETLAB360 | Redes Empresariales Multisede`. Título formal **sujeto a observaciones de la profesora**.
