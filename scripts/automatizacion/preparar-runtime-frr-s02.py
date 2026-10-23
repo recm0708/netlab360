@@ -93,13 +93,13 @@ def main() -> None:
             )
             if hashlib.sha256((dest / "frr.conf").read_bytes()).hexdigest() != HASHES[r]:
                 raise RuntimeError(f"Integridad alterada en {r}")
-            command("sudo", "-n", "chown", "100:101", str(dest), str(dest / "daemons"))
-            command("sudo", "-n", "chown", "100:102",
-                    str(dest / "frr.conf"), str(dest / "vtysh.conf"))
             os.chmod(dest, 0o755)
             os.chmod(dest / "daemons", 0o640)
             os.chmod(dest / "frr.conf", 0o660)
             os.chmod(dest / "vtysh.conf", 0o660)
+            command("sudo", "-n", "chown", "100:101", str(dest), str(dest / "daemons"))
+            command("sudo", "-n", "chown", "100:102",
+                    str(dest / "frr.conf"), str(dest / "vtysh.conf"))
             validate_file(dest / "daemons", 100, 101, 0o640)
             validate_file(dest / "frr.conf", 100, 102, 0o660)
             validate_file(dest / "vtysh.conf", 100, 102, 0o660)
