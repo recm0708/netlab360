@@ -79,6 +79,7 @@ def main() -> None:
     if daemons.count("\nzebra=yes\n") != 1 or daemons.count("\nospfd=yes\n") != 1:
         raise RuntimeError("Activacion zebra/ospfd no verificable")
     stage = Path(tempfile.mkdtemp(prefix=".runtime-s02-stage-", dir=BASE))
+    os.chmod(stage, 0o755)  # al renombrar stage a runtime, FRR debe poder recorrerlo
     print(f"STAGING={stage}")
     previous = None
     try:
