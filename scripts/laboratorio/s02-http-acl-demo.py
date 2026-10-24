@@ -136,20 +136,47 @@ def main() -> None:
         print("S02_HTTP_MULTISEDE=VALIDADO")
         print("S02_ACL_SERVICIO_REAL=VALIDADO")
     finally:
+        cleanup_errors = []
         if fw_installed:
             try:
                 sudo("nsenter", "-t", hpid, "-n", "nft", "delete", "table", "inet", TABLE)
                 print("S02_ACL_TEMPORAL_RETIRADA=SI")
             except Exception as e:
+                cleanup_errors.append(f"ACL: {e}")
                 print(f"S02_ACL_LIMPIEZA_ERROR={e}", file=sys.stderr)
         for process, log in reversed(servers):
-            if process.poll() is None:
-                try:
+            try:
+                if process.poll() is None:
                     os.killpg(process.pid, signal.SIGTERM)
-                    process.wait(timeout=6)
-                except Exception:
-                    process.kill()
-            log.close()
+                    try:
+                        process.wait(timeout=5)
+                    except subprocess.TimeoutExpired:
+                        os.killpg(process.pid, signal.SIGKILL)
+                        process.wait(timeout=5)
+            except ProcessLookupError:
+                pass
+            except Exception as e:
+                cleanup_errors.append(f"Proceso HTTP: {e}")
+            finally:
+                log.close()
+        # Comprobar que no sobreviven servidores de ESTA prueba en los
+        # namespaces asignados, aunque sudo haya lanzado procesos hijos.
+        for site, vlan, ipaddr, port in SERVICES:
+            source_ns = f"nl360-s02-h-{site.lower()}-{vlan}"
+            ns_pids = sudo("ip", "netns", "pids", source_ns, allow=True).split()
+            marker = str(BASE / f"s02-http-{site.lower()}-{port}").encode()
+            for pid in ns_pids:
+                if not pid.isdigit():
+                    continue
+                try:
+                    argv = Path(f"/proc/{pid}/cmdline").read_bytes()
+                except (OSError, PermissionError):
+                    continue
+                if marker in argv and b"http.server" in argv:
+                    sudo("kill", "-TERM", pid, allow=True)
+                    cleanup_errors.append(f"HTTP hijo persistente {source_ns} PID={pid}, se ordeno terminar")
+        if cleanup_errors:
+            raise RuntimeError("Limpieza HTTP/ACL requiere comprobacion: " + "; ".join(cleanup_errors))
         print("S02_SERVIDORES_TEMPORALES_FINALIZADOS=SI")
 
 
