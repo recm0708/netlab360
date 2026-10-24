@@ -129,6 +129,14 @@ def check(plan_data: dict, routers: dict) -> dict:
                 raise RuntimeError(f"Subinterfaz ya existe {site}/{dev}")
     if run("git", "-C", str(ROOT), "status", "--porcelain").strip():
         raise RuntimeError("Git tiene cambios locales")
+    for site, target, dev in (("HQ", "10.79.0.2", "s1p"),
+                              ("HQ", "10.79.0.3", "s2p"),
+                              ("S1", "10.79.0.1", "s1p"),
+                              ("S2", "10.79.0.1", "s2p")):
+        route = router_ns(routers, site, "ip", "-4", "route", "get", target, allow=True)
+        if f"dev {dev}" not in route:
+            raise RuntimeError(f"WAN principal no validada antes de LAN: {site}->{target} {route}")
+    print("S02_WAN_PRINCIPALES_PRELAN=OK")
     print("S02_LAN_PRECHECK=OK")
     return before
 
@@ -148,9 +156,10 @@ def cleanup(d: dict, routers: dict) -> None:
     owns(data, routers)
     names = data.get("namespaces", [])
     for site in ROUTERS:
-        if router_ns(routers, site, "ip", "link", "show", "dev", "trunk0", allow=True):
-            router_ns(routers, site, "ip", "link", "delete", "dev", "trunk0")
-            print(f"S02_LAN_TRUNK_RETIRADO={site}")
+        for device in ("trunk0", "tr-r"):
+            if router_ns(routers, site, "ip", "link", "show", "dev", device, allow=True):
+                router_ns(routers, site, "ip", "link", "delete", "dev", device)
+                print(f"S02_LAN_TRUNK_RETIRADO={site}/{device}")
     for name in reversed(names):
         if name in {s.split()[0] for s in sudo("ip", "netns", "list").splitlines() if s.strip()}:
             pids = sudo("ip", "netns", "pids", name).split()
@@ -168,16 +177,16 @@ def cleanup(d: dict, routers: dict) -> None:
 def up(d: dict, routers: dict) -> None:
     before = check(d, routers)
     STATE.parent.mkdir(parents=True, exist_ok=True)
+    reserved = [name for site, row in d.items()
+                for name in [row["switch"]] + [v["host"] for v in row["vlans"]]]
     value = {"owner": OWNER, "date": datetime.now().isoformat(),
              "host": before, "router_ids": {s: routers[s]["id"] for s in ROUTERS},
-             "namespaces": []}
+             "namespaces": reserved}
     STATE.write_text(json.dumps(value, indent=2))
     try:
         for site, entry in d.items():
             sw = entry["switch"]
             sudo("ip", "netns", "add", sw)
-            value["namespaces"].append(sw)
-            STATE.write_text(json.dumps(value, indent=2))
             ip_ns(sw, "link", "set", "lo", "up")
             ip_ns(sw, "link", "add", "br0", "type", "bridge", "vlan_filtering", "1")
             ip_ns(sw, "link", "set", "br0", "up")
@@ -199,8 +208,6 @@ def up(d: dict, routers: dict) -> None:
                 port = f"a{vid}"
                 peer = f"e{vid}"
                 sudo("ip", "netns", "add", host)
-                value["namespaces"].append(host)
-                STATE.write_text(json.dumps(value, indent=2))
                 ip_ns(host, "link", "set", "lo", "up")
                 ip_ns(sw, "link", "add", port, "type", "veth", "peer", "name", peer)
                 ip_ns(sw, "link", "set", peer, "netns", host)
