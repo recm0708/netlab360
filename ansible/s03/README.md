@@ -36,3 +36,18 @@ El usuario ejecutó correctamente la compilación y **5/5 tests offline**, el in
 **Corrección publicada, sin prueba real Ubuntu aún:** la tarea de consulta utiliza `become: true`, `become_method: sudo`, `environment.HOME` del controlador normal para que el script encuentre `~/netlab360-bootstrap` en lugar de `/root`, `changed_when: false`, con autenticación `--ask-become-pass`. No se habilita contraseña permanente ni NOPASSWD, no se toca Docker socket, sólo un proceso read-only del auditor. El playbook fija intérprete local `/usr/bin/python3` y se añade test de alcance/elevación `tests/test_s03_ansible_compliance.py`.
 
 **Puerta de control:** nuevo git pull, py_compile/test nuevo (4/4), syntax-check, `sudo -v`, auditoría directa 8/8, playbook corregido en **dos ejecuciones** con `--ask-become-pass`, esperar `changed=0`, `failed=0`, `unreachable=0` en los tres. Si falla, detener avance con logs. **No ejecutar la prueba drift/reconciliación hasta esto.**
+
+## Problema real con sudo-rs (23/10/2026, segunda correccion)
+
+Dos ejecuciones previas con `become:true` y `--ask-become-pass` llegaron a fallar (`RESULTADO_ANSIBLE_CORREGIDO_1=4`; 3 routers `unreachable=1`) con:
+
+```text
+Timed out waiting for become success or become password prompt.
+[sudo: [sudo via ansible, key=...] password:] Contraseña:
+```
+
+**Causa técnica confirmada por documentación Ubuntu y bug de Ansible**: en Ubuntu 26.04 `sudo-rs` es el proveedor predeterminado de `sudo`; su prefijo adicional al prompt impide que el módulo `become` de la versión instalada de Ansible reconozca la solicitud. Esto es distinto del problema inicial de credenciales de los workers y no lo arregla ejecutar `sudo -v`. La referencia Ubuntu permite expresamente usar `/usr/bin/sudo.ws`, la implementación clásica, manteniendo `sudo-rs` como predeterminada.
+
+**Solución de alcance mínimo publicada pero sin ejecución Ubuntu aún:** dentro de la tarea read-only `Verificar costos OSPF reales contra fuente de verdad`, `vars.ansible_become_exe=/usr/bin/sudo.ws`; el resto del playbook no adquiere privilegios. Se conserva `--ask-become-pass`, `HOME` del usuario para el SoT, sin editar `/etc/sudoers` ni `update-alternatives` del host. Actualizado test `test_s03_ansible_compliance.py` para comprobar este alcance. **Antes de ejecutar** confirmar `test -x /usr/bin/sudo.ws` y `sudo.ws --version`; si falta, detener y diagnosticar, NO cambiar el proveedor global por anticipado.
+
+Referencias: https://ubuntu.com/server/docs/security-users/ ; https://ubuntu.com/server/docs/reference/other-tools/sudo-rs/ ; https://bugs.launchpad.net/bugs/2122414
