@@ -25,6 +25,9 @@ class TestS03AnsibleCompliance(unittest.TestCase):
         task=privileged[0]
         self.assertIn("ansible.builtin.command",task)
         self.assertEqual(task["become_method"],"sudo")
+        # Sudo-rs (Ubuntu 26.04) imprime un prompt no compatible con
+        # Ansible 2.20. El fallback aplica solo al auditor read-only.
+        self.assertEqual(task["vars"]["ansible_become_exe"],"/usr/bin/sudo.ws")
         self.assertFalse(task["changed_when"])
         self.assertEqual(task["environment"]["HOME"],
                          "{{ lookup('ansible.builtin.env', 'HOME') }}")
