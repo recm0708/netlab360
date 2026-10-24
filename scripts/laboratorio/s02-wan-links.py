@@ -147,6 +147,8 @@ def precheck(records: list[dict], current: dict) -> dict:
 def verify_ownership(state: dict, current: dict) -> None:
     if state.get("owner") != OWNER or set(state.get("ids", {})) != set(ROUTERS):
         raise RuntimeError("Marcador de propiedad WAN S02 invalido")
+    if set(state.get("forward_before", {})) != set(ROUTERS):
+        raise RuntimeError("Estado incompleto: sysctl ip_forward previo no registrado")
     for logical, item in current.items():
         if item["id"] != state["ids"][logical]:
             raise RuntimeError(f"Router reemplazado; no modificar red: {logical}")
@@ -176,6 +178,9 @@ def cleanup(records: list[dict], current: dict) -> None:
         if loop in ns(current, logical, "ip", "-4", "-o", "addr", "show", "dev", "lo"):
             ns(current, logical, "ip", "addr", "del", loop, "dev", "lo")
             print(f"S02_LOOPBACK_RETIRADA={logical}:{loop}")
+    for logical, previous in state["forward_before"].items():
+        ns(current, logical, "sysctl", "-qw", f"net.ipv4.ip_forward={previous}")
+        print(f"S02_IP_FORWARD_RESTAURADO={logical}:{previous}")
     after = host_before()
     if (after["ens33"] != state["host"]["ens33"]
             or after["routes"] != state["host"]["routes"]):
@@ -190,7 +195,11 @@ def up(records: list[dict], current: dict) -> None:
     BASE.mkdir(parents=True, exist_ok=True)
     value = {
         "owner": OWNER, "created": datetime.now().isoformat(),
-        "ids": {k: v["id"] for k, v in current.items()}, "host": host
+        "ids": {k: v["id"] for k, v in current.items()}, "host": host,
+        "forward_before": {
+            logical: ns(current, logical, "sysctl", "-n", "net.ipv4.ip_forward").strip()
+            for logical in ROUTERS
+        },
     }
     with STATE.open("x", encoding="utf-8") as fh:
         json.dump(value, fh, indent=2)
@@ -199,6 +208,9 @@ def up(records: list[dict], current: dict) -> None:
             ns(current, logical, "ip", "link", "set", "lo", "up")
             ns(current, logical, "ip", "addr", "add", loop, "dev", "lo")
             print(f"S02_LOOPBACK_CREADA={logical}:{loop}")
+        for logical in ROUTERS:
+            ns(current, logical, "sysctl", "-qw", "net.ipv4.ip_forward=1")
+            print(f"S02_IP_FORWARD_NAMESPACE={logical}:1")
         for v in records:
             h = v["temporary_hq"]
             b = v["temporary_branch"]
