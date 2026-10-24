@@ -3,7 +3,7 @@
 # SOLO AUDITORÍA: no aplica configuración ni cambia interfaces/Docker.
 # Uso:
 # sudo -v
-# ansible-playbook -i "$HOME/netlab360-bootstrap/s03/rendered/inventory-s03.yml" ansible/s03/compliance-frr.yml
+# ansible-playbook --ask-become-pass -i "$HOME/netlab360-bootstrap/s03/rendered/inventory-s03.yml" ansible/s03/compliance-frr.yml
 - name: Auditoria OSPF S03 en los tres routers vivos de NETLAB360
   hosts: routers
   gather_facts: false
@@ -11,6 +11,7 @@
   strategy: linear
   vars:
     s03_script: "{{ playbook_dir }}/../../scripts/validacion/s03-frr-compliance.py"
+    ansible_python_interpreter: /usr/bin/python3
   tasks:
     - name: Verificar identidad de inventario y alcance
       ansible.builtin.assert:
@@ -25,6 +26,14 @@
       changed_when: false
 
     - name: Verificar costos OSPF reales contra fuente de verdad
+      # Ansible crea workers/forks que NO heredan sudo -v del TTY SSH.
+      # Become solo para esta tarea, sin habilitar NOPASSWD en el host.
+      become: true
+      become_method: sudo
+      # El validador debe leer los state/SoT del usuario del laboratorio,
+      # nunca los directorios /root tras la elevacion.
+      environment:
+        HOME: "{{ lookup('ansible.builtin.env', 'HOME') }}"
       ansible.builtin.command:
         argv:
           - python3
