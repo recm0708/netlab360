@@ -192,6 +192,8 @@ def perform(action:str,snapshot:bool)->None:
     current=routers(wan,lan)
     before=host()
     cost=observed_costs(current)[TARGET_ROUTER].get(TARGET_INTERFACE)
+    if cost not in (100, INJECTED_COST):
+        raise RuntimeError(f"Costo de respaldo desconocido; no actuar: {cost}")
     print(f"S03_TARGET={TARGET_ROUTER}/{TARGET_INTERFACE}")
     print(f"S03_COSTO_SOT={desired[TARGET_ROUTER][TARGET_INTERFACE]}")
     print(f"S03_COSTO_OBSERVADO={cost}")
