@@ -7,6 +7,7 @@ No crea/mueve interfaces, no cambia rutas del host, no detiene contenedores.
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 import time
@@ -116,7 +117,7 @@ def wait_and_validate(pids: dict[str, str]) -> None:
             pids, source, "ping", "-n", "-c", "2", "-W", "2",
             "-I", LOOPS[source], LOOPS[dest]
         )
-        if "0% packet loss" not in output:
+        if re.search(r"(?:^|,\s)0% packet loss(?:,|$)", output, re.MULTILINE) is None:
             raise RuntimeError(f"Ping sin respuesta completa: {source}->{dest}\n{output}")
         print(f"S02_PING_{source}_A_{dest}=OK")
     print("S02_OSPF_Y_CONECTIVIDAD=VALIDADOS")
