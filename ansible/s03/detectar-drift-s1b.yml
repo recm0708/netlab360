@@ -1,0 +1,48 @@
+---
+# NETLAB360 S03 — Detecta exclusivamente desviación esperada R-S1/s1b
+# 100 -> 150 sin cambios sobre FRR. Acepta rc2 del auditor como resultado
+# de una detección correcta del experimento.
+- name: Detectar costo OSPF WAN respaldo fuera de SoT
+  hosts: R-S1
+  gather_facts: false
+  connection: local
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    s03_script: "{{ playbook_dir }}/../../scripts/validacion/s03-frr-compliance.py"
+  tasks:
+    - name: Revisar alcance del experimento
+      ansible.builtin.assert:
+        that:
+          - inventory_hostname == 'R-S1'
+          - nl360_container == 'nl360-s02-r-s1'
+        fail_msg: "Router fuera del alcance de drift R-S1/s1b"
+      changed_when: false
+
+    - name: Leer costos FRR y detectar desviacion esperada
+      become: true
+      become_method: sudo
+      vars:
+        ansible_become_exe: /usr/bin/sudo.ws
+      environment:
+        HOME: "{{ lookup('ansible.builtin.env','HOME') }}"
+      ansible.builtin.command:
+        argv: [python3, "{{ s03_script }}", --router, R-S1]
+      register: s03_drifts
+      check_mode: false
+      changed_when: false
+      failed_when: s03_drifts.rc not in [0,2]
+
+    - name: Exigir deteccion NON_COMPLIANT de costo 150 en respaldo
+      ansible.builtin.assert:
+        that:
+          - s03_drifts.rc == 2
+          - "'S03_COSTO_R-S1_s1b=NON_COMPLIANT ESPERADO=100 OBSERVADO=150' in s03_drifts.stdout"
+          - "'S03_COMPLIANCE_RESULTADO=NON_COMPLIANT' in s03_drifts.stdout"
+        fail_msg: "La desviacion controlada esperada no fue detectada"
+        success_msg: "S03_DRIFT_ESPERADO_DETECTADO=SI"
+      changed_when: false
+
+    - name: Mostrar evidencia de desviacion real sin editar FRR
+      ansible.builtin.debug:
+        var: s03_drifts.stdout_lines
+      changed_when: false
