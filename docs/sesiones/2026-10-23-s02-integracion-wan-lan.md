@@ -40,3 +40,16 @@
 - **HTTP/ACL NO validado:** `s02-http-acl-demo.py` imprimió `S02_SERVIDOR_INICIADO` para HQ 8080, S1 8080, S2 8080, S1 8081; al hacer primer `curl` en HQ VLAN110 hacia `10.71.20.20:8080`, exit **7** (Could not connect to server). Exit global **1**. **No se ejecutó instalación nftables ACL**; sin resultado de denegación y sin captura S02_09. El script imprimió cierre de servidores, pero no se validó por `ss`.
 - Los pasos **66–69 (incluido SoT S03)** no se realizaron por decisión correcta de detenerse al código no cero. No asumir S03 iniciada; archivos de código remoto están preparados, ejecución y evidencia pendientes.
 - **Próximo diagnóstico:** conservar routers WAN y LAN; leer cuatro logs `S02_HTTP_Server_{HQ,S1,S2}_8080.log` y `S02_HTTP_Server_S1_8081.log`; verificar listeners TCP en namespaces y reglas `nft` en R-HQ/S1; examinar si el servidor llegó a enlazar el puerto antes de repetir la prueba. No introducir ACL a ciegas, no eliminar recursos.
+
+
+## Diagnostico HTTP resuelto a nivel de causa y plan de prueba — 23/10/2026 19:54 (-05)
+
+**Evidencia recibida del usuario:**
+- Los cuatro archivos `S02_HTTP_Server_{HQ,S1,S2}_8080.log` y `S02_HTTP_Server_S1_8081.log` contienen únicamente `sudo: interactive authentication is required`. El script anterior ejecutaba el servidor mediante `subprocess.Popen(..., start_new_session=True)` a la vez que dependía de `sudo -n` y caché de autorización por TTY, por tanto el proceso hijo no obtuvo credencial. No existían sockets TCP 8080/8081 en namespace después del intento. **NO era prueba de ACL ni fallo IP.**
+- HQ VLAN110 `10.70.10.10/24` y S1 VLAN220 `10.71.20.20/24` están UP; ping HQ→S1 2/2, ida y retorno vía sus gateways. nft `nl360_s02_acl` AUSENTE.
+- Tres FRR running >52 min; `validar-ospf-s02.py` retorna 0, `validar-lan-s02.py` retorna 0; `ens33 .40/24` y GW `.2` intactas, Git limpio.
+- SoT S03 **generado realmente** 19:53:25: 3 routers, 9 VLAN, 8 extremos WAN, source `candidate`; hash `inventory-s03.yml=33edfa992eb35ea5f99154365f149f62eee703305db924b50db854c025b16f0d`, `sot-s03.json=4f1a6d70b49918e08e4c51b398036e8c285f4d512bd7214d04a120fff075f09c`. Captura `S03_01` comunicada tomada. **Esto no acredita Ansible live o idempotencia todavía.**
+
+**Corrección publicada en GitHub, no ejecutada en Ubuntu:** nuevo `s02-http-acl-demo.py` mantiene proceso sudo en misma sesión (sin setsid), comprueba autorización no interactiva antes de iniciar, verifica HTTP real local de cada uno de cuatro servidores, comprueba que S1:8081 continúa activo tras bloqueo HQ:110→S1:8081, que HTTP 8080 sigue permitido y que la regla nft registra paquetes. Limpieza apunta a PID HTTP propio y a tabla nft S02 exclusivamente, sin matar el grupo de sesión SSH. 6 tests nuevos `test_s02_http_acl.py`. **Aceptar captura S02_09 únicamente si test, HTTP/ACL, limpieza y postchecks dan salida 0.**
+
+**S03 adicional preparado, no ejecutado en Ubuntu:** `s03-estado-observado.py` consulta 3 routers solo lectura por Docker/namespaces, confronta 3 loopbacks, 9 VLAN, 8 extremos WAN IPv4 y vecinos OSPF Full 4+2+2 con SoT candidate, exporta JSON observado estable; 3 pruebas offline `test_s03_estado_observado.py`. No aplica playbooks ni reconcilia; candidata captura `S03_02_SoT_Contra_Estado_Real_Tres_Sedes` con hashes de dos lecturas.
