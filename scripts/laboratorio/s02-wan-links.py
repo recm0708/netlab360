@@ -133,9 +133,10 @@ def precheck(records: list[dict], current: dict) -> dict:
         for dev in (v["temporary_hq"], v["temporary_branch"]):
             if execute("ip", "link", "show", "dev", dev, allow_failure=True):
                 raise RuntimeError(f"Veth temporal preexistente: {dev}")
-        for site in ("R-HQ", v["branch"]):
-            if ns(current, site, "ip", "link", "show", "dev", v["nic"], allow_failure=True):
-                raise RuntimeError(f"Interfaz WAN preexistente: {site}/{v['nic']}")
+        for site, temp in (("R-HQ", v["temporary_hq"]), (v["branch"], v["temporary_branch"])):
+            for dev in (v["nic"], temp):
+                if ns(current, site, "ip", "link", "show", "dev", dev, allow_failure=True):
+                    raise RuntimeError(f"Interfaz preexistente: {site}/{dev}")
     if execute("git", "-C", str(ROOT), "status", "--porcelain").strip():
         raise RuntimeError("Git tiene cambios locales pendientes")
     privilege("docker", "image", "inspect", "quay.io/frrouting/frr:10.7.1")
