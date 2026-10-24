@@ -53,3 +53,22 @@
 **Corrección publicada en GitHub, no ejecutada en Ubuntu:** nuevo `s02-http-acl-demo.py` mantiene proceso sudo en misma sesión (sin setsid), comprueba autorización no interactiva antes de iniciar, verifica HTTP real local de cada uno de cuatro servidores, comprueba que S1:8081 continúa activo tras bloqueo HQ:110→S1:8081, que HTTP 8080 sigue permitido y que la regla nft registra paquetes. Limpieza apunta a PID HTTP propio y a tabla nft S02 exclusivamente, sin matar el grupo de sesión SSH. 6 tests nuevos `test_s02_http_acl.py`. **Aceptar captura S02_09 únicamente si test, HTTP/ACL, limpieza y postchecks dan salida 0.**
 
 **S03 adicional preparado, no ejecutado en Ubuntu:** `s03-estado-observado.py` consulta 3 routers solo lectura por Docker/namespaces, confronta 3 loopbacks, 9 VLAN, 8 extremos WAN IPv4 y vecinos OSPF Full 4+2+2 con SoT candidate, exporta JSON observado estable; 3 pruebas offline `test_s03_estado_observado.py`. No aplica playbooks ni reconcilia; candidata captura `S03_02_SoT_Contra_Estado_Real_Tres_Sedes` con hashes de dos lecturas.
+
+
+## Tercer corte real — 23/10/2026 20:10 (-05): HTTP/ACL aprobado y S03 auditoría live inicial
+
+**Resultados enviados por el estudiante (salida completa de los pasos 71–80, 404 líneas):**
+- Python py_compile exit 0; pruebas 6/6 S02 HTTP/ACL y 3/3 S03 observado exitosas.
+- S02 pre-HTTP sudo -n autentica, OSPF 0, LAN 0 y sin tabla nft previa.
+- HTTP corregido arranca **4/4 servicios reales**: HQ `10.70.20.20:8080`, S1 `10.71.20.20:8080`, S2 `10.72.20.20:8080` y S1 `10.71.20.20:8081`, cada uno pasó comprobación HTTP local y devolución de cuerpo.
+- Baseline HTTP intersedes **4/4 OK**; servicio TCP 8081 **ACTIVO PRE-ACL**; nftables tabla `nl360_s02_acl` solo en namespace R-HQ bloqueó tráfico específico HQ VLAN110→S1 `10.71.20.20:8081`, **2 paquetes /120 bytes** contados en la regla. Cliente S1 aún accede al mismo 8081; HTTP 8080 sigue PERMITIDO en 4/4 rutas. `S02_HTTP_MULTISEDE=VALIDADO`, `S02_ACL_SERVICIO_REAL=VALIDADO`, `RESULTADO_HTTP_ACL_CORREGIDO=0`.
+- Postcheck ACL ausente, ningún listener TCP 8080/8081 en los tres endpoints, `S02_ACL_TEMPORAL_RETIRADA=SI` y `S02_SERVIDORES_TEMPORALES_FINALIZADOS=SI`. **La ACL y los HTTP fueron temporales: persistencia/operación de servicios queda para fases posteriores**.
+- Regresión final WAN OSPF **0** y LAN **0**; tres FRR `running`, IP gestión `192.168.47.40/24`, gateway `192.168.47.2`, Git limpio `32c8fc0` en la VM.
+- Se ejecutó bloque de terminal para evidencia `S02_09_HTTP_Real_y_ACL_Entre_Sedes` fechado 20:07:57; **no consta confirmación de archivo PNG guardado** (la salida visible sí es válida).
+- S03 `s03-estado-observado.py` auditoría live sólo lectura exit 0, 3/3 loopback, 9/9 VLAN, 8/8 extremos WAN, OSPF Full 4+2+2. Segunda lectura exit 0 con **SHA256 idéntico** `2c902055a71eaf59bfeeea8db38b2b24e69be23ead4903e74bc1be3fbc37afd7`. `S03_APLICACION_ANSIBLE_EJECUTADA=NO`.
+- Se ejecutó bloque de terminal para `S03_02_SoT_Contra_Estado_Real_Tres_Sedes` a 20:10:19; sin confirmación independiente de guardado PNG. Hash SoT `4f1a6d70b49918e08e4c51b398036e8c285f4d512bd7214d04a120fff075f09c`.
+- Herramientas listas para S03: Ansible Core **2.20.1**, inventario `R-HQ,R-S1,R-S2` reconocido, OpenTofu **1.13.1**, Git limpio.
+
+**Resultado del alcance S02 principal:** multisede integrada real con 4 WAN OSPF y failover/restauración S1/S2, 9 VLAN 802.1Q, 9 clientes de prueba, 4 verificaciones HTTP y ACL temporal discriminante entre sedes, redes del host intactas. **Este bloque funcional pasó sus pruebas.** La issue S02 general no puede cerrarse automáticamente porque su checklist histórico también abarca LACP, NOC, analítica, documentación final, OVA condicional y demás fases transferidas; estas siguen en S04-S08.
+
+**Próxima fase S03:** playbook Ansible sobre 3 routers reales **de solo lectura** para costos OSPF WAN contra SoT; registrar changed=0/failed=0 por router; después, solo con precheck y snapshots, preparar experimento de drift en costo OSPF de backup (sin tocar primaria) con reconciliación y rollback acotado. OpenTofu state/lifecycle y CI quedan pendientes.
