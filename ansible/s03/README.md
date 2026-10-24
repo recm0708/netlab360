@@ -16,7 +16,9 @@ ansible-playbook -i "$HOME/netlab360-bootstrap/s03/rendered/inventory-s03.yml" a
 sudo -v
 sudo -n true
 python3 scripts/validacion/s03-frr-compliance.py
-ansible-playbook -i "$HOME/netlab360-bootstrap/s03/rendered/inventory-s03.yml" ansible/s03/compliance-frr.yml
+# El playbook usa become SOLO en la tarea de consulta de FRR;
+# --ask-become-pass abre el prompt interactivo de Ansible.
+ansible-playbook --ask-become-pass -i "$HOME/netlab360-bootstrap/s03/rendered/inventory-s03.yml" ansible/s03/compliance-frr.yml
 ```
 
 **Éxito estricto:** primer script `S03_COSTOS_WAN_COMPLIANT=8/8`, `S03_COMPLIANCE_RESULTADO=COMPLIANT`, y Ansible recap con `changed=0`, `failed=0` y `unreachable=0` para R-HQ, R-S1 y R-S2. Repetir read-only para verificar estabilidad; `changed=0` **no constituye idempotencia de configuración**, porque no hay `apply`. Nunca declarar reconciliación o drift live comprobados antes de probarlos.
@@ -25,3 +27,12 @@ ansible-playbook -i "$HOME/netlab360-bootstrap/s03/rendered/inventory-s03.yml" a
 Planificar drift controlado exclusivamente de **un costo OSPF de enlace de respaldo** y su reconciliación de `100` mediante Ansible con precheck estado (4+2+2 Full, seis FIB principales y protección ens33). Exigir snapshots VMware, una ventana de recuperación y un guard de propiedad de la interfaz. Ningún `tofu apply` contra recursos S02 activos ni `vtysh configure terminal` sin prueba aprobada. En paralelo IaC OpenTofu con state/lifecycle y revisión de PR/CI.
 
 El corte de documento único 30/10 Teams y el de 13/11 permanecen prioritarios.
+
+
+## Incidente real de autenticacion (23/10/2026, ~20:26 -05)
+
+El usuario ejecutó correctamente la compilación y **5/5 tests offline**, el inventario/syntax-check y la auditoría directa `s03-frr-compliance.py` (**8/8 costos COMPLIANT**, exit 0). Las **dos** ejecuciones del playbook Ansible original fallaron (exit 2, `failed=1` por router) porque los forks `ansible.builtin.command` invocaban `sudo -n docker inspect` sin compartir caché `sudo -v` de la terminal; código `sudo: interactive authentication is required`. Los tres routers/gestión permanecieron intactos según precheck; Ansible no modificó FRR porque la tarea fallida era de solo lectura. **NO capturar esas salidas como compliance Ansible exitoso, ni continuar a drift.**
+
+**Corrección publicada, sin prueba real Ubuntu aún:** la tarea de consulta utiliza `become: true`, `become_method: sudo`, `environment.HOME` del controlador normal para que el script encuentre `~/netlab360-bootstrap` en lugar de `/root`, `changed_when: false`, con autenticación `--ask-become-pass`. No se habilita contraseña permanente ni NOPASSWD, no se toca Docker socket, sólo un proceso read-only del auditor. El playbook fija intérprete local `/usr/bin/python3` y se añade test de alcance/elevación `tests/test_s03_ansible_compliance.py`.
+
+**Puerta de control:** nuevo git pull, py_compile/test nuevo (4/4), syntax-check, `sudo -v`, auditoría directa 8/8, playbook corregido en **dos ejecuciones** con `--ask-become-pass`, esperar `changed=0`, `failed=0`, `unreachable=0` en los tres. Si falla, detener avance con logs. **No ejecutar la prueba drift/reconciliación hasta esto.**
