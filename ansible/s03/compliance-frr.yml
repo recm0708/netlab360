@@ -3,6 +3,7 @@
 # SOLO AUDITORÍA: no aplica configuración ni cambia interfaces/Docker.
 # Uso:
 # sudo -v
+# test -x /usr/bin/sudo.ws
 # ansible-playbook --ask-become-pass -i "$HOME/netlab360-bootstrap/s03/rendered/inventory-s03.yml" ansible/s03/compliance-frr.yml
 - name: Auditoria OSPF S03 en los tres routers vivos de NETLAB360
   hosts: routers
@@ -30,6 +31,10 @@
       # Become solo para esta tarea, sin habilitar NOPASSWD en el host.
       become: true
       become_method: sudo
+      # Ubuntu 26.04 usa sudo-rs por defecto, que presenta un prompt
+      # incompatible con este Ansible; sudo.ws se aplica SOLO a esta tarea.
+      vars:
+        ansible_become_exe: /usr/bin/sudo.ws
       # El validador debe leer los state/SoT del usuario del laboratorio,
       # nunca los directorios /root tras la elevacion.
       environment:
