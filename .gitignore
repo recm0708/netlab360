@@ -25,3 +25,11 @@ dist/
 *.log
 *.pid
 *.tmp
+
+# OpenTofu: estado, planes, metadatos locales nunca en el repositorio.
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.plan
+.terraform/
+.terraform.lock.hcl
