@@ -51,12 +51,11 @@ def plan() -> dict:
         for v in vlans:
             net = ipaddress.ip_network(v["subnet"])
             gw = ipaddress.ip_address(v["gateway"])
-            last = int(str(v["id"])[-1])
-            lastoct = {0: 10, 1: 10, 2: 20, 3: 30}.get(last, 20)
-            # primer VLAN (x10) USERS .10, segundo x20 SERVICES .20, tercero x30 MGMT .30
-            if v["id"] % 100 == 10: lastoct = 10
-            elif v["id"] % 100 == 20: lastoct = 20
-            elif v["id"] % 100 == 30: lastoct = 30
+            # Usuarios .10, servicios .20, gestion interna .30.
+            last_octets = {10: 10, 20: 20, 30: 30}
+            if v["id"] % 100 not in last_octets:
+                raise ValueError(f"VLAN no admitida para host prueba: {v['id']}")
+            lastoct = last_octets[v["id"] % 100]
             ipaddr = ipaddress.ip_address(int(net.network_address) + lastoct)
             if ipaddr not in net or gw not in net or ipaddr == gw:
                 raise ValueError(f"Subred/host fuera de rango: {v}")
@@ -158,7 +157,6 @@ def cleanup(d: dict, routers: dict) -> None:
             for pid in pids:
                 if pid.isdigit():
                     sudo("kill", "-TERM", pid, allow=True)
-            ip_ns(name, "link", "set", "lo", "down") if False else None
             sudo("ip", "netns", "delete", name)
             print(f"S02_LAN_NETNS_RETIRADO={name}")
     if host_state() != data["host"]:
