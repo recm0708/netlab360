@@ -39,8 +39,14 @@
 6. Priorizar resultado funcional demostrable frente a número de tecnologías prometidas. Reducir **alcance opcional** si hace falta, pero no borrar compromisos técnicos oficiales ni falsificar pruebas.
 7. Crear/actualizar el PPT **después del cierre del contenido del informe**, no antes, salvo esquema de demo que puede diseñarse previamente.
 
-## Próximo trabajo operativo inmediato
+## Próximo trabajo operativo inmediato — corte REAL 23/10/2026 20:54 -05
 
-**S02 / primer sprint de integración:** iniciar Ubuntu tras encendido de VMware, precheck seguro (Docker/netns/ens33/GW/SSH/Git), revisar documentación/scripts ya existentes, diseñar integración HQ–S1–S2 y una ruta de pruebas; NO desplegar o modificar interfaces hasta revisar el plan y conservar recovery. La VM fue apagada limpiamente por el usuario el 16/10; su estado apagada por GUI aún pendiente de observación.
+**S01:** conservar 72/100 histórico. No transferirle el avance de S02/S03 ni bloquear S03 por metas que corresponden a S04–S08.
 
-**Estado de documentación:** se dispone ya de fechas parciales y se confirmó demostración en vivo; el parcial se trabaja aparte para resolver criterios de demostración, sin tratar un ejemplo de parcial como rúbrica oficial del semestral.
+**S02:** integración funcional principal **ya demostrada** en una sola topología (HQ/S1/S2, 4 WAN OSPF, retorno y failover, 9 VLAN, HTTP/ACL). Estimación interna del **núcleo replanteado ~90 %**. Prioridad: verificar los PNG de S02_09 guardados, aceptar el hito y enlazar evidencias al informe; la issue #2 continúa abierta hasta completar este cierre documental y ratificar los pendientes reubicados. LACP/capacidad avanzado pertenece a S05 y NOC a S04; **no desmontar el stack S02 vivo**.
+
+**S03:** ~55 % interno gracias a Ansible FRR live, drift REAL de R-S1/s1b 100→150, detección NON_COMPLIANT y reconciliación 150→100 con segunda pasada idempotente `changed=0`; OSPF/LAN e IP de gestión intactos. **Siguiente:** OpenTofu S03 con 17 recursos únicamente de **metadatos `terraform_data`**, estado fuera de Git, tests/offline y plan con gate antes de cualquier apply; posterior segundo plan sin cambios y regresiones. Validación de workflow CI real y PR revisado sigue pendiente, sin desplegar redes desde CI.
+
+**Seguridad operativa:** gestión VMware `ens33=192.168.47.40/24` y GW `192.168.47.2`, tres FRR S02 UP; nunca `docker compose down` o cambios a primarias para probar OpenTofu S03. El commit Git de Ubuntu aportado fue `1dba348`; GitHub ya tiene código y documentación nuevos: revisar estado y sincronizar con `git pull --ff-only` antes de correr validaciones.
+
+**Prioridad académica paralela:** informe único: Introducción, Objetivos, Planteamiento para Teams el **30/10/2026**; luego Fundamento y Diseño para **13/11/2026**. No crear PPT/manual independiente para estos cortes. [Avance verificado](../control/04-avance-s01-s03-2026-10-23.md) · [Sesión S03](../sesiones/2026-10-23-s03-drift-opentofu.md).
