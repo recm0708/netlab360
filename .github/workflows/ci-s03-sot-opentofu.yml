@@ -1,0 +1,75 @@
+name: NETLAB360 - S03 SoT OpenTofu CI declarativa
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'iac/s03/**'
+      - 'inventario/ipam/topologia-s02.yaml'
+      - 'scripts/automatizacion/s03-generar-sot.py'
+      - 'scripts/validacion/s03-*.py'
+      - 'scripts/laboratorio/s03-*.py'
+      - 'ansible/s03/**'
+      - 'tests/test_s03_*.py'
+      - '.github/workflows/ci-s03-sot-opentofu.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'iac/s03/**'
+      - 'inventario/ipam/topologia-s02.yaml'
+      - 'scripts/automatizacion/s03-generar-sot.py'
+      - 'scripts/validacion/s03-*.py'
+      - 'scripts/laboratorio/s03-*.py'
+      - 'ansible/s03/**'
+      - 'tests/test_s03_*.py'
+      - '.github/workflows/ci-s03-sot-opentofu.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  offline-s03:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout solo codigo
+        uses: actions/checkout@v5
+
+      - name: Python para validaciones offline
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Instalar PyYAML version conocida
+        run: python -m pip install --disable-pip-version-check PyYAML==6.0.2
+
+      - name: Compilar Python de S03
+        run: |
+          python -m compileall -q scripts/automatizacion scripts/validacion scripts/laboratorio tests
+
+      - name: Tests S03 sin acceso a FRR real
+        run: python -m unittest discover -s tests -p 'test_s03_*.py' -v
+
+      - name: Preparar OpenTofu sin provider externo
+        uses: opentofu/setup-opentofu@v2
+        with:
+          tofu_version: 1.13.1
+          tofu_wrapper: false
+
+      - name: OpenTofu init sin backend remoto
+        run: tofu -chdir=iac/s03 init -backend=false -input=false -no-color
+
+      - name: OpenTofu validar
+        run: tofu -chdir=iac/s03 validate -no-color
+
+      - name: OpenTofu plan SOLO METADATOS (sin apply)
+        run: |
+          tofu -chdir=iac/s03 plan -input=false -lock=false -no-color \
+            -var="sot_path=$GITHUB_WORKSPACE/inventario/ipam/topologia-s02.yaml"
+
+      - name: Declarar limites de CI
+        run: |
+          echo "S03_CI_OFFLINE=OK"
+          echo "S03_NO_DOCKER_NO_FRR_NO_SUDO=SI"
+          echo "S03_NO_TOFU_APPLY=SI"
+          echo "S03_NO_ESTADO_OPERATIVO_VERIFICADO=SI"
