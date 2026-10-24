@@ -57,9 +57,75 @@ def curl(namespace: str, url: str, success: bool = True) -> str:
     return p.stdout.strip()
 
 
+def wait_http_ready(process, namespace: str, ipaddr: str, port: int, logfile: Path) -> None:
+    """No declarar servicio operativo hasta HTTP de loopback local en VLAN."""
+    url = f"http://{ipaddr}:{port}/"
+    for attempt in range(1, 26):
+        if process.poll() is not None:
+            details = logfile.read_text(errors="replace")[-1200:] if logfile.exists() else ""
+            raise RuntimeError(f"Servidor {namespace}:{port} terminó prematuramente: {details}")
+        try:
+            body = curl(namespace, url)
+            if "NETLAB360_S02_HTTP_" in body:
+                print(f"S02_SERVIDOR_ESCUCHANDO={namespace}:{ipaddr}:{port} INTENTO={attempt}", flush=True)
+                return
+        except RuntimeError:
+            time.sleep(0.2)
+    details = logfile.read_text(errors="replace")[-1200:] if logfile.exists() else ""
+    raise RuntimeError(f"Servidor no escuchó {namespace}:{port} después de 25 intentos: {details}")
+
+
+def cleanup_http_processes(servers) -> list[str]:
+    """Terminar solo procesos de esta prueba, nunca el grupo SSH de usuario."""
+    errors = []
+    for process, log in reversed(servers):
+        try:
+            if process.poll() is None:
+                process.terminate()
+            try:
+                process.wait(timeout=3)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait(timeout=3)
+        except Exception as exc:
+            errors.append(f"Proceso controlador HTTP: {exc}")
+        finally:
+            log.close()
+    # Un sudo que fork+exec deja a veces el python hijo activo. Buscar
+    # únicamente HTTP con directorios específicos de esta prueba en netns.
+    for site, vlan, ipaddr, port in SERVICES:
+        source_ns = f"nl360-s02-h-{site.lower()}-{vlan}"
+        marker = str(BASE / f"s02-http-{site.lower()}-{port}").encode()
+        for _ in range(3):
+            pids = sudo("ip", "netns", "pids", source_ns, allow=True).split()
+            targets = []
+            for pid in pids:
+                if not pid.isdigit():
+                    continue
+                try:
+                    cmdline = Path(f"/proc/{pid}/cmdline").read_bytes().split(b"\0")
+                    comm = Path(f"/proc/{pid}/comm").read_text().strip()
+                except OSError:
+                    continue
+                if comm.startswith("python") and b"http.server" in cmdline and marker in cmdline:
+                    targets.append(pid)
+            if not targets:
+                break
+            for pid in targets:
+                sudo("kill", "-TERM", pid, allow=True)
+            time.sleep(0.2)
+        else:
+            errors.append(f"Servidores persistentes en {source_ns}:{port}")
+    return errors
+
+
 def main() -> None:
     if os.geteuid() == 0:
         raise RuntimeError("Ejecutar como usuario normal, sudo -v previamente")
+    # Ejecutar SIN nueva sesión POSIX: sudo por defecto asocia la
+    # credencial temporal al TTY/sesión. setsid aislaba los hijos de sudo -v.
+    sudo("-v")
+    print("S02_SUDO_NO_INTERACTIVO=OK")
     d = lan.plan()
     routers = lan.router_state()
     if not lan.STATE.is_file() or lan.STATE.is_symlink():
@@ -76,6 +142,7 @@ def main() -> None:
     BASE.mkdir(parents=True, exist_ok=True)
     servers = []
     fw_installed = False
+    acl_attempted = False
     try:
         print("========== HTTP S02 SERVICIOS ==========", flush=True)
         for site, vlan, ipaddr, port in SERVICES:
@@ -85,17 +152,18 @@ def main() -> None:
                 f"NETLAB360_S02_HTTP_{site}_{port}_OK\n", encoding="utf-8"
             )
             source_ns = f"nl360-s02-h-{site.lower()}-{vlan}"
-            log = open(BASE/f"S02_HTTP_Server_{site}_{port}.log", "ab")
+            logpath = BASE / f"S02_HTTP_Server_{site}_{port}.log"
+            log = open(logpath, "ab")
             process = subprocess.Popen(
                 ["sudo", "-n", "ip", "netns", "exec", source_ns,
                  "python3", "-m", "http.server", str(port),
                  "--bind", ipaddr, "--directory", str(directory)],
                 stdin=subprocess.DEVNULL, stdout=log, stderr=subprocess.STDOUT,
-                start_new_session=True
+                start_new_session=False
             )
             servers.append((process, log))
-            print(f"S02_SERVIDOR_INICIADO={site}:{ipaddr}:{port}", flush=True)
-        time.sleep(2)
+            print(f"S02_SERVIDOR_PROCESO_LANZADO={site}:{ipaddr}:{port}", flush=True)
+            wait_http_ready(process, source_ns, ipaddr, port, logpath)
         hq_users = "nl360-s02-h-hq-110"
         s1_users = "nl360-s02-h-s1-210"
         s2_users = "nl360-s02-h-s2-310"
@@ -120,65 +188,44 @@ def main() -> None:
             " }\n}\n"
         )
         sudocmd = ["sudo", "-n", "nsenter", "-t", hpid, "-n", "nft", "-f", "-"]
+        acl_attempted = True
         cmd(*sudocmd, input_text=script)
         fw_installed = True
         print("S02_ACL_ROUTER=R-HQ PUERTO_8081=DENEGADO")
         curl(hq_users, "http://10.71.20.20:8081/", success=False)
         print("S02_ACL_HTTP_8081_DENEGADO=OK")
+        # El mismo servicio debe continuar aceptando conexiones desde S1:
+        alive_after = curl(s1_users, "http://10.71.20.20:8081/")
+        print(f"S02_SERVICIO_8081_POSTACL_DESDE_S1=ACTIVO BODY={alive_after}")
         for ns, url, name in tests:
             body = curl(ns, url)
             print(f"S02_ACL_HTTP_8080_{name}=PERMITIDO BODY={body}")
         print("========== CONTADOR ACL ==========")
-        print(sudo("nsenter", "-t", hpid, "-n", "nft", "-a", "list",
-                   "chain", "inet", TABLE, "forward").strip())
+        counter = sudo("nsenter", "-t", hpid, "-n", "nft", "-a", "list",
+                       "chain", "inet", TABLE, "forward")
+        print(counter.strip())
+        count_match = re.search(r"counter packets\s+(\d+)\s+bytes", counter)
+        if not count_match or int(count_match.group(1)) < 1:
+            raise RuntimeError("ACL no contabilizó tráfico bloqueado")
+        print(f"S02_ACL_PAQUETES_BLOQUEADOS={count_match.group(1)}")
         if lan.host_state() != state["host"]:
             raise RuntimeError("Gestion administrativa alterada durante ACL")
         print("S02_HTTP_MULTISEDE=VALIDADO")
         print("S02_ACL_SERVICIO_REAL=VALIDADO")
     finally:
         cleanup_errors = []
-        if fw_installed:
+        if fw_installed or acl_attempted:
             try:
+                # Borrar solo nuestra tabla, sin vaciar otras reglas del router.
                 sudo("nsenter", "-t", hpid, "-n", "nft", "delete", "table", "inet", TABLE)
                 print("S02_ACL_TEMPORAL_RETIRADA=SI")
             except Exception as e:
                 cleanup_errors.append(f"ACL: {e}")
                 print(f"S02_ACL_LIMPIEZA_ERROR={e}", file=sys.stderr)
-        for process, log in reversed(servers):
-            try:
-                if process.poll() is None:
-                    os.killpg(process.pid, signal.SIGTERM)
-                    try:
-                        process.wait(timeout=5)
-                    except subprocess.TimeoutExpired:
-                        os.killpg(process.pid, signal.SIGKILL)
-                        process.wait(timeout=5)
-            except ProcessLookupError:
-                pass
-            except Exception as e:
-                cleanup_errors.append(f"Proceso HTTP: {e}")
-            finally:
-                log.close()
-        # Comprobar que no sobreviven servidores de ESTA prueba en los
-        # namespaces asignados, aunque sudo haya lanzado procesos hijos.
-        for site, vlan, ipaddr, port in SERVICES:
-            source_ns = f"nl360-s02-h-{site.lower()}-{vlan}"
-            ns_pids = sudo("ip", "netns", "pids", source_ns, allow=True).split()
-            marker = str(BASE / f"s02-http-{site.lower()}-{port}").encode()
-            for pid in ns_pids:
-                if not pid.isdigit():
-                    continue
-                try:
-                    argv = Path(f"/proc/{pid}/cmdline").read_bytes()
-                except (OSError, PermissionError):
-                    continue
-                if marker in argv and b"http.server" in argv:
-                    sudo("kill", "-TERM", pid, allow=True)
-                    cleanup_errors.append(f"HTTP hijo persistente {source_ns} PID={pid}, se ordeno terminar")
+        cleanup_errors.extend(cleanup_http_processes(servers))
         if cleanup_errors:
             raise RuntimeError("Limpieza HTTP/ACL requiere comprobacion: " + "; ".join(cleanup_errors))
         print("S02_SERVIDORES_TEMPORALES_FINALIZADOS=SI")
-
 
 if __name__ == "__main__":
     try:
