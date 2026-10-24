@@ -1,0 +1,45 @@
+---
+# NETLAB360 S03 — Acción explícita y acotada en WAN BACKUP R-S1/s1b.
+# 'inspect' = solo lectura. 'inject' = 100->150 tras snapshot.
+# 'reconcile' = 150->100 según SoT (segunda vez changed=0).
+# Prohibe otros routers/interfaces y elevación global. HOME original.
+- name: NETLAB360 S03 drift y reconciliacion acotados a R-S1
+  hosts: R-S1
+  gather_facts: false
+  connection: local
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    script_control: "{{ playbook_dir }}/../../scripts/laboratorio/s03-drift-s1b.py"
+    operacion_validada: "{{ operacion_s03 | default('') }}"
+    snapshot_validado: "{{ snapshot_s03 | default(false) | bool }}"
+  tasks:
+    - name: Verificar operacion, alcance y consentimiento de snapshot
+      ansible.builtin.assert:
+        that:
+          - inventory_hostname == 'R-S1'
+          - nl360_container == 'nl360-s02-r-s1'
+          - operacion_validada in ['inspect','inject','reconcile']
+          - operacion_validada != 'inject' or snapshot_validado
+          - operacion_validada == 'inject' or not snapshot_validado
+        fail_msg: "Operacion S03 invalida o snapshot no confirmado. No ejecutar cambios."
+        success_msg: "S03_OPERACION_AUTORIZADA={{ operacion_validada }}"
+      changed_when: false
+
+    - name: Consultar o gestionar UNICO costo OSPF respaldo en R-S1
+      become: true
+      become_method: sudo
+      vars:
+        ansible_become_exe: /usr/bin/sudo.ws
+      environment:
+        HOME: "{{ lookup('ansible.builtin.env','HOME') }}"
+      ansible.builtin.command:
+        argv: "{{ ['python3', script_control, operacion_validada] + (['--snapshot-confirmado'] if operacion_validada == 'inject' else []) }}"
+      register: s03_control
+      check_mode: false
+      changed_when: "'S03_CONFIG_CHANGED=1' in s03_control.stdout"
+      failed_when: s03_control.rc != 0
+
+    - name: Mostrar resultado y valor de changed sin afectar FRR
+      ansible.builtin.debug:
+        var: s03_control.stdout_lines
+      changed_when: false
