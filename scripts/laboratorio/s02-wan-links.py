@@ -253,7 +253,13 @@ def status(records: list[dict], current: dict) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("action", choices=["plan", "precheck", "up", "status", "down"])
+    parser.add_argument("--snapshot-confirmado", action="store_true",
+                        help="Obligatorio solo para up: instantanea VMware confirmada")
     args = parser.parse_args()
+    if args.action == "up" and not args.snapshot_confirmado:
+        raise RuntimeError("Antes de up confirme snapshot con --snapshot-confirmado")
+    if args.action != "up" and args.snapshot_confirmado:
+        raise RuntimeError("El indicador --snapshot-confirmado solo aplica a up")
     records = plan()
     if args.action == "plan":
         print("S02_SIN_CAMBIOS=SI")
