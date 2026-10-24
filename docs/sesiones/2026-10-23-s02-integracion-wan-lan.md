@@ -30,3 +30,13 @@
 - No ejecutar `docker compose down` mientras existan WAN/LAN. Para revertir caso integral: detener prueba HTTP, `python3 scripts/laboratorio/s02-lan-vlan.py down` si LAN fue creada, luego `python3 scripts/laboratorio/s02-wan-links.py down`, y solo finalmente Compose.
 - Nunca `docker system prune`, `ip link del ens33`, `ip route flush`, ni limpiar namespaces globalmente.
 - No asumir que archivos publicados o pruebas no ejecutadas en Ubuntu ya funcionaron.
+
+
+## Segundo corte real — 23/10/2026 19:42 (-05), failover/LAN y bloqueo HTTP
+- **WAN failover S1:** primaria `s1p` down, ambas FIB HQ/S1 usan `s1b`, otra sede estable, al restaurar retorna `s1p`, `RESULTADO_FAILOVER_S1=0`.
+- **WAN failover S2:** primaria `s2p` down, ambas FIB HQ/S2 usan `s2b`, S1 estable y vuelve a `s2p` al restaurar, `RESULTADO_FAILOVER_S2=0`.
+- OSPF después de fallas `RESULTADO_OSPF_POSTFAILOVER=0`, cuatro FULL HQ, dos FULL S1/S2 y seis rutas principales. Captura **S02_07** comunicada tomada.
+- **LAN S02:** plan/precheck 0; `up --snapshot-confirmado` termina 0, tres bridges, nueve VLAN etiquetadas por sede y nueve hosts, host sin cambios; `validar-lan-s02.py` confirma **9/9** ping a gateways, **6/6** ICMP inter-VLAN y entre sedes y resultado 0; `status` muestra trunk etiquetado y subinterfaces `trunk0.<VID>`. Captura **S02_08** comunicada tomada.
+- **HTTP/ACL NO validado:** `s02-http-acl-demo.py` imprimió `S02_SERVIDOR_INICIADO` para HQ 8080, S1 8080, S2 8080, S1 8081; al hacer primer `curl` en HQ VLAN110 hacia `10.71.20.20:8080`, exit **7** (Could not connect to server). Exit global **1**. **No se ejecutó instalación nftables ACL**; sin resultado de denegación y sin captura S02_09. El script imprimió cierre de servidores, pero no se validó por `ss`.
+- Los pasos **66–69 (incluido SoT S03)** no se realizaron por decisión correcta de detenerse al código no cero. No asumir S03 iniciada; archivos de código remoto están preparados, ejecución y evidencia pendientes.
+- **Próximo diagnóstico:** conservar routers WAN y LAN; leer cuatro logs `S02_HTTP_Server_{HQ,S1,S2}_8080.log` y `S02_HTTP_Server_S1_8081.log`; verificar listeners TCP en namespaces y reglas `nft` en R-HQ/S1; examinar si el servidor llegó a enlazar el puerto antes de repetir la prueba. No introducir ACL a ciegas, no eliminar recursos.
