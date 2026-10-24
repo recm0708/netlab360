@@ -3,7 +3,8 @@
 
 plan: validacion declarativa sin sudo, sin cambios.
 precheck: comprueba identidad de routers, redes y ausencia de enlaces previos.
-up: crea 4 veth, IP, aplica FRR, verifica OSPF FULL/FIB/ping, rollback si falla.
+up: crea 4 veth, loopbacks, IP, aplica FRR; rollback exclusivo si falla.
+La prueba de vecinos OSPF/FIB se realiza despues mediante validador independiente.
 status: muestra interfaces/vecindades/rutas sin cambios.
 down: retira SOLO los enlaces WAN de S02, sin detener los 3 routers.
 No modifica ens33, VMnet8, rutas/firewall del host, ni namespaces ajenos.
@@ -124,6 +125,10 @@ def precheck(records: list[dict], current: dict) -> dict:
     host = host_before()
     if STATE.exists() or STATE.is_symlink():
         raise RuntimeError("WAN S02 posee estado previo; usar status/down o diagnosticar")
+    for logical, loop in (("R-HQ", "10.79.0.1/32"), ("R-S1", "10.79.0.2/32"), ("R-S2", "10.79.0.3/32")):
+        output = ns(current, logical, "ip", "-4", "-o", "addr", "show", "dev", "lo")
+        if loop in output:
+            raise RuntimeError(f"Loopback S02 preexistente: {logical} {loop}")
     for v in records:
         for dev in (v["temporary_hq"], v["temporary_branch"]):
             if execute("ip", "link", "show", "dev", dev, allow_failure=True):
@@ -158,10 +163,18 @@ def cleanup(records: list[dict], current: dict) -> None:
                 ns(current, logical, "ip", "link", "delete", "dev", v["nic"])
                 print(f"S02_WAN_RETIRADA={v['id']} lado={logical}")
                 break
+        for logical, temp in (("R-HQ", v["temporary_hq"]), (v["branch"], v["temporary_branch"])):
+            if ns(current, logical, "ip", "link", "show", "dev", temp, allow_failure=True):
+                ns(current, logical, "ip", "link", "delete", "dev", temp)
+                print(f"S02_WAN_TEMP_NAMESPACE_RETIRADO={logical}/{temp}")
         for temp in (v["temporary_hq"], v["temporary_branch"]):
             if execute("ip", "link", "show", "dev", temp, allow_failure=True):
                 privilege("ip", "link", "delete", "dev", temp)
-                print(f"S02_WAN_TEMP_RETIRADO={temp}")
+                print(f"S02_WAN_TEMP_HOST_RETIRADO={temp}")
+    for logical, loop in (("R-HQ", "10.79.0.1/32"), ("R-S1", "10.79.0.2/32"), ("R-S2", "10.79.0.3/32")):
+        if loop in ns(current, logical, "ip", "-4", "-o", "addr", "show", "dev", "lo"):
+            ns(current, logical, "ip", "addr", "del", loop, "dev", "lo")
+            print(f"S02_LOOPBACK_RETIRADA={logical}:{loop}")
     after = host_before()
     if (after["ens33"] != state["host"]["ens33"]
             or after["routes"] != state["host"]["routes"]):
@@ -181,6 +194,10 @@ def up(records: list[dict], current: dict) -> None:
     with STATE.open("x", encoding="utf-8") as fh:
         json.dump(value, fh, indent=2)
     try:
+        for logical, loop in (("R-HQ", "10.79.0.1/32"), ("R-S1", "10.79.0.2/32"), ("R-S2", "10.79.0.3/32")):
+            ns(current, logical, "ip", "link", "set", "lo", "up")
+            ns(current, logical, "ip", "addr", "add", loop, "dev", "lo")
+            print(f"S02_LOOPBACK_CREADA={logical}:{loop}")
         for v in records:
             h = v["temporary_hq"]
             b = v["temporary_branch"]
