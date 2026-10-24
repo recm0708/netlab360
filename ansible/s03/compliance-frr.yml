@@ -1,0 +1,43 @@
+---
+# NETLAB360 S03 — Primera automatización ANSIBLE sobre routers FRR VIVOS.
+# SOLO AUDITORÍA: no aplica configuración ni cambia interfaces/Docker.
+# Uso:
+# sudo -v
+# ansible-playbook -i "$HOME/netlab360-bootstrap/s03/rendered/inventory-s03.yml" ansible/s03/compliance-frr.yml
+- name: Auditoria OSPF S03 en los tres routers vivos de NETLAB360
+  hosts: routers
+  gather_facts: false
+  connection: local
+  strategy: linear
+  vars:
+    s03_script: "{{ playbook_dir }}/../../scripts/validacion/s03-frr-compliance.py"
+  tasks:
+    - name: Verificar identidad de inventario y alcance
+      ansible.builtin.assert:
+        that:
+          - inventory_hostname in ['R-HQ', 'R-S1', 'R-S2']
+          - nl360_container is defined
+          - nl360_container in ['nl360-s02-r-hq', 'nl360-s02-r-s1', 'nl360-s02-r-s2']
+          - nl360_wan | length == (4 if inventory_hostname == 'R-HQ' else 2)
+          - ansible_connection == 'local'
+        fail_msg: El inventario S03 no corresponde a la topologia protegida.
+        success_msg: S03_INVENTARIO_ANSIBLE=VALIDO
+      changed_when: false
+
+    - name: Verificar costos OSPF reales contra fuente de verdad
+      ansible.builtin.command:
+        argv:
+          - python3
+          - "{{ s03_script }}"
+          - --router
+          - "{{ inventory_hostname }}"
+      register: s03_auditoria
+      # Se mantiene ejecutable incluso con --check porque SOLO LEE estado.
+      check_mode: false
+      changed_when: false
+      failed_when: s03_auditoria.rc != 0
+
+    - name: Presentar cumplimiento del router sin cambiar configuracion
+      ansible.builtin.debug:
+        var: s03_auditoria.stdout_lines
+      changed_when: false
