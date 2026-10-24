@@ -102,12 +102,11 @@ def cleanup_http_processes(servers) -> list[str]:
             for pid in pids:
                 if not pid.isdigit():
                     continue
-                try:
-                    cmdline = Path(f"/proc/{pid}/cmdline").read_bytes().split(b"\0")
-                    comm = Path(f"/proc/{pid}/comm").read_text().strip()
-                except OSError:
-                    continue
-                if comm.startswith("python") and b"http.server" in cmdline and marker in cmdline:
+                # Los servidores se iniciaron con sudo y pueden ser root.
+                # No depender de permisos de lectura /proc del usuario SSH.
+                cmdline = sudo("ps", "-p", pid, "-o", "args=", allow=True)
+                comm = sudo("ps", "-p", pid, "-o", "comm=", allow=True).strip()
+                if comm.startswith("python") and "http.server" in cmdline and marker.decode() in cmdline:
                     targets.append(pid)
             if not targets:
                 break
