@@ -1,59 +1,33 @@
-# NETLAB360 — Índice maestro OFICIAL del informe final académico-técnico
+# NETLAB360 — Índice maestro de trabajo del informe académico-técnico
 
-**Vigente desde 16/10/2026, REV0.3.** ÚNICO informe escrito requerido por las guías oficiales: **mínimo 40 páginas**. Portada institucional por el usuario. Estructura derivada de `1457-Formato Proyecto Final.pdf` y desarrollada con `1457-Elaboración del Trabajo Escrito.pdf`. El usuario preparó ya un borrador académico de **65 páginas** bajo numeración previa; **se debe migrar sin perder contenido**, no destruir ni recrear desde cero.
+**Actualizado el 25/10/2026.** Un único informe institucional, mínimo **40 páginas**, con estructura técnica continua. El borrador recibido `1457-Proyecto Semestral_borrador2.5.pdf` tiene **80 páginas**. El estudiante informó posteriormente haber aplicado correcciones editoriales; **no consta todavía una nueva exportación revisada**. Conservar su Word original y proporcionar correcciones por chat; no recrear el archivo sin solicitud.
 
-**Título formal de portada:** NETLAB360: Diseño e implementación de una plataforma virtualizada para la automatización, observabilidad y diagnóstico de redes empresariales multisede.
-**Encabezado abreviado:** NETLAB360 | Redes Empresariales Multisede.
+**Título comunicado por Teams el 17/10/2026:** «Diseño e implementación de una plataforma virtualizada para la automatización, observabilidad y diagnóstico de redes empresariales multisede». Su aprobación docente sigue por confirmar. **Nombre/encabezado abreviado:** NETLAB360 | Redes Empresariales Multisede.
 
-## Orden exigido por la profesora
+## Orden editorial vigente del informe
 
-1. **Portada:** UTP, facultad, carrera, asignatura, título, integrantes **nombre y cédula**, profesor, fecha.
-2. **Introducción:** contexto, importancia en redes actuales, síntesis de problema y solución implementada. Sin comandos.
-3. **Objetivos:**
-   - Objetivo general: verbo en infinitivo, finalidad y resultado medible.
-   - Objetivos específicos: diseño→implementación→comprobación, resultados verificables y vinculados con las pruebas.
-4. **Planteamiento del problema:**
-   - Situación y necesidad concreta.
-   - Impacto, consecuencias y limitaciones.
-   - Justificación de la solución propuesta; aquí se traslada la anterior sección de justificación separada.
-5. **Fundamento técnico:** tecnologías efectivamente usadas y justificación de selección; VMware/Ubuntu, contenedores/netns, VLAN/802.1Q, ACL, FRR/OSPF doble WAN, LACP/bonding, SoT/IPAM, OpenTofu/Ansible, Prometheus/NOC y diagnóstico por reglas. Fuentes bibliográficas oficiales APA7. Evitar historia genérica inconexa.
-6. **Diseño de la solución:**
-   - Arquitectura lógica por sedes HQ/S1/S2 (S2 reservada hasta implementación), red de gestión VMnet8 aislada.
-   - Componentes/roles, topología general, subredes/VLAN, dos enlaces WAN, protocolos, políticas, flujos.
-   - Planos lógico/funcional de automatización, telemetría y analítica; figuras con nota que distingan diseño de práctica.
-7. **Implementación:**
-   - Entorno anfitrión, VM Ubuntu Desktop, recursos, SO, versiones verificadas, SSH y protección de gestión.
-   - Secuencia de construcción REAL: inventario/IPAM→VLAN/ACL→routers FRR/OSPF→WAN/LACP/bonding→IaC/Ansible→telemetría/NOC→diagnóstico y siguientes módulos integrados.
-   - Explicar las **configuraciones principales y scripts** (entradas, lógica, salidas pertinentes, criterios de reversión) con fragmentos imprescindibles y nombre/ruta de archivos; código completo al anexo, mediante ZIP autorizado.
-   - No narrar cada comando de error del operador.
-8. **Pruebas y validación:**
-   - Baseline de cada escenario; objetivo y condiciones.
-   - Resultado esperado; evento inducido (normal, falla o recuperación); **resultado observado cuantificado** y evidencia.
-   - Pruebas de WAN primario/respaldo/restaurado, ACL permitida/denegada, LACP dos→uno→dos, IaC idempotencia/drift de archivos, alertas firing/resueltas, datos B4 y postchecks.
-   - Distinguir pruebas de subtopologías S01 de futuras pruebas de extremo a extremo. Figuras/tablas preámbulo y nota APA7.
-9. **Análisis de resultados:**
-   - Comparación de lo esperado contra lo realmente conseguido, precisión/limitación de métricas.
-   - **Problemas técnicos reales y mitigación** (p. ej. espera FIB después de OSPF Full; reglas Prometheus que no cargaban por ruta relativa), verificación correctiva, sin inventar causalidad.
-   - Limitaciones: S2 no desplegada a la fecha del corte, falta L2→WAN en topología única, LACP virtual ≠ duplicación física, reglas deterministas ≠ IA evaluada, OVA no comprobada.
-   - Mejoras priorizadas solo cuando respaldadas.
-10. **Conclusiones y recomendaciones:** cumplimiento de objetivos, síntesis probada y recomendaciones específicas coherentes con estado final; evitar conclusiones anticipadas sobre capacidades pendientes.
-11. **Referencias:** UN único listado APA7 de fuentes citadas, revisión bidireccional cita/referencia.
-12. **Anexos:** descripción del paquete de fuentes/configuraciones/logs y evidencias, listado de archivos, versiones, SHA256 y modo de verificación; si la profesora admite ZIP separado, aportar índice dentro del escrito y ZIP físico fuera.
+- Portada e índice general institucional.
+- Introducción.
+- **1. Objetivos** (objetivo general y específicos).
+- **2. Planteamiento del problema** (problema y justificación).
+- **3. Fundamento técnico** (virtualización/contendores, Linux networking, VLAN, OSPF/FRR, LACP, SoT, OpenTofu, Ansible, observabilidad y diagnóstico; citas verificables).
+- **4. Diseño de la solución** (HQ/S1/S2, cuatro WAN, nueve VLAN y sus direcciones, protección VMnet8, módulos pendientes; **Figura 1 debe mostrar la topología real, no texto provisional**).
+- **5. Implementación**: 5.1 entorno, 5.2 metodología en **ocho fases internas**, 5.3 fase 1 (antecedentes experimentales) y 5.4 fase 2 (integración multisede y desmontaje seguro); nuevas fases se incorporan progresivamente sin duplicar informes.
+- **6. Pruebas y validación** (propósito, baseline, esperado/observado, evidencia y recuperación; diferenciar pruebas de red y offline).
+- **7. Análisis de resultados** (interpretación de resultados, limitaciones reales; sin atribuir disponibilidad continua o IA no probadas).
+- **8. Conclusiones y recomendaciones**, actualizadas conforme avance la implementación.
+- **Referencias**, listado único APA 7, cierre del informe.
 
-## Reglas de actualización
+**Importante — modalidad docente precisada por estudiante 25/10/2026:** **no insertar capítulo/sección de anexos en el Word**. Los scripts, YAML/JSON, HCL, Ansible, configuraciones, pruebas y evidencias técnicas necesarias se entregarán mediante **un único `.tar` independiente**. La guía académica histórica relaciona doce piezas y contempla anexos, pero la modalidad externa se registró en [criterios](../academico/00-criterios-docentes-y-hitos.md) y [plan TAR](../academico/03-anexos-y-demostracion.md). No crear ZIP ni índice ficticio de anexos dentro del informe.
 
-- No insertar ocho documentos dentro de uno. Agregar progreso de fases bajo 7 Implementación, 8 Pruebas, 9 Análisis; actualizar diseño y fundamentos solo si cambian tecnologías reales.
-- **No alterar directamente la copia Word institucional de usuario.** Proporcionar bloques de revisión para migrar secciones; respetar numeración de figuras/tablas hasta cotejar DOCX/PDF vigente.
-- Reporte S01 actual: base técnica aprovechable con 86 PNG/7 CSV, CI 24/24. **Quedan secciones 7 y 8 por ampliar** y orden 1–12 por ajustar. No afirmar informe final aprobado.
-- Los criterios anteriores C01–C11 son **matriz interna**, no rúbrica oficial; la guía no los enumera como tales.
-- Presentación después de cerrar informe y pruebas; manual técnico 02 **pospuesto para uso posterior**.
+## Disciplina de actualización y evidencia
 
-**Cruces:** [requisitos oficiales](../academico/00-criterios-docentes-y-hitos.md) · [plan de migración](../academico/01-migracion-borrador-a-formato-docente.md) · [paquete de anexos/demostración](../academico/03-anexos-y-demostracion.md).
+- En la narración utilizar **fase 1, fase 2, fase 3**; mantener identificadores S01/S02/S03 cuando son nombres reales de scripts, rutas y evidencias. Ocho fases son hitos internos, no ocho informes separados.
+- S01 histórico incluyó LACP virtual, dos WAN HQ/S1, pruebas de automatización candidata, Prometheus y diagnóstico determinista. S02 integró funcionalmente **tres routers, cuatro WAN, nueve VLAN, HTTP y ACL**; desmontada deliberadamente el 23/10 con respaldos.
+- S03 cuenta con SoT, auditoría real Ansible y drift/reconciliación de FRR comprobados, pero **OpenTofu metadata-only y CI/PR siguen sin aceptación real**.
+- Ninguna captura o tabla implica resultado diferente al observado. Figuras y tablas con preámbulo, título, nota y referencias cruzadas correctos. El borrador 2.5 tenía **Figura 1 pendiente**, y el usuario indicó haber aplicado correcciones editoriales sin facilitar aún nuevo PDF verificable.
+- Conservar historial técnico de evidencias SHA-256; nunca insertar secretos o archivos docentes recibidos de terceros en GitHub ni en TAR distribuible.
+- No cerrar issues técnicas por un borrador narrativo; exigir resultados comprobados, trazabilidad, checklist y aceptación del alcance.
+- **30/10/2026:** mostrar en Teams introducción, objetivos y planteamiento, sin PPT adicional (#47). **13/11/2026:** fundamento y diseño (#48). Presentación y demostración final según fecha docente por confirmar. Manual independiente pospuesto.
 
-
-## Control de entregas parciales (17/10/2026)
-
-- **Título del semestral:** enviar al chat Teams, documentar respuesta y ajuste si la docente lo solicita. **Estado de envío no confirmado**, issue #46.
-- **30/10/2026:** mostrar en Teams borrador institucional de Introducción, Objetivos y Planteamiento del problema, **sin diapositivas**. Responsable del grupo a designar (#47).
-- **13/11/2026:** presentar fundamento técnico y diseño del mismo informe (#48).
-- **Anexos por separado autorizados**; preparar ZIP de solo código/evidencias propias, sin documentos recibidos de clase ni secretos. Presentación final **EN VIVO** y posterior al informe.
+**Vínculos:** [criterios docentes](../academico/00-criterios-docentes-y-hitos.md) · [TAR externo](../academico/03-anexos-y-demostracion.md) · [fase 2 #2](https://github.com/recm0708/netlab360/issues/2) · [fase 3 #3](https://github.com/recm0708/netlab360/issues/3) · [entrega TAR #45](https://github.com/recm0708/netlab360/issues/45).
