@@ -1,6 +1,6 @@
 # NETLAB360 S03 — OpenTofu y GitOps sin riesgo para infraestructura viva
 
-**Estado:** código preparado y publicado en GitHub el 23/10/2026. **No se ha ejecutado todavía en la VM del estudiante**; no afirmar `tofu plan/apply` aprobado antes de resultados reales.
+**Estado actualizado 25/10/2026:** `init`, `validate`, plan seguro de 17 creaciones y `apply` **17 added, 0 changed, 0 destroyed** verificados realmente en Ubuntu. Manifiesto 3 sedes/4 WAN/9 VLAN y segundo plan **sin cambios (código 0)** también confirmados, conservando `ens33` y la fase 2 pausada. El state permanece fuera del repositorio y no debe incorporarse al TAR. [Sesión verificada](../../docs/sesiones/2026-10-25-s03-opentofu-metadata-ci.md). CI específica S03 y PR #49 de regresión global también comprobados; validar checks de `main` posteriores al merge y confirmar capturas guardadas. Las instrucciones de preparación que siguen son **para un workspace nuevo**, no para volver a aplicar el estado ya creado.
 
 ## Alcance exacto
 
@@ -50,6 +50,10 @@ python3 scripts/validacion/s03-tofu-plan.py "$ART/s03-plan.json"
 **Puerta de cambio:** comprobar `S03_PLAN_SOLO_TERRAFORM_DATA=17/17` y `S03_PLAN_ACCIONES_EXCLUSIVAS=CREATE` **ANTES** de ejecutar `tofu apply -input=false -no-color "$ART/s03-plan.tfplan"`. Verificar `Apply complete! Resources: 17 added, 0 changed, 0 destroyed.`. Si el plan es diferente, DETENER: no aplicar.
 
 Tras apply, exportar `tofu -chdir="$WORK" output -json s03_manifest > "$ART/s03-manifest.json"` y validar `python3 scripts/validacion/s03-tofu-manifest.py "$ART/s03-manifest.json"`: 3/3 sitios, 4/4 WAN, 9/9 VLAN y estado = 17/17. Repetir `tofu plan -detailed-exitcode` con la misma var; **0 significa sin cambios**, 2 significa cambios planificados (no confundir con error). Nunca destruir estados S01 para completar esta fase.
+
+## Historial de aplicación en la VM
+
+El estado OpenTofu de fase 3 ya existe en `~/netlab360-bootstrap/iac/s03/work`. **NO ejecutar de nuevo** el preparador de inicialización, no sobrescribir ni borrar `terraform.tfstate` y no ejecutar `tofu apply` para repetir las capturas. Para read-only usar `tofu state list`, `tofu output -json s03_manifest` y `tofu plan -detailed-exitcode`, siempre con la variable `sot_path` correcta; las comprobaciones existentes están documentadas en la sesión del 25/10. Mantener los 17 metadatos fuera del paquete TAR final.
 
 ## CI/GitOps (solo offline)
 
