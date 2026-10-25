@@ -22,7 +22,8 @@ from datetime import datetime
 
 import yaml
 
-ROOT = Path.home() / "proyectos/netlab360"
+# Repo relativo al script: funciona tanto en la VM como en GitHub Actions.
+ROOT = Path(__file__).resolve().parents[2]
 BASE = Path.home() / "netlab360-bootstrap/s02"
 STATE = BASE / "wan-links-state.json"
 IPAM = ROOT / "inventario/ipam/topologia-s02.yaml"
