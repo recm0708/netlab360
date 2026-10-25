@@ -1,0 +1,50 @@
+name: NETLAB360 - Eliminar rama fusionada
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  limpiar-rama:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verificar merge y eliminar solo la rama de origen fusionada
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          BASE_REPO: ${{ github.event.pull_request.base.repo.full_name }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          [[ "$REPO" == "$BASE_REPO" ]]
+          [[ "$HEAD_REPO" == "$REPO" ]] || {
+            echo "SKIP=RAMA_DE_FORK_AJENO"
+            exit 0
+          }
+          [[ "$HEAD_BRANCH" != "main" && "$HEAD_BRANCH" != "master" ]]
+          [[ "$HEAD_BRANCH" =~ ^[a-zA-Z0-9._/-]+$ ]]
+          merged="$(gh api "repos/$REPO/pulls/$PR_NUMBER" --jq '.merged_at // empty')"
+          [[ -n "$merged" ]]
+          current="$(gh api "repos/$REPO/git/ref/heads/$HEAD_BRANCH" --jq '.object.sha' 2>/dev/null || true)"
+          if [[ -z "$current" ]]; then
+            echo "RAMA_YA_ELIMINADA=$HEAD_BRANCH"
+            exit 0
+          fi
+          if [[ "$current" != "$HEAD_SHA" ]]; then
+            echo "RAMA_CON_CAMBIOS_POSTMERGE_NO_ELIMINADA=$HEAD_BRANCH"
+            exit 1
+          fi
+          gh api -X DELETE "repos/$REPO/git/refs/heads/$HEAD_BRANCH" >/dev/null
+          echo "PR_FUSIONADO=$PR_NUMBER"
+          echo "RAMA_ELIMINADA=$HEAD_BRANCH"
+          echo "AUTOLIMPIEZA_POSTMERGE=OK"
