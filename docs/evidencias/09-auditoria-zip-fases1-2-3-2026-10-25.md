@@ -52,10 +52,12 @@ Hay **dos** imágenes llamadas `S02_05`:
 
 Las ocho son consistentes con registros previos. Nombres descriptivos propuestos para 06–08: `S03_06_OpenTofu_Plan_17_Metadatos.png`, `S03_07_OpenTofu_Apply_Manifest_17_Metadatos.png`, `S03_08_OpenTofu_Segundo_Plan_Sin_Cambios.png`. El renombrado no debe alterar bytes. **S03_09 GitOps** existe como [registro Markdown de PR/Actions auténticos](S03_09_GitOps_CI_Regresion_PullRequest.md), no como PNG y no se exige nueva captura para afirmar checks remotos.
 
-## Incorporación al repositorio
+## Publicación definitiva comprobada
 
-La auditoría de 111 archivos está finalizada, pero **no equivale a la publicación de las 25 imágenes adicionales**. El lote definitivo se limita a **21 PNG originales**, conservando sus bytes y excluyendo las cuatro preliminares o históricas. La publicación se realizará mediante un paquete transferido desde Windows a Ubuntu, con verificación de SHA-256, copia controlada de los archivos aprobados y una rama Git independiente para revisión.
+La auditoría de 111 fotografías originales permitió seleccionar **21 PNG nuevas** y excluir cuatro históricas o preliminares. El lote definitivo corresponde a **cuatro complementarias de fase 1**, **nueve definitivas de fase 2** y **ocho definitivas de fase 3**.
 
-El [plan de carga](../../evidencias/manifiestos/PLAN_CARGA_CAPTURAS_2026-10-25.csv) identifica nombre original, nombre definitivo, SHA-256, tamaño y clasificación. Una vez fusionada la rama de carga y aprobada la CI, se actualizarán los totales a **90 PNG fase1, 9 fase2 y 8 fase3**. Hasta ese momento, el inventario remoto conserva solo las 86 PNG de fase1.
+La transferencia se efectuó desde Windows hacia Ubuntu, se comprobó el contenido contra los 21 SHA-256 previstos, y la incorporación se realizó mediante la [rama y PR #53](https://github.com/recm0708/netlab360/pull/53), fusionado a `main` en el commit `e7f3d3a5ddec191c5144edbeeeb36dcae9abfce7`. La inspección de Git confirmó que **los 21 blobs PNG**, sus tamaños y rutas coinciden con el [manifiesto definitivo](../../evidencias/manifiestos/MANIFIESTO_SHA256_CAPTURAS_2026-10-25.csv), con **996.924 bytes** añadidos. La regresión [Actions run 40241580823](https://github.com/recm0708/netlab360/actions/runs/40241580823) finalizó satisfactoriamente después de la fusión.
 
-Los registros completos de pruebas WAN, Ansible y OpenTofu ya están disponibles: **no es necesario reconstruir la red o repetir los ensayos para obtener estas capturas**. Seguimiento en [issue #51](https://github.com/recm0708/netlab360/issues/51).
+**Inventario final en GitHub: 90 PNG fase 1, 9 fase 2 y 8 fase 3; 107 en total**. No se subieron imágenes preliminares ni se reemplazaron las fotografías originales de la fase 1. El registro de GitOps S03_09 continúa como documento Markdown verificable y no se presenta como una imagen.
+
+Las pruebas WAN, FRRouting, Ansible y OpenTofu documentadas no necesitan repetirse para esta tarea. La aceptación académica de las fases se controla por separado, de acuerdo con el informe escrito y el alcance de cada una. Seguimiento documental: [issue #51](https://github.com/recm0708/netlab360/issues/51).
