@@ -1,6 +1,6 @@
 # NETLAB360 — S02: inicio y plan de integración multisede (17/10/2026)
 
-**Estado:** diseño candidato y preflight pendiente; **NO se ha desplegado topología S02 ni modificado la VM por este registro**. La máquina Ubuntu fue encendida por el usuario y `git pull --ff-only origin main` se completó correctamente sobre commit `94339de` sin cambios locales visibles al cierre de esa operación.
+**Estado:** diseño candidato y preflight pendiente; **NO se ha desplegado topología S02 ni modificado la VM por este registro**. La máquina Ubuntu fue encendida en el registro y `git pull --ff-only origin main` se completó correctamente sobre commit `94339de` sin cambios locales visibles al cierre de esa operación.
 
 ## Confirmación académica relevante
 - El estudiante confirmó que envió a Teams el título **«Diseño e implementación de una plataforma virtualizada para la automatización, observabilidad y diagnóstico de redes empresariales multisede»**. **Aprobación docente pendiente**, issue #46.
@@ -35,12 +35,12 @@
 6. Evidenciar **baseline→falla→esperado vs. observado→recuperación→postcheck** con nombres de capturas por prueba; registrar logs y SHA256 de capturas reales.
 7. Actualizar Informe ÚNICO (7 Implementación, 8 Pruebas, 9 Análisis) y issues técnicas. No cerrar S01/S02 ni afirmar integración S2 antes de éxito medido.
 
-**Próximo paso exacto del usuario:** ejecutar la tanda de precheck (sin despliegue ni cambios de red) y remitir los resultados. Se decidirá entonces la asignación definitiva de nuevos enlaces y el diseño del script S02.
+**Siguiente paso operativo:** ejecutar la tanda de precheck (sin despliegue ni cambios de red) y remitir los resultados. Se decidirá entonces la asignación definitiva de nuevos enlaces y el diseño del script S02.
 
 
 ## Actualizacion de comprobaciones recibidas — 17/10/2026, 15:31 -05
 
-El usuario ejecuto precheck por SSH, compartio salidas de terminal y confirmo captura `S02_01_Precheck_Inicial_Integracion_Multisede`.
+Se ejecutó el precheck por SSH, se conservaron las salidas de terminal y se confirmó la captura `S02_01_Precheck_Inicial_Integracion_Multisede`.
 
 - `git pull --ff-only`: commit `527ca35`, limpio `main...origin/main` al momento de la prueba.
 - `ens33=192.168.47.40/24`; default via `192.168.47.2`; Docker 0 contenedores; 0 namespaces; docker/ssh/open-vm-tools activos; `systemctl --failed` 0.
@@ -48,14 +48,14 @@ El usuario ejecuto precheck por SSH, compartio salidas de terminal y confirmo ca
 - `RESULTADO_PRECHECK_S02=0`, validador B1 `RESULTADO_IPAM=0`, sintaxis Bash `RESULTADO_SINTAXIS_LABS=0`, FRR imagen local `quay.io/frrouting/frr:10.7.1` amd64.
 - Se intento una comprobacion manual de colisiones WAN S2, pero **fallo su propio codigo** con `TypeError: 'NoneType' object is not iterable` al recorrer `Docker IPAM.Config=null` para redes sin prefijos. **Esta comprobacion NO permite declarar aun libres las subredes S2**. La captura S02_01 es valida como precheck B1, **no acredita colisiones S02**.
 - Se creo `inventario/ipam/topologia-s02.yaml` (candidato, esquema 0.2), `scripts/validacion/validar-ipam-s02.py` y `tests/test_s02_ipam.py` para corregir el manejo `null`, proteger VMnet8 y validar solapamientos de S02 con rutas Ubuntu/Docker. **No desplegado y sin resultados de ejecucion sobre Ubuntu en esta etapa**.
-- **Proxima verificacion del usuario**: pull, compilacion Python, tests unitarios, validacion estatica y live del IPAM candidato; revisar rutas IPv4 Windows/VMware/VPN antes de aprobar los dos /30 de HQ-S2.
+- **Siguiente comprobación operativa**: pull, compilacion Python, tests unitarios, validacion estatica y live del IPAM candidato; revisar rutas IPv4 Windows/VMware/VPN antes de aprobar los dos /30 de HQ-S2.
 
 **Estado:** S02_01 CAPTURADA y precheck B1=OK; IPAM candidato S02 CREADO pero VALIDACION LIVE PENDIENTE. No se marcaran redes como activas ni se capturara evidencia falsamente exitosa.
 
 
 ## Segundo corte de evidencia S02_02 — 17/10/2026 15:38:58 -05
 
-El usuario confirmo captura `S02_02_Validacion_IPAM_Tres_Sedes_Cuatro_WAN`; la captura fisica PNG aun NO se ha incorporado a GitHub. **Evidencia de terminal aceptada como predespliegue**:
+Se confirmó la captura `S02_02_Validacion_IPAM_Tres_Sedes_Cuatro_WAN`; la captura fisica PNG aun NO se ha incorporado a GitHub. **Evidencia de terminal aceptada como predespliegue**:
 
 - Ubuntu `git pull --ff-only` => `0f25aa9` limpio `main...origin/main`.
 - `python3 -m py_compile` S02 y test => salida 0; `python3 -m unittest ... test_s02_ipam.py` => **4/4 OK**.
@@ -63,7 +63,7 @@ El usuario confirmo captura `S02_02_Validacion_IPAM_Tres_Sedes_Cuatro_WAN`; la c
 - `S02_REDES_HOST_DOCKER_REVISADAS=10`, `S02_COLISIONES_HOST_DOCKER=0`, `S02_VALIDACION_LIVE_UBUNTU=OK`, `RESULTADO_COLISIONES_S02=0`.
 - Estado tras prueba: red ens33 `192.168.47.40/24`, GW `192.168.47.2`, Docker sin contenedores, netns vacios y Git limpio.
 - Windows PowerShell `Get-NetRoute -AddressFamily IPv4`: las rutas activas informadas (`10.20.30.0/26`, `172.16.20.0/24`, `192.168.10.0/24`, `192.168.47.0/24`, `192.168.1.0/24`, `192.168.2.0/24`, mas rutas host) **NO incluyen solapamientos con 10.70–10.72, 10.78.0.0/28 ni 10.79.0.0/32**. La comprobacion aplica a rutas ACTIVAS del momento, no VPN futuras ni rutas fuera de Windows.
-- Capturas `S02_01` y `S02_02` declaradas tomadas por el usuario pero aun NO auditadas como archivos PNG ni publicadas: no contar en el inventario GitHub de evidencias.
+- Capturas `S02_01` y `S02_02` declaradas tomadas en el registro pero aun NO auditadas como archivos PNG ni publicadas: no contar en el inventario GitHub de evidencias.
 - No se ha creado ningun dispositivo S02 real: `S02_DESPLIEGUE_EJECUTADO=NO`.
 
 ## Preparacion predespliegue posterior a validacion
@@ -75,7 +75,7 @@ Archivos añadidos al repositorio: `scripts/automatizacion/render-frr-s02.py` y 
 
 ## Tercer corte — render y predespliegue 17/10/2026 16:08 -05
 
-**COMPROBADO POR SALIDAS DE USUARIO:** commit local `6db0fab` sincronizado; Python compila sin errores; cuatro tests de `test_s02_render_frr.py` `OK`; generador FRR produce R-HQ `1037` bytes, R-S1 `758`, R-S2 `758` en `~/netlab360-bootstrap/s02/rendered` (archivos candidatos, no red viva). Hashes SHA256: HQ `8fcc1e756c7ad026a5dfdbdf9fc0b65ec8841e9de494fe0fe543383ba2b2ac36`, S1 `345eb21fdf66c16b82c2e3b294b5c278553232907606468a02b776f8f82ad036`, S2 `7bfb8be5d642b9c52bc628af24eb238b7b445dfc0aa3ea898badfec484f4e917`. Auditoría estática: HQ 3 VLAN y 4 WAN, S1/S2 3 VLAN y 2 WAN cada una; costos OSPF principal 10/respaldo 100 verificados. S02 IPAM en Ubuntu sigue 3 sedes/9 VLAN/4 WAN/17 redes y cero solapamientos con rutas Ubuntu y Docker. `ens33=192.168.47.40/24`, gateway `.2`, cero contenedores/netns, Git limpio. **El usuario confirmó creación de instantánea VMware**; nombre y opciones no observados directamente.
+**COMPROBADO POR SALIDAS DE USUARIO:** commit local `6db0fab` sincronizado; Python compila sin errores; cuatro tests de `test_s02_render_frr.py` `OK`; generador FRR produce R-HQ `1037` bytes, R-S1 `758`, R-S2 `758` en `~/netlab360-bootstrap/s02/rendered` (archivos candidatos, no red viva). Hashes SHA256: HQ `8fcc1e756c7ad026a5dfdbdf9fc0b65ec8841e9de494fe0fe543383ba2b2ac36`, S1 `345eb21fdf66c16b82c2e3b294b5c278553232907606468a02b776f8f82ad036`, S2 `7bfb8be5d642b9c52bc628af24eb238b7b445dfc0aa3ea898badfec484f4e917`. Auditoría estática: HQ 3 VLAN y 4 WAN, S1/S2 3 VLAN y 2 WAN cada una; costos OSPF principal 10/respaldo 100 verificados. S02 IPAM en Ubuntu sigue 3 sedes/9 VLAN/4 WAN/17 redes y cero solapamientos con rutas Ubuntu y Docker. `ens33=192.168.47.40/24`, gateway `.2`, cero contenedores/netns, Git limpio. **Se confirmó la creación de una instantánea VMware**; nombre y opciones no observados directamente.
 
 **ATENCIÓN antes de redes reales:** `systemctl is-active docker ssh open-vm-tools` devolvió `active\ninactive\nactive` en 16:08, pese a sesión SSH preexistente funcional. Puede ser `ssh.socket` activo con `ssh.service` inactivo por systemd socket activation; **se debe probar, no asumir**. Primero consultar ssh.service/ssh.socket/listener/sshd -t y abrir segunda conexión nueva desde PowerShell manteniendo la actual abierta. No desplegar/ejecutar `up` hasta confirmar disponibilidad de acceso o recuperación vía consola VMware. **PasswordAuthentication yes** era pendiente histórico; no endurecerlo durante pruebas de integración.
 
