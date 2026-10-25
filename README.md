@@ -18,7 +18,7 @@ Los porcentajes son indicadores internos, no calificaciones ni el resultado de u
 - **Máquina:** Ubuntu Desktop 26.04.1 sobre VMware, interfaz administrativa `ens33=192.168.47.40/24` y puerta de enlace `192.168.47.2`.
 - **Red empresarial experimental:** tres routers FRRouting, enlaces WAN principales y de respaldo, tres switches virtuales y nueve VLAN. La fase 2 está **desmontada intencionalmente** tras validar sus escenarios.
 - **Administración declarativa:** el inventario IPAM/SoT organiza tres sedes, cuatro enlaces y nueve VLAN. OpenTofu materializa 17 metadatos `terraform_data` y **no** despliega los dispositivos; Ansible valida y reconcilia costos reales de FRRouting.
-- **Control de cambios:** repositorio privado, scripts versionados, pruebas offline, pull requests y GitHub Actions. Los recursos de estado OpenTofu están fuera del clon y se excluyen de entregables.
+- **Control de cambios:** repositorio privado, `main` como única rama permanente, scripts versionados, pruebas offline, pull requests y GitHub Actions. Las ramas de trabajo se eliminan tras fusionarse mediante un control que compara su SHA. Los recursos de estado OpenTofu están fuera del clon y se excluyen de entregables.
 - **Evidencias:** directorios [`evidencias/capturas/fase1`–`fase8`](evidencias/capturas/README.md). Hay **107 PNG definitivas publicadas**: **90 de fase 1**, **9 de fase 2** y **8 de fase 3**, con integridad verificada. El lote de 21 imágenes se incorporó mediante el [PR #53](https://github.com/recm0708/netlab360/pull/53), acompañado de un [manifiesto SHA-256](evidencias/manifiestos/MANIFIESTO_SHA256_CAPTURAS_2026-10-25.csv) y de [CI posterior satisfactoria](https://github.com/recm0708/netlab360/actions/runs/40241580823).
 
 ## Entrega académica
@@ -30,6 +30,7 @@ El título comunicado a Teams el 17/10 es: «Diseño e implementación de una pl
 ## Documentación y continuidad
 
 - [Reanudación técnica vigente](docs/REANUDAR-AQUI.md)
+- [Puertas de cierre y pendientes comprobados de fases 1–3](docs/control/07-puertas-cierre-fases1-a-3-2026-10-25.md)
 - [Convenciones de redacción y nomenclatura](docs/convenciones/01-redaccion-y-nomenclatura.md)
 - [Criterios docentes](docs/academico/00-criterios-docentes-y-hitos.md)
 - [Política editorial y entrega TAR](docs/entregables/00-politica-editorial-y-entrega-acumulativa.md)
