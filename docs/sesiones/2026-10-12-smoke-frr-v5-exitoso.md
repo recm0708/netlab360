@@ -18,7 +18,7 @@
 10. Postcheck: `sudo docker ps -a` vacío, `sudo ip netns list` vacío; `ens33=192.168.47.40/24`, gateway `192.168.47.2`; `docker`, `ssh`, `open-vm-tools` activos; Git limpio.
 
 **Log original local:** `~/netlab360-bootstrap/evidencias/14-b2-frr-smoke-v5-20261012-235725.log`.  
-**Evidencia gráfica tomada según preferencia del usuario:** `B2_10_Arranque_FRR_V5_Verificado.png`, delimitada desde `INICIO CAPTURA B2_10` hasta `FIN CAPTURA B2_10`. PNG aún NO revisado visualmente ni subido al repositorio. Hora de consulta del log 23:57:37 (diferente de la hora del ensayo).
+**Evidencia gráfica tomada según la convención definida:** `B2_10_Arranque_FRR_V5_Verificado.png`, delimitada desde `INICIO CAPTURA B2_10` hasta `FIN CAPTURA B2_10`. PNG aún NO revisado visualmente ni subido al repositorio. Hora de consulta del log 23:57:37 (diferente de la hora del ensayo).
 
 ## Alcance y límites
 
