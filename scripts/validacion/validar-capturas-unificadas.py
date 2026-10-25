@@ -1,110 +1,90 @@
 #!/usr/bin/env python3
-"""Auditoría de integridad para el repositorio de capturas unificadas de NETLAB360.
+"""NETLAB360 — auditoría de capturas reales, organizada por fases.
 
-Comprueba los 57 PNG originales según el mapa SHA256 de migración y, si
-se incorporó el lote05, los PNG adicionales de lotes 05 (cinco) y 06 (veinticuatro) según sus manifiestos.
-No modifica ningún archivo; salida 0 solo si los conteos y hashes coinciden.
+Fase 1 conserva 86 PNG de los lotes históricos 01–06; se valida por SHA-256,
+tamaño, nombre y hash Git. Los siete CSV históricos permanecen inmutables.
+Fases 2–8 admiten nueva evidencia solo con prefijos técnicos correctos.
+No modifica archivos, no requiere Docker y no crea capturas sintéticas.
 """
-from pathlib import Path
+from __future__ import annotations
+
 import csv
 import hashlib
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-CAPTURAS = ROOT / "evidencias/capturas"
-MANIFIESTOS = ROOT / "evidencias/manifiestos"
-MAPA = MANIFIESTOS / "MAPA_ORIGEN_A_RAIZ_2026-10-13.csv"
-LOTE05 = MANIFIESTOS / "MANIFIESTO_SHA256_NETLAB360_LOTE05_DUALNIC_5PNG.csv"
-LOTE06 = MANIFIESTOS / "MANIFIESTO_SHA256_NETLAB360_LOTE06_IAC_B4_24PNG.csv"
+CAPTURAS = ROOT / "evidencias" / "capturas"
+MANIFIESTOS = ROOT / "evidencias" / "manifiestos"
+MAPA = MANIFIESTOS / "MAPA_RENOMBRADO_FASE1_2026-10-25.csv"
+HISTORICOS = {
+    "MANIFIESTO_SHA256_LOTE01.csv",
+    "MANIFIESTO_SHA256_LOTE02.csv",
+    "MANIFIESTO_SHA256_NETLAB360_LOTE03_20PNG.csv",
+    "MANIFIESTO_SHA256_NETLAB360_LOTE04_LACP_13PNG.csv",
+    "MANIFIESTO_SHA256_NETLAB360_LOTE05_DUALNIC_5PNG.csv",
+    "MANIFIESTO_SHA256_NETLAB360_LOTE06_IAC_B4_24PNG.csv",
+    "MAPA_ORIGEN_A_RAIZ_2026-10-13.csv",
+}
 
-def sha(path):
-    return hashlib.sha256(path.read_bytes()).hexdigest()
 
-def load_csv(path):
-    with path.open(newline="", encoding="utf-8") as reader:
-        return list(csv.DictReader(reader))
+def file_hashes(path: Path) -> tuple[str, str, int]:
+    data = path.read_bytes()
+    git_input = f"blob {len(data)}\0".encode() + data
+    return hashlib.sha256(data).hexdigest(), hashlib.sha1(git_input).hexdigest(), len(data)
 
-def main():
-    assert CAPTURAS.is_dir() and MANIFIESTOS.is_dir()
-    assert not any(p.is_dir() for p in CAPTURAS.iterdir()), "Quedan subdirectorios en capturas"
-    assert MAPA.is_file(), "Falta mapa de migracion"
-    mapa = load_csv(MAPA)
-    assert len(mapa) == 61, f"Mapa incompleto: {len(mapa)}"
-    rutas = [r["ruta_actual"] for r in mapa]
-    assert len(rutas) == len(set(rutas)), "Rutas repetidas en mapa"
-    historicos = set()
-    antiguos_csv = set()
-    for fila in mapa:
-        relativo = Path(fila["ruta_actual"])
-        assert not relativo.is_absolute() and ".." not in relativo.parts
-        archivo = ROOT / relativo
-        assert archivo.is_file(), f"Falta: {archivo}"
-        assert archivo.stat().st_size == int(fila["bytes"]), f"Tamano diferente: {archivo}"
-        assert sha(archivo) == fila["sha256"], f"SHA diferente: {archivo}"
-        if relativo.suffix.lower() == ".png":
-            assert relativo.parent == Path("evidencias/capturas")
-            historicos.add(relativo.name)
-        else:
-            assert relativo.suffix.lower() == ".csv"
-            assert relativo.parent == Path("evidencias/manifiestos")
-            antiguos_csv.add(relativo.name)
-    assert len(historicos) == 57
-    assert len(antiguos_csv) == 4
-    assert all(p.suffix.lower() == ".png" for p in CAPTURAS.iterdir())
 
-    actuales = {p.name for p in CAPTURAS.glob("*.png")}
-    if LOTE05.is_file():
-        nuevos = load_csv(LOTE05)
-        assert len(nuevos) == 5
-        nombres = [r["archivo"] for r in nuevos]
-        assert len(set(nombres)) == 5
-        assert not set(nombres) & historicos, "Lote05 duplica historicos"
-        for fila in nuevos:
-            p = CAPTURAS / fila["archivo"]
-            assert p.is_file()
-            assert p.stat().st_size == int(fila["bytes"])
-            assert sha(p) == fila["sha256"], f"SHA lote05 diferente: {p}"
-        historicos |= set(nombres)
-        estado = "LOTE05_INCORPORADO=SI"
-        esperado = 62
-    else:
-        estado = "LOTE05_INCORPORADO=NO"
-        esperado = 57
+def main() -> None:
+    assert CAPTURAS.is_dir() and MANIFIESTOS.is_dir(), "Faltan directorios de evidencias"
+    assert MAPA.is_file(), "Falta mapa nuevo de rutas S01"
+    assert {p.name for p in MANIFIESTOS.glob("*.csv")} == HISTORICOS | {MAPA.name}, (
+        "Manifiestos históricos alterados o incompletos"
+    )
+    with MAPA.open(encoding="utf-8", newline="") as stream:
+        rows = list(csv.DictReader(stream))
+    assert len(rows) == 86, f"Esperadas 86 capturas históricas; mapa tiene {len(rows)}"
+    assert {p.name for p in CAPTURAS.iterdir() if p.is_dir()} == {
+        f"fase{i}" for i in range(1, 9)
+    }, "Se esperaban directorios fase1 a fase8"
 
-    if LOTE06.is_file():
-        assert LOTE05.is_file(), "Lote06 requiere lote05"
-        nuevos = load_csv(LOTE06)
-        assert len(nuevos) == 24, "Lote06 incompleto"
-        nombres = [r["archivo"] for r in nuevos]
-        assert len(set(nombres)) == 24, "Duplicados lote06"
-        assert not (set(nombres) & historicos), "Lote06 colisiona con anteriores"
-        assert sum(n.startswith("B4_") for n in nombres) == 13
-        assert sum(n.startswith("IAC_") for n in nombres) == 11
-        for fila in nuevos:
-            p = CAPTURAS / fila["archivo"]
-            assert p.is_file(), "PNG lote06 ausente"
-            assert p.stat().st_size == int(fila["bytes"]), "Tamano lote06 incorrecto"
-            assert sha(p) == fila["sha256"], f"SHA lote06 diferente: {p}"
-        historicos |= set(nombres)
-        esperado = 86
-        estado06 = "LOTE06_INCORPORADO=SI"
-    else:
-        estado06 = "LOTE06_INCORPORADO=NO"
-    assert actuales == historicos, "PNG inesperados o faltantes"
+    targets: set[str] = set()
+    originals: set[str] = set()
+    for row in rows:
+        prior = Path(row["ruta_anterior"])
+        rel = Path(row["ruta_actual"])
+        assert prior.parent == Path("evidencias/capturas")
+        assert rel.parent == Path("evidencias/capturas/fase1")
+        assert rel.name.startswith("S01_") and rel.suffix.lower() == ".png"
+        assert not (ROOT / prior).exists(), f"Ruta anterior sin retirar: {prior}"
+        assert row["ruta_anterior"] not in originals
+        assert row["ruta_actual"] not in targets
+        targets.add(row["ruta_actual"])
+        originals.add(row["ruta_anterior"])
+        full = ROOT / rel
+        assert full.is_file() and not full.is_symlink(), f"Captura ausente: {rel}"
+        digest, git_blob, size = file_hashes(full)
+        assert digest == row["sha256"], f"SHA-256 diferente: {rel}"
+        assert git_blob == row["git_blob_sha"], f"Blob Git diferente: {rel}"
+        assert size == int(row["bytes"]) and size > 0, f"Tamaño inválido: {rel}"
 
-    csv_actuales = {p.name for p in MANIFIESTOS.glob("*.csv")}
-    esperado_csv = antiguos_csv | {MAPA.name}
-    if LOTE05.is_file():
-        esperado_csv.add(LOTE05.name)
-    if LOTE06.is_file():
-        esperado_csv.add(LOTE06.name)
-    assert csv_actuales == esperado_csv, "Manifiestos inesperados o faltantes"
-    print(f"PNG_DIRECTOS={esperado}")
-    print(f"CSV_VERIFICADOS={len(csv_actuales)}")
-    print("COLISIONES_Y_SUBCARPETAS=0")
-    print("SHA256_ORIGINALES=OK")
-    print(estado)
-    print(estado06)
-    print("AUDITORIA_CAPTURAS_PLANAS=OK")
+    actual_s01 = {p.relative_to(ROOT).as_posix() for p in
+                  (CAPTURAS / "fase1").glob("*.png")}
+    assert actual_s01 == targets, "Fase 1: faltan PNG o hay extras sin mapear"
+    assert not list(CAPTURAS.glob("*.png")), "Persisten PNG fuera de las carpetas fase"
+    print("S01_PNG_RENOMBRADOS=86/86")
+    print("S01_SHA256_Y_GIT_BLOB_CONSERVADOS=86/86")
+    print(f"MANIFIESTOS_HISTORICOS={len(HISTORICOS)}/7")
+
+    for i in range(2, 9):
+        folder = CAPTURAS / f"fase{i}"
+        assert folder.is_dir()
+        items = list(folder.glob("*.png"))
+        for file in items:
+            assert file.name.startswith(f"S{i:02d}_"), f"Prefijo incorrecto: {file}"
+            assert file.stat().st_size > 0
+        print(f"FASE_{i}_PNG_VERSIONADOS={len(items)}")
+
+    print("AUDITORIA_CAPTURAS_POR_FASE=OK")
+
 
 if __name__ == "__main__":
     main()
