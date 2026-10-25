@@ -1,14 +1,17 @@
 # NETLAB360 — Capturas organizadas por fase
 
-Esta carpeta contiene únicamente **capturas auténticas** de NETLAB360. El nombre de archivo comienza por el código técnico `S01` a `S08`, mientras que cada directorio se identifica como `fase1` … `fase8`.
+Este directorio reúne únicamente **evidencias PNG auténticas de NETLAB360**, clasificadas por fase y con prefijos técnicos S01–S08. Los archivos fueron renombrados conservando sus bytes originales; no se modificaron resultados, imágenes ni metadatos de cada archivo.
 
-- **fase1:** 86 PNG históricos ya existentes en GitHub, renombrados solo mediante referencias al **mismo blob Git**, sin modificar bytes. Los nombres originales `B1_`, `B2_`, `B3_`, `B4_`, `IAC_` se conservan después del prefijo S01 para rastrear el laboratorio de origen. [Mapa nombre anterior ↔ nuevo](../manifiestos/MAPA_RENOMBRADO_FASE1_2026-10-25.csv).
-- **fase2:** preparada para incorporar capturas locales reales de la integración HQ–S1–S2; no afirmar ninguna PNG versionada hasta su auditoría y subida.
-- **fase3:** preparada para capturas de automatización/Ansible/OpenTofu; los resultados GitHub Actions del PR #49 están documentados en `docs/evidencias/S03_09_GitOps_CI_Regresion_PullRequest.md`, que **NO** es captura PNG.
-- **fase4–fase8:** directorios reservados para evidencias que se obtengan al ejecutar cada fase.
+| Directorio | Capturas PNG versionadas | Estado |
+|---|---:|---|
+| `fase1/` | **90** | 86 históricas y cuatro complementarias |
+| `fase2/` | **9** | Evidencias finales S02_01–S02_09 |
+| `fase3/` | **8** | Evidencias finales S03_01–S03_08 |
+| `fase4/`–`fase8/` | **0** | Directorios listos para etapas posteriores |
+| **Total** | **107** | Integridad comprobada |
 
-**Integridad:** los manifiestos históricos en `evidencias/manifiestos/` son inmutables y reflejan los nombres anteriores. El mapa adicional proporciona rutas vigentes y SHA-256 originales. El validador `scripts/validacion/validar-capturas-unificadas.py` comprueba los 86 hashes en la estructura nueva. No cambiar nombres de archivos ya citados sin actualizar el mapa.
+**Integridad:** las 86 imágenes iniciales conservan sus hashes en los [manifiestos históricos](../manifiestos/) y su [mapa de renombrado](../manifiestos/MAPA_RENOMBRADO_FASE1_2026-10-25.csv). Las **21 incorporadas posteriormente** constan en el [manifiesto definitivo SHA-256](../manifiestos/MANIFIESTO_SHA256_CAPTURAS_2026-10-25.csv) y la [verificación CI](https://github.com/recm0708/netlab360/actions/runs/40241580823). Las cuatro imágenes históricas o preliminares que no acreditan resultados finales **no se incorporaron**.
 
-**Conteos distintos:** el inventario local contiene **93 capturas de fase 1** en su inventario local (no verificadas aquí), mientras GitHub conserva 86; faltan comparar **7 potenciales capturas** antes de declarar completo el lote de fase 1.
+El respaldo verificable de GitOps `S03_09` se conserva como [registro Markdown de GitHub Actions y PR](../../docs/evidencias/S03_09_GitOps_CI_Regresion_PullRequest.md), **no como PNG**.
 
-**Entrega:** la profesora autorizó los artefactos técnicos en un `.tar` externo al informe; no hay capítulo de anexos en Word/PDF. No añadir capturas innecesarias, credenciales, material de clase ni estados OpenTofu.
+La entrega técnica al cierre del proyecto será un **TAR separado del informe**, que termina en Referencias y no contiene capítulo de anexos.

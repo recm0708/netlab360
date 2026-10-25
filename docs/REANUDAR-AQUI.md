@@ -14,17 +14,17 @@
 
 - [PR #49](https://github.com/recm0708/netlab360/pull/49): corrección de rutas portables, fusionado. [CI general](https://github.com/recm0708/netlab360/actions/runs/40233355346) y [CI OpenTofu](https://github.com/recm0708/netlab360/actions/runs/40233355350) completadas satisfactoriamente.
 - [PR #50](https://github.com/recm0708/netlab360/pull/50): reorganización de **86 PNG de la fase 1** sin modificar bytes; [CI posterior](https://github.com/recm0708/netlab360/actions/runs/40236374576) satisfactoria.
-- [Issue #51](https://github.com/recm0708/netlab360/issues/51): auditoría de ZIP de 111 imágenes completada. Se seleccionaron **21 adicionales** (4 complementarias fase1, 9 definitivas fase2, 8 definitivas fase3). Otras cuatro preliminares se excluyen del lote de publicación. La auditoría [consta aquí](evidencias/09-auditoria-zip-fases1-2-3-2026-10-25.md).
-- Los archivos binarios seleccionados **todavía deben publicarse**. [Plan de carga](../evidencias/manifiestos/PLAN_CARGA_CAPTURAS_2026-10-25.csv), script seguro de [importación](../scripts/mantenimiento/importar-capturas-validadas-20261025.sh) y auditoría SHA-256 preparada. El procedimiento recibe una transferencia desde Windows a Ubuntu, crea una rama independiente, valida los bytes y deja el merge sujeto a revisión y CI.
+- [Issue #51](https://github.com/recm0708/netlab360/issues/51): auditoría de 111 capturas cerrada con **21 imágenes aprobadas publicadas** (4 complementarias fase1, 9 finales fase2 y 8 finales fase3), y cuatro preliminares excluidas. La auditoría [se documentó aquí](evidencias/09-auditoria-zip-fases1-2-3-2026-10-25.md).
+- [PR #53](https://github.com/recm0708/netlab360/pull/53) fusionado: **107 capturas PNG** en `main` (90/9/8), manifestadas y verificadas por SHA-256. La [regresión GitHub Actions posterior a la fusión](https://github.com/recm0708/netlab360/actions/runs/40241580823) fue satisfactoria. No repetir el importador ni volver a subir las fotografías.
 - La administración de GitHub, pull requests, issues y Actions queda centralizada en el mantenimiento del repositorio. Los comandos locales se limitan a operaciones de laboratorio o transferencia controlada de archivos, sin requerir revisión manual de PR en navegador.
 
 ## Indicadores de avance
 
 | Fase | Corte actual | Pendiente para aceptación |
 |---|---:|---|
-| 1 | 72 % histórico | Conciliación final de evidencias y decisión de cierre de línea base |
-| 2 | ≈90 % | Publicación de nueve imágenes y cierre documental; Figura 1 del informe pendiente |
-| 3 | ≈90 % | Publicación de ocho imágenes, delimitación de OpenTofu metadata-only e integración al informe |
+| 1 | 72 % histórico | Decidir el cierre administrativo de la línea base sin atribuir las fases posteriores a esta fase |
+| 2 | ≈90 % | Evidencias publicadas; resta aceptación documental y Figura 1 del informe |
+| 3 | ≈90 % | Evidencias publicadas; delimitar OpenTofu metadata-only e integrar resultados al informe |
 | 4–8 | 0 % de aceptación formal | Implementación, pruebas y entregables propios de cada fase |
 
 [Tablero completo de criterios](control/06-tablero-porcentajes-cierre-fases-2026-10-25.md). Las funciones experimentales de fases previas no se contabilizan como aceptación formal de fases posteriores.
@@ -39,9 +39,9 @@
 
 ## Siguiente secuencia
 
-1. Transferir las **21 capturas auténticas** desde Windows aplicando los controles SHA-256; revisar el PR y la CI antes de fusionar.
-2. Confirmar en GitHub **90 PNG de fase1, 9 de fase2 y 8 de fase3**, sin preliminares, solo cuando la fusión se haya verificado.
-3. Consolidar las convenciones editoriales Markdown, manteniendo intactos comandos, resultados y bitácoras.
-4. Incorporar la fase 3 al informe y revisar coherencia, títulos, preámbulos, citas y referencias.
+1. Mantener el inventario de **107 capturas** y los manifiestos SHA-256 ya verificados, sin repetir la transferencia.
+2. Incorporar la fase 3 al escrito: implementación 5.5, pruebas 6, análisis 7 y conclusiones 8.
+3. Completar la Figura 1 del diseño, revisar las citas y las referencias y corregir menciones residuales a anexos.
+4. Evaluar el cierre documental de las fases 2 y 3, manteniendo separados sus límites técnicos y los módulos de fases posteriores.
 
 **Conservación histórica:** las sesiones detalladas permanecen en [`docs/sesiones/`](sesiones/), las decisiones en [`docs/academico/`](academico/) y los resultados de auditoría en [`docs/evidencias/`](evidencias/). Los registros cronológicos anteriores también son recuperables mediante el historial Git, sin duplicarlos en este punto de reanudación.

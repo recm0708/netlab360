@@ -1,7 +1,9 @@
 # Capturas NETLAB360 — fase 1 (S01)
 
-**Auditoría real 25/10/2026:** el ZIP proporcionado contiene **93 PNG de fase1**; las **86 PNG ya publicadas** en esta carpeta son **idénticas byte a byte** a las 86 correspondientes del ZIP. Comparación mediante SHA de blob Git (86 objetos) y 5.313.907 bytes, sin necesidad de sustituir archivos. Ver [auditoría 111 capturas](../../../docs/evidencias/09-auditoria-zip-fases1-2-3-2026-10-25.md).
+**90 PNG versionadas** en `fase1/`: **86 históricas** cuyo contenido se preservó intacto durante la migración del [PR #50](https://github.com/recm0708/netlab360/pull/50), y **cuatro complementarias** recibidas en el lote posterior [PR #53](https://github.com/recm0708/netlab360/pull/53).
 
-**Siete adicionales locales:** `B2_L3_04_Postcheck_HTTP_WAN.png`, `B3_09_Postcheck_Telemetria_Viva.png` e `IAC_S01_01_Precheck_IPAM_Herramientas.png` son históricas/preliminares o no aptas para éxito; `IAC_S01_03_Tofu_Apply_Manifest.png`, `IAC_S01_04_Ansible_Render_Candidato_FRR.png`, `IAC_S01_06_Idempotencia.png` y `LOTE06_Postcheck_Publicacion.png` son **complementarias**, que requieren evidencia completa de logs cuando aplique. **No hay nuevas PNG subidas por esta auditoría**.
+Las cuatro complementarias corresponden a la verificación del manifiesto OpenTofu, la generación de archivos candidatos Ansible, una salida de idempotencia y el postcheck de publicación. Su interpretación depende de los registros técnicos completos; ninguna evidencia aislada se presenta como prueba de todas las operaciones anteriores.
 
-La carpeta preserva las 86 históricas renombradas al prefijo S01 sin cambiar bytes. Mapa de 86 identificadores: [MAPA_RENOMBRADO_FASE1_2026-10-25.csv](../../manifiestos/MAPA_RENOMBRADO_FASE1_2026-10-25.csv). El inventario local de 93 no representa 93 pruebas funcionales independientes.
+El inventario de 93 PNG del ZIP de origen incluía **tres versiones históricas o preliminares no seleccionadas**; por tanto, 90 PNG versionadas es el número correcto de esta fase. Las imágenes originales se conservan en el material fuente local sin alterar.
+
+[Mapa de las 86 capturas históricas](../../manifiestos/MAPA_RENOMBRADO_FASE1_2026-10-25.csv) · [Manifiesto de las cuatro complementarias](../../manifiestos/MANIFIESTO_SHA256_CAPTURAS_2026-10-25.csv) · [Auditoría del ZIP](../../../docs/evidencias/09-auditoria-zip-fases1-2-3-2026-10-25.md).
