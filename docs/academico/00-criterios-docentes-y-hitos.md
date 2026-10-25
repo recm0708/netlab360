@@ -6,7 +6,7 @@
 
 - **Dos partes del proyecto:** (a) un informe escrito de **al menos 40 páginas** y (b) presentación PowerPoint con **demostración en vivo**.
 - El informe debe explicar el problema abordado, la arquitectura y diseño, **cómo se implementó**, cómo se verificó y qué resultados se observaron. Redacción académica propia del grupo, ordenada, sin repeticiones, con afirmaciones sustentadas y figuras contextualizadas; mantener APA 7 en citas y referencias según plantilla institucional.
-- **Orden del informe:** 1 Portada; 2 Introducción; 3 Objetivos; 4 Planteamiento del problema; 5 Fundamento técnico; 6 Diseño de la solución; 7 Implementación; 8 Pruebas y validación; 9 Análisis de resultados; 10 Conclusiones y recomendaciones; 11 Referencias; 12 Anexos.
+- **Orden de trabajo del informe:** portada, introducción, objetivos, planteamiento, fundamento técnico, diseño, implementación, pruebas, análisis, conclusiones/recomendaciones y referencias. La relación histórica de doce piezas de la guía incluía Anexos, pero la modalidad docente confirmada para este proyecto utiliza un TAR externo y no crea dicho capítulo.
 - Portada incluye universidad, facultad, carrera, asignatura, título, profesor, fecha y nombres/cédulas de integrantes; datos personales solo en el archivo institucional bajo control del equipo, **NO registrar cédulas en GitHub**.
 - El título debe describir la **acción técnica, solución y finalidad**, sin ser genérico.
 - Introducción: contexto→problema/relevancia→solución, no comandos.
