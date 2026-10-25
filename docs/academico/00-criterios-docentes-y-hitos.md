@@ -19,7 +19,7 @@
 - Análisis: interpretar resultados, limitaciones, incidentes técnicos reales y mitigaciones. Las conjeturas no se presentan como causas probadas.
 - Conclusiones: objetivos demostrados; recomendaciones: ampliaciones o mejoras futuras realistas.
 - Referencias: preferencia por documentación oficial/estándares/artículos fiables, con citas usadas en el cuerpo.
-- Anexos: scripts completos, configuraciones, salidas extensas, dataset y otros artefactos realmente utilizados.
+- Material técnico de soporte: scripts completos, configuraciones, salidas extensas y datasets auténticos, reunidos en **.tar externo** según la precisión docente comunicada el 25/10; sin apartado de anexos en el informe.
 
 ## Entrega del título (prioridad inmediata)
 
@@ -37,12 +37,14 @@
 - La presentación del 30/10 exige **mostrar el documento**, no preparar exposición PowerPoint adicional. Si la plataforma de entrega pide adjuntar un archivo, comprobar allí el formato antes de subir; la reunión no fijó una extensión informática obligatoria para esas dos revisiones.
 - Estas son **revisiones parciales**, NO fecha final confirmada del informe o de la demostración semestral.
 
-## Anexos como archivo independiente — decisión resuelta
+## Paquete técnico externo — decisión docente precisada por el estudiante (25/10/2026)
 
-- Se preguntó expresamente si el código y los artefactos pueden presentarse en un archivo aparte. **La docente respondió que sí, junto con el informe.** Se acepta preparar ZIP de anexos técnicos para NETLAB360.
-- ZIP debe contener exclusivamente archivos **del proyecto** realmente utilizados o necesarios para reproducirlo, con README, estructura por tipo, manifiesto SHA256 de los artefactos del proyecto, sin secretos/tokens/llaves privadas ni archivos personales/de clase.
-- La modalidad concreta de carga, peso máximo y si se solicita algún índice de anexos dentro del informe deben confirmarse en la plataforma de entrega; no extrapolar límites del parcial al semestral.
-- No trasladar el texto integral de código al informe; describir lógica, principales parámetros, resultados y vínculo a anexos.
+- **Confirmación comunicada expresamente por el estudiante el 25/10/2026:** la profesora validó la entrega de un archivo **`.tar` independiente** que agrupará scripts, YAML, JSON, configuraciones, pruebas, registros y demás artefactos propios necesarios para la entrega de NETLAB360, **sin abrir un capítulo ni apartado de «Anexos» en el Word/PDF académico**. El informe finaliza en **Referencias**; el paquete técnico se entrega junto a él como archivo separado. Esta precisión reemplaza la propuesta anterior de ZIP y de índice de anexos dentro del documento.
+- **Historial preservado:** el 16/10/2026 se confirmó verbalmente que podían entregarse artefactos técnicos por separado; la primera propuesta operativa era ZIP. La selección concreta de **TAR** y la omisión del apartado de anexos del informe son la aclaración más reciente del estudiante, no una modificación textual comprobada de la guía original.
+- Contenido permitido: únicamente archivos del proyecto necesarios para reproducir sus escenarios y corroborar resultados, incluyendo README, estructura de carpetas, inventarios, Python/Bash, HCL/OpenTofu, Ansible, FRR, pruebas, evidencias pertinentes y **manifiesto SHA-256**.
+- Excluir secretos y artefactos locales sensibles: credenciales, llaves privadas, tokens, ficheros `.env` con secretos, estados OpenTofu/`terraform.tfstate`, `.git`, cachés, material docente ajeno y archivos personales. Verificar contenido con `tar -tf`, extracción de prueba, integridad del manifiesto y ausencia de secretos **antes de distribuir**.
+- No afirmar que el paquete TAR fue generado o entregado antes de comprobarlo. No imponer OVA/OVF: su obligatoriedad sigue sin confirmación.
+- **Criterio de estructura:** la guía histórica menciona «Anexos» entre las doce piezas, pero según la modalidad docente que comunica el estudiante la evidencia de código se materializa **únicamente en el TAR externo**; no crear un apartado de anexos vacío en el Word.
 
 ## Presentación y demostración final
 
@@ -62,7 +64,7 @@
 
 - Fecha final de entrega del informe y exposición, tiempo máximo/minimo de presentación y rúbrica de ponderación detallada.
 - ¿Se exige entregar/exportar una OVA? No hay confirmación afirmativa en indicaciones revisadas; demostrar en vivo sí es obligatorio.
-- Tamaño máximo de anexos, ubicación de subida para el proyecto final y quién presenta la defensa final.
+- Tamaño máximo del archivo .tar, ubicación de subida para el proyecto final y quién presenta la defensa final.
 - Estado de revisión/aprobación del título por la profesora.
 - Extensión exacta de cómputo de las 40 páginas (preliminares y anexos); la instrucción «mínimo 40» sí está confirmada.
 
