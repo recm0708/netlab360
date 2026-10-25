@@ -52,8 +52,10 @@ Hay **dos** imágenes llamadas `S02_05`:
 
 Las ocho son consistentes con registros previos. Nombres descriptivos propuestos para 06–08: `S03_06_OpenTofu_Plan_17_Metadatos.png`, `S03_07_OpenTofu_Apply_Manifest_17_Metadatos.png`, `S03_08_OpenTofu_Segundo_Plan_Sin_Cambios.png`. El renombrado no debe alterar bytes. **S03_09 GitOps** existe como [registro Markdown de PR/Actions auténticos](S03_09_GitOps_CI_Regresion_PullRequest.md), no como PNG y no se exige nueva captura para afirmar checks remotos.
 
-## Estado de publicación y limitación del conector
+## Incorporación al repositorio
 
-**IMPORTANTE:** este documento es una **auditoría de los archivos originales proporcionados**; NO implica que las 25 imágenes adicionales estén versionadas. El conector GitHub disponible permite escribir árboles, commits y blobs a partir de **contenido de texto o base64 explícito**, pero no admite referenciar directamente una imagen binaria del ZIP local como archivo de entrada. Por ello, en este corte se publican en GitHub los **resultados de auditoría** y se conserva un paquete local preparado con 21 imágenes candidatas y cuatro imágenes históricas separadas. **No se simula una subida remota de imágenes que aún no ocurrió.** Ninguna operación sobre redes o state OpenTofu es necesaria por este bloqueo de transferencia binaria.
+La auditoría de 111 archivos está finalizada, pero **no equivale a la publicación de las 25 imágenes adicionales**. El lote definitivo se limita a **21 PNG originales**, conservando sus bytes y excluyendo las cuatro preliminares o históricas. La publicación se realizará mediante un paquete transferido desde Windows a Ubuntu, con verificación de SHA-256, copia controlada de los archivos aprobados y una rama Git independiente para revisión.
 
-**Seguimiento:** [issue #51](https://github.com/recm0708/netlab360/issues/51). El siguiente avance será incorporar los bytes originales al repositorio mediante un mecanismo de transferencia seguro compatible, no repetir FRRouting u OpenTofu.
+El [plan de carga](../../evidencias/manifiestos/PLAN_CARGA_CAPTURAS_2026-10-25.csv) identifica nombre original, nombre definitivo, SHA-256, tamaño y clasificación. Una vez fusionada la rama de carga y aprobada la CI, se actualizarán los totales a **90 PNG fase1, 9 fase2 y 8 fase3**. Hasta ese momento, el inventario remoto conserva solo las 86 PNG de fase1.
+
+Los registros completos de pruebas WAN, Ansible y OpenTofu ya están disponibles: **no es necesario reconstruir la red o repetir los ensayos para obtener estas capturas**. Seguimiento en [issue #51](https://github.com/recm0708/netlab360/issues/51).
