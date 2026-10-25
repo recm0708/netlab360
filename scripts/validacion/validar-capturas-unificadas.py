@@ -16,6 +16,8 @@ ROOT = Path(__file__).resolve().parents[2]
 CAPTURAS = ROOT / "evidencias" / "capturas"
 MANIFIESTOS = ROOT / "evidencias" / "manifiestos"
 MAPA = MANIFIESTOS / "MAPA_RENOMBRADO_FASE1_2026-10-25.csv"
+PLAN = MANIFIESTOS / "PLAN_CARGA_CAPTURAS_2026-10-25.csv"
+LOTE = MANIFIESTOS / "MANIFIESTO_SHA256_CAPTURAS_2026-10-25.csv"
 HISTORICOS = {
     "MANIFIESTO_SHA256_LOTE01.csv",
     "MANIFIESTO_SHA256_LOTE02.csv",
@@ -36,7 +38,10 @@ def file_hashes(path: Path) -> tuple[str, str, int]:
 def main() -> None:
     assert CAPTURAS.is_dir() and MANIFIESTOS.is_dir(), "Faltan directorios de evidencias"
     assert MAPA.is_file(), "Falta mapa nuevo de rutas S01"
-    assert {p.name for p in MANIFIESTOS.glob("*.csv")} == HISTORICOS | {MAPA.name}, (
+    permitidos = HISTORICOS | {MAPA.name, PLAN.name}
+    if LOTE.is_file():
+        permitidos.add(LOTE.name)
+    assert {p.name for p in MANIFIESTOS.glob("*.csv")} == permitidos, (
         "Manifiestos históricos alterados o incompletos"
     )
     with MAPA.open(encoding="utf-8", newline="") as stream:
@@ -66,9 +71,42 @@ def main() -> None:
         assert git_blob == row["git_blob_sha"], f"Blob Git diferente: {rel}"
         assert size == int(row["bytes"]) and size > 0, f"Tamaño inválido: {rel}"
 
+    extras = set()
+    fase_esperada = {i: set() for i in range(1, 9)}
+    if LOTE.is_file():
+        assert PLAN.is_file(), "Falta el plan original del lote"
+        with LOTE.open(encoding="utf-8", newline="") as stream:
+            aprobadas = list(csv.DictReader(stream))
+        with PLAN.open(encoding="utf-8", newline="") as stream:
+            plan = list(csv.DictReader(stream))
+        assert len(aprobadas) == len(plan) == 21, "Lote de 21 fotos incompleto"
+        assert {x["ruta_actual"] for x in aprobadas} == {
+            x["ruta_actual"] for x in plan
+        }, "Rutas de lote distintas del plan"
+        for row in aprobadas:
+            ruta = Path(row["ruta_actual"])
+            fase = int(ruta.parent.name.removeprefix("fase"))
+            assert 1 <= fase <= 3
+            assert ruta.parent == Path(f"evidencias/capturas/fase{fase}")
+            assert ruta.name.startswith(f"S{fase:02d}_") and ruta.suffix.lower() == ".png"
+            assert row["ruta_actual"] not in targets and row["ruta_actual"] not in extras
+            assert not ruta.is_absolute() and ".." not in ruta.parts
+            original = ROOT / ruta
+            assert original.is_file() and not original.is_symlink()
+            sha256, blob, size = file_hashes(original)
+            assert (sha256 == row["sha256"] and
+                    blob == row["git_blob_sha"] and
+                    size == int(row["bytes"]) and size > 0), f"SHA del lote diferente: {ruta}"
+            extras.add(row["ruta_actual"])
+            fase_esperada[fase].add(row["ruta_actual"])
+        assert [len(fase_esperada[i]) for i in (1, 2, 3)] == [4, 9, 8]
+        print("LOTE_20261025_SHA256_Y_BLOB=21/21")
+    else:
+        assert PLAN.is_file(), "Falta plan de lote previsto"
+
     actual_s01 = {p.relative_to(ROOT).as_posix() for p in
                   (CAPTURAS / "fase1").glob("*.png")}
-    assert actual_s01 == targets, "Fase 1: faltan PNG o hay extras sin mapear"
+    assert actual_s01 == targets | fase_esperada[1], "Fase 1: faltan PNG o hay extras sin mapear"
     assert not list(CAPTURAS.glob("*.png")), "Persisten PNG fuera de las carpetas fase"
     print("S01_PNG_RENOMBRADOS=86/86")
     print("S01_SHA256_Y_GIT_BLOB_CONSERVADOS=86/86")
@@ -78,6 +116,10 @@ def main() -> None:
         folder = CAPTURAS / f"fase{i}"
         assert folder.is_dir()
         items = list(folder.glob("*.png"))
+        if i in (2, 3):
+            assert {p.relative_to(ROOT).as_posix() for p in items} == fase_esperada[i], (
+                f"Fase {i}: capturas distintas del manifiesto aprobado"
+            )
         for file in items:
             assert file.name.startswith(f"S{i:02d}_"), f"Prefijo incorrecto: {file}"
             assert file.stat().st_size > 0
