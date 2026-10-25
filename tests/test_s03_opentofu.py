@@ -34,6 +34,20 @@ class TestS03OpenTofu(unittest.TestCase):
                      for v in site["vlans"]},
         }
 
+    def test_preparation_guard_has_paused_and_partial_state_modes(self):
+        """Comprobación estática de guardas; no sustituye precheck real Ubuntu."""
+        script = (ROOT / "scripts/laboratorio/s03-preparar-opentofu.sh").read_text()
+        for required in (
+            "S03_TOFU_MODO_S02=PAUSADA_Y_LIMPIA",
+            "S03_TOFU_MODO_S02=DESPLEGADA_CON_ESTADOS",
+            "S03_TOFU_PREPARACION_DETENIDA=ESTADOS_S02_INCOMPLETOS",
+            "S03_TOFU_PREPARACION_DETENIDA=CONTENEDORES_S02_RESIDUALES",
+            "S03_TOFU_PREPARACION_DETENIDA=NAMESPACES_S02_RESIDUALES",
+            "sudo -n docker ps -a",
+            'test -z "$(git status --porcelain)"',
+        ):
+            self.assertIn(required, script)
+
     def test_seventeen_records_match_source(self):
         result=mod.validate_manifest(self.fixture,self.source,self.sha)
         self.assertEqual(result,{"sites":3,"links":4,"vlans":9,"records":17})
