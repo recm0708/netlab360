@@ -1,6 +1,6 @@
 # NETLAB360 — Índice maestro de trabajo del informe académico-técnico
 
-**Actualizado el 25/10/2026.** Un único informe institucional, mínimo **40 páginas**, con estructura técnica continua. El borrador recibido `1457-Proyecto Semestral_borrador2.5.pdf` tiene **80 páginas**. Posteriormente se registró la aplicación de correcciones editoriales; **no consta todavía una nueva exportación revisada**. Conservar su Word original y proporcionar correcciones por chat; no recrear el archivo sin solicitud.
+**Actualizado el 25/10/2026.** Un único informe institucional, mínimo **40 páginas**, con estructura técnica continua. La versión de referencia recibida más reciente es `1457-Proyecto Semestral_borrador3.pdf`, de **79 páginas**. El capítulo de la fase 3 sigue pendiente de incorporación al documento, aunque su implementación y pruebas técnicas están comprobadas. Conservar su Word original y proporcionar correcciones por chat; no recrear el archivo sin solicitud.
 
 **Título comunicado por Teams el 17/10/2026:** «Diseño e implementación de una plataforma virtualizada para la automatización, observabilidad y diagnóstico de redes empresariales multisede». Su aprobación docente sigue por confirmar. **Nombre/encabezado abreviado:** NETLAB360 | Redes Empresariales Multisede.
 
