@@ -18,6 +18,14 @@
 - [PR #53](https://github.com/recm0708/netlab360/pull/53) fusionado: **107 capturas PNG** en `main` (90/9/8), manifestadas y verificadas por SHA-256. La [regresión GitHub Actions posterior a la fusión](https://github.com/recm0708/netlab360/actions/runs/40241580823) fue satisfactoria. No repetir el importador ni volver a subir las fotografías.
 - La administración de GitHub, pull requests, issues y Actions queda centralizada en el mantenimiento del repositorio. Los comandos locales se limitan a operaciones de laboratorio o transferencia controlada de archivos, sin requerir revisión manual de PR en navegador.
 
+## Limpieza de ramas e issues — 25/10/2026
+
+- [Limpieza controlada de ramas fusionadas](https://github.com/recm0708/netlab360/actions/runs/40242595670) terminada con resultado SUCCESS: cinco ramas eliminadas tras comprobar PR y SHA; **única rama permanente `main`**.
+- Se retiró el workflow temporal y se instaló `.github/workflows/limpiar-rama-tras-merge.yml` para que, en futuros PR fusionados, la rama de origen se elimine después de comprobar que sigue apuntando al SHA incluido en el merge.
+- Se cerraron por alcance técnico verificado las issues #10, #11, #12, #13, #14, #18, #19 y #30. Se consolidaron #9→#36 y #37→#29, sin perder sus pendientes futuros.
+- Permanecen abiertas las **tres issues generales #1, #2 y #3** únicamente hasta superar sus puertas explícitas. Las funciones de NOC S04, LACP S05 y entrega S08 dejaron de figurar como exigencias del cierre funcional de S02.
+- [Puertas de cierre S01–S03](control/07-puertas-cierre-fases1-a-3-2026-10-25.md): **S01** requiere verificación/decisión SSH y compatibilidad fundacional; **S02** figura 1 + revisión/aceptación del escrito; **S03** formalización del contrato SoT y alcance OpenTofu, más incorporación académica en 5.5/6/7/8. No repetir pruebas completas para completar capturas.
+
 ## Indicadores de avance
 
 | Fase | Corte actual | Pendiente para aceptación |
@@ -39,9 +47,10 @@
 
 ## Siguiente secuencia
 
-1. Mantener el inventario de **107 capturas** y los manifiestos SHA-256 ya verificados, sin repetir la transferencia.
-2. Incorporar la fase 3 al escrito: implementación 5.5, pruebas 6, análisis 7 y conclusiones 8.
-3. Completar la Figura 1 del diseño, revisar las citas y las referencias y corregir menciones residuales a anexos.
-4. Evaluar el cierre documental de las fases 2 y 3, manteniendo separados sus límites técnicos y los módulos de fases posteriores.
+1. Mantener la rama única `main`, el inventario de **107 capturas** y los manifiestos SHA-256 ya verificados.
+2. Resolver la aceptación fundacional de la fase 1 sin alterar FRRouting: SSH seguro con rollback y notas de compatibilidad.
+3. Completar la Figura 1 y corregir el corte escrito de fase 2, registrando su aceptación.
+4. Incorporar la fase 3 al Word (5.5, 6, 7, 8), delimitar SoT/OpenTofu y registrar su aceptación.
+5. Preparar el corte académico 30/10 y continuar las fases 4–8 por sus propios hitos.
 
 **Conservación histórica:** las sesiones detalladas permanecen en [`docs/sesiones/`](sesiones/), las decisiones en [`docs/academico/`](academico/) y los resultados de auditoría en [`docs/evidencias/`](evidencias/). Los registros cronológicos anteriores también son recuperables mediante el historial Git, sin duplicarlos en este punto de reanudación.
