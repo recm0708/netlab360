@@ -15,7 +15,7 @@ Las configuraciones FRR candidatas declaran interfaces `s1p`, `s1b`, `s2p` y `s2
 
 ## Flujo de operación autorizado
 
-1. Mantener consola VMware disponible y snapshot **confirmado por el usuario**.
+1. Mantener consola VMware disponible y snapshot **confirmado en el registro**.
 2. Git limpio, `precheck-s02.sh` cero, segunda conexión SSH probada desde Windows. No endurecer ni reiniciar SSH en esta fase.
 3. Crear **solo en el directorio externo de runtime** las tres carpetas de FRR, copiar `frr.conf` generado, obtener plantilla `daemons` de imagen FRR y habilitar `zebra=yes`, `ospfd=yes`; añadir `vtysh.conf`; aplicar permisos/grupos compatibles con imagen previamente probada.
 4. Ejecutar `sudo docker compose -f topologias/s02-frr/docker-compose.yml config --quiet` para verificar estructura. Confirmar `docker compose version` disponible.
