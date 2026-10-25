@@ -1,6 +1,6 @@
 # NETLAB360 — Archivo técnico TAR independiente y demostración académica
 
-**Decisión operativa vigente, precisada por el estudiante el 25/10/2026:** la profesora autorizó entregar por separado los archivos técnicos del proyecto. El formato definitivo indicado ahora es **un único archivo `.tar`**, no ZIP, y **no se insertará un apartado de anexos en el informe escrito**, que termina en Referencias. La aprobación previa de archivos externos registrada el 16/10 se conserva como antecedente; el cambio de ZIP a TAR responde a la confirmación reciente del estudiante. **El TAR aún no se ha generado, examinado ni entregado.**
+**Decisión operativa vigente, precisada en los registros del proyecto el 25/10/2026:** la profesora autorizó entregar por separado los archivos técnicos del proyecto. El formato definitivo indicado ahora es **un único archivo `.tar`**, no ZIP, y **no se insertará un apartado de anexos en el informe escrito**, que termina en Referencias. La aprobación previa de archivos externos registrada el 16/10 se conserva como antecedente; el cambio de ZIP a TAR responde a la confirmación reciente del proyecto. **El TAR aún no se ha generado, examinado ni entregado.**
 
 ## Propuesta de estructura del TAR final
 

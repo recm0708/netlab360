@@ -21,7 +21,7 @@
 
 Las dos ejecuciones finales corresponden al commit `9e894d3f19051a7ca90662b4076febf8320986b3`, antes de los commits documentales siguientes. **No inferir automáticamente el resultado de runs futuros; consultar la ejecución del SHA que se esté evaluando.**
 
-## Validación cruzada de Ubuntu (registro del estudiante)
+## Validación cruzada de Ubuntu (registro del proyecto)
 
 En la VM, después de sincronizar el merge, `git log` llegó al commit `417c244`, las rutas portables de los tres scripts se verificaron, la regresión S02 obtuvo **29/29 pruebas OK**, la general **87/87 pruebas OK**, y la sintaxis Bash se validó. `tofu state list` conservó **17/17** registros; el manifiesto correspondió a **3/3 sedes, 4/4 WAN y 9/9 VLAN**, sin desplegar nuevos routers. `ens33=192.168.47.40/24` y GW `.2` permanecieron intactos; la fase 2 siguió pausada y `RESULTADO_S03_POSTMERGE=0`.
 
@@ -38,7 +38,7 @@ Carpeta auditada por PowerShell: `Pictures\Screenshots`, prefijo `S03_03` a `S03
 - `S03_09`: **PNG no encontrada**; resultado de auditoría `S03_EVIDENCIAS_VALIDAS=6/7`.
 - CSV de auditoría generado localmente: `Documents\NETLAB360_S03_Evidencias_20261025_160701.csv`. **No se ha transferido al repositorio ni se han contrastado las huellas SHA-256 individuales**, aunque el script las calculó localmente.
 
-**Criterio de documentación:** para la parte de GitHub, este documento y los enlaces de ejecución son la evidencia primaria comprobable directamente en el repositorio, y el usuario no necesita abrir un PR o comprobar checks manualmente. **No declarar `S03_09` como PNG capturada.** Si la docente solicita obligatoriamente imagen de GitHub, se incorporará una captura genuina adicional; nunca una imagen sintética que parezca la interfaz real.
+**Criterio de documentación:** para la parte de GitHub, este documento y los enlaces de ejecución son la evidencia primaria comprobable directamente en el repositorio, y no es necesario abrir un PR o comprobar checks manualmente. **No declarar `S03_09` como PNG capturada.** Si la docente solicita obligatoriamente imagen de GitHub, se incorporará una captura genuina adicional; nunca una imagen sintética que parezca la interfaz real.
 
 ## Límites
 

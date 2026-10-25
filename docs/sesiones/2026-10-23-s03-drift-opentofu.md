@@ -1,6 +1,6 @@
 # NETLAB360 — S03: Ansible drift real validado y OpenTofu S03 preparado
 
-**Corte real registrado:** 23/10/2026 20:54 (-05). Este documento separa operaciones ejecutadas por el estudiante de nuevo código remoto no probado. No convierte las fechas S01–S08 en plazos de la docente.
+**Corte real registrado:** 23/10/2026 20:54 (-05). Este documento separa operaciones ejecutadas en los registros del proyecto de nuevo código remoto no probado. No convierte las fechas S01–S08 en plazos de la docente.
 
 ## Evidencia Ansible real, aprobada
 Fuente: salida de terminal de 514 líneas proporcionada por el usuario:

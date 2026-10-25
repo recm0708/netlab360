@@ -9,6 +9,6 @@ Esta carpeta contiene únicamente **capturas auténticas** de NETLAB360. El nomb
 
 **Integridad:** los manifiestos históricos en `evidencias/manifiestos/` son inmutables y reflejan los nombres anteriores. El mapa adicional proporciona rutas vigentes y SHA-256 originales. El validador `scripts/validacion/validar-capturas-unificadas.py` comprueba los 86 hashes en la estructura nueva. No cambiar nombres de archivos ya citados sin actualizar el mapa.
 
-**Conteos distintos:** el estudiante registra **93 capturas de fase 1** en su inventario local (no verificadas aquí), mientras GitHub conserva 86; faltan comparar **7 potenciales capturas** antes de declarar completo el lote de fase 1.
+**Conteos distintos:** el inventario local contiene **93 capturas de fase 1** en su inventario local (no verificadas aquí), mientras GitHub conserva 86; faltan comparar **7 potenciales capturas** antes de declarar completo el lote de fase 1.
 
 **Entrega:** la profesora autorizó los artefactos técnicos en un `.tar` externo al informe; no hay capítulo de anexos en Word/PDF. No añadir capturas innecesarias, credenciales, material de clase ni estados OpenTofu.

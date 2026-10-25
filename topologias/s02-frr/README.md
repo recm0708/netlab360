@@ -31,7 +31,7 @@ Preparar un plan de enlaces veth por namespace con nombre y pertenencia explíci
 
 ## Continuacion de WAN posterior al primer arranque correcto (23/10/2026)
 
-**Primer arranque corregido VALIDADO por el estudiante:** 3 routers FRRouting 10.7.1 operativos, `network_mode: none`, `S02_RESULTADO_ARRANQUE=0`, gestion `ens33=192.168.47.40/24` intacta. Captura de éxito confirmada `S02_05_FRR_Tres_Routers_Aislados_Validados`, PNG fisico aún no incorporado al repositorio.
+**Primer arranque corregido VALIDADO en los registros del proyecto:** 3 routers FRRouting 10.7.1 operativos, `network_mode: none`, `S02_RESULTADO_ARRANQUE=0`, gestion `ens33=192.168.47.40/24` intacta. Captura de éxito confirmada `S02_05_FRR_Tres_Routers_Aislados_Validados`, PNG fisico aún no incorporado al repositorio.
 
 **Siguiente procedimiento, de forma incremental:**
 1. Ejecutar `python3 scripts/laboratorio/s02-wan-links.py plan` y `python3 -m unittest discover -s tests -p 'test_s02_wan_plan.py' -v` (solo lectura).

@@ -2,11 +2,13 @@
 
 # NETLAB360 — Plataforma Virtualizada de Redes Empresariales Multisede
 
+[Convenciones de redacción y nomenclatura](docs/convenciones/01-redaccion-y-nomenclatura.md) · [Plan de carga de capturas originales](evidencias/manifiestos/PLAN_CARGA_CAPTURAS_2026-10-25.csv).
+
 **Control del proyecto actualizado: 17/10/2026.** En este repositorio se almacenan **solo instrucciones de trabajo adaptadas al proyecto, configuraciones, scripts, pruebas y evidencias PROPIAS de NETLAB360**. No publicar materiales recibidos de la profesora (guías, documentos, grabaciones ni transcripciones), ni archivos o hashes de esos materiales. [Criterios y calendario aplicables](docs/academico/00-criterios-docentes-y-hitos.md).
 
 ## Entrega semestral y fechas de control
 
-- **Un solo informe académico-técnico de mínimo 40 páginas**, con 12 apartados en orden. [Índice maestro](docs/entregables/01-proyecto-investigacion-maestro.md). Borrador previo de 65 páginas del estudiante se reorganizará y ampliará, **sin recrearlo desde cero**.
+- **Un solo informe académico-técnico de mínimo 40 páginas**, con 12 apartados en orden. [Índice maestro](docs/entregables/01-proyecto-investigacion-maestro.md). Borrador previo de 65 páginas del proyecto se reorganizará y ampliará, **sin recrearlo desde cero**.
 - **Título propuesto en Teams**: ya enviado al chat Teams (confirmado por estudiante el 17/10); **respuesta/aprobación docente pendiente**.
 - **30/10/2026**: revisión grupal del borrador de **introducción, objetivo general y específicos, planteamiento del problema**. Mostrar **el documento en Teams**, sin PowerPoint especial. Designar un representante del grupo.
 - **13/11/2026**: revisión grupal de **fundamento técnico y diseño de la solución**.

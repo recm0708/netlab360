@@ -1,6 +1,6 @@
 # NETLAB360 — Auditoría visual y comparación de capturas locales de las fases 1–3
 
-**Fecha:** 25 de octubre de 2026. **Fuente primaria:** ZIP auténtico facilitado por el estudiante, `fase 1-2-3.zip`, procedente de `C:\Users\ruben\Pictures\Screenshots\Proyecto TE2`. **Alcance:** revisión de presencia, nombres, tamaños, huellas de bytes y lectura visual de capturas adicionales. No se alteraron píxeles, resultados ni fechas.
+**Fecha:** 25 de octubre de 2026. **Fuente primaria:** ZIP auténtico facilitado en los registros del proyecto, `fase 1-2-3.zip`, procedente de `C:\Users\ruben\Pictures\Screenshots\Proyecto TE2`. **Alcance:** revisión de presencia, nombres, tamaños, huellas de bytes y lectura visual de capturas adicionales. No se alteraron píxeles, resultados ni fechas.
 
 ## Inventario contrastado
 

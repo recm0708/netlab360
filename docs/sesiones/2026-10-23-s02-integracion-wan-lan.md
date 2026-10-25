@@ -1,7 +1,7 @@
 # NETLAB360 S02 — Validación WAN y ruta de cierre (23/10/2026)
 
 ## Evidencia VERIFICADA del operador (no inferida)
-- Archivo de salida real aportado por el usuario, 23/10/2026 19:19 -05. Compilación Python S02 WAN exit 0 y 4/4 tests plan WAN correctos.
+- Archivo de salida real conservado en la bitácora, 23/10/2026 19:19 -05. Compilación Python S02 WAN exit 0 y 4/4 tests plan WAN correctos.
 - El primer validador IPAM live retornó 1 al ejecutar `sudo -n docker network ls` **antes de autenticar sudo**; esto NO fue un solapamiento. Después `sudo -v`, el `precheck` WAN devolvió 0.
 - `python3 scripts/laboratorio/s02-wan-links.py up --snapshot-confirmado`: `S02_WAN_CREADA` en primaria/respaldo HQ–S1 y HQ–S2, loopbacks `10.79.0.1/32`–`.3/32`, `ip_forward=1` **solamente en los namespaces de routers**, `S02_WAN_LINKS_UP=4`, `S02_HOST_GESTION_INTACTO=SI`, exit 0.
 - `validar-ospf-s02.py`: HQ cuatro OSPF Full, S1 dos, S2 dos. **6/6 decisiones de ruta FIB principal** y seis pruebas ICMP bidireccionales HQ↔S1, HQ↔S2, S1↔S2 con éxito, `RESULTADO_VALIDACION_OSPF=0`.
@@ -44,7 +44,7 @@
 
 ## Diagnostico HTTP resuelto a nivel de causa y plan de prueba — 23/10/2026 19:54 (-05)
 
-**Evidencia recibida del usuario:**
+**Evidencia recibida del registro del proyecto:**
 - Los cuatro archivos `S02_HTTP_Server_{HQ,S1,S2}_8080.log` y `S02_HTTP_Server_S1_8081.log` contienen únicamente `sudo: interactive authentication is required`. El script anterior ejecutaba el servidor mediante `subprocess.Popen(..., start_new_session=True)` a la vez que dependía de `sudo -n` y caché de autorización por TTY, por tanto el proceso hijo no obtuvo credencial. No existían sockets TCP 8080/8081 en namespace después del intento. **NO era prueba de ACL ni fallo IP.**
 - HQ VLAN110 `10.70.10.10/24` y S1 VLAN220 `10.71.20.20/24` están UP; ping HQ→S1 2/2, ida y retorno vía sus gateways. nft `nl360_s02_acl` AUSENTE.
 - Tres FRR running >52 min; `validar-ospf-s02.py` retorna 0, `validar-lan-s02.py` retorna 0; `ens33 .40/24` y GW `.2` intactas, Git limpio.
@@ -57,7 +57,7 @@
 
 ## Tercer corte real — 23/10/2026 20:10 (-05): HTTP/ACL aprobado y S03 auditoría live inicial
 
-**Resultados enviados por el estudiante (salida completa de los pasos 71–80, 404 líneas):**
+**Resultados enviados en los registros del proyecto (salida completa de los pasos 71–80, 404 líneas):**
 - Python py_compile exit 0; pruebas 6/6 S02 HTTP/ACL y 3/3 S03 observado exitosas.
 - S02 pre-HTTP sudo -n autentica, OSPF 0, LAN 0 y sin tabla nft previa.
 - HTTP corregido arranca **4/4 servicios reales**: HQ `10.70.20.20:8080`, S1 `10.71.20.20:8080`, S2 `10.72.20.20:8080` y S1 `10.71.20.20:8081`, cada uno pasó comprobación HTTP local y devolución de cuerpo.
