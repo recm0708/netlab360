@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 from pathlib import Path
+import subprocess
 import unittest
 import yaml
 
@@ -33,6 +34,13 @@ class TestS03OpenTofu(unittest.TestCase):
                      for name,site in cls.source["sites"].items()
                      for v in site["vlans"]},
         }
+
+    def test_preparation_script_bash_syntax(self):
+        """La CI debe detectar errores de sintaxis antes de probar la VM."""
+        script = ROOT / "scripts/laboratorio/s03-preparar-opentofu.sh"
+        result = subprocess.run(["bash", "-n", str(script)],
+                                capture_output=True, text=True, check=False)
+        self.assertEqual(result.returncode, 0, result.stderr)
 
     def test_preparation_guard_has_paused_and_partial_state_modes(self):
         """Comprobación estática de guardas; no sustituye precheck real Ubuntu."""
