@@ -1,33 +1,40 @@
-# NETLAB360 — Política académica vigente tras guías oficiales (16/10/2026)
+# NETLAB360 — Política editorial y entregables vigentes
 
-**Esta versión REV0.3 sustituye la decisión anterior de DOS informes entregables.** Fundamento: tres criterios docentes proporcionados por el usuario el 16/10 y decisión explícita del mismo. En caso de conflicto consultar [requisitos docentes](../academico/00-criterios-docentes-y-hitos.md). Las instrucciones orales ya están convertidas a criterios operativos sin publicar la transcripción. Las revisiones grupales del escrito están fechadas **30/10 y 13/11**; la demostración final será en vivo.
+**Revisión: 25/10/2026.** Este archivo recoge los criterios operativos del informe único y del paquete técnico. Sustituye las propuestas anteriores de dos informes y ZIP de anexos, conservadas en el historial Git.
 
-## Entrega principal obligatoria: UN solo informe escrito
+## Informe académico único
 
-[Índice vigente](01-proyecto-investigacion-maestro.md): 1 Portada; 2 Introducción; 3 Objetivos; 4 Planteamiento del problema (justificación integrada); 5 Fundamento técnico; 6 Diseño de la solución; 7 Implementación; 8 Pruebas y validación; 9 Análisis de resultados (incidentes reales/mitigación); 10 Conclusiones y recomendaciones; 11 Referencias; 12 Anexos. **Mínimo 40 páginas**. La portada la crea el usuario. Debe explicar cómo se realizó y verificó lo implementado, **no solo teoría**, ni copiar íntegramente scripts o outputs interminables.
+NETLAB360 se documenta en **un solo Word/PDF institucional, de mínimo 40 páginas**, con portada, índice, introducción y los siguientes apartados: **1. Objetivos; 2. Planteamiento del problema; 3. Fundamento técnico; 4. Diseño de la solución; 5. Implementación; 6. Pruebas y validación; 7. Análisis de resultados; 8. Conclusiones y recomendaciones; Referencias**.
 
-El borrador anterior del Documento 01 tiene **65 páginas**, revisadas previamente en PDF institucional; requiere **reubicación según estructura docente y refuerzo** de implementación y pruebas. No se ha editado el Word del usuario por GitHub ni se considera entregado. La profesora puede precisar extensión y otros aspectos mediante transcripción futura.
+**No se incluye capítulo de anexos.** La modalidad de entrega aprobada para los archivos técnicos corresponde a un **TAR independiente** con scripts, YAML/JSON, HCL, inventarios, configuraciones propias, pruebas y evidencias pertinentes, además de instrucciones de ejecución, manifiesto SHA-256 y medidas de exclusión de secretos. Véase [criterios docentes](../academico/00-criterios-docentes-y-hitos.md), [plan TAR](../academico/03-anexos-y-demostracion.md) y [issue #45](https://github.com/recm0708/netlab360/issues/45).
 
-## Entregas adicionales
+El documento se desarrolla por **ocho fases técnicas** dentro de una única investigación. Las funciones de las fases 1 y 2 ya cuentan con pruebas reales, mientras que la fase 3 incorpora Ansible sobre FRRouting activo, OpenTofu **solo de metadatos** y GitOps. Los módulos restantes se documentarán tras su propia aceptación.
 
-- **PowerPoint y demostración técnica obligatorios**, diseñados **después** de cerrar el informe principal; los escenarios deben mostrar baseline, operación/falla y contraste esperado/real, con razonamiento técnico. [Plan](../academico/03-anexos-y-demostracion.md).
-- **Anexos técnicos**: fuente de código completo, YAML, OpenTofu, Ansible, Python, scripts, configuraciones y salidas relevantes. Se permite un ZIP de anexos separado, junto al informe, con manifiesto de integridad y estructura interna; confirmar solo límites de tamaño y carga.
-- [Documento 02 — manual técnico integral](02-informe-tecnico-maestro.md): **DIFERIDO para después del proyecto**; no es requerido en las tres guías y no bloquea S02, informe, demo ni entrega. Conservar issue #28 como proyecto futuro, sin crear contenido nuevo por ahora.
+## Edición y sustentación de resultados
 
-## Reglas editoriales
+- Redacción natural y técnica, coherente con [convenciones Markdown](../convenciones/01-redaccion-y-nomenclatura.md), sin referencias a interlocutores que no formen parte del proyecto.
+- Párrafos completos y cohesionados; no alargar deliberadamente expresiones que necesitan ser breves.
+- Figuras y tablas con preámbulo, numeración consecutiva, título, nota apropiada y referencia cruzada.
+- Citas en el cuerpo y referencias APA 7 consistentes; no agregar fuentes bibliográficas para justificar salidas originales de terminal.
+- Mantener separados el diseño previsto, el resultado implementado y lo pendiente. No presentar `terraform_data` como aprovisionamiento de routers ni las reglas deterministas como un modelo ML entrenado.
+- No atribuir disponibilidad continua, recuperación sin pérdidas ni redundancia física a ensayos que solo demuestran conectividad o conmutación lógica.
+- Las capturas son **originales y verificables**, con comandos/resultados visibles y nombres `S01_...`, `S02_...`, etc. Para los archivos nuevos conservar el hash SHA-256 y la correspondencia con el nombre inicial.
+- No duplicar en Word los scripts extensos, registros completos o el contenido del TAR técnico.
+- La Figura 1 de topología HQ/S1/S2 debe incorporarse al diseño antes del cierre del documento. Revisar el borrador 3, que aún no documenta la fase 3.
 
-- Informe en voz académica del equipo, evidencias reales, no manipular resultados. APA7 híbrido con plantilla institucional; un solo índice automático, citas autor-año y bibliografía donde coincidan referencias y citas.
-- Toda figura o tabla: preámbulo con mención en texto, numeración secuencial, título, **Nota.** cuando proceda; tamaño legible. Capturas solo representativas; archivo ZIP para código/extensiones, si se autoriza.
-- **Incidentes técnicos reales y verificables** en sección 9 (causa cuando es comprobable, mitigación, verificación), vinculados a la implementación del punto 7. No incluir descuidos personales ni fallas artificiales como incidentes reales. En implementación se presentan configuraciones finales limpias.
-- Título formal descriptivo de la plataforma en portada; encabezado corto `NETLAB360 | Redes Empresariales Multisede`. El alumno proporciona y edita Word institucional.
-- Si el alcance final se recorta, se describe SOLO lo efectivamente implementado, sin capítulos de fases inexistentes ni falsificar cronología o requisitos docentes. Mantener trazabilidad en issues/commits.
-- Registrar el estado «implementado/probado/pendiente» y no confundir reglas con IA entrenada, veth con NIC físicas ni subtopologías separadas con integración total.
+## Fechas académicas y presentación
 
-## Prioridad de ejecución (revisada)
+- **30/10/2026:** revisión por Teams de introducción, objetivos y planteamiento.
+- **13/11/2026:** revisión de fundamento y diseño.
+- **Demostración final en vivo** con PowerPoint derivado del informe y operaciones normal/falla/recuperación. Fecha y aceptación final, por confirmar.
 
-1. Comprobar envío del título a Teams y preparar con el grupo la revisión del **30/10** de Introducción, Objetivos y Planteamiento del problema.
-2. **Retomar implementación técnica integrada S02** usando prácticas S01 probadas y la VM protegida; dejar la issue original S01 abierta por brechas sin usarla como bloqueo global.
-3. Incorporar progresivamente contenido verificado al ÚNICO informe académico-técnico; reestructurar Word vigente con el mapa oficial.
-4. Preparar anexos y verificación final; luego PPT+demo. Manual 02 después.
+No se exige un manual técnico independiente para el corte actual. La exportación OVA/OVF tampoco se declara requisito docente hasta contar con confirmación.
 
-**No añadir páginas por rellenar: la calidad de las 40+ páginas depende de diseño, implementación, baseline, resultados, análisis y citas pertinentes.**
+## Integridad y control
+
+- Todos los cambios operativos se gestionan en GitHub mediante issues, commits, PR y CI, con pruebas satisfactorias antes de fusionar.
+- La administración remota de GitHub se gestiona de forma centralizada; las operaciones locales y la obtención de fotografías se limitan al equipo de laboratorio.
+- No versionar llaves privadas, tokens, contraseñas, `terraform.tfstate`, planes guardados, archivos docentes externos ni datos personales.
+- Los controles de cierre se basan en la evidencia real de cada fase, sin exigir que una fase inicial complete las funcionalidades de otras fases.
+
+[Punto de reanudación](../REANUDAR-AQUI.md) · [Tablero de fases](../control/06-tablero-porcentajes-cierre-fases-2026-10-25.md) · [Auditoría de capturas](../evidencias/09-auditoria-zip-fases1-2-3-2026-10-25.md).

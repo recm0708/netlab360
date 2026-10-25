@@ -35,7 +35,7 @@ El instalador valida SO, arquitectura y hostname; realiza mantenimiento de APT e
 
 El script **no** añade el usuario al grupo docker (dicho grupo da permisos equivalentes a root), **no** modifica SSH, UFW, Netplan ni interfaces y **no** crea ni despliega topologías. Los comandos Docker se realizan con sudo.
 
-Si un comando falla, detenerse y revisar el log; no dar por terminado. El usuario realizó la pausa antes de terminar por bloqueo sudo; la VM recibió `sudo systemctl poweroff` y SSH se cerró. Debe confirmarse desde VMware que está apagada. No atribuir el fallo a Docker, OpenTofu, Ansible o Node.js, que no llegaron a instalarse.
+Si un comando falla, detenerse y revisar el log; no dar por terminado. Se realizó la pausa antes de terminar por bloqueo sudo; la VM recibió `sudo systemctl poweroff` y SSH se cerró. Debe confirmarse desde VMware que está apagada. No atribuir el fallo a Docker, OpenTofu, Ansible o Node.js, que no llegaron a instalarse.
 
 ## Evidencias de salida
 

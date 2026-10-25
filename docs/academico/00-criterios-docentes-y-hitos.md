@@ -6,7 +6,7 @@
 
 - **Dos partes del proyecto:** (a) un informe escrito de **al menos 40 páginas** y (b) presentación PowerPoint con **demostración en vivo**.
 - El informe debe explicar el problema abordado, la arquitectura y diseño, **cómo se implementó**, cómo se verificó y qué resultados se observaron. Redacción académica propia del grupo, ordenada, sin repeticiones, con afirmaciones sustentadas y figuras contextualizadas; mantener APA 7 en citas y referencias según plantilla institucional.
-- **Orden del informe:** 1 Portada; 2 Introducción; 3 Objetivos; 4 Planteamiento del problema; 5 Fundamento técnico; 6 Diseño de la solución; 7 Implementación; 8 Pruebas y validación; 9 Análisis de resultados; 10 Conclusiones y recomendaciones; 11 Referencias; 12 Anexos.
+- **Orden de trabajo del informe:** portada, introducción, objetivos, planteamiento, fundamento técnico, diseño, implementación, pruebas, análisis, conclusiones/recomendaciones y referencias. La relación histórica de doce piezas de la guía incluía Anexos, pero la modalidad docente confirmada para este proyecto utiliza un TAR externo y no crea dicho capítulo.
 - Portada incluye universidad, facultad, carrera, asignatura, título, profesor, fecha y nombres/cédulas de integrantes; datos personales solo en el archivo institucional bajo control del equipo, **NO registrar cédulas en GitHub**.
 - El título debe describir la **acción técnica, solución y finalidad**, sin ser genérico.
 - Introducción: contexto→problema/relevancia→solución, no comandos.
@@ -23,7 +23,7 @@
 
 ## Entrega del título (prioridad inmediata)
 
-- **Envío del título a Teams CONFIRMADO por el estudiante el 17/10/2026**, título comunicado: «Diseño e implementación de una plataforma virtualizada para la automatización, observabilidad y diagnóstico de redes empresariales multisede». **Aprobación u observaciones de la profesora todavía pendientes**. NETLAB360 sigue siendo el nombre técnico de la plataforma y encabezado abreviado; no añadirlo retroactivamente al mensaje enviado.
+- **Envío del título a Teams CONFIRMADO en los registros del proyecto el 17/10/2026**, título comunicado: «Diseño e implementación de una plataforma virtualizada para la automatización, observabilidad y diagnóstico de redes empresariales multisede». **Aprobación u observaciones de la profesora todavía pendientes**. NETLAB360 sigue siendo el nombre técnico de la plataforma y encabezado abreviado; no añadirlo retroactivamente al mensaje enviado.
 - La docente indicó que revisaría lo recibido y comunicaría eventuales ajustes del **título** durante el fin de semana o el lunes siguiente. Mantener el título realmente comunicado **sujeto a su respuesta**, no alterar plataforma/nombre interno por una sugerencia editorial.
 
 ## Entregas parciales del proyecto (fecha y alcance definidos)
@@ -37,14 +37,14 @@
 - La presentación del 30/10 exige **mostrar el documento**, no preparar exposición PowerPoint adicional. Si la plataforma de entrega pide adjuntar un archivo, comprobar allí el formato antes de subir; la reunión no fijó una extensión informática obligatoria para esas dos revisiones.
 - Estas son **revisiones parciales**, NO fecha final confirmada del informe o de la demostración semestral.
 
-## Paquete técnico externo — decisión docente precisada por el estudiante (25/10/2026)
+## Paquete técnico externo — decisión docente precisada en los registros del proyecto (25/10/2026)
 
-- **Confirmación comunicada expresamente por el estudiante el 25/10/2026:** la profesora validó la entrega de un archivo **`.tar` independiente** que agrupará scripts, YAML, JSON, configuraciones, pruebas, registros y demás artefactos propios necesarios para la entrega de NETLAB360, **sin abrir un capítulo ni apartado de «Anexos» en el Word/PDF académico**. El informe finaliza en **Referencias**; el paquete técnico se entrega junto a él como archivo separado. Esta precisión reemplaza la propuesta anterior de ZIP y de índice de anexos dentro del documento.
-- **Historial preservado:** el 16/10/2026 se confirmó verbalmente que podían entregarse artefactos técnicos por separado; la primera propuesta operativa era ZIP. La selección concreta de **TAR** y la omisión del apartado de anexos del informe son la aclaración más reciente del estudiante, no una modificación textual comprobada de la guía original.
+- **Confirmación comunicada expresamente en los registros del proyecto el 25/10/2026:** la profesora validó la entrega de un archivo **`.tar` independiente** que agrupará scripts, YAML, JSON, configuraciones, pruebas, registros y demás artefactos propios necesarios para la entrega de NETLAB360, **sin abrir un capítulo ni apartado de «Anexos» en el Word/PDF académico**. El informe finaliza en **Referencias**; el paquete técnico se entrega junto a él como archivo separado. Esta precisión reemplaza la propuesta anterior de ZIP y de índice de anexos dentro del documento.
+- **Historial preservado:** el 16/10/2026 se confirmó verbalmente que podían entregarse artefactos técnicos por separado; la primera propuesta operativa era ZIP. La selección concreta de **TAR** y la omisión del apartado de anexos del informe son la aclaración más reciente del proyecto, no una modificación textual comprobada de la guía original.
 - Contenido permitido: únicamente archivos del proyecto necesarios para reproducir sus escenarios y corroborar resultados, incluyendo README, estructura de carpetas, inventarios, Python/Bash, HCL/OpenTofu, Ansible, FRR, pruebas, evidencias pertinentes y **manifiesto SHA-256**.
 - Excluir secretos y artefactos locales sensibles: credenciales, llaves privadas, tokens, ficheros `.env` con secretos, estados OpenTofu/`terraform.tfstate`, `.git`, cachés, material docente ajeno y archivos personales. Verificar contenido con `tar -tf`, extracción de prueba, integridad del manifiesto y ausencia de secretos **antes de distribuir**.
 - No afirmar que el paquete TAR fue generado o entregado antes de comprobarlo. No imponer OVA/OVF: su obligatoriedad sigue sin confirmación.
-- **Criterio de estructura:** la guía histórica menciona «Anexos» entre las doce piezas, pero según la modalidad docente que comunica el estudiante la evidencia de código se materializa **únicamente en el TAR externo**; no crear un apartado de anexos vacío en el Word.
+- **Criterio de estructura:** la guía histórica menciona «Anexos» entre las doce piezas, pero según la modalidad docente que se encuentra registrada la evidencia de código se materializa **únicamente en el TAR externo**; no crear un apartado de anexos vacío en el Word.
 
 ## Presentación y demostración final
 

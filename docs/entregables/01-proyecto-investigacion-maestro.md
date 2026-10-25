@@ -1,6 +1,6 @@
 # NETLAB360 — Índice maestro de trabajo del informe académico-técnico
 
-**Actualizado el 25/10/2026.** Un único informe institucional, mínimo **40 páginas**, con estructura técnica continua. El borrador recibido `1457-Proyecto Semestral_borrador2.5.pdf` tiene **80 páginas**. El estudiante informó posteriormente haber aplicado correcciones editoriales; **no consta todavía una nueva exportación revisada**. Conservar su Word original y proporcionar correcciones por chat; no recrear el archivo sin solicitud.
+**Actualizado el 25/10/2026.** Un único informe institucional, mínimo **40 páginas**, con estructura técnica continua. La versión de referencia recibida más reciente es `1457-Proyecto Semestral_borrador3.pdf`, de **79 páginas**. El capítulo de la fase 3 sigue pendiente de incorporación al documento, aunque su implementación y pruebas técnicas están comprobadas. Conservar su Word original y proporcionar correcciones por chat; no recrear el archivo sin solicitud.
 
 **Título comunicado por Teams el 17/10/2026:** «Diseño e implementación de una plataforma virtualizada para la automatización, observabilidad y diagnóstico de redes empresariales multisede». Su aprobación docente sigue por confirmar. **Nombre/encabezado abreviado:** NETLAB360 | Redes Empresariales Multisede.
 
@@ -25,7 +25,7 @@
 - En la narración utilizar **fase 1, fase 2, fase 3**; mantener identificadores S01/S02/S03 cuando son nombres reales de scripts, rutas y evidencias. Ocho fases son hitos internos, no ocho informes separados.
 - S01 histórico incluyó LACP virtual, dos WAN HQ/S1, pruebas de automatización candidata, Prometheus y diagnóstico determinista. S02 integró funcionalmente **tres routers, cuatro WAN, nueve VLAN, HTTP y ACL**; desmontada deliberadamente el 23/10 con respaldos.
 - S03 cuenta con SoT, auditoría real Ansible y drift/reconciliación de FRR comprobados, pero **OpenTofu metadata-only y CI/PR siguen sin aceptación real**.
-- Ninguna captura o tabla implica resultado diferente al observado. Figuras y tablas con preámbulo, título, nota y referencias cruzadas correctos. El borrador 2.5 tenía **Figura 1 pendiente**, y el usuario indicó haber aplicado correcciones editoriales sin facilitar aún nuevo PDF verificable.
+- Ninguna captura o tabla implica resultado diferente al observado. Figuras y tablas con preámbulo, título, nota y referencias cruzadas correctos. El borrador 2.5 tenía **Figura 1 pendiente**, y se registró haber aplicado correcciones editoriales sin facilitar aún nuevo PDF verificable.
 - Conservar historial técnico de evidencias SHA-256; nunca insertar secretos o archivos docentes recibidos de terceros en GitHub ni en TAR distribuible.
 - No cerrar issues técnicas por un borrador narrativo; exigir resultados comprobados, trazabilidad, checklist y aceptación del alcance.
 - **30/10/2026:** mostrar en Teams introducción, objetivos y planteamiento, sin PPT adicional (#47). **13/11/2026:** fundamento y diseño (#48). Presentación y demostración final según fecha docente por confirmar. Manual independiente pospuesto.

@@ -15,7 +15,7 @@ Las configuraciones FRR candidatas declaran interfaces `s1p`, `s1b`, `s2p` y `s2
 
 ## Flujo de operación autorizado
 
-1. Mantener consola VMware disponible y snapshot **confirmado por el usuario**.
+1. Mantener consola VMware disponible y snapshot **confirmado en el registro**.
 2. Git limpio, `precheck-s02.sh` cero, segunda conexión SSH probada desde Windows. No endurecer ni reiniciar SSH en esta fase.
 3. Crear **solo en el directorio externo de runtime** las tres carpetas de FRR, copiar `frr.conf` generado, obtener plantilla `daemons` de imagen FRR y habilitar `zebra=yes`, `ospfd=yes`; añadir `vtysh.conf`; aplicar permisos/grupos compatibles con imagen previamente probada.
 4. Ejecutar `sudo docker compose -f topologias/s02-frr/docker-compose.yml config --quiet` para verificar estructura. Confirmar `docker compose version` disponible.
@@ -31,7 +31,7 @@ Preparar un plan de enlaces veth por namespace con nombre y pertenencia explíci
 
 ## Continuacion de WAN posterior al primer arranque correcto (23/10/2026)
 
-**Primer arranque corregido VALIDADO por el estudiante:** 3 routers FRRouting 10.7.1 operativos, `network_mode: none`, `S02_RESULTADO_ARRANQUE=0`, gestion `ens33=192.168.47.40/24` intacta. Captura de éxito confirmada `S02_05_FRR_Tres_Routers_Aislados_Validados`, PNG fisico aún no incorporado al repositorio.
+**Primer arranque corregido VALIDADO en los registros del proyecto:** 3 routers FRRouting 10.7.1 operativos, `network_mode: none`, `S02_RESULTADO_ARRANQUE=0`, gestion `ens33=192.168.47.40/24` intacta. Captura de éxito confirmada `S02_05_FRR_Tres_Routers_Aislados_Validados`, PNG fisico aún no incorporado al repositorio.
 
 **Siguiente procedimiento, de forma incremental:**
 1. Ejecutar `python3 scripts/laboratorio/s02-wan-links.py plan` y `python3 -m unittest discover -s tests -p 'test_s02_wan_plan.py' -v` (solo lectura).
