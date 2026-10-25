@@ -52,3 +52,7 @@ El estudiante remitió `Texto pegado(20261025-210817).txt` (415 líneas). **Regr
 - El usuario pidió formalmente que ChatGPT **gestione directamente GitHub** (PR, Actions, issues, repositorio, validaciones y documentación), mientras él ejecuta solamente comandos locales del laboratorio. No volver a asignarle como paso manual revisar PR o verificar Actions.
 - **Por realizar antes de cerrar fase 3 global:** insertar desarrollo académico específico de fase 3 en el Word y comprobar nueva exportación; evaluar paquete TAR final por separado. No repetir scripts `up/down`, `tofu apply` ni drift.
 
+
+### Interpretación de una salida de tests potencialmente confusa
+
+La regresión general offline imprimió `S03_WAN_COSTOS_VERIFICADOS=8/8 TARGET=150` y `S03_CONFIG_APLICADA=R-S1/s1b COSTO=150` mientras ejecutaba `test_*.py`. **Estos mensajes proceden del conjunto de pruebas unitarias/fixtures** y no de un cambio real de costo en el FRRouting de la VM. La infraestructura S02 se mantuvo desmontada, sin routers activos ni states WAN/LAN; el ensayo real de drift del 23/10 terminó con la restauración 150→100. No atribuir a esta regresión offline una nueva inyección de drift ni un escenario live.
