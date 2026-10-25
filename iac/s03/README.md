@@ -10,11 +10,24 @@ OpenTofu `terraform_data` **sí** tiene ciclo de vida de estado (plan, creación
 
 Documentación oficial: https://opentofu.org/docs/language/resources/tf-data/
 
+## Reanudación segura si la fase 2 está pausada
+
+**Actualización 25/10/2026:** la infraestructura WAN/LAN de la fase 2 fue **desmontada intencionalmente** después de aprobar sus pruebas y conservar respaldos. Como OpenTofu administra exclusivamente metadatos, no necesita reconstruir esa red para operar.
+
+El preparador `scripts/laboratorio/s03-preparar-opentofu.sh` acepta **dos modos explícitos**: `S03_TOFU_MODO_S02=DESPLEGADA_CON_ESTADOS` (ambos estados WAN/LAN presentes) o `S03_TOFU_MODO_S02=PAUSADA_Y_LIMPIA` (ambos ausentes, sin contenedores FRR S02 ni namespaces S02 detectables). Estados parciales, Docker sin permisos de inspección o residuos detectados detienen la preparación. La rama pausada requiere `sudo -v` en la terminal antes de llamar al preparador, sin modificar sudoers. **No arrancar S02 únicamente para crear los 17 metadatos**.
+
+El preparador rechaza cualquier workspace o plan previo y comprueba la red administrativa. No invocar `tofu init`, `plan` o `apply` hasta verificar la situación real del host y un `git pull --ff-only` limpio. Si ya existiera un directorio `~/netlab360-bootstrap/iac/s03/work` o cualquier state antiguo, **no sobrescribir, mover ni borrar**: diagnosticar primero.
+
+**Regresión OSPF/LAN:** ejecutarla solamente si la topología de la fase 2 está efectivamente desplegada. Cuando está pausada, acreditar el modo limpio y la gestión intacta, sin pretender ejecutar comprobaciones FRR en dispositivos inexistentes.
+
 ## Pasos operativos previstos (probar resultados, no asumir)
 
 ```bash
 cd ~/proyectos/netlab360
+git status --short --branch
 GIT_TERMINAL_PROMPT=0 git pull --ff-only origin main
+sudo -v
+bash -n scripts/laboratorio/s03-preparar-opentofu.sh
 python3 -m py_compile scripts/validacion/s03-tofu-manifest.py scripts/validacion/s03-tofu-plan.py
 python3 -m unittest discover -s tests -p 'test_s03_opentofu.py' -v
 python3 -m unittest discover -s tests -p 'test_s03_tofu_plan.py' -v
@@ -23,9 +36,8 @@ ROOT="$HOME/proyectos/netlab360"
 ART="$HOME/netlab360-bootstrap/iac/s03"
 WORK="$ART/work"
 # Verificar ausencia de un state antiguo; NO sobrescribir work ya existente.
-mkdir -p "$WORK"
-chmod 700 "$ART" "$WORK"
-cp -n "$ROOT/iac/s03/main.tf" "$WORK/main.tf"
+bash scripts/laboratorio/s03-preparar-opentofu.sh
+# El script anterior genera $WORK/main.tf; no recrear work ni copiar a mano.
 tofu -chdir="$WORK" init -backend=false -input=false -no-color
 tofu -chdir="$WORK" validate -no-color
 tofu -chdir="$WORK" plan -input=false -no-color \
