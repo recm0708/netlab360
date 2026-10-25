@@ -1,0 +1,59 @@
+name: NETLAB360 - Limpieza controlada de ramas fusionadas
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/cleanup-merged-branches-20261025.yml'
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  limpieza:
+    name: Auditar PR y eliminar refs ya fusionadas
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Eliminar unicamente las cinco ramas de PR ya fusionados
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = "refs/heads/main"
+          test "$REPO" = "recm0708/netlab360"
+          declare -a specs=(
+            'chore/evidencias-fases-s01-s08-20261025|50|c3afb1ca61f252fa729d81069f2dcb3a4bd2b95e'
+            'docs/cierre-evidencias-107-20261025|54|e568ea57733d1bd7ab256a2d72906cd60f47d01e'
+            'docs/voz-editorial-unificada-20261025|52|3cf720cb369b1cdd41a5ddb9d785a19932238d7d'
+            'fix/s03-ci-portable-paths-20261025|49|887c01e58a0bc468ed064daa763497078afde0ff'
+            'upload/capturas-fases-20261025|53|e099e5f79670c11a910c447ea4797340a55aee5f'
+          )
+          echo "========== PRECHECK RAMAS =========="
+          for row in "${specs[@]}"; do
+            IFS='|' read -r ref pr expected <<< "$row"
+            merged="$(gh api "repos/$REPO/pulls/$pr" --jq '.merged_at // empty')"
+            pr_head="$(gh api "repos/$REPO/pulls/$pr" --jq '.head.sha')"
+            remote="$(gh api "repos/$REPO/git/ref/heads/$ref" --jq '.object.sha')"
+            test -n "$merged"
+            test "$expected" = "$pr_head"
+            test "$expected" = "$remote"
+            echo "PR_$pr=MERGED; RAMA=$ref; SHA_OK=SI"
+          done
+          echo "========== LIMPIEZA DE RAMAS CONFIRMADAS =========="
+          for row in "${specs[@]}"; do
+            IFS='|' read -r ref pr expected <<< "$row"
+            gh api -X DELETE "repos/$REPO/git/refs/heads/$ref" >/dev/null
+            echo "RAMA_ELIMINADA=$ref"
+          done
+          echo "========== VERIFICACION FINAL =========="
+          gh api "repos/$REPO/branches?per_page=100" --jq '.[].name'
+          count="$(gh api "repos/$REPO/branches?per_page=100" --jq 'length')"
+          main="$(gh api "repos/$REPO/branches?per_page=100" --jq '.[0].name')"
+          test "$count" -eq 1
+          test "$main" = "main"
+          echo "RAMAS_ACTIVAS=1"
+          echo "SOLO_MAIN=OK"
