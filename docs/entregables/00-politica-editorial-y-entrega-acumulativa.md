@@ -1,6 +1,6 @@
 # NETLAB360 — Política académica vigente tras guías oficiales (16/10/2026)
 
-**Esta versión REV0.3 sustituye la decisión anterior de DOS informes entregables.** Fundamento: tres criterios docentes proporcionados por el usuario el 16/10 y decisión explícita del mismo. En caso de conflicto consultar [requisitos docentes](../academico/00-criterios-docentes-y-hitos.md). Las instrucciones orales ya están convertidas a criterios operativos sin publicar la transcripción. Las revisiones grupales del escrito están fechadas **30/10 y 13/11**; la demostración final será en vivo.
+**Esta versión REV0.3 sustituye la decisión anterior de DOS informes entregables.** Fundamento: tres criterios docentes recibidos en la documentación técnica el 16/10 y decisión explícita del mismo. En caso de conflicto consultar [requisitos docentes](../academico/00-criterios-docentes-y-hitos.md). Las instrucciones orales ya están convertidas a criterios operativos sin publicar la transcripción. Las revisiones grupales del escrito están fechadas **30/10 y 13/11**; la demostración final será en vivo.
 
 ## Entrega principal obligatoria: UN solo informe escrito
 
