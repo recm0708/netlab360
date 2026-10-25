@@ -39,3 +39,16 @@ Resultados **ejecutados realmente en Ubuntu** según registro de terminal aporta
 3. Confirmar físicamente los archivos PNG de evidencia en Windows y sus huellas.
 4. Registrar aceptación de `#17` (OpenTofu) y `#19` (CI/PR) al cumplir sus evidencias, conservando abierta la fase 3 global hasta documentación consolidada.
 5. Continuar informe único hasta fase 3; artefactos finales en **TAR externo**, sin capítulo de anexos, sin incluir state, credenciales ni material docente.
+
+## Actualización documentada tras regresión y auditoría Windows (25/10/2026)
+
+El estudiante remitió `Texto pegado(20261025-210817).txt` (415 líneas). **Regresión post-merge en VM `RESULTADO_S03_POSTMERGE=0`** tras `git pull --ff-only` hasta `417c244`:
+- `S03_REVISION_PR49=OK`: scripts WAN/LAN/HTTP portables con `Path(__file__).resolve().parents[2]`.
+- Suite S02 `Ran 29 tests`, **OK**. Suite completa `Ran 87 tests`, **OK**. `S03_BASH_SINTAXIS=OK`.
+- State OpenTofu externo persistente **17/17**, manifiesto 3/3 sedes–4/4 WAN–9/9 VLAN, `S03_PLAN_SIN_CAMBIOS_CONSERVADO=OK`, ens33/gateway intactos y fase 2 pausada.
+- Auditoría PowerShell: **6/7 PNG**, `S03_03` a `S03_08` existen (archivos distintos y tamaño >0), `S03_09` ausente; CSV local `NETLAB360_S03_Evidencias_20261025_160701.csv` con huellas SHA-256 no transferidas ni verificadas por este repositorio. No afirmar contenido visual de imágenes no examinadas.
+- [PR #49](https://github.com/recm0708/netlab360/pull/49) **merged**, SHA `6e89b1c245e48512596bf6d1b46c3ee99293ecfb`; CI general [40233116672](https://github.com/recm0708/netlab360/actions/runs/40233116672) PR SUCCESS, main [40233253796](https://github.com/recm0708/netlab360/actions/runs/40233253796) SUCCESS, además [40233355346](https://github.com/recm0708/netlab360/actions/runs/40233355346) SUCCESS y CI OpenTofu [40233355350](https://github.com/recm0708/netlab360/actions/runs/40233355350) SUCCESS.
+- La **evidencia de GitOps** se mantiene en el propio repositorio: [`S03_09_GitOps_CI_Regresion_PullRequest.md`](../evidencias/S03_09_GitOps_CI_Regresion_PullRequest.md), con enlaces auténticos; esto evita exigir al usuario una inspección manual de GitHub. El documento no se presenta como captura PNG.
+- El usuario pidió formalmente que ChatGPT **gestione directamente GitHub** (PR, Actions, issues, repositorio, validaciones y documentación), mientras él ejecuta solamente comandos locales del laboratorio. No volver a asignarle como paso manual revisar PR o verificar Actions.
+- **Por realizar antes de cerrar fase 3 global:** insertar desarrollo académico específico de fase 3 en el Word y comprobar nueva exportación; evaluar paquete TAR final por separado. No repetir scripts `up/down`, `tofu apply` ni drift.
+
