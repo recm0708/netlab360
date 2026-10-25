@@ -18,7 +18,8 @@ import sys
 
 import yaml
 
-ROOT = Path.home() / "proyectos/netlab360"
+# Repo relativo al script: funciona tanto en la VM como en GitHub Actions.
+ROOT = Path(__file__).resolve().parents[2]
 IPAM = ROOT / "inventario/ipam/topologia-s02.yaml"
 STATE = Path.home() / "netlab360-bootstrap/s02/lan-vlan-state.json"
 WAN_STATE = Path.home() / "netlab360-bootstrap/s02/wan-links-state.json"

@@ -17,7 +17,8 @@ import subprocess
 import sys
 import time
 
-ROOT = Path.home() / "proyectos/netlab360"
+# Repo relativo al script: funciona tanto en la VM como en GitHub Actions.
+ROOT = Path(__file__).resolve().parents[2]
 BASE = Path.home() / "netlab360-bootstrap/evidencias"
 SPEC = importlib.util.spec_from_file_location("s02lan", ROOT/"scripts/laboratorio/s02-lan-vlan.py")
 assert SPEC and SPEC.loader
