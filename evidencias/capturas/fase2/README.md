@@ -1,5 +1,7 @@
-# NETLAB360 — Capturas de la fase 2 (S02)
+# Capturas NETLAB360 — fase 2 (S02)
 
-Ninguna PNG versionada todavía. El estudiante indica **10 capturas locales** y antes se habían auditado 9 identificadores S02_01–S02_09: revisar la décima y posibles duplicados, sin recrear la topología por ello.
+**Auditoría real 25/10/2026:** estudiante entregó **10 PNG auténticos** en ZIP. Nueve representan los identificadores `S02_01`–`S02_09` y son candidatas para su incorporación posterior, tras transferir bytes originales. La décima `S02_05_FRR_Tres_Routers_Aislados.png` (**17/10**) mostraba **solo R-HQ** y está sustituida por `S02_05_FRR_Tres_Routers_Aislados_Validados.png` (**23/10**) que sí muestra los tres. **NO usar la captura preliminar como prueba de tres routers**.
 
-Los archivos de evidencia real deberán usar nombres descriptivos sin secretos, prefijo `S02_`, ser legibles y tener precheck, comando, resultado y postcheck cuando corresponda. La carpeta en el repositorio no significa que la fase esté completada.
+**Estado remoto actual:** aún 0 PNG en esta carpeta; revisión visual y validación de archivos locales ≠ publicación en GitHub. Análisis completo: [auditoría de 111 imágenes](../../../docs/evidencias/09-auditoria-zip-fases1-2-3-2026-10-25.md).
+
+La infraestructura fue desmontada de forma controlada y no necesita reconstruirse solo para subir imágenes. Usar prefijo S02 y preservar huellas.
