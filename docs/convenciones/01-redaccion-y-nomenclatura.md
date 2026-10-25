@@ -6,9 +6,9 @@
 
 Se utiliza una voz **técnica y natural**, como documentación del propio proyecto: `Se configuró…`, `Comprobé…` cuando se describe una operación personal, `Se verificó…`, `La prueba confirmó…`, `Quedó pendiente…`. Para decisiones del equipo, `Definimos…` o `Se acordó…`. No se introducen interlocutores externos como narradores de la bitácora.
 
-En los documentos del proyecto **no** se escriben expresiones del tipo `el estudiante informó`, `el usuario confirmó`, `el asistente verificó`, `ChatGPT gestionó`, `se le pidió al estudiante` ni fórmulas equivalentes para narrar nuestro propio trabajo. Estas se sustituyen por descripciones comprobables del hecho, de su resultado, de la fuente técnica o de la decisión. **No atribuir a la docente afirmaciones no confirmadas:** distinguir `criterio indicado en clase`, `decisión de entrega comunicada` y `aprobación documentada` según el respaldo disponible.
+En los documentos del proyecto **no** se escriben expresiones del tipo `el estudiante informó`, `el usuario confirmó`, `el asistente verificó`, `una herramienta externa gestionó`, `se le pidió al estudiante` ni fórmulas equivalentes para narrar nuestro propio trabajo. Estas se sustituyen por descripciones comprobables del hecho, de su resultado, de la fuente técnica o de la decisión. **No atribuir a la docente afirmaciones no confirmadas:** distinguir `criterio indicado en clase`, `decisión de entrega comunicada` y `aprobación documentada` según el respaldo disponible.
 
-**Excepciones:** `usuarios` como población de una VLAN, el `usuario final` de una interfaz, el servicio `ChatGPT` cuando sea objeto de estudio, nombres exactos de archivos, terminales, comandos, mensajes de error, resultados literales y citas bibliográficas. Nunca cambiar esos datos por razones de estilo.
+**Excepciones:** `usuarios` como población de una VLAN, el `usuario final` de una interfaz, denominaciones de productos cuando sean objeto de estudio, nombres exactos de archivos, terminales, comandos, mensajes de error, resultados literales y citas bibliográficas. Nunca cambiar esos datos por razones de estilo.
 
 ## Organización y nomenclatura
 
