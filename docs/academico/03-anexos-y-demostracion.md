@@ -1,40 +1,43 @@
-# NETLAB360 — Paquete de anexos y demostración académica
+# NETLAB360 — Archivo técnico TAR independiente y demostración académica
 
-**Estado 16/10/2026:** planificado; **NO se ha generado ZIP**, el formato ZIP como adjunto separado confirmado por la profesora. El entregable escrito principal debe ser autocontenido para comprender arquitectura, implementación, pruebas y resultados. No sustituirlo por código suelto.
+**Decisión operativa vigente, precisada por el estudiante el 25/10/2026:** la profesora autorizó entregar por separado los archivos técnicos del proyecto. El formato definitivo indicado ahora es **un único archivo `.tar`**, no ZIP, y **no se insertará un apartado de anexos en el informe escrito**, que termina en Referencias. La aprobación previa de archivos externos registrada el 16/10 se conserva como antecedente; el cambio de ZIP a TAR responde a la confirmación reciente del estudiante. **El TAR aún no se ha generado, examinado ni entregado.**
 
-## Política para anexos de código completo
+## Propuesta de estructura del TAR final
 
-**Propuesta de un archivo único** `NETLAB360_Anexos_Tecnicos_Final.zip` con:
-- `00_LEEME.txt`: versión/tag/commit, requisitos y correspondencia con las secciones 7–9 del informe.
-- `01_inventario/`: YAML de sedes, IPAM, VLAN, políticas; datos no secretos.
-- `02_topologias/`: archivos y diagramas de escenario, con distinción desplegado/draft.
-- `03_iac/`: `.tf`, `.tfvars.example` despersonalizado, HCL/OpenTofu, Ansible/roles/playbooks, **no** `terraform.tfstate`, ficheros lock de estado, passwords ni `.tfvars` con credenciales.
-- `04_scripts/`: Bash/Python, validadores, simulaciones seguras y utilidades de rollback.
-- `05_servicios/`: FRR, exporter, Prometheus, config NOC sin credenciales.
-- `06_tests/`: pruebas unitarias y de integración sin datos sensibles.
-- `07_evidencias_seleccionadas/`: logs, outputs y capturas pertinentes, no duplicar por defecto las 86 PNG.
-- `08_documentacion/`: matriz de pruebas: ID, etapa, condición inicial, estímulo, resultado esperado/observado, artefacto, commit y estado.
-- `MANIFIESTO_SHA256.csv`: hash relativo y tamaño de cada archivo; fecha de empaquetado y script/orden para verificar integridad.
+Nombre provisional: `NETLAB360_Entrega_Tecnica.tar`.
 
-**Exclusiones obligatorias:** tokens GitHub, claves privadas SSH, passwords, `.env` secretos, bases de datos reales con datos privados, caches, `.git/`, estados sensibles de OpenTofu, `__pycache__`, datos de usuario y valores personales ocultos en salidas/logs. Sanitizar **copias de distribución**, no borrar sin respaldo la VM original.
+- `00_LEEME.md`: propósito, alcance por fases, versión/tag/commit, compatibilidad, dependencias y orden de ejecución, así como correspondencia con el texto del informe.
+- `inventario/`: YAML, IPAM, VLAN y políticas declarativas propias de NETLAB360.
+- `topologias/`: definiciones Docker/FRR y materiales de topología necesarios para los escenarios reproducibles.
+- `iac/`: HCL y código OpenTofu; incluir **solo configuraciones y ejemplos sanitizados**, sin estados, planes guardados ni secretos.
+- `ansible/`: inventarios, roles y playbooks sin credenciales.
+- `scripts/`: Bash/Python, validadores, controles preventivos y procedimientos de reversión.
+- `servicios/`: configuraciones FRR/exportador/Prometheus y paneles propios, si están validados y son distribuibles.
+- `tests/`: pruebas reproducibles y fixtures sin datos sensibles.
+- `evidencias/`: registros, mediciones y capturas **seleccionadas**, solamente cuando sean necesarios y estén autorizados; evitar duplicar todo el histórico.
+- `MANIFIESTO_SHA256.txt`: huellas verificables de los archivos incluidos, excluyendo el propio manifiesto para evitar autorreferencia.
 
-**Verificación previa a la entrega:** ZIP abre sin errores, archivos listados existen, manifiesto SHA256 coincide, README/requisitos completos, referencias cruzadas desde el informe; reproducción inicial con una VM limpia en copia si procede. Nunca llamar «anexos entregados» antes de que se genere, revise y acepte.
+La estructura final podrá adaptarse a las rutas reales del repositorio y al alcance aprobado hasta la fase final. **No copiar ciegamente todo el clon.**
 
-## Presentación oficial: desarrollar DESPUÉS del informe
+### Exclusiones de seguridad
 
-PowerPoint obligatorio: portada/título; introducción; objetivos; planteamiento del problema; diseño; demostración; conclusión y referencias. No existe un número fijo de diapositivas comunicado; el PowerPoint será una síntesis del mismo informe. Para referencias se pueden escoger unas cinco a diez representativas, sin obligación de cantidad exacta. Cantidad y tiempo real aún no confirmados.
+No incluir `.git/`, `.env` con secretos, llaves SSH privadas, contraseñas, tokens de GitHub, `terraform.tfstate*`, planes `*.tfplan`, `.terraform/`, caches, archivos personales ni guías/archivos recibidos de la profesora. Sanitizar **copias de distribución**; no borrar datos del entorno original sin respaldo. Los registros técnicos y datos de prueba deben revisarse para evitar direcciones/credenciales personales ajenas al escenario.
 
-**La demostración final debe ser EN VIVO, directamente en el entorno desarrollado.** No basta reproducir imágenes ni videos sin ejecución interactiva. La demostración debe explicar **por qué funcionan** los escenarios y contrastar la respuesta esperada con la real. Diseñar un recorrido técnico con fallos seguros:
-1. Mostrar arquitectura y baseline: sedes, VLAN, dos WAN, NOC.
-2. Generar tráfico cliente VLAN HQ→servicio S1/S2 con pruebas positivas y negativas de ACL.
-3. Interrumpir WAN-P, observar OSPF ruta respaldo, verificar tráfico y NOC/alerta; restaurar y verificar retorno a estado normal.
-4. Si se integra y prueba: miembro LACP DOWN y recuperación / redundancia de equipo sin tocar red de administración.
-5. Mostrar IaC SoT→Ansible FRR y compliance/drift; diagnóstico basado en datos y límites.
-6. Cerrar con postcheck limpio y evidencias con versión/fecha.
-**Cada paso se presentará solo si previamente está probado**; nada de demo basada en capturas falsas o funciones simuladas que se etiqueten como reales.
+### Comprobaciones obligatorias antes de entregar
 
-## Estado de otras entregas
+1. Congelar versión de código y correspondencia con el informe, sin simular funciones no implementadas.
+2. Preparar directorio de staging externo a `~/proyectos/netlab360`, con permisos privados; revisar archivo por archivo.
+3. Generar `MANIFIESTO_SHA256.txt` y obtener listado de contenidos.
+4. Crear TAR con `tar -cf`, verificar con `tar -tf` y extraer en directorio de prueba distinto.
+5. Verificar SHA-256 de los archivos extraídos, búsqueda de secretos y pruebas de reproducción que correspondan.
+6. Registrar hash SHA-256 del propio TAR y conservar ruta/version/tag/fecha de la entrega; **no marcar entregado hasta constar su recepción**.
 
-- OVA: no hay obligación explícita en estos criterios docentes. Su necesidad/fecha quedan por confirmar en transcripción; si la profesora no la exige, la OVA puede ser complemento recomendable, no requisito asumido.
-- Manual técnico 02: **no se entrega ahora**; redacción posentrega/futura conservada en issue #28.
-- El ejemplo del parcial aún no ha sido adjuntado en esta revisión; no usarlo como norma oficial ni afirmar que fue auditado.
+## Presentación y demostración final
+
+PowerPoint derivado del informe: título, problema, objetivos, diseño y arquitectura, demostración, conclusiones y referencias. La demostración técnica debe hacerse **en vivo**: estado inicial → modificación controlada → resultado medido → recuperación. Solo se muestran capacidades comprobadas y con procedimientos reversibles. No usar capturas para sustituir una función que se presenta como operativa.
+
+## Otros entregables
+
+- **Informe:** único Word/PDF académico, mínimo 40 páginas, con citas y referencias APA 7; **sin apartado de anexos**. El archivo TAR es entrega separada.
+- **OVA/OVF:** no consta exigencia expresa de la profesora; no darlo por obligatorio ni generarlo sin un plan de exportación seguro.
+- **Manual independiente:** pospuesto, no parte de la entrega actual.
