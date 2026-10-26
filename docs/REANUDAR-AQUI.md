@@ -23,8 +23,8 @@
 - [Limpieza controlada de ramas fusionadas](https://github.com/recm0708/netlab360/actions/runs/40242595670) terminada con resultado SUCCESS: cinco ramas eliminadas tras comprobar PR y SHA; **única rama permanente `main`**.
 - Se retiró el workflow temporal y se instaló `.github/workflows/limpiar-rama-tras-merge.yml` para que, en futuros PR fusionados, la rama de origen se elimine después de comprobar que sigue apuntando al SHA incluido en el merge.
 - Se cerraron por alcance técnico verificado las issues #10, #11, #12, #13, #14, #18, #19 y #30. Se consolidaron #9→#36 y #37→#29, sin perder sus pendientes futuros.
-- Permanecen abiertas las **tres issues generales #1, #2 y #3** únicamente hasta superar sus puertas explícitas. Las funciones de NOC S04, LACP S05 y entrega S08 dejaron de figurar como exigencias del cierre funcional de S02.
-- [Puertas de cierre S01–S03](control/07-puertas-cierre-fases1-a-3-2026-10-25.md): **S01** requiere verificación/decisión SSH y compatibilidad fundacional; **S02** figura 1 + revisión/aceptación del escrito; **S03** formalización del contrato SoT y alcance OpenTofu, más incorporación académica en 5.5/6/7/8. No repetir pruebas completas para completar capturas.
+- La **issue #2 de fase 2 se cerró** tras validar técnica y documentalmente el borrador académico 3.2 (94 páginas). Permanecen abiertas #1 (fundamentos/SSH) y #3 (formalización SoT/alcance OpenTofu). Las funciones de NOC S04, LACP S05 y entrega S08 dejaron de figurar como exigencias del cierre funcional de S02.
+- [Puertas de cierre S01–S03](control/07-puertas-cierre-fases1-a-3-2026-10-25.md): **S01** requiere verificación/decisión SSH y compatibilidad fundacional; **S02 CERRADA** con Figura 1 y validación documental del escrito 3.2; **S03** tiene escritura comprobada en 5.5/6/7/8, pendiente únicamente de formalización SoT `candidate` y alcance externo OpenTofu. No repetir pruebas completas para completar capturas.
 
 ## Indicadores de avance
 
@@ -39,8 +39,8 @@
 
 ## Informe académico y entregables
 
-- Última exportación revisada: `1457-Proyecto Semestral_borrador3.pdf`, **79 páginas**. Falta incorporar la fase 3 al apartado 5.5, actualizar pruebas en 6, análisis en 7 y conclusiones en 8; mantener los capítulos 1–8 coherentes.
-- Corregir en Word el marcador de la **Figura 1** y las referencias narrativas residuales a anexos o a `S01`/`S02` cuando estos códigos no formen parte de archivos.
+- Última exportación revisada: `1457-Proyecto Semestral_borrador3.2.pdf`, **94 páginas**. Las fases 1–3 se encuentran desarrolladas; la fase 2 está cerrada internamente. Queda pulido tipográfico general (coma desplazada pág. 7, sangría de 6.5 en índice pág. 5 y espaciado de notas Figuras 12–15/Tabla 12), registrado en #27; fase 3 pendiente de definición de SoT y OpenTofu externo, no de pruebas adicionales.
+- La **Figura 1** ya está insertada y las referencias a anexos fueron corregidas. No modificar las 15 figuras ni repetir las capturas; aplicar exclusivamente el pulido editorial pendiente en Word.
 - Según la modalidad docente registrada, la entrega académica termina en **Referencias**, **sin capítulo de anexos**. El código, YAML/JSON, pruebas y evidencias seleccionadas se entregarán en un **archivo `.tar` externo**.
 - Revisiones docentes: 30/10 (introducción, objetivos y planteamiento) y 13/11 (fundamento y diseño). Confirmar sus resultados reales antes de registrar aprobación.
 - No incluir credenciales, claves SSH privadas, planes/state OpenTofu o archivos de clase en el TAR.
@@ -49,8 +49,9 @@
 
 1. Mantener la rama única `main`, el inventario de **107 capturas** y los manifiestos SHA-256 ya verificados.
 2. Resolver la aceptación fundacional de la fase 1 sin alterar FRRouting: SSH seguro con rollback y notas de compatibilidad.
-3. Completar la Figura 1 y corregir el corte escrito de fase 2, registrando su aceptación.
-4. Incorporar la fase 3 al Word (5.5, 6, 7, 8), delimitar SoT/OpenTofu y registrar su aceptación.
+3. Mantener fase 2 cerrada y sus pruebas intactas; mejorar los tres detalles tipográficos transversales de #27 cuando se exporte el siguiente PDF.
+4. Formalizar el contrato SoT `candidate` y decidir si el objetivo de data sources/ownership externo de OpenTofu se amplía, excluye o difiere; dejar constancia antes de cerrar fase 3.
+5. Continuar fase 4 desde la VM apagada/pausada solo después de comprobar el estado real del arranque; no desplegar S02 por fotografía.
 5. Preparar el corte académico 30/10 y continuar las fases 4–8 por sus propios hitos.
 
 **Conservación histórica:** las sesiones detalladas permanecen en [`docs/sesiones/`](sesiones/), las decisiones en [`docs/academico/`](academico/) y los resultados de auditoría en [`docs/evidencias/`](evidencias/). Los registros cronológicos anteriores también son recuperables mediante el historial Git, sin duplicarlos en este punto de reanudación.
