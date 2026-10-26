@@ -39,7 +39,7 @@
 
 ## Informe académico y entregables
 
-- Última exportación revisada: `1457-Proyecto Semestral_borrador3.2.pdf`, **94 páginas**. Las fases 1–3 se encuentran desarrolladas; la fase 2 está cerrada internamente. Queda pulido tipográfico general (coma desplazada pág. 7, sangría de 6.5 en índice pág. 5 y espaciado de notas Figuras 12–15/Tabla 12), registrado en #27; fase 3 pendiente de definición de SoT y OpenTofu externo, no de pruebas adicionales.
+- Última exportación revisada: `1457-Proyecto Semestral_borrador3.2.pdf`, **94 páginas**. Las fases 1–3 se encuentran desarrolladas; la fase 2 está cerrada internamente. Queda pulido editorial general (coma desplazada pág. 7, sangría de 6.5 en índice pág. 5, espaciado de notas Figuras 12–15/Tabla 12, notas separadas de Figuras 1/5/7 y de Tabla 12), registrado en #27; fase 3 pendiente de definición de SoT y OpenTofu externo, no de pruebas adicionales.
 - La **Figura 1** ya está insertada y las referencias a anexos fueron corregidas. No modificar las 15 figuras ni repetir las capturas; aplicar exclusivamente el pulido editorial pendiente en Word.
 - Según la modalidad docente registrada, la entrega académica termina en **Referencias**, **sin capítulo de anexos**. El código, YAML/JSON, pruebas y evidencias seleccionadas se entregarán en un **archivo `.tar` externo**.
 - Revisiones docentes: 30/10 (introducción, objetivos y planteamiento) y 13/11 (fundamento y diseño). Confirmar sus resultados reales antes de registrar aprobación.
