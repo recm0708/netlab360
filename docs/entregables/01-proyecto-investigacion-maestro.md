@@ -1,3 +1,5 @@
+**VERSIÓN VIGENTE AL 27/10/2026:** `1457-Proyecto Semestral_borrador4.2.pdf` (**95 páginas**), todas las correcciones 1–13 confirmadas. El único párrafo antiguo repetido está en 4.7 p.32 y debe eliminarse. Falta incorporar texto nuevo de S04 en 5.6/6.9/7.10, conclusiones y Tabla12 en Word; SLO sigue propuesto, y no existe aceptación docente. Bitácora de preapagado y desmontaje 4.69–4.75 OK; los servicios están detenidos y la red S02 desmontada, pero no consta poweroff de Ubuntu. [Registro](../sesiones/2026-10-27-s04-borrador42-desmontaje-validado.md).
+
 # NETLAB360 — Índice maestro y situación del informe único
 
 **Actualizado el 27/10/2026.** Documento principal: Word institucional editado por el equipo. Última exportación recibida: `1457-Proyecto Semestral_borrador4.1.pdf` (**95 páginas**): incorporadas cinco correcciones intro/fundamento/diseño/Tabla5, pero todavía no los apartados completos 5.6, 6.9 y 7.10. Las correcciones se entregarán **por mensajes de chat**, para copiar y pegar en el Word original, y se comprobará un PDF posterior antes de declarar aceptación.

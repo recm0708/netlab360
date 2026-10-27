@@ -1,3 +1,7 @@
+## Prioridad del corte 27/10 — borrador4.2 y entorno desmontado
+
+**Estado actualizado a partir de evidencia real:** `1457-Proyecto Semestral_borrador4.2.pdf` (**95 páginas**), correcciones 6–13 confirmadas, duplicación obsoleta en 4.7 p.32 a retirar y S04 **todavía sin** 5.6, 6.9 y 7.10. [Bitácora vigente](sesiones/2026-10-27-s04-borrador42-desmontaje-validado.md). Los procesos NOC/exporter/Prometheus se detuvieron, la TSDB quedó respaldada en frío, y la topología S02 fue eliminada correctamente en 4.73/4.74. Validación **4.75**: 12 namespaces LAN ausentes, cuatro WAN retiradas, 3 routers Docker eliminados, 3 eventos G3 conservados, `ens33=192.168.47.40/24`/GW .2 intacto y Git limpio; `S04_APAGADO_PREPARADO=OK`. **VM todavía encendida**, sin constancia de `systemctl poweroff`. Revisión académica 30/10 pendiente. Las referencias inferiores que describen 4.0 o topología activa corresponden a estado **histórico**.
+
 # NETLAB360 — Estado vigente de continuidad (27/10/2026)
 
 **Documento de orientación actual.** El estado histórico de 17/10 se conserva en Git y en bitácoras `docs/sesiones/`, no como situación técnica vigente.

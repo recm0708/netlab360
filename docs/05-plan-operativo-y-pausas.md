@@ -1,6 +1,10 @@
+## Resultado real de retirada completada (27/10) — no repetir
+
+Los pasos **4.69–4.75** terminaron satisfactoriamente en Ubuntu: respaldos de estado WAN/LAN y base SQLite en `~/netlab360-bootstrap/s04/evidencias/S04_Preapagado_20261027T084907083378Z`, exportador/NOC/Prometheus detenidos; TSDB archivada en frío con SHA256 `e7602327d233fcb7dccd60f57fc3230202b1998c592655ec75ed20ef06ba49c1`; LAN S02 (12 namespaces), cuatro WAN y tres FRR retirados en ese orden. Comprobación final `S04_APAGADO_PREPARADO=OK`, sin servicios de observabilidad escuchando y red administrativa ens33 .40/24 GW .2 preservada. Git `main` limpio (`1781ff5` en el postcheck). **La VM aún no está apagada**, por lo que falta solicitar `sudo systemctl poweroff` cuando corresponda y confirmar **Powered Off** desde VMware; no repetir ningún `down` ya concluido. Para la sesión S05 se hará un precheck de entorno desmontado antes del arranque de la topología. El documento inferior describe el **procedimiento** históricamente aplicado; no es una instrucción para ejecutarlo de nuevo.
+
 # NETLAB360 — Plan operativo y apagado seguro entre S04 y S05
 
-**Actualizado:** 27/10/2026. Referencia académica: un único informe Word/PDF de mínimo 40 páginas (capítulos 1–8 + referencias), PowerPoint y demostración final en vivo, **TAR técnico externo** y **sin apartado de anexos**. Versión recibida `1457-Proyecto Semestral_borrador4.0.pdf` (94 pp.) todavía sin S04 integrada. El estado remoto de Git y la VM no equivale a una entrega académica.
+**Actualizado:** 27/10/2026. Referencia académica: un único informe Word/PDF de mínimo 40 páginas (capítulos 1–8 + referencias), PowerPoint y demostración final en vivo, **TAR técnico externo** y **sin apartado de anexos**. Versión recibida `1457-Proyecto Semestral_borrador4.2.pdf` (95 pp.), con correcciones preliminares integradas pero capítulos 5.6/6.9/7.10 pendientes. El estado remoto de Git y la VM no equivale a una entrega académica.
 
 ## Estado confirmado previo a la parada
 
