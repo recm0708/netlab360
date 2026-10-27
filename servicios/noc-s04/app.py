@@ -365,6 +365,7 @@ def main() -> None:
     group.add_argument("--check", action="store_true")
     group.add_argument("--once", action="store_true")
     group.add_argument("--serve", action="store_true")
+    group.add_argument("--import-g3-log", action="store_true")
     cli.add_argument("--port", type=int, default=9120)
     args = cli.parse_args()
     if not 1024 <= args.port <= 65535:
@@ -375,6 +376,12 @@ def main() -> None:
         print("S04_NOC_NO_CAMBIOS=SI")
     elif args.once:
         print(json.dumps(overview(), indent=2, ensure_ascii=False, sort_keys=True))
+    elif args.import_g3_log:
+        HISTORY.initialize()
+        count = HISTORY.import_g3()
+        print(f"S04_G4_G3_EVENTOS_IMPORTADOS={count}")
+        print(f"S04_G4_HISTORIAL_TOTAL_G3={len(HISTORY.events(site='HQ',limit=200))}")
+        print("S04_G4_IMPORTACION_G3=OK")
     else:
         serve(args.port)
 
