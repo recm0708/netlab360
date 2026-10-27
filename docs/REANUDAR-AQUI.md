@@ -135,3 +135,10 @@
 - [Guía G3](operaciones/s04-g3-incidente-wan-controlado.md) indica precheck, corte aislado HQ/s1p por 32 segundos, observación pending/firing, backup s1b y restauración protegida. NO se ha ejecutado todavía el corte.
 - La topología G1 y los servicios G2 deben permanecer activos: FRR 3, WAN 4, VLAN 9, exporter 9110, Prometheus 9091, NOC 9120. Terminal 1 se usa para validaciones.
 - Próximo paso: sincronizar main limpia en Ubuntu, compilar el script, ejecutar tests G3 y validador de capturas, luego ejecutar python3 scripts/observabilidad/s04-incidente-wan.py --check. Revisar salida antes de ejecutar --execute --snapshot-confirmado. S01 y S03 permanecen abiertas sin bloquear S04-S08.
+
+## Último corte — 27/10/2026, 01:06:18 (S04 G3 REAL completada)
+
+- **G3 validada en producción de laboratorio:** HQ/s1p DOWN 06:05:04Z → Prometheus pending 06:05:07Z → firing 06:05:13Z, visible desde NOC; respaldo S1 en s1b (ambas direcciones), S2 estable en s2p, ICMP correcto; HQ/s1p UP 06:06:07Z, retorno a s1p y alarma ausente de activas 06:06:18Z. Marcadores `S04_G3_RESULTADO=OK`, `S04_G3_EJECUCION_COMPLETA=OK`. [Bitácora de G3](sesiones/2026-10-27-s04-g3-incidente-real-y-recuperacion.md).
+- **Capturas recibidas y auditadas en esta sesión:** lote S04 02 consta de 8 PNG originales (`S04_07`, `S04_08`, `S04_09` ×4, `S04_10`, `S04_11`). ZIP/CSV SHA-256 preparados para importar al repositorio, **no se han publicado**. Inventario remoto aún **114 PNG**; sería **122** tras la publicación del lote.
+- **Servicios y red presumiblemente activos al finalizar G3:** se registró gestión intacta, rutas principales restauradas y fuente fresca. **Próximo paso postcheck read-only** de OSPF/FIB, LAN, exporter, Prometheus y NOC antes de asumir nuevas pruebas G4. Conservar Term1 operaciones y Term2/3/4 procesos, sin desmontar WAN/LAN.
+- **Roadmap nuevo**: historial mínimo durable y vista por sede desde G4/G5 S04 (issue #21); diagrama gráfico animado en S05 (issue #64), colores por estado observado, respaldo distinguible y animaciones solo con tráfico medido. En S06 y S07 se amplía diagnóstico/integración, no adelantar esos hitos.
