@@ -1,5 +1,21 @@
-# NETLAB360 — Capturas de la fase 4 (S04)
+# NETLAB360 — Evidencias de la fase 4 (S04)
 
-Pendiente de implementar y validar la fase 4; no incluir capturas inventadas.
+**Corte técnico: 26/10/2026.** El NOC inicial central/HQ/S1/S2, el exporter S04 y Prometheus fueron comprobados sobre la **topología intencionalmente desmontada**. No representa todavía la supervisión de WAN desplegadas ni una prueba de incidente y restauración.
 
-Los archivos de evidencia real deberán usar nombres descriptivos sin secretos, prefijo `S04_`, ser legibles y tener precheck, comando, resultado y postcheck cuando corresponda. La carpeta en el repositorio no significa que la fase esté completada.
+## Primer lote de evidencias S04 — auditado y pendiente de publicación binaria
+
+Se recibieron **siete capturas PNG originales** y se inspeccionaron visualmente contra las salidas de terminales. La [auditoría y los SHA-256 auténticos se registraron en la issue #4](https://github.com/recm0708/netlab360/issues/4#issuecomment-6433141415). **Estas imágenes aún no se encuentran versionadas en esta carpeta**; no modificar el cómputo global de 107 PNG de las fases 1–3 hasta finalizar su publicación.
+
+| Archivo previsto | Clasificación | Criterio demostrado |
+|---|---|---|
+| `S04_01_API_Telemetria_Real_Tres_Sedes_Offline.png` | Obligatoria | API Docker fiable; HQ/S1/S2, 8 WAN, 9 VLAN, 25 series |
+| `S04_02_Prometheus_Scrape_Real_Sin_Falsas_Alertas.png` | Obligatoria | Scrape UP, fuente UP, cero falsas alarmas |
+| `S04_03_NOC_Central_Tres_Sedes_Offline-1.png` | Obligatoria (parte 1) | Vista central de tres sedes |
+| `S04_03_NOC_Central_Tres_Sedes_Offline-2.png` | Obligatoria (parte 2) | Sección de alertas del mismo NOC |
+| `S04_04_NOC_Sucursal_Estados_WAN_VLAN.png` | Obligatoria | Vista S1 WAN/VLAN y frescura |
+| `S04_05_NOC_API_Agregada_Fuentes_Confiables.png` | Complementaria | Agregación API de exporter y Prometheus |
+| `S04_06_Postcheck_NOC_Prometheus_Exporter.png` | Complementaria | Puertos liberados; red de gestión intacta; Docker y Git limpios |
+
+Las dos partes de S04_03 se conservan por separado sin recomprimir. No sustituir su contenido por reconstrucciones o imágenes generadas. Para publicar, validar el SHA256 de cada archivo contra el manifiesto recibido y agregar sólo los PNG auténticos mediante Git.
+
+**Estado de la fase 4:** abierta. Faltan topología activa, OSPF/servicios, alertas de fallas/restituciones reales, histórico, indicadores SLI/SLO, decisiones de notificación y documentación final.
