@@ -1,0 +1,40 @@
+name: NETLAB360 - Integridad de capturas por fase
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'evidencias/**'
+      - 'scripts/validacion/validar-capturas-unificadas.py'
+      - 'tests/test_capturas_por_fase.py'
+      - '.github/workflows/ci-evidencias.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'evidencias/**'
+      - 'scripts/validacion/validar-capturas-unificadas.py'
+      - 'tests/test_capturas_por_fase.py'
+      - '.github/workflows/ci-evidencias.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  audit-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Obtener repositorio y PNG reales
+        uses: actions/checkout@v5
+      - name: Instalar Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Auditar SHA256 y dimensiones de manifiestos
+        run: python scripts/validacion/validar-capturas-unificadas.py
+      - name: Regresion inventario de fases
+        run: python -m unittest discover -s tests -p 'test_capturas_por_fase.py' -v
+      - name: Delimitar alcance
+        run: |
+          echo 'CI_EVIDENCIAS=OK'
+          echo 'No sustituye revisión visual de las PNG ni prueba de topología real.'
