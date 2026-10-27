@@ -1,3 +1,10 @@
+## Corte 27/10 — manuscrito 4.1 y preapagado S04 (verificado)
+
+- **PDF académico 4.1 de 95 páginas recibido**: 5/5 correcciones de la tanda anterior presentes en páginas 7–8, 21, 32 y 38; todavía sin las secciones 5.6, 6.9 y 7.10, ni conclusiones/Tabla12 actualizadas. Revisar contradicciones anteriores en 2.4.1, 3.8, 4, Tabla1, 4.7 apertura, 4.8 y capítulo5.
+- **Preapagado 4.69 OK:** Git main 8254376 limpio, ens33 .40/24 y GW .2, backup de estados S02 + SQLite G3 3/3 confirmado, directorio `~/netlab360-bootstrap/s04/evidencias/S04_Preapagado_20261027T084907083378Z`.
+- **Servicios NOC 9120 / Prometheus 9091 / exporter 9110 ya detenidos por Ctrl+C**, Prometheus con log de cierre graceful; pendiente el **4.71** de puertos/TSDB/red y después la retirada LAN→WAN→Docker Compose únicamente S02. **No hay evidencia de VM apagada**.
+- Bitácora primaria: [sesión 27/10, borrador 4.1/preapagado](sesiones/2026-10-27-s04-borrador41-preapagado.md).
+
 # NETLAB360 — Reanudación técnica y documental
 
 **Corte técnico actualizado: 26 de octubre de 2026.** Este es el punto de partida vigente; las bitácoras y commits anteriores se conservan como historial verificable. La documentación utiliza la [voz editorial del proyecto](convenciones/01-redaccion-y-nomenclatura.md).
