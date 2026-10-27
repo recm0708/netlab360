@@ -1,3 +1,5 @@
+**CONTROL DE TABLAS PDF 4.4 (27/10):** La Tabla 12 (p. 98) compara capacidades de S01/S02 y se conserva. Hay dos rótulos «Tabla 13»: la tabla SLI de capítulo 6 mantiene el 13; la segunda, en 7.8 (p. 104), debe renumerarse a Tabla 14 y su fila de 107 capturas debe actualizarse a 122 (83/9/8/22). Revisar también cifras en 6.6 (p. 81), 6.9.6 (p. 97) y 7.7.1 (p. 103). No se ha editado el PDF; la corrección corresponde al Word del equipo.
+
 # NETLAB360 — Continuidad editorial del informe académico hasta S04
 
 **Documento fuente recibido:** `1457-Proyecto Semestral_borrador4.4.pdf`, **110 páginas**, 27/10/2026. Se actualiza en Word por el equipo; no se modifica el PDF por el repositorio. Un solo informe académico y TAR técnico independiente, sin capítulo de anexos.
