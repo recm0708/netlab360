@@ -1,6 +1,6 @@
 # NETLAB360 — Reanudación técnica y documental
 
-**Corte de trabajo: 25 de octubre de 2026.** Este es el punto de partida vigente; las bitácoras y commits anteriores se conservan como historial verificable. La documentación utiliza la [voz editorial del proyecto](convenciones/01-redaccion-y-nomenclatura.md).
+**Corte técnico actualizado: 26 de octubre de 2026.** Este es el punto de partida vigente; las bitácoras y commits anteriores se conservan como historial verificable. La documentación utiliza la [voz editorial del proyecto](convenciones/01-redaccion-y-nomenclatura.md).
 
 ## Estado de la máquina de laboratorio
 
@@ -26,13 +26,19 @@
 - La **issue #2 de fase 2 se cerró** tras validar técnica y documentalmente el borrador académico 3.2 (94 páginas). Permanecen abiertas #1 (fundamentos/SSH) y #3 (formalización SoT/alcance OpenTofu). Las funciones de NOC S04, LACP S05 y entrega S08 dejaron de figurar como exigencias del cierre funcional de S02.
 - [Puertas de cierre S01–S03](control/07-puertas-cierre-fases1-a-3-2026-10-25.md): **S01** requiere verificación/decisión SSH y compatibilidad fundacional; **S02 CERRADA** con Figura 1 y validación documental del escrito 3.2; **S03** tiene escritura comprobada en 5.5/6/7/8, pendiente únicamente de formalización SoT `candidate` y alcance externo OpenTofu. No repetir pruebas completas para completar capturas.
 
+## Preparación de la fase 4 — 26/10/2026
+
+- [Issue #4](https://github.com/recm0708/netlab360/issues/4): inicio de S04 registrado; **sin ejecución de VM ni despliegue nuevo confirmado todavía**.
+- Se verificó en el código que el exporter vivo B3 usa los contenedores **dos routers** `nl360-b2-r-hq`/`nl360-b2-r-s1` e interfaces `wan-p`/`wan-b`, mientras que S02 usa **tres routers**, cuatro WAN y nueve VLAN. La reutilización requiere adaptación y pruebas de telemetría fresca por sede.
+- Primer procedimiento al arrancar Ubuntu: verificar hostname, `ens33`/gateway, Git, Docker/netns y puertos 8765/9108/9090. **No** iniciar servicios, desplegar S02, cambiar SSH o ejecutar OpenTofu hasta confirmar el preflight.
+
 ## Indicadores de avance
 
 | Fase | Corte actual | Pendiente para aceptación |
 |---|---:|---|
 | 1 | 72 % histórico | Decidir el cierre administrativo de la línea base sin atribuir las fases posteriores a esta fase |
-| 2 | ≈90 % | Evidencias publicadas; resta aceptación documental y Figura 1 del informe |
-| 3 | ≈90 % | Evidencias publicadas; delimitar OpenTofu metadata-only e integrar resultados al informe |
+| 2 | **Cerrada** | Pruebas y documentación aceptadas internamente; issue #2 cerrada |
+| 3 | Técnicamente documentada | SoT `candidate` (#16) y data sources/ownership externo OpenTofu (#17) por decidir; informe 3.2 validado |
 | 4–8 | 0 % de aceptación formal | Implementación, pruebas y entregables propios de cada fase |
 
 [Tablero completo de criterios](control/06-tablero-porcentajes-cierre-fases-2026-10-25.md). Las funciones experimentales de fases previas no se contabilizan como aceptación formal de fases posteriores.
@@ -51,7 +57,7 @@
 2. Resolver la aceptación fundacional de la fase 1 sin alterar FRRouting: SSH seguro con rollback y notas de compatibilidad.
 3. Mantener fase 2 cerrada y sus pruebas intactas; mejorar los tres detalles tipográficos transversales de #27 cuando se exporte el siguiente PDF.
 4. Formalizar el contrato SoT `candidate` y decidir si el objetivo de data sources/ownership externo de OpenTofu se amplía, excluye o difiere; dejar constancia antes de cerrar fase 3.
-5. Continuar fase 4 desde la VM apagada/pausada solo después de comprobar el estado real del arranque; no desplegar S02 por fotografía.
-5. Preparar el corte académico 30/10 y continuar las fases 4–8 por sus propios hitos.
+5. Comenzar S04 mediante **preflight de solo lectura**; el exporter histórico B3 apunta a dos routers `nl360-b2-*` y no es compatible directamente con la topología S02 de tres routers `nl360-s02-*`. No desplegar S02 por fotografía.
+6. Preparar el corte académico del 30/10 y continuar las fases 4–8 según sus hitos.
 
 **Conservación histórica:** las sesiones detalladas permanecen en [`docs/sesiones/`](sesiones/), las decisiones en [`docs/academico/`](academico/) y los resultados de auditoría en [`docs/evidencias/`](evidencias/). Los registros cronológicos anteriores también son recuperables mediante el historial Git, sin duplicarlos en este punto de reanudación.
