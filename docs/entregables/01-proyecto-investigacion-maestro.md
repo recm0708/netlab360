@@ -1,6 +1,6 @@
 # NETLAB360 — Índice maestro y situación del informe único
 
-**Actualizado el 27/10/2026.** Documento principal: Word institucional editado por el equipo. Última exportación recibida: `1457-Proyecto Semestral_borrador4.0.pdf` (**94 páginas**), todavía no incorporada la fase 4. Las correcciones se entregarán **por mensajes de chat**, para copiar y pegar en el Word original, y se comprobará un PDF posterior antes de declarar aceptación.
+**Actualizado el 27/10/2026.** Documento principal: Word institucional editado por el equipo. Última exportación recibida: `1457-Proyecto Semestral_borrador4.1.pdf` (**95 páginas**): incorporadas cinco correcciones intro/fundamento/diseño/Tabla5, pero todavía no los apartados completos 5.6, 6.9 y 7.10. Las correcciones se entregarán **por mensajes de chat**, para copiar y pegar en el Word original, y se comprobará un PDF posterior antes de declarar aceptación.
 
 **Título comunicado en Teams el 17/10/2026:** «Diseño e implementación de una plataforma virtualizada para la automatización, observabilidad y diagnóstico de redes empresariales multisede». Aprobación docente pendiente. Encabezado abreviado del proyecto: `NETLAB360 | Redes Empresariales Multisede`.
 
@@ -36,3 +36,5 @@ Hasta el borrador 4.0 hay **15 figuras** y **12 tablas**, por lo que las nuevas 
 - [ ] Formalizar por el grupo SLO candidato, alcance de alertas solo locales y decisiones de inclusión de datos antes de aceptación S04; continuar S05–S08 en el mismo informe.
 
 [Guion de S04 para Word](../academico/s04-guion-de-actualizacion-del-informe.md) · [Matriz de pruebas S04](../operaciones/s04-g6-matriz-aceptacion-evidencias-2026-10-27.md) · [Criterios docentes](../academico/00-criterios-docentes-y-hitos.md) · [TAR técnico final](../academico/03-anexos-y-demostracion.md).
+
+**Control 27/10 (borrador 4.1):** se validaron 5 correcciones efectivamente incluidas, sin alterar datos originales del informe. Quedan textos de estado anterior a S04, en especial 2.4.1, 3.8, Tabla1 y nota de Tabla5; la edición se suministra por chat y se coteja después con una nueva exportación. En paralelo se respaldaron estados WAN/LAN y SQLite G3, se detuvieron servicios NOC/Prometheus/exporter; la topología FRR/LAN/WAN todavía no consta desmontada. [Bitácora S04](../sesiones/2026-10-27-s04-borrador41-preapagado.md).
