@@ -7,10 +7,13 @@ Este directorio reúne únicamente **evidencias PNG auténticas de NETLAB360**, 
 | `fase1/` | **90** | 86 históricas y cuatro complementarias |
 | `fase2/` | **9** | Evidencias finales S02_01–S02_09 |
 | `fase3/` | **8** | Evidencias finales S03_01–S03_08 |
-| `fase4/`–`fase8/` | **0** | Directorios listos para etapas posteriores |
-| **Total** | **107** | Integridad comprobada |
+| `fase4/` | **7** | Primer lote S04, seis identificadores, NOC/Prometheus sobre topología OFFLINE; [PR #58](https://github.com/recm0708/netlab360/pull/58) |
+| `fase5/`–`fase8/` | **0** | Directorios listos para etapas posteriores |
+| **Total** | **114** | 90 S01 + 9 S02 + 8 S03 + 7 S04; validación de transferencia y fusión confirmadas |
 
 **Integridad:** las 86 imágenes iniciales conservan sus hashes en los [manifiestos históricos](../manifiestos/) y su [mapa de renombrado](../manifiestos/MAPA_RENOMBRADO_FASE1_2026-10-25.csv). Las **21 incorporadas posteriormente** constan en el [manifiesto definitivo SHA-256](../manifiestos/MANIFIESTO_SHA256_CAPTURAS_2026-10-25.csv) y la [verificación CI](https://github.com/recm0708/netlab360/actions/runs/40241580823). Las cuatro imágenes históricas o preliminares que no acreditan resultados finales **no se incorporaron**.
+
+Los siete PNG S04 se publicaron sin alterar imágenes en [PR #58](https://github.com/recm0708/netlab360/pull/58), con [manifiesto SHA-256 propio](../manifiestos/MANIFIESTO_SHA256_S04_LOTE01_2026-10-26.csv). El manifiesto fue normalizado de CRLF a LF exclusivamente; los hashes de PNG no cambiaron. El lote S04 acredita observabilidad OFFLINE, no enlace WAN activo.
 
 El respaldo verificable de GitOps `S03_09` se conserva como [registro Markdown de GitHub Actions y PR](../../docs/evidencias/S03_09_GitOps_CI_Regresion_PullRequest.md), **no como PNG**.
 
