@@ -2,9 +2,9 @@
 
 **Corte técnico: 26/10/2026.** El NOC inicial central/HQ/S1/S2, el exporter S04 y Prometheus fueron comprobados sobre la **topología intencionalmente desmontada**. No representa todavía la supervisión de WAN desplegadas ni una prueba de incidente y restauración.
 
-## Primer lote de evidencias S04 — auditado y pendiente de publicación binaria
+## Primer lote de evidencias S04 — auditado y publicado
 
-Se recibieron **siete capturas PNG originales** y se inspeccionaron visualmente contra las salidas de terminales. La [auditoría y los SHA-256 auténticos se registraron en la issue #4](https://github.com/recm0708/netlab360/issues/4#issuecomment-6433141415). **Estas imágenes aún no se encuentran versionadas en esta carpeta**; no modificar el cómputo global de 107 PNG de las fases 1–3 hasta finalizar su publicación.
+Se recibieron **siete capturas PNG originales** y se inspeccionaron visualmente contra las salidas de terminales. La [auditoría y los SHA-256 auténticos se registraron en la issue #4](https://github.com/recm0708/netlab360/issues/4#issuecomment-6433141415). **Las siete imágenes están versionadas en esta carpeta**, fusionadas mediante [PR #58](https://github.com/recm0708/netlab360/pull/58), junto con el [manifiesto SHA-256](../../manifiestos/MANIFIESTO_SHA256_S04_LOTE01_2026-10-26.csv). El inventario remoto contiene **114 PNG** entre S01–S04, de los cuales **7** corresponden a S04.
 
 | Archivo previsto | Clasificación | Criterio demostrado |
 |---|---|---|
@@ -16,6 +16,6 @@ Se recibieron **siete capturas PNG originales** y se inspeccionaron visualmente 
 | `S04_05_NOC_API_Agregada_Fuentes_Confiables.png` | Complementaria | Agregación API de exporter y Prometheus |
 | `S04_06_Postcheck_NOC_Prometheus_Exporter.png` | Complementaria | Puertos liberados; red de gestión intacta; Docker y Git limpios |
 
-Las dos partes de S04_03 se conservan por separado sin recomprimir. No sustituir su contenido por reconstrucciones o imágenes generadas. Para publicar, validar el SHA256 de cada archivo contra el manifiesto recibido y agregar sólo los PNG auténticos mediante Git.
+Las dos partes de S04_03 se conservan por separado sin recomprimir. No sustituir su contenido por reconstrucciones o imágenes generadas. Publicación completada: hashes de los PNG validados en Ubuntu antes del push; PR revisado con exactamente siete PNG y un CSV, normalización exclusiva de saltos de línea del CSV y fusión remota confirmada. No regenerar ni recomprimir las capturas.
 
 **Estado de la fase 4:** abierta. Faltan topología activa, OSPF/servicios, alertas de fallas/restituciones reales, histórico, indicadores SLI/SLO, decisiones de notificación y documentación final.
