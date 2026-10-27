@@ -1,6 +1,6 @@
 # Prometheus S04: pruebas unitarias sintéticas de reglas, no prueban una topologia viva.
 rule_files:
-  - servicios/observabilidad/prometheus/rules/s04-alerts.yml
+  - ../rules/s04-alerts.yml
 
 evaluation_interval: 2s
 
