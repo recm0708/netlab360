@@ -162,3 +162,11 @@
 - Respaldo SQLite por API `backup`, íntegro y 3/3 eventos G3, ruta `~/netlab360-bootstrap/s04/evidencias/S04_G6_Respaldo_Historial_20261027T075205880317Z.sqlite3`, SHA256 `23f1db998a3e9b4811507e3f7b50d063d76e5e3971931acb491683c120f8d820`, fuera de Git.
 - PowerShell confirmó físicamente **7 PNG S04_12–17** en Windows (S04_15 tiene 2 partes). Falta empaquetar/transferir/auditar 7 PNG y publicar manifiesto LOTE03. GitHub todavía 122 PNG (S04 15); meta tras PR 129 (S04 22). Capturas que antes figuraban no confirmadas ahora se localizaron como archivos; **contenido visual aún no auditado**.
 - **Estado:** G0–G4 técnicamente cerradas; G5 SLI calculados, SLO candidato 99 % incumplido en 60m y no aprobado; G6 escrito/manifestación/postcheck por completar. Conservar Term1 operativa, Term2 exporter 9110, Term3 Prometheus 9091, Term4 NOC 9120 y red FRR/WAN/LAN activa. No repetir falla WAN G3.
+
+
+## Corte 27/10/2026 — G6 evidencia publicada / G5 decisión pendiente
+
+- [PR #75](https://github.com/recm0708/netlab360/pull/75) **fusionado**, commit `0f8e943f`, CI integridad SUCCESS tanto PR (40471188245) como main (40471266913). Inventario remoto **129 PNG** (S01 90, S02 9, S03 8, S04 **22**), tres manifiestos S04 7+8+7. En Ubuntu SHA origen Windows y dimensiones 7/7, inventario global y tests OK.
+- G6 regresión final real **`S04_G6_POSTCHECK=OK`**: FRR OSPF FULL 4/2/2, FIB primaria 6/6, loopbacks 6/6, VLAN gateways 9/9, LAN 6/6, exporter `active_fresh`, Prometheus `up`, NOC `active`, cero alertas actuales, tres eventos G3 históricos, gestión `ens33=192.168.47.40/24` GW `.2` preservada.
+- **No declarar S04 terminada académicamente:** G5 SLO 99 % sigue **candidato**, ventana 60m 97.586 % con remanente −25; notificaciones externas NO implantadas (solo visuales/locales). Falta ratificar el alcance y editar secciones 5–8 del informe único, revisión visual de figuras; issue #47 reunión 30/10 por celebrarse. [Propuesta G5](operaciones/s04-g5-decision-medida-notificaciones-locales.md) y [matriz G6](operaciones/s04-g6-matriz-aceptacion-evidencias-2026-10-27.md).
+- Conservar Term1 operativa, exporter 9110 Term2, Prometheus 9091 Term3, NOC 9120 Term4 y FRR/WAN/LAN activos; **no** repetir G3 ni desmontar hasta definir próxima fase. La visualización topológica animada es futura S05 #64.
