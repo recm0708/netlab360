@@ -127,3 +127,11 @@
 - **Evidencia pendiente:** confirmar capturas `S04_07` y `S04_08`, establecer túnel interactivo SSH para visualizar NOC en navegador Windows y tomar `S04_09`; aún no hay nuevas PNG publicadas. El túnel previo estaba en autenticación y no acredita navegador.
 - **Terminales simplificadas a cuatro:** Term2 exporter, Term3 Prometheus, Term4 NOC y Term1 consola de operaciones con `ssh -L 9120:127.0.0.1:9120 netlab360`. Cerrar Term5 y Term6 duplicadas antes de reabrir el túnel, sin interferir con Term2–4.
 - **Siguiente puerta G3:** revisar temporización `WANAdminDown for:6s` y ciclo de corte/restauración seguro antes de inducir una falla. No registrar incidente `firing/resolved` hasta observarlo de verdad. G4–G6 pendientes.
+
+## Nuevo corte 27/10/2026 — G2 fotografiada; G3 preparada, no ejecutada
+
+- El usuario confirma S04_07, S04_08 y S04_09 tomadas; PNG aún sin auditoría de archivos ni publicación remota. El contador Git permanece en 114 PNG (S04=7).
+- [PR #62](https://github.com/recm0708/netlab360/pull/62) fusionado (commit 0bc47c9) con nueva herramienta scripts/observabilidad/s04-incidente-wan.py, 5 pruebas offline y CI [SUCCESS](https://github.com/recm0708/netlab360/actions/runs/40457448149). El validador de capturas reconoce los manifiestos S04-S08 y comprueba SHA-256, bytes y dimensiones.
+- [Guía G3](operaciones/s04-g3-incidente-wan-controlado.md) indica precheck, corte aislado HQ/s1p por 32 segundos, observación pending/firing, backup s1b y restauración protegida. NO se ha ejecutado todavía el corte.
+- La topología G1 y los servicios G2 deben permanecer activos: FRR 3, WAN 4, VLAN 9, exporter 9110, Prometheus 9091, NOC 9120. Terminal 1 se usa para validaciones.
+- Próximo paso: sincronizar main limpia en Ubuntu, compilar el script, ejecutar tests G3 y validador de capturas, luego ejecutar python3 scripts/observabilidad/s04-incidente-wan.py --check. Revisar salida antes de ejecutar --execute --snapshot-confirmado. S01 y S03 permanecen abiertas sin bloquear S04-S08.
