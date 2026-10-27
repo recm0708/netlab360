@@ -8,12 +8,16 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime, timezone
+import importlib.util
+from pathlib import Path
+import sqlite3
+import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 import socket
 import subprocess
 from urllib.error import URLError
-from urllib.parse import urlsplit
+from urllib.parse import parse_qs, urlsplit
 from urllib.request import urlopen
 
 EXPORTER = "http://127.0.0.1:9110"
@@ -23,6 +27,12 @@ JOB = "netlab360-s04-multisede"
 FRESHNESS_MAX_SECONDS = 15.0
 ADMIN_IP = "192.168.47.40/24"
 ADMIN_GATEWAY = "default via 192.168.47.2 dev ens33"
+
+_hist_spec = importlib.util.spec_from_file_location(
+    "netlab360_s04_historial", Path(__file__).with_name("historial_s04.py"))
+assert _hist_spec and _hist_spec.loader
+HISTORY = importlib.util.module_from_spec(_hist_spec)
+_hist_spec.loader.exec_module(HISTORY)
 
 PAGE = r"""<!doctype html>
 <html lang="es"><head><meta charset="utf-8">
@@ -61,6 +71,10 @@ footer{border-top:1px solid #29445b;margin-top:32px;padding-top:16px;color:#9ab2
 <div class="metrics" id="metrics"></div>
 <section class="section"><h2 id="place-title">Vista central de las tres sedes</h2><div class="grid" id="sites"></div></section>
 <section class="section"><h2>Alertas de Prometheus S04</h2><p class="small">Los datos provienen de /api/v1/alerts. Sin Alertmanager ni notificaciones externas verificadas.</p><div id="alerts"></div></section>
+<section class="section"><h2>Historial de incidentes registrados</h2>
+<p class="small">Transiciones observadas por el NOC desde que se activó el registro, no reconstrucción de eventos anteriores. Archivo SQLite local; los estados resolved indican ausencia confirmada de alerta al volver a ser fiable la observación.</p>
+<p class="small"><a id="history-csv" href="/api/v1/incidents.csv?site=ALL" style="color:#9ee2f9">Exportar CSV de la vista seleccionada</a></p>
+<div id="history"></div></section>
 <footer>La presencia de un contenedor no certifica OSPF Full ni HTTP. OFFLINE indica topología intencionalmente desmontada cuando la fuente es fiable. UNKNOWN significa que la observación no es confiable; no implica falla física. Las interfaces con estado −1 no representan una caída WAN. Actualización cada 3 segundos, exclusivamente en localhost.</footer>
 </main>
 <script>
@@ -119,11 +133,32 @@ $("alerts").innerHTML=alerts.map(a=>'<div class="alert">'+tag(a.state||"active",
 '<div class="small">Inicio: '+esc(a.activeAt||"—")+'</div></div>').join("");
 }
 }
+async function refreshHistory(){
+const view=selection;
+$("history-csv").href="/api/v1/incidents.csv?site="+encodeURIComponent(view);
+try{
+const r=await fetch("/api/v1/incidents?site="+encodeURIComponent(view)+"&limit=100",{cache:"no-store"});
+if(!r.ok)throw Error("HTTP "+r.status);
+const payload=await r.json();
+if(selection!==view)return;
+const events=payload.events||[];
+$("history").innerHTML=events.length?events.map(e=>
+'<div class="alert">'+tag(e.state,e.state==="resolved"?"active":"partial")+
+" "+esc(e.alertname)+" · "+esc(e.site)+"/"+esc(e.resource)+
+'<div class="small">Observado UTC: '+esc(e.observed_at_utc)+
+" · Inicio reportado: "+esc(e.active_at_utc||"—")+
+" · Origen: "+esc(e.source)+"</div></div>").join(""):
+'<div class="alert">No hay transiciones observadas desde que se activó el registrador.</div>';
+}catch(err){
+if(selection===view)$("history").textContent="Historial no disponible: "+err.message;
+}
+}
 async function refresh(){
 try{
 const r=await fetch("/api/v1/overview",{cache:"no-store"});
 if(!r.ok)throw Error("HTTP "+r.status);
 render(await r.json());
+await refreshHistory();
 }catch(e){
 $("stamp").textContent="Panel no puede consultar su API: "+e.message;
 $("metrics").innerHTML=slot("NOC", "UNKNOWN", "API local sin respuesta", "unknown");
@@ -135,6 +170,7 @@ document.querySelectorAll("button[data-site]").forEach(b=>b.addEventListener("cl
 selection=b.dataset.site;
 document.querySelectorAll("button[data-site]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
 if(last)render(last);
+refreshHistory();
 }));
 refresh();
 setInterval(refresh,3000);
@@ -244,6 +280,19 @@ def overview(reader=get_json, now=None) -> dict:
 
 
 def serve(port: int) -> None:
+    HISTORY.initialize()
+    stop = threading.Event()
+
+    def journal_monitor():
+        while not stop.is_set():
+            try:
+                count = HISTORY.record(overview())
+                if count:
+                    print(f"S04_NOC_HISTORIAL_CAMBIOS={count}", flush=True)
+            except (RuntimeError, ValueError, OSError, sqlite3.Error) as exc:
+                print(f"S04_NOC_HISTORIAL_ERROR={type(exc).__name__}: {exc}", flush=True)
+            stop.wait(2)
+
     class Handler(BaseHTTPRequestHandler):
         def send_body(self, code: int, body: bytes, content_type: str):
             self.send_response(code)
@@ -265,6 +314,25 @@ def serve(port: int) -> None:
             elif path == "/api/v1/overview":
                 self.send_body(200, json.dumps(overview(), ensure_ascii=False).encode(),
                                "application/json; charset=utf-8")
+            elif path in ("/api/v1/incidents", "/api/v1/incidents.csv"):
+                qs = parse_qs(urlsplit(self.path).query)
+                try:
+                    site = qs.get("site", ["ALL"])[0]
+                    limit = int(qs.get("limit", ["100"])[0])
+                    records = HISTORY.events(site=site, limit=limit)
+                except ValueError:
+                    self.send_body(400, b'{"error":"invalid-filter"}', "application/json")
+                except (OSError, sqlite3.Error):
+                    self.send_body(503, b'{"error":"journal-unavailable"}', "application/json")
+                else:
+                    if path.endswith(".csv"):
+                        self.send_body(200, HISTORY.as_csv(records), "text/csv; charset=utf-8")
+                    else:
+                        payload = {"source": "prometheus_active_alerts",
+                                   "scope": "transitions observed since NOC journal startup",
+                                   "events": records}
+                        self.send_body(200, json.dumps(payload, ensure_ascii=False).encode(),
+                                       "application/json; charset=utf-8")
             else:
                 self.send_body(404, b"not found\n", "text/plain")
 
@@ -275,14 +343,19 @@ def serve(port: int) -> None:
             return
 
     server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
+    monitor = threading.Thread(target=journal_monitor, daemon=True)
+    monitor.start()
     print(f"S04_NOC_URL=http://127.0.0.1:{port}/", flush=True)
+    print(f"S04_NOC_HISTORIAL_DB={HISTORY.DEFAULT_DB}", flush=True)
     print("S04_NOC_SOLO_LECTURA=SI", flush=True)
     try:
         server.serve_forever(poll_interval=0.5)
     except KeyboardInterrupt:
         pass
     finally:
+        stop.set()
         server.server_close()
+        monitor.join(timeout=5)
         print("S04_NOC_DETENIDO=SI", flush=True)
 
 
@@ -292,6 +365,7 @@ def main() -> None:
     group.add_argument("--check", action="store_true")
     group.add_argument("--once", action="store_true")
     group.add_argument("--serve", action="store_true")
+    group.add_argument("--import-g3-log", action="store_true")
     cli.add_argument("--port", type=int, default=9120)
     args = cli.parse_args()
     if not 1024 <= args.port <= 65535:
@@ -302,6 +376,12 @@ def main() -> None:
         print("S04_NOC_NO_CAMBIOS=SI")
     elif args.once:
         print(json.dumps(overview(), indent=2, ensure_ascii=False, sort_keys=True))
+    elif args.import_g3_log:
+        HISTORY.initialize()
+        count = HISTORY.import_g3()
+        print(f"S04_G4_G3_EVENTOS_IMPORTADOS={count}")
+        print(f"S04_G4_HISTORIAL_TOTAL_G3={len(HISTORY.events(site='HQ',limit=200))}")
+        print("S04_G4_IMPORTACION_G3=OK")
     else:
         serve(args.port)
 
@@ -309,6 +389,6 @@ def main() -> None:
 if __name__ == "__main__":
     try:
         main()
-    except (RuntimeError, OSError) as exc:
+    except (RuntimeError, ValueError, sqlite3.Error, OSError) as exc:
         print("S04_NOC_ERROR=" + str(exc))
         raise SystemExit(2)
