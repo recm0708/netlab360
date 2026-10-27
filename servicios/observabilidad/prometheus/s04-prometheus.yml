@@ -6,7 +6,7 @@ global:
   evaluation_interval: 2s
 
 rule_files:
-  - servicios/observabilidad/prometheus/rules/s04-alerts.yml
+  - rules/s04-alerts.yml
 
 scrape_configs:
   - job_name: netlab360-s04-multisede
