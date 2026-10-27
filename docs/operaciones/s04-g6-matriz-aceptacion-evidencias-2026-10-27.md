@@ -1,3 +1,7 @@
+## Postcierre operativo posterior al corte de la matriz — 27/10
+
+Las puertas G0–G4 técnicas se mantienen aprobadas; G5 SLO sigue propuesto, G6 aceptación académica aún pendiente. Desmontaje ordenado comprobado (LAN 12 namespaces, cuatro WAN, tres FRR) y cierre de observabilidad con respaldo TSDB/SQLite, hash verificado. Se ejecutó `sudo systemctl poweroff` después de `S04_APAGADO_AUTORIZADO=SI`; SSH cerrado; **verificación VMware Powered Off todavía pendiente**. El borrador **4.3 de 99 páginas** incorpora 5.6 completo, no 6.9/capítulo7–8 S04. Texto inferior «No se desmontan los recursos» corresponde al postcheck anterior y **ya no es el estado actual**. [Bitácora vigente](../sesiones/2026-10-27-s04-poweroff-solicitado-borrador43.md).
+
 # NETLAB360 — S04 G6: matriz de aceptación técnica y cierre documental
 
 **Corte:** 2026-10-27. Fuentes: salidas reales del operador y CI GitHub. **S04 aún no cerrada académicamente.**
