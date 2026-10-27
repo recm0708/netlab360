@@ -40,6 +40,15 @@
 - **Todavía no se ha ejecutado el colector S04 en Ubuntu real**. La próxima tarea es `git pull --ff-only origin main`, pruebas offline, `--check` y `--once` con `sudo -v`; el resultado real esperado con S02 desmontada es `topology=offline` y `source_ok=true`. El nuevo puerto `9110` solo se usará en una siguiente etapa y únicamente en loopback.
 - **No confundir:** `active` significa tres contenedores presentes, no OSPF Full ni servicio HTTP validado. El antiguo exporter B3 y sus reglas para `wan-p`/`wan-b` no se alteraron. Pendientes NOC, Prometheus S04, incidentes, SLI/SLO y capturas `S04_*`.
 
+## Observabilidad S04 — Ensayo real y panel NOC (26/10/2026)
+
+- Terminal A: colector S04 `127.0.0.1:9110` con `source_ok=true`, `topology=offline` y 25 series de métricas; tres routers, ocho extremos WAN, nueve VLAN; edad observada 3,86 s.
+- Terminal B: Prometheus 3.7.0 `127.0.0.1:9091`, reglas 4/4 y escenarios `promtool test rules` satisfactorios, `scrape_up=1`, `source_up=1`, `topology_offline=1`, cero alertas WAN/VLAN y cero activas. `ens33=192.168.47.40/24` y GW `.2` intactas. Sin Docker ni netns residuales.
+- Capturas `S04_01_API_Telemetria_Real_Tres_Sedes_Offline` y `S04_02_Prometheus_Scrape_Real_Sin_Falsas_Alertas`: **confirmadas tomadas**, pendientes de recibir PNG, inspección visual, SHA256 y publicación.
+- Al terminar la salida recibida, las terminales A/B seguían ejecutando colector y Prometheus; **no se ha certificado su detención**. No reiniciarlas sin comprobar estado.
+- [PR #57](https://github.com/recm0708/netlab360/pull/57) fusionado como `dcc5c6ce` con panel NOC S04 `servicios/noc-s04/app.py` (puerto `127.0.0.1:9120`), vistas central/HQ/S1/S2, agregación del colector y Prometheus, estado UNKNOWN ante muestras antiguas o fuentes inaccesibles. **20 pruebas S04 offline** y [CI S04 `main`](https://github.com/recm0708/netlab360/actions/runs/40443847932) y [regresión general](https://github.com/recm0708/netlab360/actions/runs/40443847941) SUCCESS. La [autolimpieza de rama](https://github.com/recm0708/netlab360/actions/runs/40443848768) también fue satisfactoria.
+- **Siguiente prueba**: NOC real `--check`, `--once`, `--serve` y verificación HTTP desde Ubuntu; visita visual por túnel SSH Windows y capturas `S04_03` / `S04_04` / opcional `S04_05`. No afirmar aún observabilidad de enlaces WAN **desplegados** ni NOC definitivamente aceptado.
+
 ## Indicadores de avance
 
 | Fase | Corte actual | Pendiente para aceptación |
