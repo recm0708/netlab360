@@ -1,0 +1,94 @@
+# Prometheus S04: pruebas unitarias sintéticas de reglas, no prueban una topologia viva.
+rule_files:
+  - servicios/observabilidad/prometheus/rules/s04-alerts.yml
+
+evaluation_interval: 2s
+
+tests:
+  - name: "topologia detenida: no es caida WAN ni VLAN"
+    interval: 2s
+    input_series:
+      - series: 'up{job="netlab360-s04-multisede",instance="127.0.0.1:9110"}'
+        values: '1+0x15'
+      - series: 'netlab360_s04_source_up'
+        values: '1+0x15'
+      - series: 'netlab360_s04_wan_admin_up{site="HQ",interface="s1p"}'
+        values: '-1+0x15'
+      - series: 'netlab360_s04_vlan_admin_up{site="HQ",vlan="110"}'
+        values: '-1+0x15'
+    alert_rule_test:
+      - eval_time: 20s
+        alertname: NETLAB360S04WANAdminDown
+        exp_alerts: []
+      - eval_time: 20s
+        alertname: NETLAB360S04VLANAdminDown
+        exp_alerts: []
+      - eval_time: 20s
+        alertname: NETLAB360S04CollectorUnknown
+        exp_alerts: []
+      - eval_time: 20s
+        alertname: NETLAB360S04ExporterUnavailable
+        exp_alerts: []
+
+  - name: "WAN realmente administrativamente DOWN: alerta con fuente fiable"
+    interval: 2s
+    input_series:
+      - series: 'up{job="netlab360-s04-multisede",instance="127.0.0.1:9110"}'
+        values: '1+0x15'
+      - series: 'netlab360_s04_source_up'
+        values: '1+0x15'
+      - series: 'netlab360_s04_wan_admin_up{site="HQ",interface="s1p"}'
+        values: '0+0x15'
+    alert_rule_test:
+      - eval_time: 20s
+        alertname: NETLAB360S04WANAdminDown
+        exp_alerts:
+          - exp_labels:
+              site: HQ
+              interface: s1p
+              severity: warning
+              phase: s04
+            exp_annotations:
+              summary: "Interfaz WAN HQ/s1p administrativamente DOWN"
+              description: "Revisar enlace real. No equivale a fallo de vecino OSPF ni a interrupcion de servicio."
+
+  - name: "sin acceso Docker: UNKNOWN, no generar falso WAN DOWN"
+    interval: 2s
+    input_series:
+      - series: 'up{job="netlab360-s04-multisede",instance="127.0.0.1:9110"}'
+        values: '1+0x15'
+      - series: 'netlab360_s04_source_up'
+        values: '0+0x15'
+      - series: 'netlab360_s04_wan_admin_up{site="HQ",interface="s1p"}'
+        values: '-1+0x15'
+    alert_rule_test:
+      - eval_time: 20s
+        alertname: NETLAB360S04CollectorUnknown
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              phase: s04
+            exp_annotations:
+              summary: "El colector S04 responde, pero no puede observar Docker"
+              description: "Estado UNKNOWN. Verificar sudo no interactivo, Docker y la proteccion de red administrativa."
+      - eval_time: 20s
+        alertname: NETLAB360S04WANAdminDown
+        exp_alerts: []
+
+  - name: "scrape fallido: alarma de exporter, no alarma de WAN"
+    interval: 2s
+    input_series:
+      - series: 'up{job="netlab360-s04-multisede",instance="127.0.0.1:9110"}'
+        values: '0+0x15'
+    alert_rule_test:
+      - eval_time: 20s
+        alertname: NETLAB360S04ExporterUnavailable
+        exp_alerts:
+          - exp_labels:
+              job: netlab360-s04-multisede
+              instance: "127.0.0.1:9110"
+              severity: warning
+              phase: s04
+            exp_annotations:
+              summary: "Prometheus no puede consultar el colector S04"
+              description: "Revisar localhost:9110 y el proceso, sin inferir una caida WAN."
