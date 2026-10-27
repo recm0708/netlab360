@@ -21,6 +21,8 @@ class TestCapturasPorFase(unittest.TestCase):
             "LOTE_20261025_SHA256_Y_BLOB=21/21",
             "FASE_2_PNG_VERSIONADOS=9",
             "FASE_3_PNG_VERSIONADOS=8",
+            "FASE_4_PNG_VERSIONADOS=7",
+            "LOTE_MANIFIESTO_SHA256_S04_LOTE01_2026-10-26.csv_SHA256_Y_DIMENSIONES=7/7",
             "AUDITORIA_CAPTURAS_POR_FASE=OK",
         ):
             self.assertIn(comprobacion, completed.stdout)
