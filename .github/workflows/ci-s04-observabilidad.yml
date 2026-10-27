@@ -8,12 +8,20 @@ on:
       - 'servicios/observabilidad/s04_exporter_multisede.py'
       - 'servicios/observabilidad/README-S04.md'
       - 'tests/test_s04_exporter_multisede.py'
+      - 'servicios/observabilidad/prometheus/s04-prometheus.yml'
+      - 'servicios/observabilidad/prometheus/rules/s04-alerts.yml'
+      - 'servicios/observabilidad/prometheus/tests/s04-alertas.test.yml'
+      - 'scripts/observabilidad/s04-iniciar-prometheus-local.sh'
       - '.github/workflows/ci-s04-observabilidad.yml'
   pull_request:
     paths:
       - 'servicios/observabilidad/s04_exporter_multisede.py'
       - 'servicios/observabilidad/README-S04.md'
       - 'tests/test_s04_exporter_multisede.py'
+      - 'servicios/observabilidad/prometheus/s04-prometheus.yml'
+      - 'servicios/observabilidad/prometheus/rules/s04-alerts.yml'
+      - 'servicios/observabilidad/prometheus/tests/s04-alertas.test.yml'
+      - 'scripts/observabilidad/s04-iniciar-prometheus-local.sh'
       - '.github/workflows/ci-s04-observabilidad.yml'
 
 permissions:
@@ -34,6 +42,25 @@ jobs:
         run: python -m py_compile servicios/observabilidad/s04_exporter_multisede.py tests/test_s04_exporter_multisede.py
       - name: Pruebas offline de estados y proteccion
         run: python -m unittest discover -s tests -p 'test_s04_*.py' -v
+      - name: Validar configuracion, reglas y casos Prometheus S04
+        run: |
+          set -euo pipefail
+          docker run --rm --network none \
+            --entrypoint=/bin/promtool \
+            -v "$PWD:/repo:ro" -w /repo \
+            quay.io/prometheus/prometheus:v3.7.0 \
+            check config servicios/observabilidad/prometheus/s04-prometheus.yml
+          docker run --rm --network none \
+            --entrypoint=/bin/promtool \
+            -v "$PWD:/repo:ro" -w /repo \
+            quay.io/prometheus/prometheus:v3.7.0 \
+            check rules servicios/observabilidad/prometheus/rules/s04-alerts.yml
+          docker run --rm --network none \
+            --entrypoint=/bin/promtool \
+            -v "$PWD:/repo:ro" -w /repo \
+            quay.io/prometheus/prometheus:v3.7.0 \
+            test rules servicios/observabilidad/prometheus/tests/s04-alertas.test.yml
+
       - name: Garantizar limites de CI
         run: |
           echo 'S04_CI_OFFLINE=OK'
