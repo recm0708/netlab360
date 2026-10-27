@@ -17,8 +17,8 @@
 |---|---|---|
 | G0: exporter/API/Prometheus/NOC OFFLINE | `S04_01` a `S04_06`, manifest de 7 PNG, 20/20 tests, API real, postcheck | **CERRADA:** siete PNG publicados por PR #58 |
 | G1: infraestructura activa | 3 FRR, 4 WAN y 9 VLAN realmente desplegadas, OSPF Full 4/2/2, rutas preferidas y 9/9 gateways; `ens33` sin cambios | **CERRADA:** WAN 4/4, OSPF Full 4/2/2, FIB 6/6, loopback ICMP 6/6, LAN 9/9 gateways e ICMP 6/6, gestión intacta |
-| G2: telemetría activa | exporter observa los enlaces y VLAN esperados en vivo, Prometheus scrape y series confiables, NOC actualiza las tres sedes; no confundir `active` de Docker con conectividad probada | **Funcionalmente comprobada por APIs reales:** exporter 25 series/3.21 s, WAN 8/8 y VLAN 9/9; Prometheus 9091 target UP, 0 alertas; NOC 9120 tres sedes, fuente fresca y scrape UP. Pendientes visualización Windows, S04_07–S04_09 y publicación PNG |
-| G3: incidente y restitución | corte **controlado** de primaria S1 y/o S2 con `ip link` mediante script con `finally`; regla WAN realmente `pending→firing→resolved`, timestamps y ruta backup→primaria; otra sede estable, postcheck | Pendiente |
+| G2: telemetría activa | exporter observa los enlaces y VLAN esperados en vivo, Prometheus scrape y series confiables, NOC actualiza las tres sedes; no confundir `active` de Docker con conectividad probada | **Funcionalmente comprobada por APIs reales:** exporter 25 series/3.21 s, WAN 8/8 y VLAN 9/9; Prometheus 9091 target UP, 0 alertas; NOC 9120 tres sedes, fuente fresca y scrape UP. NOC Windows comprobado y capturas S04_07–S04_09 recibidas y auditadas localmente; pendiente publicación de lote 02 |
+| G3: incidente y restitución | corte **controlado** de primaria S1 y/o S2 con `ip link` mediante script con `finally`; regla WAN realmente `pending→firing→resolved`, timestamps y ruta backup→primaria; otra sede estable, postcheck | **ACEPTADA TÉCNICAMENTE (S1):** HQ/s1p DOWN 06:05:04Z; alerta pending 06:05:07Z y firing 06:05:13Z en NOC, respaldo s1b, S2 estable, ICMP OK; UP 06:06:07Z, retorno s1p, alerta ausente 06:06:18Z. Pendiente postcheck regresivo y publicación de PNG de G6 |
 | G4: disponibilidad de fuentes e histórico | comprobar `UNKNOWN` si falla Docker/permisos o scrape; conservación de series/alertas después de restart según alcance y TSDB real | Pendiente |
 | G5: SLI/SLO y notificación | definir SLI comprobable y ventana de muestra, SLO y método de cálculo, o documentar decisión de posponer capacidades concretas; probar envío externo si se incorpora Alertmanager | Pendiente de decisión y prueba |
 | G6: aceptación y escritura | capturas con SHA256, pruebas regresión, límites, informe único con sección fase 4 en 5/6/7/8 y aceptación registrada | Pendiente |
@@ -54,3 +54,10 @@ G1 completa con evidencia de terminal real; G2 con muestra `--once` confiable pe
 ## Actualización del 27/10/2026 — G2 funcional validada en red activa
 
 Los tres procesos exporter 9110, Prometheus 9091 y NOC 9120 quedaron iniciados y con APIs comprobadas sobre G1 operativa; [bitácora de resultados](../sesiones/2026-10-27-s04-g2-servicios-activos.md). Pendiente la visualización en Windows y los PNG S04_07–S04_09, que no se presumen capturados. Consolidar Terminal 1 en sesión interactiva SSH con reenvío 9120, y reservar Terminales 2–4 para los tres procesos persistentes. No interrumpir G1/G2 mientras se organiza G3.
+
+
+## 27/10/2026 — G3 ejecutada y fotografiada
+
+- [Bitácora real G3](../sesiones/2026-10-27-s04-g3-incidente-real-y-recuperacion.md): 60 segundos de corte controlado HQ/s1p, alerta `pending→firing` en Prometheus/NOC, rutas S1 por respaldo s1b, S2 primaria estable, conectividad ICMP y restitución de s1p y alarma. La recuperación se acredita por fuente fresca, métrica `admin_up=1` y ausencia de alerta entre activas, no como notificación externa.
+- El operador aportó y se auditó un lote de ocho PNG originales S04_07–11, con S04_09 dividida en cuatro vistas; **ZIP/CSV SHA-256 listos fuera de Git**. Falta transferir al repositorio, validar y publicar; contador de GitHub sin cambios (114 PNG).
+- Historial durable básico de incidentes, TSDB, fuente `UNKNOWN` y SLI/SLO constituyen trabajo G4/G5; [topología gráfica animada/semántica avanzada corresponde a S05](https://github.com/recm0708/netlab360/issues/64). La fase S04 **continúa abierta**.
