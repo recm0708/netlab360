@@ -147,3 +147,78 @@ def as_csv(records: list[dict]) -> bytes:
     for record in records:
         w.writerow({key: record.get(key, "") for key in fields})
     return buf.getvalue().encode("utf-8")
+
+G3_LOG_SHA256 = "6e799191c7237145b30459ba201bca261e9517fefcfee223d92a36a27c29b7b3"
+G3_LOG = Path.home() / "netlab360-bootstrap/s04/evidencias/S04_G3_Incidente_WAN_S1_20261027.log"
+
+
+def parse_verified_g3(data: bytes) -> list[dict]:
+    """Importacion deliberada de G3; nunca sintetizar sin log y hash autenticos."""
+    if hashlib.sha256(data).hexdigest() != G3_LOG_SHA256:
+        raise ValueError("SHA-256 de G3 distinto al log originalmente comprobado")
+    content = data.decode("utf-8")
+    required = (
+        "S04_G3_NOC_ALERTA_FIRING=SI",
+        "S04_G3_CONECTIVIDAD_DURANTE_INCIDENTE=OK",
+        "S04_G3_RUTA_RESPALDO_HQ=",
+        " dev s1b ",
+        "S04_G3_RUTA_PRIMARIA_HQ=",
+        "S04_G3_HOST_GESTION_INTACTO=SI",
+        "S04_G3_RESULTADO=OK",
+    )
+    if any(mark not in content for mark in required):
+        raise ValueError("Log G3 incompleto, no importar incidente")
+    from re import search
+    def find_timestamp(pattern: str) -> str:
+        match = search(pattern, content)
+        if not match:
+            raise ValueError("Marca temporal G3 ausente")
+        from datetime import datetime, timezone
+        dt = datetime.fromisoformat(match.group(1))
+        if dt.tzinfo is None:
+            raise ValueError("Timestamp sin zona")
+        return dt.astimezone(timezone.utc).isoformat(timespec="seconds")
+
+    start = find_timestamp(r"S04_G3_HORA_INICIO_UTC=(\S+)")
+    pending = find_timestamp(r"S04_G3_ALERTA_TRANSICION=inactive->pending UTC=(\S+)")
+    firing = find_timestamp(r"S04_G3_ALERTA_TRANSICION=pending->firing UTC=(\S+)")
+    recovery = find_timestamp(r"S04_G3_ALERTA_RESUELTA=SI_AUSENTE_EN_ACTIVAS UTC=(\S+)")
+    if not start < pending < firing < recovery:
+        raise ValueError("Secuencia de evento G3 inconsistente")
+    label = {"alertname": "NETLAB360S04WANAdminDown", "site": "HQ", "interface": "s1p"}
+    fp = hashlib.sha256(json.dumps(label, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    return [
+        {"fingerprint": fp, "observed_at_utc": timestamp,
+         "active_at_utc": start, "alertname": label["alertname"],
+         "site": "HQ", "resource": "s1p", "severity": "warning",
+         "state": state, "source": "verified_G3_terminal_log"}
+        for timestamp, state in ((pending, "pending"), (firing, "firing"),
+                                 (recovery, "resolved"))
+    ]
+
+
+def import_g3(path: Path = G3_LOG, db_path: Path = DEFAULT_DB) -> int:
+    if path.is_symlink() or not path.is_file():
+        raise ValueError("Log G3 original no disponible")
+    entries = parse_verified_g3(path.read_bytes())
+    inserted = 0
+    with closing(sqlite3.connect(db_path, timeout=5)) as db:
+        with db:
+            for e in entries:
+                present = db.execute(
+                    "SELECT 1 FROM events WHERE fingerprint=? AND observed_at_utc=? "
+                    "AND state=? AND source=? LIMIT 1",
+                    (e["fingerprint"], e["observed_at_utc"], e["state"], e["source"])
+                ).fetchone()
+                if present:
+                    continue
+                db.execute(
+                    "INSERT INTO events(fingerprint,observed_at_utc,active_at_utc,"
+                    "alertname,site,resource,severity,state,source)"
+                    "VALUES(?,?,?,?,?,?,?,?,?)",
+                    tuple(e[k] for k in ("fingerprint", "observed_at_utc", "active_at_utc",
+                                        "alertname", "site", "resource", "severity",
+                                        "state", "source"))
+                )
+                inserted += 1
+    return inserted
