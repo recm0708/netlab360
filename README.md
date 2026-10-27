@@ -2,30 +2,36 @@
 
 NETLAB360 es una plataforma académica desarrollada sobre Ubuntu Desktop y VMware Workstation para implementar, automatizar, supervisar y evaluar una infraestructura empresarial de tres sedes (HQ, S1 y S2). El proyecto se organiza en **ocho fases** con comprobaciones técnicas propias, un informe único y una demostración final.
 
-## Estado técnico al 25/10/2026
+## Estado técnico verificable al 27/10/2026
 
-| Fase | Avance de seguimiento | Comprobaciones realizadas |
-|---|---:|---|
-| 1 — Base experimental | 72 % histórico | VMware/Ubuntu, FRR/OSPF, VLAN/ACL local, doble WAN HQ-S1, LACP y bonding virtual, automatización inicial, Prometheus y diagnóstico por reglas |
-| 2 — Infraestructura multisede | ≈90 % | Tres routers, cuatro WAN, nueve VLAN, failover y restauración de S1/S2, HTTP/ACL, validaciones y desmontaje controlado |
-| 3 — Automatización y GitOps | ≈90 % | Ansible sobre FRR activo con compliance y reconciliación, OpenTofu metadata-only 17/17, CI GitHub Actions, PR #49 fusionado, 87/87 tests offline |
-| 4–8 — Módulos posteriores | 0 % de aceptación formal | Observabilidad integrada, redundancia/SDN, diagnóstico inteligente, pruebas extremo a extremo y entrega final |
+| Fase | Estado real al corte | Resultados |
+|---|---|---|
+| S01 | 72 % **histórico de su matriz propia**, aceptación fundacional pendiente | VMware/Ubuntu, FRR OSPF, VLAN/ACL, LACP y bonding virtual, supervisión y diagnóstico por reglas |
+| S02 | **Cerrada por alcance técnico** | Tres routers, cuatro WAN, nueve VLAN, OSPF Full 4/2/2, respaldo S1/S2, HTTP/ACL y comprobación de regresión |
+| S03 | ~90 % **estimación técnica**; SoT y ownership OpenTofu aún pendientes | Ansible compliance/drift/reconciliación real, OpenTofu 17 `terraform_data` metadatos, GitHub Actions |
+| S04 | **G0–G4 y G6 técnico comprobados; G5 medido, SLO por ratificar; escrito pendiente** | Colector 9110, Prometheus 9091, NOC 9120, incidente WAN real, historial persistente TSDB/SQLite, SLI 15m 100 % y 60m 97.586 % |
+| S05–S08 | **0 % aceptación técnica de funcionalidades nuevas** | Redundancia/SDN y topología interactiva, IA, integración de servicios y entrega final por desarrollar |
 
-Los porcentajes son indicadores internos, no calificaciones ni el resultado de una única rúbrica. [Criterios de aceptación por fase](docs/control/06-tablero-porcentajes-cierre-fases-2026-10-25.md).
+Los porcentajes no son calificaciones ni promedios intercambiables. **99 %** es exclusivamente un SLO académico **candidato** del éxito de scrapes, **no aprobado**: en ventana 60 minutos solo 1698/1740 scrapes tuvieron éxito (97.586 %, 42 fallos, presupuesto propuesto restante −25). La observación condicional de `source_up` no prueba disponibilidad continua. [Matriz S04](docs/operaciones/s04-g6-matriz-aceptacion-evidencias-2026-10-27.md).
 
 ## Arquitectura y operación
 
-- **Máquina:** Ubuntu Desktop 26.04.1 sobre VMware, interfaz administrativa `ens33=192.168.47.40/24` y puerta de enlace `192.168.47.2`.
-- **Red empresarial experimental:** tres routers FRRouting, enlaces WAN principales y de respaldo, tres switches virtuales y nueve VLAN. La fase 2 está **desmontada intencionalmente** tras validar sus escenarios.
-- **Administración declarativa:** el inventario IPAM/SoT organiza tres sedes, cuatro enlaces y nueve VLAN. OpenTofu materializa 17 metadatos `terraform_data` y **no** despliega los dispositivos; Ansible valida y reconcilia costos reales de FRRouting.
-- **Control de cambios:** repositorio privado, `main` como única rama permanente, scripts versionados, pruebas offline, pull requests y GitHub Actions. Las ramas de trabajo se eliminan tras fusionarse mediante un control que compara su SHA. Los recursos de estado OpenTofu están fuera del clon y se excluyen de entregables.
-- **Evidencias:** directorios [`evidencias/capturas/fase1`–`fase8`](evidencias/capturas/README.md). Hay **107 PNG definitivas publicadas**: **90 de fase 1**, **9 de fase 2** y **8 de fase 3**, con integridad verificada. El lote de 21 imágenes se incorporó mediante el [PR #53](https://github.com/recm0708/netlab360/pull/53), acompañado de un [manifiesto SHA-256](evidencias/manifiestos/MANIFIESTO_SHA256_CAPTURAS_2026-10-25.csv) y de [CI posterior satisfactoria](https://github.com/recm0708/netlab360/actions/runs/40241580823).
+- **Máquina:** Ubuntu Desktop 26.04.1 en VMware; gestión `ens33=192.168.47.40/24` y GW `192.168.47.2`, aislada de la red de laboratorio.
+- **Red multisede S02 reutilizada en S04:** tres routers FRRouting `nl360-s02-r-hq/s1/s2`, cuatro enlaces WAN, tres switches virtuales, nueve VLAN. Se comprobó activa en el postcheck S04; **su desmontaje aún no ha sido ejecutado para cierre de la sesión**.
+- **Observabilidad S04:** exporter solo lectura `127.0.0.1:9110`, Prometheus `127.0.0.1:9091` con TSDB de 1 día y alertas, NOC `127.0.0.1:9120` con sedes CENTRAL/HQ/S1/S2, histórico SQLite y exportación CSV; el acceso desde Windows usa túnel SSH.
+- **Fuente declarativa:** SoT IPAM 3 sedes/4 WAN/9 VLAN, estado `candidate`. OpenTofu S03 `terraform_data` metadata-only, sin aprovisionamiento de contenedores. Ansible consulta y reconcilia configuraciones FRRouting bajo pruebas autorizadas.
+- **GitHub:** `main`, PRs y GitHub Actions para pruebas y auditoría de evidencias. Los JSON/SQLite operativos, estados OpenTofu y credenciales permanecen fuera de Git.
+- **Capturas versionadas:** **129 PNG** verificadas mediante manifiestos: **S01 90, S02 9, S03 8, S04 22** (S04 lotes de 7+8+7; PRs #58, #67 y #75). Ninguna PNG S05–S08 todavía. [Auditoría por fase](evidencias/capturas/README.md).
 
+La operación de apagado/reanudación de la VM para S05 debe seguir el [plan de parada segura](docs/05-plan-operativo-y-pausas.md), no una parada indiscriminada de Docker ni interfaces.
+ 
 ## Entrega académica
 
 El trabajo escrito se presenta como **un único Word/PDF, mínimo 40 páginas**, con apartados 1–8 y referencias APA 7. **No habrá capítulo de anexos**. Los scripts, inventarios, configuraciones y evidencias técnicas pertinentes integrarán un archivo **`.tar` independiente**, con manifiesto de integridad y exclusión de credenciales.
 
 El título comunicado a Teams el 17/10 es: «Diseño e implementación de una plataforma virtualizada para la automatización, observabilidad y diagnóstico de redes empresariales multisede». La aprobación final del título permanece pendiente de confirmación. Las revisiones del escrito son el **30/10** y **13/11**. La demostración final con PowerPoint será en vivo.
+
+**Borrador académico recibido:** `1457-Proyecto Semestral_borrador4.0.pdf` (94 páginas), aún con S04 no integrada en los capítulos 5–8. Se entregarán correcciones por mensajes para incorporarlas al Word original; no se sustituye automáticamente el PDF adjunto. Revisión Teams 30/10 aún pendiente.
 
 ## Documentación y continuidad
 
