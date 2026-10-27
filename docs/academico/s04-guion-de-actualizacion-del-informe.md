@@ -1,3 +1,5 @@
+**AVISO VIGENTE 27/10: PDF 4.1 auditado (95 páginas).** Están incorporados exactamente los cinco primeros cambios del guion: Introducción, 3.6, 3.6.1, 4.7.2 y la fila S04 de Tabla 5. El siguiente lote debe corregir p.11 2.4.1; p.23 3.8/4; pp.24–25 Tabla1; p.32 apertura 4.7; pp.33–34 4.8/4.8.1; pp.35–38 apertura 5, preámbulo/nota/cierre Tabla5, antes de crear 5.6. Se documenta en [bitácora](../sesiones/2026-10-27-s04-borrador41-preapagado.md). **No volver a sustituir las cinco secciones ya corregidas.**
+
 # NETLAB360 — Texto de integración de S04 en el borrador académico 3.2
 
 **Versión de trabajo interna actualizada el 27/10/2026.** No sustituye ni altera el Word/PDF maestro. Se verificó contra **el PDF realmente adjuntado más reciente** `1457-Proyecto Semestral_borrador4.0.pdf` (94 páginas, exportado 27/10 desde Microsoft Word): mantiene el esquema anterior de fases S01–S03, todavía sin inserciones S04. La última figura publicada en ese PDF es la **Figura 15** y la última tabla localizada es la **Tabla 12**. Cualquier numeración adicional se recalculará tras edición del documento maestro y no se adelantará como definitiva.
