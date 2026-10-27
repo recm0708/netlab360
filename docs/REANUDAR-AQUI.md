@@ -104,3 +104,11 @@
 6. Preparar el corte académico del 30/10 y continuar las fases 4–8 según sus hitos.
 
 **Conservación histórica:** las sesiones detalladas permanecen en [`docs/sesiones/`](sesiones/), las decisiones en [`docs/academico/`](academico/) y los resultados de auditoría en [`docs/evidencias/`](evidencias/). Los registros cronológicos anteriores también son recuperables mediante el historial Git, sin duplicarlos en este punto de reanudación.
+
+## Corte operativo posterior — S04 WAN activa (26/10/2026, ~23:48)
+
+- **NUEVO último estado de Ubuntu:** `main` sincronizada a `d1aa854`, árbol local limpio, siete PNG S04 ya incluidos; SSH alternativo desde Windows comprobado (un intento fallido de contraseña seguido de acceso satisfactorio).
+- **Infraestructura efectivamente desplegada:** 3/3 routers FRR aislados, 4/4 WAN, loopbacks HQ/S1/S2, OSPF FULL HQ=4/S1=2/S2=2, FIB preferente 6/6 y pings loopback 6/6. Resultado del usuario `S04_G1_WAN_OSPF=OK`; `ens33=192.168.47.40/24` y GW `192.168.47.2` sin cambios. [Bitácora detallada](sesiones/2026-10-26-s04-wan-ospf-activa.md).
+- **NO desmontar routers ni WAN.** El próximo paso es `s02-lan-vlan.py precheck`, luego `up --snapshot-confirmado`, validador de 9 gateways/6 ICMP, `status` y postcheck de gestión. La instantánea VMware S04 fue confirmada por el operador, sin prueba de restauración. Si falla un paso, conservar state y diagnosticar sin cleanup global.
+- **G1 parcial:** la WAN/OSPF está probada; LAN/VLAN todavía no. Exporter/Prometheus/NOC S04 aún no se han reactivado sobre esta topología; no anunciar alertas reales ni cerrar G1–G6 todavía.
+- **Cierres independientes:** S01 permanece abierta con 72 % histórico hasta resolver SSH #38, compatibilidad #34 y aceptación documental; S03 ~90 % hasta contrato SoT #16 y decisión/implementación acotada OpenTofu externo #17. El avance S04 no cambia automáticamente esos indicadores. S02 sigue cerrada.
