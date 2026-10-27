@@ -45,3 +45,7 @@ Para el panel se proponen capturas futuras:
 - `S04_05_NOC_API_Agregada_Fuentes_Confiables` — verificación complementaria de API central y frescura.
 
 La evidencia de enlaces fallidos y restaurados requerirá una prueba **posterior** sobre la red desplegada en condiciones seguras, por lo que no debe derivarse de estos estados `offline`. La cronología persistente de eventos, notificaciones, SLI/SLO y HTTP real continúan pendientes.
+
+## Incremento operativo real G4/G5 — 27/10/2026
+
+El NOC se validó en topología real activa: historial SQLite por HQ, filtros S2, CSV, importación auténtica G3 de tres transiciones y conservación idéntica tras reiniciar únicamente NOC (PID 248883→263894). `S04_G4_CIERRE_TECNICO=OK`. La descripción antigua de propuesta/offline se conserva como antecedente cronológico. No se ha implantado envío de notificaciones externas. G5 inició con 396/396 muestras scrape y 396/396 fuente condicional en 15 minutos; [metodología](../../docs/operaciones/s04-g5-sli-slo-alcance-observabilidad.md).
