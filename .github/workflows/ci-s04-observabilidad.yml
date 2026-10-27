@@ -8,6 +8,8 @@ on:
       - 'servicios/observabilidad/s04_exporter_multisede.py'
       - 'servicios/observabilidad/README-S04.md'
       - 'tests/test_s04_exporter_multisede.py'
+      - 'servicios/noc-s04/**'
+      - 'tests/test_s04_noc_central.py'
       - 'servicios/observabilidad/prometheus/s04-prometheus.yml'
       - 'servicios/observabilidad/prometheus/rules/s04-alerts.yml'
       - 'servicios/observabilidad/prometheus/tests/s04-alertas.test.yml'
@@ -18,6 +20,8 @@ on:
       - 'servicios/observabilidad/s04_exporter_multisede.py'
       - 'servicios/observabilidad/README-S04.md'
       - 'tests/test_s04_exporter_multisede.py'
+      - 'servicios/noc-s04/**'
+      - 'tests/test_s04_noc_central.py'
       - 'servicios/observabilidad/prometheus/s04-prometheus.yml'
       - 'servicios/observabilidad/prometheus/rules/s04-alerts.yml'
       - 'servicios/observabilidad/prometheus/tests/s04-alertas.test.yml'
@@ -38,8 +42,8 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: '3.12'
-      - name: Sintaxis Python exporter S04
-        run: python -m py_compile servicios/observabilidad/s04_exporter_multisede.py tests/test_s04_exporter_multisede.py
+      - name: Sintaxis Python exporter y NOC S04
+        run: python -m py_compile servicios/observabilidad/s04_exporter_multisede.py servicios/noc-s04/app.py tests/test_s04_exporter_multisede.py tests/test_s04_noc_central.py
       - name: Pruebas offline de estados y proteccion
         run: python -m unittest discover -s tests -p 'test_s04_*.py' -v
       - name: Validar configuracion, reglas y casos Prometheus S04
