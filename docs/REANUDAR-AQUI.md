@@ -26,13 +26,13 @@
 - La **issue #2 de fase 2 se cerró** tras validar técnica y documentalmente el borrador académico 3.2 (94 páginas). Permanecen abiertas #1 (fundamentos/SSH) y #3 (formalización SoT/alcance OpenTofu). Las funciones de NOC S04, LACP S05 y entrega S08 dejaron de figurar como exigencias del cierre funcional de S02.
 - [Puertas de cierre S01–S03](control/07-puertas-cierre-fases1-a-3-2026-10-25.md): **S01** requiere verificación/decisión SSH y compatibilidad fundacional; **S02 CERRADA** con Figura 1 y validación documental del escrito 3.2; **S03** tiene escritura comprobada en 5.5/6/7/8, pendiente únicamente de formalización SoT `candidate` y alcance externo OpenTofu. No repetir pruebas completas para completar capturas.
 
-## Preparación de la fase 4 — 26/10/2026
+## Antecedente: preparación de la fase 4 — 26/10/2026
 
 - [Issue #4](https://github.com/recm0708/netlab360/issues/4): inicio de S04 registrado; **sin ejecución de VM ni despliegue nuevo confirmado todavía**.
 - Se verificó en el código que el exporter vivo B3 usa los contenedores **dos routers** `nl360-b2-r-hq`/`nl360-b2-r-s1` e interfaces `wan-p`/`wan-b`, mientras que S02 usa **tres routers**, cuatro WAN y nueve VLAN. La reutilización requiere adaptación y pruebas de telemetría fresca por sede.
 - Primer procedimiento al arrancar Ubuntu: verificar hostname, `ens33`/gateway, Git, Docker/netns y puertos 8765/9108/9090. **No** iniciar servicios, desplegar S02, cambiar SSH o ejecutar OpenTofu hasta confirmar el preflight.
 
-## Primer incremento S04 tras auditoría de Ubuntu — 26/10/2026
+## Antecedente: primer incremento S04 tras auditoría de Ubuntu — 26/10/2026
 
 - El 26/10 a las 21:10 (UTC−05) se comprobó Ubuntu 26.04.1, `ens33 192.168.47.40/24` y GW `.2`, SSH/Docker/VMware Tools activos; 0 contenedores, 0 netns, puertos `8765/9090/9108` libres; binarios Prometheus 3.7.0 disponibles y state OpenTofu externo presente.
 - La sincronización de Ubuntu a `cc76800` terminó con código 0; árbol Git limpio. Sintaxis Python 3/3, `promtool check config` y `promtool check rules` (tres reglas) terminaron correctamente. SoT S03 `candidate` conserva 3 routers, 9 VLAN y 8 extremos de 4 WAN.
@@ -56,6 +56,15 @@
 - Las terminales documentaron **20/20 pruebas S04 offline**, preflight NOC 0, vista real `offline` y Prometheus `scrape=up`. Se verificó la parada normal de NOC (`S04_NOC_DETENIDO=SI`), Prometheus (apagado ordenado) y exporter (`S04_EXPORTER_DETENIDO=SI`). La VM puede quedar apagada normalmente después de decidir si se continúa con ensayos WAN activas.
 - Se preparó un ZIP de traslado con **siete PNG originales sin alteración** y un manifiesto SHA-256; el paso siguiente es transferirlo al clon Ubuntu y publicarlo tras cotejar hashes. No repetir capturas, no reconstruir S02 todavía y no ejecutar `tofu apply`.
 - La fase 4 **permanece ABIERTA** para topología desplegada, estados WAN/OSPF/HTTP, alertas `firing/resolved` reales, eventos persistentes, SLI/SLO y decisiones de notificación.
+
+## Último corte verificado: lote S04 importado, publicación Git pendiente — 26/10/2026
+
+- La importación en Ubuntu comenzó desde `main` en **`c6ec108`**, árbol limpio. El ZIP `NETLAB360_S04_LOTE01_7PNG_AUDITADOS_2026-10-26.zip` fue transferido al HOME y verificado contra `MANIFIESTO_SHA256_S04_LOTE01_2026-10-26.csv`. La salida REAL confirmó **7 líneas `S04_SHA256_OK`**, `S04_CAPTURAS_VERIFICADAS=7`, `S04_MANIFIESTO_VERIFICADO=SI`, `S04_IMPORTACION_RESULTADO=0`.
+- `git status --short` mostró **8 archivos `??`** (7 PNG `S04_01` a `S04_06`, con dos partes de S04_03, y CSV del manifiesto). **Todavía no hay commit ni push remotos acreditados**. Primero ejecutar `git pull --ff-only origin main` para traer documentación actualizada, abrir rama única de evidencias, agregar únicamente esos ocho archivos, revisar staged, `git commit` y `git push -u origin feat/s04-evidencias-lote01`; aprobar PR solo tras cotejar lista/hash. No hacer `git clean`, no borrar ZIP ni añadir secretos o estados externos.
+- El archivo [`docs/sesiones/2026-10-26-s04-noc-multisede-offline.md`](sesiones/2026-10-26-s04-noc-multisede-offline.md) documenta todos los resultados reales de las terminales, las pruebas 20/20, las capturas visuales y los límites del escenario offline. [`docs/operaciones/s04-cierre-observabilidad-multisede.md`](operaciones/s04-cierre-observabilidad-multisede.md) fija las puertas G0–G6 y orden protegido para desplegar WAN/LAN y terminar la fase. [Tablero general](control/06-tablero-porcentajes-cierre-fases-2026-10-25.md) actualizado: S02 cerrada, S03 pendiente de alcance, S04 aceptación parcial.
+- **Próximo trabajo técnico, después de publicar capturas y quedar `main` limpia:** prechecks de solo lectura; verificar snapshot VMware de `netlab360-lab` antes de permitir `--snapshot-confirmado`; despliegue protegido routers FRR→4 WAN→OSPF→LAN (9 VLAN), exporter→Prometheus→NOC, incidente WAN primario con *rollback*, captura firing/resolved y postcheck. La fase 4 NO está cerrada. No repetir `tofu apply`.
+- **Escrito académico:** último borrador revisado es `1457-Proyecto Semestral_borrador3.2.pdf` (94 págs.), fases 1–3 incorporadas; falta ampliar el informe con fase 4 solo después de tener pruebas con WAN desplegadas. El informe no lleva anexos; TAR es independiente.
+- **Seguridad y estado físico actual:** tras las pruebas NOC S04 quedaron libres los puertos 9091/9110/9120, sin contenedores ni netns, `ens33 192.168.47.40/24` y gateway `192.168.47.2`. El host no ejecuta NOC/Prometheus/exporter por defecto al reanudar.
 
 ## Indicadores de avance
 
