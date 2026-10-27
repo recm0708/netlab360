@@ -32,6 +32,14 @@
 - Se verificó en el código que el exporter vivo B3 usa los contenedores **dos routers** `nl360-b2-r-hq`/`nl360-b2-r-s1` e interfaces `wan-p`/`wan-b`, mientras que S02 usa **tres routers**, cuatro WAN y nueve VLAN. La reutilización requiere adaptación y pruebas de telemetría fresca por sede.
 - Primer procedimiento al arrancar Ubuntu: verificar hostname, `ens33`/gateway, Git, Docker/netns y puertos 8765/9108/9090. **No** iniciar servicios, desplegar S02, cambiar SSH o ejecutar OpenTofu hasta confirmar el preflight.
 
+## Primer incremento S04 tras auditoría de Ubuntu — 26/10/2026
+
+- El 26/10 a las 21:10 (UTC−05) se comprobó Ubuntu 26.04.1, `ens33 192.168.47.40/24` y GW `.2`, SSH/Docker/VMware Tools activos; 0 contenedores, 0 netns, puertos `8765/9090/9108` libres; binarios Prometheus 3.7.0 disponibles y state OpenTofu externo presente.
+- La sincronización de Ubuntu a `cc76800` terminó con código 0; árbol Git limpio. Sintaxis Python 3/3, `promtool check config` y `promtool check rules` (tres reglas) terminaron correctamente. SoT S03 `candidate` conserva 3 routers, 9 VLAN y 8 extremos de 4 WAN.
+- [PR #55](https://github.com/recm0708/netlab360/pull/55), fusionado como `5848287`: `servicios/observabilidad/s04_exporter_multisede.py`, `tests/test_s04_exporter_multisede.py`, `README-S04.md` y workflow de pruebas offline. [CI de S04 en main](https://github.com/recm0708/netlab360/actions/runs/40438597012) y [regresión general en main](https://github.com/recm0708/netlab360/actions/runs/40438597219) SUCCESS. La rama del PR fue eliminada automáticamente.
+- **Todavía no se ha ejecutado el colector S04 en Ubuntu real**. La próxima tarea es `git pull --ff-only origin main`, pruebas offline, `--check` y `--once` con `sudo -v`; el resultado real esperado con S02 desmontada es `topology=offline` y `source_ok=true`. El nuevo puerto `9110` solo se usará en una siguiente etapa y únicamente en loopback.
+- **No confundir:** `active` significa tres contenedores presentes, no OSPF Full ni servicio HTTP validado. El antiguo exporter B3 y sus reglas para `wan-p`/`wan-b` no se alteraron. Pendientes NOC, Prometheus S04, incidentes, SLI/SLO y capturas `S04_*`.
+
 ## Indicadores de avance
 
 | Fase | Corte actual | Pendiente para aceptación |
