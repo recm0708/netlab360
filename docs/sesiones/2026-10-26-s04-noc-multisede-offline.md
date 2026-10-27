@@ -25,6 +25,16 @@ S04_IMPORTACION_RESULTADO=0
 ```
 `git status --short` mostró **8 archivos sin seguimiento**: siete PNG de `evidencias/capturas/fase4/` y el CSV `evidencias/manifiestos/MANIFIESTO_SHA256_S04_LOTE01_2026-10-26.csv`. No aparece evidencia de push/PR todavía. **No aumentar el conteo de imágenes remotas de 107 a 114 hasta verificar la fusión.**
 
+## Corte posterior — 26/10/2026: publicación y precheck activo
+
+**Publicación auténtica:** el operador subió la rama `feat/s04-evidencias-lote01`, commit `ce0217e` con siete PNG originales y un manifiesto CSV. El control `git diff --cached --check` señaló finales CRLF del CSV; se normalizó **solo el manifiesto** a LF mediante commit `c34c824` sin modificar los PNG. [PR #58](https://github.com/recm0708/netlab360/pull/58) fusionado como `4babb2849890700462c8eff20dcc6cdc22d20096`. El árbol `main` verificado contiene **114 PNG**: S01 90, S02 9, S03 8, S04 7; no había PR adicionales abiertos y la rama remota se retiró automáticamente.
+
+**Precheck REAL del operador (22:52 hora Panamá):** Git en rama `feat/s04-evidencias-lote01`, sin cambios locales; host `ens33=192.168.47.40/24`, gateway `.2`, `df` reportó **133 GiB disponibles de 157 GiB**, `free` mostró ~13 GiB memoria disponible. Docker sin contenedores, estados operativos WAN/LAN ausentes, directorios runtime FRR `R-HQ/R-S1/R-S2` presentes. `scripts/diagnostico/precheck-s02.sh` terminó `S02_PRECHECK_RESULTADO=0` y `RESULTADO_PRECHECK_S02=0`; validó tres sedes, nueve VLAN, cuatro WAN, 17 redes y 0 colisiones. `s02-wan-links.py plan` obtuvo `RESULTADO_PLAN_WAN=0` con primarias costo 10 y respaldos 100. `s02-lan-vlan.py plan` obtuvo `RESULTADO_PLAN_LAN=0`, tres switches/nueve VLAN/nueve hosts.
+
+**Snapshot VMware:** el operador confirmó creación de la instantánea S04 inmediatamente después del precheck y eliminación de las **dos instantáneas anteriores**. Existe un único punto de retorno conservado según su confirmación; no se ha verificado su nombre ni restaurabilidad externamente, ni debe presumirse que se conservan snapshots viejos.
+
+**Estado real al corte:** aún **NO** se ha iniciado ningún contenedor FRR ni desplegado WAN/LAN como parte de S04. Antes de los modos `up`, sincronizar el clon desde la rama local de evidencias a `main` ya fusionada, confirmar árbol limpio y ejecutar arrancador FRR→WAN→OSPF→LAN, usando `--snapshot-confirmado` únicamente porque el operador ya creó la instantánea. No ejecutar `tofu apply`.
+
 ## Aceptación y límites
 
 **Validado:** observación fiable de topología OFFLINE sin falsas alarmas, captura de 25 series, scrape real de Prometheus, API agregada y navegación central/S1 en NOC, 20 pruebas S04 offline, cierre limpio.
