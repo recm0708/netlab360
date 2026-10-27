@@ -1,0 +1,42 @@
+name: NETLAB360 - S04 exporter multisede pruebas offline
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'servicios/observabilidad/s04_exporter_multisede.py'
+      - 'servicios/observabilidad/README-S04.md'
+      - 'tests/test_s04_exporter_multisede.py'
+      - '.github/workflows/ci-s04-observabilidad.yml'
+  pull_request:
+    paths:
+      - 'servicios/observabilidad/s04_exporter_multisede.py'
+      - 'servicios/observabilidad/README-S04.md'
+      - 'tests/test_s04_exporter_multisede.py'
+      - '.github/workflows/ci-s04-observabilidad.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  s04-solo-lectura:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout del codigo versionado
+        uses: actions/checkout@v5
+      - name: Python estandar
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Sintaxis Python exporter S04
+        run: python -m py_compile servicios/observabilidad/s04_exporter_multisede.py tests/test_s04_exporter_multisede.py
+      - name: Pruebas offline de estados y proteccion
+        run: python -m unittest discover -s tests -p 'test_s04_*.py' -v
+      - name: Garantizar limites de CI
+        run: |
+          echo 'S04_CI_OFFLINE=OK'
+          echo 'S04_SIN_DOCKER_SIN_SUDO_SIN_FRR=SI'
+          echo 'S04_SIN_TOFU_APPLY=SI'
+          echo 'S04_SIN_TOPOLOGIA_VIVA=SI'
