@@ -1,4 +1,4 @@
-**CONTROL DE TABLAS PDF 4.4 (27/10):** La Tabla 12 (p. 98) compara capacidades de S01/S02 y se conserva. Hay dos rótulos «Tabla 13»: la tabla SLI de capítulo 6 mantiene el 13; la segunda, en 7.8 (p. 104), debe renumerarse a Tabla 14 y su fila de 107 capturas debe actualizarse a 122 (83/9/8/22). Revisar también cifras en 6.6 (p. 81), 6.9.6 (p. 97) y 7.7.1 (p. 103). No se ha editado el PDF; la corrección corresponde al Word del equipo.
+**CORTE ACADÉMICO VERIFICADO — PDF 4.5 (27/10/2026, 112 páginas).** Se auditaron en el PDF los rótulos y referencias de **20 figuras consecutivas (1–20)** y **13 tablas consecutivas (1–13)**, sin saltos ni duplicados. Los 33 elementos tienen título, nota y referencia en el texto. **Tabla 11**: indicadores SLI, p. 96; **Tabla 12**: comparación técnica S01/S02, pp. 98–99; **Tabla 13**: correspondencia de objetivos, pp. 104–105 y 122 PNG. **No existe Tabla 14 ni debe crearse** mientras no se agregue una nueva tabla. El apartado 7.10 ya consta en pp. 106–108; pendiente ajustar 7.6/7.9 y capítulo 8 (conclusiones/recomendaciones) que conserva afirmaciones anteriores a la ejecución S04. El PDF no fue editado automáticamente.
 
 # NETLAB360 — Continuidad editorial del informe académico hasta S04
 
@@ -17,7 +17,7 @@
 1. Actualizar inicio del capítulo **7 ANÁLISIS DE RESULTADOS** (p.98) para incluir S04, sin reescribir análisis histórico de S01–S03 si ya es correcto.
 2. Conservar los resultados específicos de 7.1–7.9 para su alcance, agregando **7.10 Interpretación de la observabilidad multisede y sus limitaciones** tras 7.9 y antes del capítulo 8.
 3. Sustituir conclusiones que todavía afirman que la observabilidad centralizada no se implementó; actualizar recomendaciones 8.2.2 y otras referencias de futuro.
-4. Ajustar **Tabla 12** y cualquier párrafo global de 129 PNG por el catálogo oficial de 122; renumerar figuras, tablas e índice automáticamente.
+4. Ajustar **Tabla 12** y cualquier párrafo global de 129 PNG por el catálogo oficial de 122; conservar la numeración de figuras 1–20 y tablas 1–13 y actualizar el índice general.
 5. Comprobar títulos, preámbulos y notas de figuras, referencias bibliográficas, lenguaje profesional de equipo y ausencia de atribuciones no probadas.
 
 Se revisará el próximo PDF exportado después de los cambios. No se declara aceptado el escrito por la docente antes de la reunión real del 30/10.
