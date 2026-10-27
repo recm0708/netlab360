@@ -389,6 +389,6 @@ def main() -> None:
 if __name__ == "__main__":
     try:
         main()
-    except (RuntimeError, OSError) as exc:
+    except (RuntimeError, ValueError, sqlite3.Error, OSError) as exc:
         print("S04_NOC_ERROR=" + str(exc))
         raise SystemExit(2)
