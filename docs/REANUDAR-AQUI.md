@@ -1,3 +1,13 @@
+## Estado prioritario — 27/10/2026: PDF 4.2 y desmontaje S04 completado, VM aún encendida
+
+- **Borrador académico 4.2, 95 páginas**: correcciones 6–13 incorporadas y comprobadas. Único resto previo a insertar 5.6: borrar el párrafo **duplicado y obsoleto de 4.7, p.32**, que comienza «Las funciones de automatización, observabilidad y diagnóstico se desarrollan progresivamente y no constituyen todavía un sistema completamente integrado». Eliminar únicamente ese párrafo. **5.6, 6.9, 7.10, conclusiones S04 y Tabla 12 aún pendientes en el Word**, revisión Teams 30/10 futura.
+- **4.72 OK**: respaldo en frío `prometheus_tsdb_s04.tar.gz` SHA256 `e7602327d233fcb7dccd60f57fc3230202b1998c592655ec75ed20ef06ba49c1`; estados WAN/LAN con ownership correcto, SQLite con tres eventos históricos. Directorio respaldo `~/netlab360-bootstrap/s04/evidencias/S04_Preapagado_20261027T084907083378Z`.
+- **4.73 OK**: LAN S02 y 12 namespaces retirados, cuatro WAN y tres loopbacks retirados, ip_forward restaurados. **4.74 OK**: 3/3 routers Compose S02 eliminados. **4.75 OK**: historial SQLite G3 3/3 y TSDB persistentes, puertos 9110/9091/9120 libres, `S04_NAMESPACES_S02_AUSENTES=OK`, host ens33 .40/24 GW .2 intacto; Git `main` limpio en `1781ff5`. `S04_APAGADO_PREPARADO=OK`.
+- **NO registrar poweroff realizado:** hasta ahora la VM Ubuntu queda encendida, desmontada y preparada; falta `sudo systemctl poweroff` y verificar `Powered Off` en VMware Workstation. No iniciar S05 antes de terminar documentación S04.
+- Fuente técnica: [bitácora de desmontaje y PDF 4.2](sesiones/2026-10-27-s04-borrador42-desmontaje-validado.md); [plan de reanudación](05-plan-operativo-y-pausas.md). Entradas de este mismo archivo fechadas 16–27/10 son **históricas** si contradicen este bloque de estado prioritario.
+
+---
+
 ## Corte 27/10 — manuscrito 4.1 y preapagado S04 (verificado)
 
 - **PDF académico 4.1 de 95 páginas recibido**: 5/5 correcciones de la tanda anterior presentes en páginas 7–8, 21, 32 y 38; todavía sin las secciones 5.6, 6.9 y 7.10, ni conclusiones/Tabla12 actualizadas. Revisar contradicciones anteriores en 2.4.1, 3.8, 4, Tabla1, 4.7 apertura, 4.8 y capítulo5.
