@@ -1,0 +1,45 @@
+# NETLAB360 S04: nunca confundir router desmontado o admin_up=-1 con WAN DOWN.
+# Reglas validas SOLO con observacion de fuente disponible (source_up=1).
+groups:
+  - name: netlab360-s04-seguridad-de-observacion
+    interval: 2s
+    rules:
+      - alert: NETLAB360S04ExporterUnavailable
+        expr: up{job="netlab360-s04-multisede"} == 0
+        for: 10s
+        labels:
+          severity: warning
+          phase: s04
+        annotations:
+          summary: "Prometheus no puede consultar el colector S04"
+          description: "Revisar localhost:9110 y el proceso, sin inferir una caida WAN."
+
+      - alert: NETLAB360S04CollectorUnknown
+        expr: (netlab360_s04_source_up == 0) and on() (up{job="netlab360-s04-multisede"} == 1)
+        for: 6s
+        labels:
+          severity: warning
+          phase: s04
+        annotations:
+          summary: "El colector S04 responde, pero no puede observar Docker"
+          description: "Estado UNKNOWN. Verificar sudo no interactivo, Docker y la proteccion de red administrativa."
+
+      - alert: NETLAB360S04WANAdminDown
+        expr: (netlab360_s04_wan_admin_up == 0) and on() (netlab360_s04_source_up == 1)
+        for: 6s
+        labels:
+          severity: warning
+          phase: s04
+        annotations:
+          summary: "Interfaz WAN {{ $labels.site }}/{{ $labels.interface }} administrativamente DOWN"
+          description: "Revisar enlace real. No equivale a fallo de vecino OSPF ni a interrupcion de servicio."
+
+      - alert: NETLAB360S04VLANAdminDown
+        expr: (netlab360_s04_vlan_admin_up == 0) and on() (netlab360_s04_source_up == 1)
+        for: 6s
+        labels:
+          severity: warning
+          phase: s04
+        annotations:
+          summary: "Subinterfaz VLAN {{ $labels.site }}/{{ $labels.vlan }} administrativamente DOWN"
+          description: "Comprobar trunk y configuracion; no equivale a indisponibilidad HTTP."
