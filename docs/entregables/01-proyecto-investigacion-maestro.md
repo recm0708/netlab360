@@ -1,33 +1,38 @@
-# NETLAB360 — Índice maestro de trabajo del informe académico-técnico
+# NETLAB360 — Índice maestro y situación del informe único
 
-**Actualizado el 25/10/2026.** Un único informe institucional, mínimo **40 páginas**, con estructura técnica continua. La versión de referencia recibida más reciente es `1457-Proyecto Semestral_borrador3.pdf`, de **79 páginas**. El capítulo de la fase 3 sigue pendiente de incorporación al documento, aunque su implementación y pruebas técnicas están comprobadas. Conservar su Word original y proporcionar correcciones por chat; no recrear el archivo sin solicitud.
+**Actualizado el 27/10/2026.** Documento principal: Word institucional editado por el equipo. Última exportación recibida: `1457-Proyecto Semestral_borrador4.0.pdf` (**94 páginas**), todavía no incorporada la fase 4. Las correcciones se entregarán **por mensajes de chat**, para copiar y pegar en el Word original, y se comprobará un PDF posterior antes de declarar aceptación.
 
-**Título comunicado por Teams el 17/10/2026:** «Diseño e implementación de una plataforma virtualizada para la automatización, observabilidad y diagnóstico de redes empresariales multisede». Su aprobación docente sigue por confirmar. **Nombre/encabezado abreviado:** NETLAB360 | Redes Empresariales Multisede.
+**Título comunicado en Teams el 17/10/2026:** «Diseño e implementación de una plataforma virtualizada para la automatización, observabilidad y diagnóstico de redes empresariales multisede». Aprobación docente pendiente. Encabezado abreviado del proyecto: `NETLAB360 | Redes Empresariales Multisede`.
 
-## Orden editorial vigente del informe
+## Estructura real verificada en borrador 4.0
 
-- Portada e índice general institucional.
-- Introducción.
-- **1. Objetivos** (objetivo general y específicos).
-- **2. Planteamiento del problema** (problema y justificación).
-- **3. Fundamento técnico** (virtualización/contendores, Linux networking, VLAN, OSPF/FRR, LACP, SoT, OpenTofu, Ansible, observabilidad y diagnóstico; citas verificables).
-- **4. Diseño de la solución** (HQ/S1/S2, cuatro WAN, nueve VLAN y sus direcciones, protección VMnet8, módulos pendientes; **Figura 1 debe mostrar la topología real, no texto provisional**).
-- **5. Implementación**: 5.1 entorno, 5.2 metodología en **ocho fases internas**, 5.3 fase 1 (antecedentes experimentales) y 5.4 fase 2 (integración multisede y desmontaje seguro); nuevas fases se incorporan progresivamente sin duplicar informes.
-- **6. Pruebas y validación** (propósito, baseline, esperado/observado, evidencia y recuperación; diferenciar pruebas de red y offline).
-- **7. Análisis de resultados** (interpretación de resultados, limitaciones reales; sin atribuir disponibilidad continua o IA no probadas).
-- **8. Conclusiones y recomendaciones**, actualizadas conforme avance la implementación.
-- **Referencias**, listado único APA 7, cierre del informe.
+1. **Introducción** y portada/índice.
+2. **1. Objetivos** (general/específicos).
+3. **2. Planteamiento del problema** (contexto, problema, formulación y justificación).
+4. **3. Fundamento técnico** (virtualización, VLAN, OSPF, LACP, SoT, OpenTofu, Ansible, Prometheus/NOC, datos y límites de AIOps).
+5. **4. Diseño de la solución** (topología real HQ/S1/S2, direcciones, VLAN, WAN redundante, gestión aislada, automatización y NOC).
+6. **5. Implementación**: `5.3` S01, `5.4` S02, `5.5` S03 **ya presentes**; agregar `5.6` S04 de collector/Prometheus/NOC/SQLite/SLI con límites documentados.
+7. **6. Pruebas y validación**: `6.1–6.8` ya presentes; agregar `6.9` para alerta G3, persistencia TSDB/SQLite, UNKNOWN, regresión y mediciones 15/60 minutos.
+8. **7. Análisis**: `7.1–7.9` presentes, centrados en tres fases. Añadir `7.10` y actualizar frases de estado vigente en `7.1,7.6,7.8,7.9`.
+9. **8. Conclusiones y recomendaciones**: actualizar `8.1`, convertir `8.2.2` de «integrar NOC» en mejoras realmente futuras, mantener los demás límites.
+10. **Referencias APA 7** al final, sin capítulo de anexos.
 
-**Importante — modalidad docente precisada por estudiante 25/10/2026:** **no insertar capítulo/sección de anexos en el Word**. Los scripts, YAML/JSON, HCL, Ansible, configuraciones, pruebas y evidencias técnicas necesarias se entregarán mediante **un único `.tar` independiente**. La guía académica histórica relaciona doce piezas y contempla anexos, pero la modalidad externa se registró en [criterios](../academico/00-criterios-docentes-y-hitos.md) y [plan TAR](../academico/03-anexos-y-demostracion.md). No crear ZIP ni índice ficticio de anexos dentro del informe.
+Hasta el borrador 4.0 hay **15 figuras** y **12 tablas**, por lo que las nuevas S04 seguirán la secuencia **solo al insertarlas y revisar índice**, sin numerarlas por anticipado. Actualizar **Tabla 1** (NOC integrado), **Tabla 5** (S04 no «Planificada») y **Tabla 12** (objetivos de observabilidad y **129 PNG**, no 107). Nota de Tabla 12 aparece separada en p. 89 de la tabla p. 88; revisar saltos de párrafo en Word.
 
-## Disciplina de actualización y evidencia
+## Fuente de evidencia técnica
 
-- En la narración utilizar **fase 1, fase 2, fase 3**; mantener identificadores S01/S02/S03 cuando son nombres reales de scripts, rutas y evidencias. Ocho fases son hitos internos, no ocho informes separados.
-- S01 histórico incluyó LACP virtual, dos WAN HQ/S1, pruebas de automatización candidata, Prometheus y diagnóstico determinista. S02 integró funcionalmente **tres routers, cuatro WAN, nueve VLAN, HTTP y ACL**; desmontada deliberadamente el 23/10 con respaldos.
-- S03 cuenta con SoT, auditoría real Ansible y drift/reconciliación de FRR comprobados, pero **OpenTofu metadata-only y CI/PR siguen sin aceptación real**.
-- Ninguna captura o tabla implica resultado diferente al observado. Figuras y tablas con preámbulo, título, nota y referencias cruzadas correctos. El borrador 2.5 tenía **Figura 1 pendiente**, y se registró haber aplicado correcciones editoriales sin facilitar aún nuevo PDF verificable.
-- Conservar historial técnico de evidencias SHA-256; nunca insertar secretos o archivos docentes recibidos de terceros en GitHub ni en TAR distribuible.
-- No cerrar issues técnicas por un borrador narrativo; exigir resultados comprobados, trazabilidad, checklist y aceptación del alcance.
-- **30/10/2026:** mostrar en Teams introducción, objetivos y planteamiento, sin PPT adicional (#47). **13/11/2026:** fundamento y diseño (#48). Presentación y demostración final según fecha docente por confirmar. Manual independiente pospuesto.
+- **S01**: validaciones de mecanismos experimentales; 90 PNG finales.
+- **S02**: integración 3 FRRouting, cuatro WAN, nueve VLAN, pruebas WAN/ACL y 9 PNG; cierre interno #2.
+- **S03**: auditoría y reconciliación Ansible sobre FRR, OpenTofu 17 recursos `terraform_data` **solo metadatos**, GitHub Actions; 8 PNG y evidencia GitOps Markdown (no PNG).
+- **S04**: NOC central y por sede, exporter 9110 y Prometheus 9091, alerta real G3, UNKNOWN sin falsas WAN/VLAN, TSDB tras restart 68/68+28/28, SQLite G3 3/3 tras reinicio NOC, 22 PNG S04 y regresión OSPF/LAN final. G5 medición 15m 450/450=100% y 60m 1698/1740=97.586%, 99 % SLO **solo propuesto**, presupuesto -25. Sin notificaciones externas ni modelo IA acreditado.
 
-**Vínculos:** [criterios docentes](../academico/00-criterios-docentes-y-hitos.md) · [TAR externo](../academico/03-anexos-y-demostracion.md) · [fase 2 #2](https://github.com/recm0708/netlab360/issues/2) · [fase 3 #3](https://github.com/recm0708/netlab360/issues/3) · [entrega TAR #45](https://github.com/recm0708/netlab360/issues/45).
+**No insertar en el informe** scripts extensos, contraseñas, tokens, estados operativos OpenTofu, anexos o PDF originales de la docente. Todo lo distribuible y necesario se preparará en un **TAR técnico separado, auditado**, en S08. No prometer OVA/OVF ni manual separado como requisito confirmado.
+
+## Prioridades editoriales
+
+- [ ] Incorporar al Word los bloques corregidos de Introducción, 3/4 (NOC real), 5.6, 6.9, 7 y 8; contrastar tablas y seleccionar figuras legibles con preámbulos/títulos/notas y referencias cruzadas.
+- [ ] Exportar nuevo PDF (borrador 4.0 **no** cambia por actualizar GitHub), comprobar paginación, índice, las notas huérfanas y coherencia APA 7.
+- [ ] Presentar Introducción, Objetivos y Problema por Teams **30/10**, registrar revisión real; Fundamento y Diseño **13/11**.
+- [ ] Formalizar por el grupo SLO candidato, alcance de alertas solo locales y decisiones de inclusión de datos antes de aceptación S04; continuar S05–S08 en el mismo informe.
+
+[Guion de S04 para Word](../academico/s04-guion-de-actualizacion-del-informe.md) · [Matriz de pruebas S04](../operaciones/s04-g6-matriz-aceptacion-evidencias-2026-10-27.md) · [Criterios docentes](../academico/00-criterios-docentes-y-hitos.md) · [TAR técnico final](../academico/03-anexos-y-demostracion.md).
