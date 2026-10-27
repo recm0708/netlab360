@@ -10,6 +10,8 @@ from __future__ import annotations
 
 import csv
 import hashlib
+import re
+import struct
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -18,6 +20,8 @@ MANIFIESTOS = ROOT / "evidencias" / "manifiestos"
 MAPA = MANIFIESTOS / "MAPA_RENOMBRADO_FASE1_2026-10-25.csv"
 PLAN = MANIFIESTOS / "PLAN_CARGA_CAPTURAS_2026-10-25.csv"
 LOTE = MANIFIESTOS / "MANIFIESTO_SHA256_CAPTURAS_2026-10-25.csv"
+S04_LOTE01 = "MANIFIESTO_SHA256_S04_LOTE01_2026-10-26.csv"
+DYNAMIC = re.compile(r"MANIFIESTO_SHA256_S(0[4-8])_LOTE[0-9]{2}_[0-9]{4}-[0-9]{2}-[0-9]{2}\.csv")
 HISTORICOS = {
     "MANIFIESTO_SHA256_LOTE01.csv",
     "MANIFIESTO_SHA256_LOTE02.csv",
@@ -41,8 +45,10 @@ def main() -> None:
     permitidos = HISTORICOS | {MAPA.name, PLAN.name}
     if LOTE.is_file():
         permitidos.add(LOTE.name)
-    assert {p.name for p in MANIFIESTOS.glob("*.csv")} == permitidos, (
-        "Manifiestos históricos alterados o incompletos"
+    presentes = {p.name for p in MANIFIESTOS.glob("*.csv")}
+    nuevos = {name for name in presentes if DYNAMIC.fullmatch(name)}
+    assert presentes == permitidos | nuevos and HISTORICOS <= presentes, (
+        "Manifiestos históricos alterados o incompletos; revisar lotes S04-S08"
     )
     with MAPA.open(encoding="utf-8", newline="") as stream:
         rows = list(csv.DictReader(stream))
@@ -104,6 +110,44 @@ def main() -> None:
     else:
         assert PLAN.is_file(), "Falta plan de lote previsto"
 
+    # Lotes S04-S08: aceptar solo manifiestos de fase cuya ruta y
+    # SHA-256, tamano, y dimensiones de cada captura puedan comprobarse.
+    expected_dynamic = {i: set() for i in range(4, 9)}
+    if list((CAPTURAS / "fase4").glob("*.png")):
+        assert S04_LOTE01 in nuevos, "Primer lote S04 sin manifiesto"
+    for name in sorted(nuevos):
+        match = DYNAMIC.fullmatch(name)
+        assert match is not None
+        fase = int(match.group(1))
+        manifest = MANIFIESTOS / name
+        assert manifest.is_file() and not manifest.is_symlink()
+        with manifest.open(encoding="utf-8-sig", newline="") as stream:
+            registros = list(csv.DictReader(stream))
+        assert registros, f"Manifiesto vacio: {name}"
+        if name == S04_LOTE01:
+            assert len(registros) == 7, "Primer lote S04 distinto de 7 PNG"
+        for row in registros:
+            ruta = Path(row["ruta_relativa"])
+            assert not ruta.is_absolute() and ".." not in ruta.parts
+            assert ruta.parent == Path(f"evidencias/capturas/fase{fase}")
+            assert ruta.name.startswith(f"S{fase:02d}_") and ruta.suffix.lower() == ".png"
+            key = ruta.as_posix()
+            assert key not in expected_dynamic[fase], f"Captura duplicada: {key}"
+            fichero = ROOT / ruta
+            assert fichero.is_file() and not fichero.is_symlink()
+            digest, _blob, size = file_hashes(fichero)
+            assert digest == row["sha256"] and size == int(row["bytes"]) and size > 0, (
+                f"SHA-256 o bytes diferentes: {ruta}"
+            )
+            with fichero.open("rb") as image:
+                header = image.read(24)
+            assert header[:8] == b"\x89PNG\r\n\x1a\n", f"Formato PNG invalido: {ruta}"
+            width, height = struct.unpack(">II", header[16:24])
+            assert width == int(row["ancho_px"]) and height == int(row["alto_px"])
+            assert width > 0 and height > 0, f"Dimensiones invalidas: {ruta}"
+            expected_dynamic[fase].add(key)
+        print(f"LOTE_{name}_SHA256_Y_DIMENSIONES={len(registros)}/{len(registros)}")
+
     actual_s01 = {p.relative_to(ROOT).as_posix() for p in
                   (CAPTURAS / "fase1").glob("*.png")}
     assert actual_s01 == targets | fase_esperada[1], "Fase 1: faltan PNG o hay extras sin mapear"
@@ -119,6 +163,10 @@ def main() -> None:
         if i in (2, 3):
             assert {p.relative_to(ROOT).as_posix() for p in items} == fase_esperada[i], (
                 f"Fase {i}: capturas distintas del manifiesto aprobado"
+            )
+        if i >= 4:
+            assert {p.relative_to(ROOT).as_posix() for p in items} == expected_dynamic[i], (
+                f"Fase {i}: PNG sin manifiesto o faltantes"
             )
         for file in items:
             assert file.name.startswith(f"S{i:02d}_"), f"Prefijo incorrecto: {file}"
