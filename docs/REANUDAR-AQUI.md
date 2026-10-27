@@ -1,3 +1,11 @@
+## Corte prioritario 27/10 — PDF 4.3 y orden de apagado ejecutada
+
+- **Paso 4.76** ejecutado por el operador: Git main sincronizada `d5158af`, TSDB SHA256 OK, S02 LAN/WAN/FRR ausentes, ens33 `192.168.47.40/24` GW `.2` conservada, `S04_APAGADO_AUTORIZADO=SI`, `sudo systemctl poweroff` ejecutado y SSH cerrada por el servidor. **Apagado de Ubuntu iniciado; estado VMware `Powered Off` todavía no confirmado externamente**. No arrancar el laboratorio mientras se edita el Word.
+- **Borrador académico 4.3 de 99 páginas** auditado: corrección duplicación p.32 hecha, 5.5.9 corregido, **5.6.1–5.6.5 incorporados en pp.66–70**. Pendientes introducción capítulo 6 obsoleta, 6.9, análisis S04, conclusiones/Tabla 12 y aprobación académica; SLO 99 % sigue candidato, sin notificaciones externas.
+- [Bitácora del paso 4.76 y PDF 4.3](sesiones/2026-10-27-s04-poweroff-solicitado-borrador43.md). Los estados históricos inferiores que dicen «VM todavía encendida» o «5.6 por escribir» son registros de corte anterior, **no estado vigente**.
+
+---
+
 ## Estado prioritario — 27/10/2026: PDF 4.2 y desmontaje S04 completado, VM aún encendida
 
 - **Borrador académico 4.2, 95 páginas**: correcciones 6–13 incorporadas y comprobadas. Único resto previo a insertar 5.6: borrar el párrafo **duplicado y obsoleto de 4.7, p.32**, que comienza «Las funciones de automatización, observabilidad y diagnóstico se desarrollan progresivamente y no constituyen todavía un sistema completamente integrado». Eliminar únicamente ese párrafo. **5.6, 6.9, 7.10, conclusiones S04 y Tabla 12 aún pendientes en el Word**, revisión Teams 30/10 futura.
