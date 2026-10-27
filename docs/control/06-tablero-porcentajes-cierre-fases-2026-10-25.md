@@ -1,3 +1,5 @@
+**CONTROL DE TABLAS PDF 4.4 (27/10):** La Tabla 12 (p. 98) compara capacidades de S01/S02 y se conserva. Hay dos rótulos «Tabla 13»: la tabla SLI de capítulo 6 mantiene el 13; la segunda, en 7.8 (p. 104), debe renumerarse a Tabla 14 y su fila de 107 capturas debe actualizarse a 122 (83/9/8/22). Revisar también cifras en 6.6 (p. 81), 6.9.6 (p. 97) y 7.7.1 (p. 103). No se ha editado el PDF; la corrección corresponde al Word del equipo.
+
 # NETLAB360 — Indicadores verificables y control de fases
 
 **Corte 27/10/2026.** Distinguir el **porcentaje de milestone GitHub** (issues cerradas / total) de la aceptación técnica y académica. Los indicadores S01 72 % histórico y S03 ≈90 % estimado proceden de matrices propias; no equivalen al porcentaje de un milestone.
@@ -21,4 +23,4 @@
 
 **Operación al corte:** topología experimental desmontada, TSDB y SQLite respaldadas y verificadas, `sudo systemctl poweroff` ejecutado con cierre remoto SSH; estado Powered Off en VMware pendiente de confirmación externa. [Bitácora](../sesiones/2026-10-27-s04-poweroff-solicitado-borrador43.md).
 
-**Tareas académicas:** borrador 4.4 de 110 pp. ya incluye 5.6 y 6.9, con Figura20 y Tabla13; falta ajustar análisis S04 en capítulo7, conclusiones/recomendaciones en capítulo8 y la Tabla12 del inventario actualizado. Teams 30/10 y 13/11 aún no celebradas al corte. [Guion](../academico/s04-guion-de-actualizacion-del-informe.md).
+**Tareas académicas:** borrador 4.4 de 110 pp. ya incluye 5.6 y 6.9, con Figura20 y Tabla13; falta ajustar análisis S04 en capítulo7, conclusiones/recomendaciones en capítulo8 y la la segunda Tabla 13 de objetivos y resultados, que debe ser Tabla 14. Teams 30/10 y 13/11 aún no celebradas al corte. [Guion](../academico/s04-guion-de-actualizacion-del-informe.md).

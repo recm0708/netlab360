@@ -1,3 +1,5 @@
+**CONTROL DE TABLAS PDF 4.4 (27/10):** La Tabla 12 (p. 98) compara capacidades de S01/S02 y se conserva. Hay dos rótulos «Tabla 13»: la tabla SLI de capítulo 6 mantiene el 13; la segunda, en 7.8 (p. 104), debe renumerarse a Tabla 14 y su fila de 107 capturas debe actualizarse a 122 (83/9/8/22). Revisar también cifras en 6.6 (p. 81), 6.9.6 (p. 97) y 7.7.1 (p. 103). No se ha editado el PDF; la corrección corresponde al Word del equipo.
+
 # NETLAB360 — Matriz G0–G6 de aceptación técnica S04
 
 **Corte técnico:** 27/10/2026. La validación funcional de los módulos S04 se realizó sobre la VM Ubuntu en operación real. Las decisiones académicas de alcance continúan abiertas.
@@ -24,6 +26,6 @@ La prueba WAN G3 mantuvo la interfaz administrativa `ens33` separada y estable. 
 
 Las métricas `admin_up` corresponden a interfaces, no latencia, paquetes o disponibilidad contractual. `up` corresponde a scrapes, no servicio de aplicaciones; `source_up` depende de muestras presentes. La TSDB tiene retención limitada y SQLite conserva transiciones, no datos universales de red. No se acreditó entrega de avisos externos, SLO formal aprobado ni IA.
 
-**Escrito:** borrador 4.4 (110 pp) incorpora 5.6 y 6.9, Figuras 16–20 y Tabla 13. Falta análisis S04 en capítulo 7, ajuste de conclusiones/recomendaciones, Tabla 12 e índices/referencias. La reunión Teams del 30/10 y ratificación de SLO aún no han ocurrido al corte.
+**Escrito:** borrador 4.4 (110 pp) incorpora 5.6 y 6.9, Figuras 16–20 y Tabla 13. Falta análisis S04 en capítulo 7, ajuste de conclusiones/recomendaciones, la duplicación de Tabla 13, los conteos oficiales e índices/referencias. La reunión Teams del 30/10 y ratificación de SLO aún no han ocurrido al corte.
 
 [Decisión G5](s04-g5-decision-medida-notificaciones-locales.md) · [Plan de continuidad](../REANUDAR-AQUI.md) · [Informe único](../entregables/01-proyecto-investigacion-maestro.md).

@@ -1,3 +1,5 @@
+**CONTROL DE TABLAS PDF 4.4 (27/10):** La Tabla 12 (p. 98) compara capacidades de S01/S02 y se conserva. Hay dos rótulos «Tabla 13»: la tabla SLI de capítulo 6 mantiene el 13; la segunda, en 7.8 (p. 104), debe renumerarse a Tabla 14 y su fila de 107 capturas debe actualizarse a 122 (83/9/8/22). Revisar también cifras en 6.6 (p. 81), 6.9.6 (p. 97) y 7.7.1 (p. 103). No se ha editado el PDF; la corrección corresponde al Word del equipo.
+
 # NETLAB360 — Plataforma virtualizada de redes empresariales multisede
 
 Proyecto académico en **Ubuntu Desktop 26.04.1 / VMware Workstation** para diseñar, automatizar, supervisar y validar un laboratorio empresarial multisede HQ/S1/S2. Ocho fases técnicas, **un único informe Word/PDF** con referencias APA 7, demostración final y paquete TAR técnico independiente.
@@ -30,7 +32,7 @@ Gestión Ubuntu por `ens33=192.168.47.40/24`, gateway `192.168.47.2` en VMware V
 
 ## Informe académico y próximas actividades
 
-El borrador **4.4 (110 páginas)** contiene implementación hasta **5.6** y pruebas hasta **6.9**, con figuras 16–20 y Tabla 13 incorporadas. Continúan pendientes actualización del capítulo 7 para reflejar S04, conclusiones y recomendaciones (capítulo 8), revisión de cifras de evidencias e índices, aceptación interna y las revisiones académicas programadas para **30/10 y 13/11**. La aprobación docente de estas sesiones no se presume.
+El borrador **4.4 (110 páginas)** contiene implementación hasta **5.6** y pruebas hasta **6.9**, con figuras 16–20 y Tabla 13 incorporadas. Continúan pendientes actualización del capítulo 7 para reflejar S04, conclusiones y recomendaciones (capítulo 8), reconciliación de cifras oficiales de evidencias y de las tablas 13–14, aceptación interna y las revisiones académicas programadas para **30/10 y 13/11**. La aprobación docente de estas sesiones no se presume.
 
 La fase S05 desarrollará topología interactiva, redundancia avanzada y SDN únicamente sobre señales medidas y pruebas reales.
 

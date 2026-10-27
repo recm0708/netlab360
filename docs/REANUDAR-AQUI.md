@@ -1,3 +1,5 @@
+**CONTROL DE TABLAS PDF 4.4 (27/10):** La Tabla 12 (p. 98) compara capacidades de S01/S02 y se conserva. Hay dos rótulos «Tabla 13»: la tabla SLI de capítulo 6 mantiene el 13; la segunda, en 7.8 (p. 104), debe renumerarse a Tabla 14 y su fila de 107 capturas debe actualizarse a 122 (83/9/8/22). Revisar también cifras en 6.6 (p. 81), 6.9.6 (p. 97) y 7.7.1 (p. 103). No se ha editado el PDF; la corrección corresponde al Word del equipo.
+
 # NETLAB360 — Punto único de reanudación
 
 **Actualizado:** 27 de octubre de 2026. La siguiente actividad inmediata es **editar el capítulo 7 del informe académico**, no ejecutar laboratorios.
@@ -16,7 +18,7 @@
 
 ## Informe único
 
-PDF recibido **`1457-Proyecto Semestral_borrador4.4.pdf`**, **110 páginas**. Implementación cap. 5 llega a **5.6.5**; pruebas cap. 6 llegan a **6.9.6**, Figuras 16–20, Tabla 13. Las cifras de resultados S04 coinciden con el laboratorio: G3 WAN, G4 TSDB/SQLite y G5 SLI. Pendientes: actualizar la apertura del capítulo 7 que sigue limitada a tres fases, insertar 7.10, modificar conclusiones y recomendaciones del capítulo 8, reconciliar Tabla 12 a 122 imágenes y actualizar índice/citas. Los textos se entregan por el chat para copiar/pegar en Word, sin generar un PDF nuevo.
+PDF recibido **`1457-Proyecto Semestral_borrador4.4.pdf`**, **110 páginas**. Implementación cap. 5 llega a **5.6.5**; pruebas cap. 6 llegan a **6.9.6**, Figuras 16–20, Tabla 13. Las cifras de resultados S04 coinciden con el laboratorio: G3 WAN, G4 TSDB/SQLite y G5 SLI. Pendientes: actualizar la apertura del capítulo 7 que sigue limitada a tres fases, insertar 7.10, modificar conclusiones y recomendaciones del capítulo 8, conservar Tabla 12 de comparación técnica; renumerar la segunda Tabla 13 (p. 104) como Tabla 14 y actualizar allí 107 a 122, además de corregir los conteos en 6.6, 6.9.6 y 7.7.1. Los textos se entregan por el chat para copiar/pegar en Word, sin generar un PDF nuevo.
 
 ## Seguridad y pausa operativa
 
