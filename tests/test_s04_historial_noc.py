@@ -73,7 +73,7 @@ class JournalTests(unittest.TestCase):
         records = mod.events("HQ", path=self.path)
         exported = mod.as_csv(records).decode("utf-8")
         self.assertIn("NETLAB360S04WANAdminDown", exported)
-        self.assertIn("event", exported)
+        self.assertIn("observed_at_utc", exported)
         self.assertIn("prometheus_active_alerts", exported)
 
     def test_invalid_filters(self):
