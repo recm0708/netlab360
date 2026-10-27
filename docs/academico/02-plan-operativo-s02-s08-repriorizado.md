@@ -1,3 +1,7 @@
+**AVISO 27/10/2026:** este documento registra una **replanificación histórica de 16/10**. Sus estados, acciones futuras y alusiones a ZIP son antecedentes **superados**: la entrega vigente es **TAR externo y sin anexos**, S02 cerrada, S03 probada con pendientes SoT/ownership, S04 NOC/TSDB/SQLite y 22 PNG verificadas con SLO 99% aún propuesto. Consultar [continuidad actual](../REANUDAR-AQUI.md), [estado maestro](../00-estado-y-continuidad.md) y [regla de apagado](../05-plan-operativo-y-pausas.md). No ejecutar literalmente las prioridades antiguas de la tabla antes de ver estado actual.
+
+---
+
 # NETLAB360 — Repriorización de trabajo técnico/academico por 7 iteraciones restantes
 
 **Fecha de decisión:** 16/10/2026. **Prioridad:** recuperar retraso sin perder pruebas verificadas. **Advertencia:** estos son **hitos internos**, NO fechas de entrega finales del semestral; los cortes 30/10 y 13/11 SÍ son comunicados. El roadmap original S01–S08 y milestones históricos siguen en GitHub hasta que las fechas reales del semestral sean confirmadas por la docente; no inventar nuevo calendario.
