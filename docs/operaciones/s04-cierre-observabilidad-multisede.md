@@ -9,15 +9,15 @@
 - PR [#56](https://github.com/recm0708/netlab360/pull/56): Prometheus 3.7.0, `127.0.0.1:9091`, 4 reglas específicas y cuatro escenarios sintéticos promtool; en Ubuntu `scrape_up=1`, `source_up=1`, cero falsas alertas.
 - PR [#57](https://github.com/recm0708/netlab360/pull/57): NOC en `127.0.0.1:9120`, vistas central/HQ/S1/S2, 12 pruebas NOC (20 S04 offline en total), API agregada y panel visual en Windows mediante túnel SSH. El panel central completo utiliza dos capturas `S04_03-1` y `S04_03-2`.
 - NOC, Prometheus y exporter detenidos normalmente. Postcheck: 9091/9110/9120 libres, Docker/netns vacíos, SSH/gestión intactos, rama `main` limpia.
-- Primer lote **7 PNG y 1 CSV SHA-256** recibido, auditado e importado al clon Ubuntu, con `S04_IMPORTACION_RESULTADO=0`. **Pendiente Git commit/push/PR y comprobación de publicación remota.** No aumentar todavía el contador de PNG publicados de 107 a 114.
+- Primer lote **7 PNG y 1 CSV SHA-256** auditado y **publicado** mediante [PR #58](https://github.com/recm0708/netlab360/pull/58); inventario remoto comprobado: **114 PNG** totales (S01=90, S02=9, S03=8, S04=7).
 
 ## Puertas de aceptación S04
 
 | Puerta | Evidencia exigida | Estado |
 |---|---|---|
-| G0: exporter/API/Prometheus/NOC OFFLINE | `S04_01` a `S04_06`, manifest de 7 PNG, 20/20 tests, API real, postcheck | **Verificada localmente**; pendiente publicación binaria |
-| G1: infraestructura activa | 3 FRR, 4 WAN y 9 VLAN realmente desplegadas, OSPF Full 4/2/2, rutas preferidas y 9/9 gateways; `ens33` sin cambios | Pendiente |
-| G2: telemetría activa | exporter observa los enlaces y VLAN esperados en vivo, Prometheus scrape y series confiables, NOC actualiza las tres sedes; no confundir `active` de Docker con conectividad probada | Pendiente |
+| G0: exporter/API/Prometheus/NOC OFFLINE | `S04_01` a `S04_06`, manifest de 7 PNG, 20/20 tests, API real, postcheck | **CERRADA:** siete PNG publicados por PR #58 |
+| G1: infraestructura activa | 3 FRR, 4 WAN y 9 VLAN realmente desplegadas, OSPF Full 4/2/2, rutas preferidas y 9/9 gateways; `ens33` sin cambios | **CERRADA:** WAN 4/4, OSPF Full 4/2/2, FIB 6/6, loopback ICMP 6/6, LAN 9/9 gateways e ICMP 6/6, gestión intacta |
+| G2: telemetría activa | exporter observa los enlaces y VLAN esperados en vivo, Prometheus scrape y series confiables, NOC actualiza las tres sedes; no confundir `active` de Docker con conectividad probada | **PARCIAL:** exporter `--once` fuente confiable, 3/3 routers y 17 interfaces UP. Pendientes HTTP 9110, Prometheus 9091, NOC 9120 y evidencias |
 | G3: incidente y restitución | corte **controlado** de primaria S1 y/o S2 con `ip link` mediante script con `finally`; regla WAN realmente `pending→firing→resolved`, timestamps y ruta backup→primaria; otra sede estable, postcheck | Pendiente |
 | G4: disponibilidad de fuentes e histórico | comprobar `UNKNOWN` si falla Docker/permisos o scrape; conservación de series/alertas después de restart según alcance y TSDB real | Pendiente |
 | G5: SLI/SLO y notificación | definir SLI comprobable y ventana de muestra, SLO y método de cálculo, o documentar decisión de posponer capacidades concretas; probar envío externo si se incorpora Alertmanager | Pendiente de decisión y prueba |
@@ -42,3 +42,10 @@
 - **El informe no contiene anexos**. Código y capturas completas se preparan para TAR técnico independiente de fase 8; redactar el avance S04 en secciones 5/6/7/8 solo con pruebas y figuras finales.
 
 **Continuidad:** revisar [REANUDAR-AQUI](../REANUDAR-AQUI.md), [issue S04 #4](https://github.com/recm0708/netlab360/issues/4), [NOC #15](https://github.com/recm0708/netlab360/issues/15), [telemetría #20](https://github.com/recm0708/netlab360/issues/20), [alertas/SLI #21](https://github.com/recm0708/netlab360/issues/21), [catálogo de incidentes #22](https://github.com/recm0708/netlab360/issues/22).
+
+
+## Corte de ejecución real — 26/10/2026, 23:58:53 (hora Panamá)
+
+G1 completa con evidencia de terminal real; G2 con muestra `--once` confiable pero sin arranque aún de Prometheus/NOC en la topología activa. [Bitácora](../sesiones/2026-10-26-s04-g1-lan-y-muestra-activa.md). Mantener FRR, WAN y LAN funcionando. Los controles G3–G6 siguen pendientes.
+
+**Política de fases:** S01 y S03 pueden permanecer abiertas mientras se avanza S04–S08; los hitos compartidos solo modifican el estado de la fase a la que pertenezca su criterio. Ninguna dependencia posterior se dará por probada anticipadamente.
