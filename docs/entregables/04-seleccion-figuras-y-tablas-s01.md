@@ -1,29 +1,15 @@
-# NETLAB360 — Figuras/tablas para el informe único oficial (16/10)
+# NETLAB360 — Figuras representativas del informe académico (S01)
 
-**Documento de selección histórica para el informe académico único; preservar títulos reales de capturas.** El único informe académico técnico exige **7 Implementación, 8 Pruebas y validación, 9 Análisis**, y se prepara presentación después. S01 cuenta con **86 PNG originales y 7 CSV hash** en GitHub; seleccionar solo figuras legibles que apoyen resultados, no publicar indiscriminadamente.
+**Catálogo oficial al 27/10/2026: 83 PNG S01.** Selección técnica por relevancia y legibilidad; el informe mantiene capítulos 1–8 y referencias, sin apartado de anexos.
 
-| Tema técnico/ubicación de informe | Evidencia representativa en `evidencias/capturas/fase1/` | Interpretación o límite |
+| Ensayo | Evidencia técnica recomendada | Interpretación |
 |---|---|---|
-| Arquitectura/diseño, sección 6 | Figura lógica de HQ↔S1 doble WAN, S2 reservada, creada para el documento | Es diseño conceptual, NO topología final integrada |
-| VLAN/ACL, 7–8 | `S01_B2_L2_06_ACL_HTTP_Permitido_Bloqueado.png` | Restricción 8081 vs 8080, dentro de HQ |
-| HTTP dual WAN, 8 | `S01_B2_L3_01_HTTP_WAN_Principal.png`, `S01_B2_L3_02_HTTP_WAN_Respaldo.png`, `S01_B2_L3_03_HTTP_WAN_Restaurada.png` | Estados estabilizados, no cero downtime demostrado |
-| LACP, 8 | Imágenes originales `S01_B2_LACP_01*`, `S01_B2_LACP_02*`, `S01_B2_LACP_03*` | Negociación IEEE 802.3ad veth 2→1→2; no capacidad medida |
-| Bonding activo-respaldo, 8 | `S01_B2_DUALNIC_02_Conmutacion_Respaldo.png` | Redundancia de miembros virtuales, no NIC del hipervisor |
-| IaC→FRR, 7–8 | `S01_IAC_B2_03_OSPF_y_Rutas_IAC.png`; `S01_IAC_09_Reconciliacion.png` | Ansible alimentó FRR real; drift corregido en COPIAS de config |
-| Observabilidad, 8 | `S01_B3_12_Alerta_Prometheus_WAN_Down.png`, `S01_B3_13_Alerta_Prometheus_Resuelta.png` | firing/resolución en Prometheus, no receptor Alertmanager |
-| Diagnóstico B4, 8–9 | `S01_B4_08_Diagnostico_Reglas_Reales.png` y perfil estadístico | Diagnóstico reglas, no modelo ML evaluado |
-| Estado final S01 | Captura postcheck validada ya publicada o logs seguros | Host limpio y red de gestión intacta, según ejecución |
+| VLAN/ACL HTTP | `S01_B2_L2_06_ACL_HTTP_Permitido_Bloqueado.png` | Puerto 8080 permitido, 8081 restringido en la prueba |
+| HTTP dual WAN | `S01_B2_L3_02_HTTP_WAN_Respaldo.png` | Servicio accesible en ruta alternativa estabilizada |
+| Enlace agregado LACP | `S01_B2_LACP_01_Agregacion_Dos_Enlaces-1.png`, `S01_B2_LACP_02_Falla_Un_Enlace-1.png` | Bond lógico IEEE 802.3ad; no ancho de banda físico medido |
+| Bonding activo/respaldo | `S01_B2_DUALNIC_02_Conmutacion_Respaldo.png` | Failover lógico del enlace virtual |
+| Integración inicial IaC→FRR | `S01_IAC_B2_03_OSPF_y_Rutas_IAC.png` | Configuraciones generadas y probadas en FRR |
+| Alertas S01 | `S01_B3_12_Alerta_Prometheus_WAN_Down.png` | Evaluación de reglas Prometheus, no entrega externa |
+| Diagnóstico determinista | `S01_B4_08_Diagnostico_Reglas_Reales.png` | Reglas sobre 76 muestras, no un modelo ML |
 
-## Inserción APA 7 / formato institucional
-- Introducir cada figura/tabla **mediante un párrafo y cita cruzada a su número**; número en negrita, título en cursiva, y `Nota.` cuando fuente, abreviaturas, procedencia, criterio o restricción lo requiera.
-- Numerar desde Figura 1/Tabla 1 a lo largo del ÚNICO Word. **No asumir numeración final actual**: el documento antiguo tenía seis figuras y seis tablas; al migrar a doce apartados puede cambiar el orden, por lo que se debe actualizar el índice automático de Word.
-- Priorizar legibilidad impresa y recortar/agrandar sin alterar contenido. Si una imagen de terminal es extensa, seleccionar el fragmento que acredita la prueba y remitir a registro técnico del paquete TAR externo, siempre íntegro.
-- Las capturas adicionales pueden usarse en PPT final solo después de cerrar informe.
-- No publicar contraseñas, claves, tokens ni datos privados en el informe o TAR externo.
-
-[Plan de migración](../academico/01-migracion-borrador-a-formato-docente.md) · [Guía oficial](../academico/00-criterios-docentes-y-hitos.md).
-
-
-## Nota de migración (25/10/2026)
-
-**Estas son referencias de imágenes históricas seleccionadas**, no una nueva numeración de Figuras 1–11 del Word. Los 86 PNG están ahora bajo `evidencias/capturas/fase1/`, con prefijo S01 y su bloque original conservado. Para cualquier ruta previa, consultar [mapa de renombrado](../../evidencias/manifiestos/MAPA_RENOMBRADO_FASE1_2026-10-25.csv). Figuras/títulos formales del borrador 3 se controlan exclusivamente en Word. El paquete docente es `.tar` externo, **sin capítulo de anexos**.
+Cada imagen requiere texto introductorio, número, título y nota cuando proceda. La numeración corresponde al Word único; al corte del borrador 4.4 se han incorporado figuras 1–20 y tablas 1–13. El paquete TAR con evidencias técnicas se preparará por separado en S08.

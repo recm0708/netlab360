@@ -1,3 +1,13 @@
+## Control vigente 27/10 — borrador 4.4 y evidencias oficiales
+
+- PDF `1457-Proyecto Semestral_borrador4.4.pdf` **110 páginas**, contiene **5.6 y 6.9 (6.9.1–6.9.6)**, figuras S04 16–20, Tabla13. Próximo trabajo: actualizar capítulo7 con análisis S04, capítulo8 con conclusiones/recomendaciones, Tabla12 y todos los índices cruzados.
+- Repositorio: catálogo oficial S01=83, S02=9, S03=8, S04=22, total **122 PNG** con manifiestos y pruebas automatizadas. El control de capturas vigente está en [README](../evidencias/capturas/README.md).
+- Issues cerradas: criterios comprobados en checklists vigentes; S04 pendiente de ratificación G5 y cierre académico G6. No atribuir aprobación docente ni notificaciones externas.
+- VM: `sudo systemctl poweroff` ejecutado, conexión SSH cerrada por Ubuntu, sin confirmar todavía `Powered Off` desde VMware. No volver a desplegar S02 durante la edición del escrito.
+- El resto del documento contiene registros cronológicos de sesiones anteriores; el estado aplicable a la continuación es el de este encabezado.
+
+---
+
 ## Corte prioritario 27/10 — PDF 4.3 y orden de apagado ejecutada
 
 - **Paso 4.76** ejecutado por el operador: Git main sincronizada `d5158af`, TSDB SHA256 OK, S02 LAN/WAN/FRR ausentes, ens33 `192.168.47.40/24` GW `.2` conservada, `S04_APAGADO_AUTORIZADO=SI`, `sudo systemctl poweroff` ejecutado y SSH cerrada por el servidor. **Apagado de Ubuntu iniciado; estado VMware `Powered Off` todavía no confirmado externamente**. No arrancar el laboratorio mientras se edita el Word.

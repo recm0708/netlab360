@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """NETLAB360 — auditoría de capturas reales, organizada por fases.
 
-Fase 1 conserva 86 PNG de los lotes históricos 01–06; se valida por SHA-256,
-tamaño, nombre y hash Git. Los siete CSV históricos permanecen inmutables.
+Fase 1 conserva un catálogo oficial de PNG con SHA-256,
+tamaño, nombre y hash Git. Los manifiestos de procedencia se conservan independientes del catálogo vigente.
 Fases 2–8 admiten nueva evidencia solo con prefijos técnicos correctos.
 No modifica archivos, no requiere Docker y no crea capturas sintéticas.
 """
@@ -52,7 +52,7 @@ def main() -> None:
     )
     with MAPA.open(encoding="utf-8", newline="") as stream:
         rows = list(csv.DictReader(stream))
-    assert len(rows) == 86, f"Esperadas 86 capturas históricas; mapa tiene {len(rows)}"
+    assert len(rows) == 79, f"Esperadas 79 capturas S01 del catálogo; mapa tiene {len(rows)}"
     assert {p.name for p in CAPTURAS.iterdir() if p.is_dir()} == {
         f"fase{i}" for i in range(1, 9)
     }, "Se esperaban directorios fase1 a fase8"
@@ -152,8 +152,8 @@ def main() -> None:
                   (CAPTURAS / "fase1").glob("*.png")}
     assert actual_s01 == targets | fase_esperada[1], "Fase 1: faltan PNG o hay extras sin mapear"
     assert not list(CAPTURAS.glob("*.png")), "Persisten PNG fuera de las carpetas fase"
-    print("S01_PNG_RENOMBRADOS=86/86")
-    print("S01_SHA256_Y_GIT_BLOB_CONSERVADOS=86/86")
+    print("S01_PNG_RENOMBRADOS=79/79")
+    print("S01_SHA256_Y_GIT_BLOB_CONSERVADOS=79/79")
     print(f"MANIFIESTOS_HISTORICOS={len(HISTORICOS)}/7")
 
     for i in range(2, 9):
