@@ -49,6 +49,14 @@
 - [PR #57](https://github.com/recm0708/netlab360/pull/57) fusionado como `dcc5c6ce` con panel NOC S04 `servicios/noc-s04/app.py` (puerto `127.0.0.1:9120`), vistas central/HQ/S1/S2, agregación del colector y Prometheus, estado UNKNOWN ante muestras antiguas o fuentes inaccesibles. **20 pruebas S04 offline** y [CI S04 `main`](https://github.com/recm0708/netlab360/actions/runs/40443847932) y [regresión general](https://github.com/recm0708/netlab360/actions/runs/40443847941) SUCCESS. La [autolimpieza de rama](https://github.com/recm0708/netlab360/actions/runs/40443848768) también fue satisfactoria.
 - **Siguiente prueba**: NOC real `--check`, `--once`, `--serve` y verificación HTTP desde Ubuntu; visita visual por túnel SSH Windows y capturas `S04_03` / `S04_04` / opcional `S04_05`. No afirmar aún observabilidad de enlaces WAN **desplegados** ni NOC definitivamente aceptado.
 
+## Auditoría visual y cierre limpio de NOC S04 — 26/10/2026, ~22:29
+
+- Se recibieron **siete PNG correspondientes a seis identificadores S04_01–06** (S04_03 está dividida en dos vistas). Todas las imágenes se inspeccionaron y se aceptaron para el escenario real **offline**; [registro completo con SHA-256](https://github.com/recm0708/netlab360/issues/4#issuecomment-6433141415). **PNG aún pendientes de transferir/publicar en Git**, por lo cual no modificar el total de 107 capturas versionadas de S01–S03.
+- `S04_01`: exporter S04 tres sedes, 8 extremos WAN, 9 VLAN y 25 series, muestra fresca; `S04_02`: Prometheus target UP, fuente 1, offline 1 y cero falsas alarmas; `S04_03` (2 PNG): NOC central con tarjetas de tres sedes y bloque de cero alertas; `S04_04`: selección S1, dos WAN/tres VLAN; `S04_05`: API agregada con `S04_05_VERIFICACION=OK`; `S04_06`: puertos 9091/9110/9120 libres, Docker/netns vacíos, red administrativa intacta, Git main limpio.
+- Las terminales documentaron **20/20 pruebas S04 offline**, preflight NOC 0, vista real `offline` y Prometheus `scrape=up`. Se verificó la parada normal de NOC (`S04_NOC_DETENIDO=SI`), Prometheus (apagado ordenado) y exporter (`S04_EXPORTER_DETENIDO=SI`). La VM puede quedar apagada normalmente después de decidir si se continúa con ensayos WAN activas.
+- Se preparó un ZIP de traslado con **siete PNG originales sin alteración** y un manifiesto SHA-256; el paso siguiente es transferirlo al clon Ubuntu y publicarlo tras cotejar hashes. No repetir capturas, no reconstruir S02 todavía y no ejecutar `tofu apply`.
+- La fase 4 **permanece ABIERTA** para topología desplegada, estados WAN/OSPF/HTTP, alertas `firing/resolved` reales, eventos persistentes, SLI/SLO y decisiones de notificación.
+
 ## Indicadores de avance
 
 | Fase | Corte actual | Pendiente para aceptación |
