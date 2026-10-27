@@ -66,6 +66,15 @@
 - **Escrito académico:** último borrador revisado es `1457-Proyecto Semestral_borrador3.2.pdf` (94 págs.), fases 1–3 incorporadas; falta ampliar el informe con fase 4 solo después de tener pruebas con WAN desplegadas. El informe no lleva anexos; TAR es independiente.
 - **Seguridad y estado físico actual:** tras las pruebas NOC S04 quedaron libres los puertos 9091/9110/9120, sin contenedores ni netns, `ens33 192.168.47.40/24` y gateway `192.168.47.2`. El host no ejecuta NOC/Prometheus/exporter por defecto al reanudar.
 
+## ACTUALIZACIÓN MÁS RECIENTE — 26/10/2026 22:52 y snapshot S04
+
+- **Evidencias S04 ya PUBLICADAS.** [PR #58](https://github.com/recm0708/netlab360/pull/58) fusionado (`4babb2849`); rama temporal remota eliminada. Confirmado con árbol remoto GitHub: **114 PNG = 90 S01 + 9 S02 + 8 S03 + 7 S04**. El manifiesto CSV fue normalizado CRLF→LF exclusivamente; los 7 PNG son idénticos. [Catálogo S04](../evidencias/capturas/fase4/README.md) y [manifiesto](../evidencias/manifiestos/MANIFIESTO_SHA256_S04_LOTE01_2026-10-26.csv).
+- **Precheck de S04 para red activa, ejecutado realmente**: `S02_PRECHECK_RESULTADO=0`, `RESULTADO_PRECHECK_S02=0`, `RESULTADO_PLAN_WAN=0`, `RESULTADO_PLAN_LAN=0`; ningún contenedor, ningún netns, ningún state WAN/LAN residual; runtimes de R-HQ/R-S1/R-S2 presentes; 3 sedes, 4 WAN, 9 VLAN, 0 colisiones Docker/host. `ens33=192.168.47.40/24`, GW `.2`; 133 GiB libres de disco y ~13 GiB de RAM disponible.
+- **Snapshot VMware confirmado por el operador**: creó una instantánea de la VM identificada como S04 y eliminó las dos instantáneas anteriores. En este corte solo queda la nueva instantánea como punto de retorno conocido; no se ha comprobado restauración.
+- **Importante: clon Ubuntu quedó en la rama local `feat/s04-evidencias-lote01`**, commit `ce0217e`, aunque GitHub ya fusionó una corrección CRLF y cerró la rama remota. **PRÓXIMO COMANDO antes de arranque**: `git switch main` (árbol limpio) y `git pull --ff-only origin main`; comprobar `main` limpia. No borrar la rama local a la fuerza ni hacer reset/clean.
+- **S04 infraestructura ACTIVA aún NO ejecutada.** Continuar secuencia con protecciones: `sudo -v`, `bash scripts/laboratorio/s02-routers-start.sh`; comprobar 3 routers; `python3 scripts/laboratorio/s02-wan-links.py precheck`, `up --snapshot-confirmado`, `validar-ospf-s02.py`; después `s02-lan-vlan.py precheck/up --snapshot-confirmado` y `validar-lan-s02.py`. Detenerse ante fallo, conservar state y logs. Snapshot confirma disponibilidad del checkpoint, **no** ejecuta backup automáticamente.
+- El cierre S04 requiere pruebas de observabilidad con WAN/VLAN en funcionamiento, alertas reales de caída/restauración, persistencia, SLI/SLO o decisión explícita de alcance, nuevas capturas, desmontaje seguro e integración en informe académico 3.2. No tocar state OpenTofu.
+
 ## Indicadores de avance
 
 | Fase | Corte actual | Pendiente para aceptación |
