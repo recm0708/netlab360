@@ -71,6 +71,10 @@ footer{border-top:1px solid #29445b;margin-top:32px;padding-top:16px;color:#9ab2
 <div class="metrics" id="metrics"></div>
 <section class="section"><h2 id="place-title">Vista central de las tres sedes</h2><div class="grid" id="sites"></div></section>
 <section class="section"><h2>Alertas de Prometheus S04</h2><p class="small">Los datos provienen de /api/v1/alerts. Sin Alertmanager ni notificaciones externas verificadas.</p><div id="alerts"></div></section>
+<section class="section"><h2>Historial de incidentes registrados</h2>
+<p class="small">Transiciones observadas por el NOC desde que se activó el registro, no reconstrucción de eventos anteriores. Archivo SQLite local; los estados resolved indican ausencia confirmada de alerta al volver a ser fiable la observación.</p>
+<p class="small"><a id="history-csv" href="/api/v1/incidents.csv?site=ALL" style="color:#9ee2f9">Exportar CSV de la vista seleccionada</a></p>
+<div id="history"></div></section>
 <footer>La presencia de un contenedor no certifica OSPF Full ni HTTP. OFFLINE indica topología intencionalmente desmontada cuando la fuente es fiable. UNKNOWN significa que la observación no es confiable; no implica falla física. Las interfaces con estado −1 no representan una caída WAN. Actualización cada 3 segundos, exclusivamente en localhost.</footer>
 </main>
 <script>
@@ -129,11 +133,32 @@ $("alerts").innerHTML=alerts.map(a=>'<div class="alert">'+tag(a.state||"active",
 '<div class="small">Inicio: '+esc(a.activeAt||"—")+'</div></div>').join("");
 }
 }
+async function refreshHistory(){
+const view=selection;
+$("history-csv").href="/api/v1/incidents.csv?site="+encodeURIComponent(view);
+try{
+const r=await fetch("/api/v1/incidents?site="+encodeURIComponent(view)+"&limit=100",{cache:"no-store"});
+if(!r.ok)throw Error("HTTP "+r.status);
+const payload=await r.json();
+if(selection!==view)return;
+const events=payload.events||[];
+$("history").innerHTML=events.length?events.map(e=>
+'<div class="alert">'+tag(e.state,e.state==="resolved"?"active":"partial")+
+" "+esc(e.alertname)+" · "+esc(e.site)+"/"+esc(e.resource)+
+'<div class="small">Observado UTC: '+esc(e.observed_at_utc)+
+" · Inicio reportado: "+esc(e.active_at_utc||"—")+
+" · Origen: "+esc(e.source)+"</div></div>").join(""):
+'<div class="alert">No hay transiciones observadas desde que se activó el registrador.</div>';
+}catch(err){
+if(selection===view)$("history").textContent="Historial no disponible: "+err.message;
+}
+}
 async function refresh(){
 try{
 const r=await fetch("/api/v1/overview",{cache:"no-store"});
 if(!r.ok)throw Error("HTTP "+r.status);
 render(await r.json());
+await refreshHistory();
 }catch(e){
 $("stamp").textContent="Panel no puede consultar su API: "+e.message;
 $("metrics").innerHTML=slot("NOC", "UNKNOWN", "API local sin respuesta", "unknown");
@@ -145,6 +170,7 @@ document.querySelectorAll("button[data-site]").forEach(b=>b.addEventListener("cl
 selection=b.dataset.site;
 document.querySelectorAll("button[data-site]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
 if(last)render(last);
+refreshHistory();
 }));
 refresh();
 setInterval(refresh,3000);
