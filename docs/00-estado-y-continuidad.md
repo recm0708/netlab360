@@ -1,3 +1,7 @@
+## Corte actualizado 27/10/2026: informe 4.4 y catálogo oficial
+
+El borrador académico 4.4 contiene 110 páginas, apartado 5.6 y pruebas 6.9 completos. Falta reflejar S04 en capítulos 7 y 8 y actualizar Tabla12 para **122 PNG oficiales (83/9/8/22)**. Las G0–G4 de observabilidad están verificadas, G5 medido con SLO propuesto no ratificado, G6 técnico comprobado; la aceptación académica no consta. VMware aún requiere comprobar visualmente `Powered Off` tras el apagado ordenado de Ubuntu. [Continuidad vigente](REANUDAR-AQUI.md).
+
 ## Prioridad actual 27/10 — apagado iniciado; informe 4.3
 
 La secuencia `sudo systemctl poweroff` se ejecutó tras `S04_APAGADO_AUTORIZADO=SI`; la VM cerró el SSH. **Confirmación `Powered Off` de VMware pendiente**. No volver a ejecutar el desmontaje. Borrador 4.3 de **99 pp.**, con sección 5.6 completa (5.6.1–5.6.5); resta añadir 6.9, análisis/conclusiones de S04 y actualizar Tabla12, más el preámbulo general del capítulo6. [Bitácora vigente](sesiones/2026-10-27-s04-poweroff-solicitado-borrador43.md).

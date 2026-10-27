@@ -1,3 +1,9 @@
+## Actualización de cierre técnico al borrador 4.4 — 27/10
+
+Las verificaciones G0–G4 siguen aprobadas; G5 es **medición válida con SLO 99% candidato por ratificar**; G6 dispone de pruebas y evidencia técnica aceptadas, con redacción académica en evolución. El borrador 4.4 incluye 5.6 y 6.9, Figuras16–20 y Tabla13; capítulos7/8 y Tabla12 aún requieren actualización editorial. Catálogo actual de **122 PNG oficiales (83 S01 / 9 S02 / 8 S03 / 22 S04)**, conservando integridad original de cada archivo. El cierre de SSH ocurrió tras `sudo systemctl poweroff`; revisar indicador de VM Powered Off en VMware. La matriz debajo documenta los criterios medidos en el corte de su creación.
+
+---
+
 ## Postcierre operativo posterior al corte de la matriz — 27/10
 
 Las puertas G0–G4 técnicas se mantienen aprobadas; G5 SLO sigue propuesto, G6 aceptación académica aún pendiente. Desmontaje ordenado comprobado (LAN 12 namespaces, cuatro WAN, tres FRR) y cierre de observabilidad con respaldo TSDB/SQLite, hash verificado. Se ejecutó `sudo systemctl poweroff` después de `S04_APAGADO_AUTORIZADO=SI`; SSH cerrado; **verificación VMware Powered Off todavía pendiente**. El borrador **4.3 de 99 páginas** incorpora 5.6 completo, no 6.9/capítulo7–8 S04. Texto inferior «No se desmontan los recursos» corresponde al postcheck anterior y **ya no es el estado actual**. [Bitácora vigente](../sesiones/2026-10-27-s04-poweroff-solicitado-borrador43.md).

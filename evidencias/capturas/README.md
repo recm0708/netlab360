@@ -1,20 +1,16 @@
-# NETLAB360 — Capturas organizadas por fase
+# NETLAB360 — Capturas oficiales organizadas por fase
 
-Este directorio reúne únicamente **evidencias PNG auténticas de NETLAB360**, clasificadas por fase y con prefijos técnicos S01–S08. Los archivos fueron renombrados conservando sus bytes originales; no se modificaron resultados, imágenes ni metadatos de cada archivo.
+Evidencias originales obtenidas de la ejecución de los laboratorios. Cada archivo conserva sus bytes y su relación con un manifiesto de integridad SHA-256.
 
-| Directorio | Capturas PNG versionadas | Estado |
+| Fase | PNG versionadas | Resultado principal |
 |---|---:|---|
-| `fase1/` | **90** | 86 históricas y cuatro complementarias |
-| `fase2/` | **9** | Evidencias finales S02_01–S02_09 |
-| `fase3/` | **8** | Evidencias finales S03_01–S03_08 |
-| `fase4/` | **7** | Primer lote S04, seis identificadores, NOC/Prometheus sobre topología OFFLINE; [PR #58](https://github.com/recm0708/netlab360/pull/58) |
-| `fase5/`–`fase8/` | **0** | Directorios listos para etapas posteriores |
-| **Total** | **114** | 90 S01 + 9 S02 + 8 S03 + 7 S04; validación de transferencia y fusión confirmadas |
+| [S01](fase1/README.md) | 83 | Laboratorios iniciales de redes, redundancia, automatización, observabilidad y análisis |
+| [S02](fase2/README.md) | 9 | Integración funcional HQ/S1/S2, WAN/OSPF, VLAN, HTTP/ACL |
+| [S03](fase3/README.md) | 8 | Inventario/SoT, cumplimiento y reconciliación Ansible, metadatos OpenTofu |
+| [S04](fase4/README.md) | 22 | Colector y NOC multisede, alertas, recuperación, TSDB/SQLite y SLI |
+| S05–S08 | 0 | Etapas planificadas |
+| **Total** | **122** | Evidencias de las cuatro fases desarrolladas |
 
-**Integridad:** las 86 imágenes iniciales conservan sus hashes en los [manifiestos históricos](../manifiestos/) y su [mapa de renombrado](../manifiestos/MAPA_RENOMBRADO_FASE1_2026-10-25.csv). Las **21 incorporadas posteriormente** constan en el [manifiesto definitivo SHA-256](../manifiestos/MANIFIESTO_SHA256_CAPTURAS_2026-10-25.csv) y la [verificación CI](https://github.com/recm0708/netlab360/actions/runs/40241580823). Las cuatro imágenes históricas o preliminares que no acreditan resultados finales **no se incorporaron**.
+La auditoría automatizada `scripts/validacion/validar-capturas-unificadas.py` comprueba rutas, tamaños, SHA-256 y, para los lotes S04, dimensiones PNG. El inventario de S01 utiliza `evidencias/manifiestos/MAPA_RENOMBRADO_FASE1_2026-10-25.csv`, complementado por el manifiesto del lote intersedes; S02–S04 disponen de manifiestos por lote.
 
-Los siete PNG S04 se publicaron sin alterar imágenes en [PR #58](https://github.com/recm0708/netlab360/pull/58), con [manifiesto SHA-256 propio](../manifiestos/MANIFIESTO_SHA256_S04_LOTE01_2026-10-26.csv). El manifiesto fue normalizado de CRLF a LF exclusivamente; los hashes de PNG no cambiaron. El lote S04 acredita observabilidad OFFLINE, no enlace WAN activo.
-
-El respaldo verificable de GitOps `S03_09` se conserva como [registro Markdown de GitHub Actions y PR](../../docs/evidencias/S03_09_GitOps_CI_Regresion_PullRequest.md), **no como PNG**.
-
-La entrega técnica al cierre del proyecto será un **TAR separado del informe**, que termina en Referencias y no contiene capítulo de anexos.
+GitOps S03 cuenta con un [registro técnico verificable de PR y CI](../../docs/evidencias/S03_09_GitOps_CI_Regresion_PullRequest.md). La evidencia del informe se selecciona por su relevancia y legibilidad; el paquete TAR es independiente y se prepara en S08.
