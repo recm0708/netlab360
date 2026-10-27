@@ -1,24 +1,26 @@
-# NETLAB360 — Estado del proyecto al 17/10/2026
+# NETLAB360 — Estado vigente de continuidad (27/10/2026)
 
-## Compromisos docentes convertidos en plan
-- Entregable: **un único informe académico-técnico de al menos 40 páginas**, y posteriormente PowerPoint con demostración **en vivo**.
-- **Título propuesto a revisar en chat Teams**: verificar envío/aceptación (no afirmarlos sin confirmación).
-- **30/10/2026:** revisión grupal del documento con introducción, objetivos y planteamiento del problema; muestra en Teams por representante, sin PPT para la revisión.
-- **13/11/2026:** revisión de fundamento técnico y diseño de solución.
-- Anexos de código y configuraciones **AUTORIZADOS en archivo separado junto al informe**; preparar ZIP solo de artefactos NETLAB360, con integridad SHA256 y sin secretos.
-- [Criterios docentes aplicables sin materiales originales](academico/00-criterios-docentes-y-hitos.md). No almacenar archivos o hashes de material de clase en este repositorio.
-- Manual técnico separado #28 difiere hasta después del proyecto; parcial individual/laboratorio 5, plazo 25/10, se trabaja en otro chat.
+**Documento de orientación actual.** El estado histórico de 17/10 se conserva en Git y en bitácoras `docs/sesiones/`, no como situación técnica vigente.
 
-## Estado técnico
-S01 issue #1 abierta por pendientes integrales; 72/100 interno antiguo no es nota ni cierre. VMware Ubuntu/ens33 .40/24 y GW .2 funcionando; SSH con claves pero `passwordauthentication yes` requiere hardening seguro; IPAM HQ/S1 (S2 reservada), pruebas aisladas VLAN/ACL y FRR/OSPF+HTTP dual WAN, LACP y bonding virtuales, IaC a FRR con drift de copias, Prometheus/NOC inicial, analítica por reglas B4 sin ML evaluado. 86 PNG y 7 CSV SHA256 **del proyecto**, 24 pruebas/CI exitosa.
+## Alcance y entregables
 
-El Ubuntu se apagó desde el SO por comando tras verificar Docker/netns vacíos y gestión preservada; control VMware Powered Off no visto directamente. **GitHub ahora tiene nuevos commits no descargados al Ubuntu hasta nuevo pull.**
+- Un único informe institucional Word/PDF de mínimo 40 páginas, capítulos 1–8 más Referencias, sin sección de anexos; archivos técnicos en **un TAR independiente** saneado, sin secretos ni materiales docentes originales.
+- Presentación PowerPoint y demostración en vivo al cierre S08. No se considera obligatoria una OVA/OVF; manual técnico independiente pospuesto.
+- Borrador **4.0 del 27/10**, 94 páginas, recibido y auditado: todavía contiene solo implementaciones documentadas S01–S03, NOC descrito parcialmente como futuro y Tabla 5 S04 «Planificada». **El Word aún no está actualizado al cierre S04**. Correcciones listas para copiar por chat en [guion académico](academico/s04-guion-de-actualizacion-del-informe.md).
+- Fechas docentes: **30/10** Introducción, objetivos, planteamiento por Teams, pendiente; **13/11** fundamento y diseño, pendiente. Título comunicado el 17/10, aprobación docente no acreditada.
 
-## Prioridades
-1. Confirmar entrega del título en Teams.
-2. Preparar borrador para **30/10** desde documento institucional existente, sin borrar 65 páginas: seleccionar las secciones solicitadas, reorganizar índice solo cuando sea oportuno.
-3. Integrar HQ–S1–S2 en S02; generar pruebas reproducibles aptas para demo en vivo y enriquecer el informe en paralelo.
-4. Preparar y revisar fundamento/diseño para **13/11**.
-5. Ensayos completos, cierre técnico, ZIP anexos, informe final y PPT/demo; manual después.
+## Arquitectura y verificación
 
-[Reanudar](REANUDAR-AQUI.md) · [Plan S02–S08](academico/02-plan-operativo-s02-s08-repriorizado.md).
+- Ubuntu Desktop 26.04.1 LTS en VMware; red administrativa `ens33=192.168.47.40/24`, GW `192.168.47.2`. SSH por llave probado, hardening de contraseña aún en #38.
+- S02 cerrada: 3 routers FRR, 4 WAN OSPF, 9 VLAN, recuperación por respaldos. S03: Ansible compliance/reconciliación real y OpenTofu 17 `terraform_data` metadata-only, SoT candidate pendiente de ratificar.
+- S04: G0–G4 técnicamente probadas; NOC `127.0.0.1:9120`, exporter `:9110`, Prometheus `:9091`, histórico SQLite por sede y TSDB. G3 incidente real HQ/s1p con respaldo s1b, alertas y recuperación comprobadas.
+- SLI 15m `450/450=100%`; 60m `1698/1740=97.586%`, **42 fallos**; 99 % es **SLO candidato no aprobado**, error budget a 60m `−25`. No hay aviso externo por Alertmanager; solo alertas y cronología locales.
+- Evidencias GitHub remotas auditadas: **129 PNG** (S01 90, S02 9, S03 8, S04 22), CI de SHA-256/dimensiones SUCCESS, G6 postcheck OSPF FULL 4/2/2, LAN 9/9+6/6, NOC active y red de gestión intacta.
+
+## Hitos y prioridades
+
+- Se comprobaron **50/50 issues con milestone**. GitHub calcula porcentaje por *issues cerradas*, no por pruebas realizadas: S01 11/14, S02 3/3, S03 3/6, S04 2/6, S05 0/6, S06 0/4, S07 0/1, S08 1/10. Consultar [tablero de control](control/06-tablero-porcentajes-cierre-fases-2026-10-25.md).
+- La red S02 se encuentra **activa según último postcheck**, los procesos S04 usan cuatro terminales; **no consta apagado posterior**. Seguir [apagado seguro](05-plan-operativo-y-pausas.md): respaldos → parar NOC, Prometheus y exporter → LAN down → WAN down → Docker Compose S02 down → comprobar gestión → poweroff Ubuntu.
+- **Primero:** incorporar textos de S04 al Word y verificar PDF actualizado; ratificar el alcance de SLO/avisos y registrar cierre interno apropiado. **Después:** arrancar S05 con criterios específicos ([issue #5](https://github.com/recm0708/netlab360/issues/5), [topología #64](https://github.com/recm0708/netlab360/issues/64)). No volver a provocar G3 para generar nuevas capturas.
+
+[Reanudar aquí](REANUDAR-AQUI.md) · [Control S04](operaciones/s04-g6-matriz-aceptacion-evidencias-2026-10-27.md) · [Guion de edición 4.0](academico/s04-guion-de-actualizacion-del-informe.md).
