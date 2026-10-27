@@ -1,50 +1,19 @@
-# NETLAB360 — Primer colector de observabilidad multisede (S04)
+# NETLAB360 S04 — Colector de métricas multisede y Prometheus
 
-**Estado:** implementación candidata versionada; **las pruebas reales en Ubuntu deben completarse antes de marcarla como validada**. Este componente complementa, pero no sustituye ni altera, el *exporter* B3 de la fase 1.
+**Estado verificado 27/10/2026: integrado con la topología real HQ/S1/S2 y comprobado durante incidentes.**
 
-## Alcance
+## Funciones y límites
 
-- Consulta el SoT local `~/netlab360-bootstrap/s03/rendered/sot-s03.json` en estado `candidate`: tres routers, cuatro enlaces WAN con ocho extremos y nueve interfaces VLAN. El SoT describe el estado esperado, no la disponibilidad real.
-- Protege la gestión del host: `netlab360-lab`, `ens33=192.168.47.40/24` y ruta predeterminada por `192.168.47.2`.
-- Utiliza exclusivamente `sudo -n docker inspect` de contenedores permitidos, cotejando nombre, proyecto Compose y `network_mode=none`. Sobre contenedores en ejecución consulta `sudo -n nsenter -t PID -n ip -j link show`. **No ejecuta Docker up/down, modificaciones de interfaces, FRR, Ansible ni OpenTofu.**
-- Distingue `offline` (ningún router en ejecución), `partial` (uno o dos), `active` (tres) y `unknown` (observación no fiable). `active` **solo confirma presencia de contenedores**; no acredita vecinos OSPF, HTTP o conectividad entre sedes.
-- Las interfaces ausentes o no desplegadas se representan con **-1 (desconocidas/no disponibles)**, sin convertir una topología detenida intencionalmente en alarma WAN. Cuando falla la consulta, `source_up=0`, estado `unknown` y no se reutilizan mediciones anteriores.
-- `--check`: valida el SoT y la red de gestión, sin Docker. `--once`: una muestra de Docker e interfaces. `--serve`: API únicamente en `127.0.0.1:9110`, sin exponer VMnet8 ni ocupar el puerto 9108 del prototipo B3.
-- Endpoints: `GET /api/v1/state`, `GET /healthz` (salud de la lectura, no disponibilidad del servicio empresarial) y `GET /metrics`. Las operaciones de escritura HTTP no están admitidas.
+`servicios/observabilidad/s04_exporter_multisede.py` consulta en solo lectura el SoT `candidate`, Docker y las interfaces permitidas de los tres routers FRRouting. Publica `/api/v1/state`, `/metrics` y estado de salud local en `127.0.0.1:9110`. Se observaron **25 series**, ocho extremos WAN, nueve interfaces VLAN y tres sedes. Una interfaz `admin_up` no prueba transferencia exitosa de paquetes ni conectividad de aplicación.
 
-## Validación inicial sin despliegue
+Prometheus 3.7.0 utilizó `127.0.0.1:9091` con reglas de alerta de indisponibilidad de fuente, WAN y VLAN. La TSDB permitió consultar historia de HQ/s1p y conservar **68/68** muestras WAN y **28/28** muestras de alerta después de reiniciar Prometheus. La retención no es indefinida.
 
-**Terminal SSH Ubuntu, ejecutando como cuenta normal:**
+Ante interrupción controlada de la fuente, el NOC informó `UNKNOWN`, Prometheus `scrape=down`, alarma del exporter `firing`, **sin falsas alarmas WAN/VLAN**, seguido de recuperación. En el incidente real HQ/s1p, la alerta WAN alcanzó `pending/firing` y se resolvió con la restauración del enlace.
 
-```bash
-cd ~/proyectos/netlab360
-python3 -m unittest discover -s tests -p 'test_s04_*.py' -v
-python3 servicios/observabilidad/s04_exporter_multisede.py --check
-sudo -v
-python3 servicios/observabilidad/s04_exporter_multisede.py --once
-```
+## SLI
 
-Al encontrarse desmontados los routers tras las pruebas de S02, la muestra real esperada es `topology=offline`, `source_ok=true` y tres routers con valor 0. No debe observarse una alarma WAN_DOWN. Si falla `sudo -n`, el resultado deberá indicar `unknown` y un error, no un falso `offline`.
+Se registraron 450/450 scrapes correctos (100 %, 15m) y 1698/1740 (97,586 %, 60m), con 42 fallos y presupuesto −25 para un objetivo **99 % únicamente candidato**. La métrica `source_up` depende de muestras presentes, por lo que no sustituye disponibilidad total del exporter ni de aplicaciones.
 
-La primera prueba del servidor `--serve` se realizará **solo después de validar el resultado anterior**. La exposición en 9110 no implica que Prometheus ya haga *scrape*. No se cambian todavía la configuración ni las reglas B3, diseñadas para interfaces antiguas.
+[Decisión y resultados G5](../../docs/operaciones/s04-g5-decision-medida-notificaciones-locales.md) · [Matriz G6](../../docs/operaciones/s04-g6-matriz-aceptacion-evidencias-2026-10-27.md).
 
-## Pruebas y pendientes
-
-La suite `tests/test_s04_exporter_multisede.py` utiliza respuestas simuladas únicamente para **validar código offline**, sin privilegios ni Docker. Incluye SoT, protección de red, diferencia entre topología apagada y consulta fallida, contenedores de proyecto ajeno, evaluación de interfaces y estado parcial. **No sustituye las pruebas reales sobre Ubuntu**.
-
-Persisten pendientes: OSPF Full, selección real de rutas de S1/S2, pruebas HTTP/VLAN, reglas de alerta nuevas, eventos correlacionados, NOC multisede, notificaciones, SLI/SLO y pruebas de recuperación. Las evidencias `S04_*` se incorporarán durante esas comprobaciones auténticas.
-
-## Prometheus S04 aislado (segundo incremento)
-
-Se añadió la configuración `servicios/observabilidad/prometheus/s04-prometheus.yml`, con destino exclusivo `127.0.0.1:9110` y **Prometheus en `127.0.0.1:9091`**, sin ocupar 9090 ni alterar las reglas B3. La TSDB queda en `~/netlab360-bootstrap/prometheus/s04/data`. El script `scripts/observabilidad/s04-iniciar-prometheus-local.sh` valida primero el colector, la red administrativa, los puertos, las reglas y los casos de prueba; no instala paquetes, no despliega contenedores y no toca FRR/Tofu.
-
-Las cuatro reglas específicas de S04 separan (1) el *scrape* del exporter caído, (2) la fuente Docker desconocida, (3) una interfaz WAN realmente en estado administrativo DOWN y (4) una subinterfaz VLAN realmente en estado administrativo DOWN. No se activa alarma WAN cuando el estado es `-1` por infraestructura desmontada. La comprobación `promtool test rules` utiliza cuatro conjuntos de datos de ensayo aislados; **no** reemplaza las futuras pruebas de falla WAN real.
-
-Para una prueba integrada se utilizan dos terminales SSH independientes y una tercera para consultar la API:
-
-1. En Terminal A: `sudo -v` y `python3 servicios/observabilidad/s04_exporter_multisede.py --serve --port 9110 --interval 2`.
-2. En Terminal B: `bash scripts/observabilidad/s04-iniciar-prometheus-local.sh`.
-3. En Terminal C: `curl -fsS http://127.0.0.1:9110/metrics`, `curl -fsS http://127.0.0.1:9091/api/v1/targets` y `curl -fsS http://127.0.0.1:9091/api/v1/alerts`. Las consultas deben confirmar que el *scrape* funciona y **no** existen alertas WAN/VLAN activas cuando los routers están desmontados.
-4. Para terminar, `Ctrl+C` en la terminal B y luego A. Verificar que los puertos 9091/9110 queden libres y la red administrativa no cambie.
-
-Las capturas oficiales S04 se tomarán con métricas y respuestas reales verificadas, no con el simple resultado de pruebas sintéticas.
+No levantar los procesos después del apagado S04 sin iniciar las verificaciones de continuidad S05 y proteger la interfaz administrativa `ens33`.
