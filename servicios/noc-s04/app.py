@@ -8,12 +8,16 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime, timezone
+import importlib.util
+from pathlib import Path
+import sqlite3
+import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 import socket
 import subprocess
 from urllib.error import URLError
-from urllib.parse import urlsplit
+from urllib.parse import parse_qs, urlsplit
 from urllib.request import urlopen
 
 EXPORTER = "http://127.0.0.1:9110"
@@ -23,6 +27,12 @@ JOB = "netlab360-s04-multisede"
 FRESHNESS_MAX_SECONDS = 15.0
 ADMIN_IP = "192.168.47.40/24"
 ADMIN_GATEWAY = "default via 192.168.47.2 dev ens33"
+
+_hist_spec = importlib.util.spec_from_file_location(
+    "netlab360_s04_historial", Path(__file__).with_name("historial_s04.py"))
+assert _hist_spec and _hist_spec.loader
+HISTORY = importlib.util.module_from_spec(_hist_spec)
+_hist_spec.loader.exec_module(HISTORY)
 
 PAGE = r"""<!doctype html>
 <html lang="es"><head><meta charset="utf-8">
@@ -244,6 +254,19 @@ def overview(reader=get_json, now=None) -> dict:
 
 
 def serve(port: int) -> None:
+    HISTORY.initialize()
+    stop = threading.Event()
+
+    def journal_monitor():
+        while not stop.is_set():
+            try:
+                count = HISTORY.record(overview())
+                if count:
+                    print(f"S04_NOC_HISTORIAL_CAMBIOS={count}", flush=True)
+            except (RuntimeError, ValueError, OSError, sqlite3.Error) as exc:
+                print(f"S04_NOC_HISTORIAL_ERROR={type(exc).__name__}: {exc}", flush=True)
+            stop.wait(2)
+
     class Handler(BaseHTTPRequestHandler):
         def send_body(self, code: int, body: bytes, content_type: str):
             self.send_response(code)
@@ -265,6 +288,25 @@ def serve(port: int) -> None:
             elif path == "/api/v1/overview":
                 self.send_body(200, json.dumps(overview(), ensure_ascii=False).encode(),
                                "application/json; charset=utf-8")
+            elif path in ("/api/v1/incidents", "/api/v1/incidents.csv"):
+                qs = parse_qs(urlsplit(self.path).query)
+                try:
+                    site = qs.get("site", ["ALL"])[0]
+                    limit = int(qs.get("limit", ["100"])[0])
+                    records = HISTORY.events(site=site, limit=limit)
+                except ValueError:
+                    self.send_body(400, b'{"error":"invalid-filter"}', "application/json")
+                except (OSError, sqlite3.Error):
+                    self.send_body(503, b'{"error":"journal-unavailable"}', "application/json")
+                else:
+                    if path.endswith(".csv"):
+                        self.send_body(200, HISTORY.as_csv(records), "text/csv; charset=utf-8")
+                    else:
+                        payload = {"source": "prometheus_active_alerts",
+                                   "scope": "transitions observed since NOC journal startup",
+                                   "events": records}
+                        self.send_body(200, json.dumps(payload, ensure_ascii=False).encode(),
+                                       "application/json; charset=utf-8")
             else:
                 self.send_body(404, b"not found\n", "text/plain")
 
@@ -275,14 +317,19 @@ def serve(port: int) -> None:
             return
 
     server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
+    monitor = threading.Thread(target=journal_monitor, daemon=True)
+    monitor.start()
     print(f"S04_NOC_URL=http://127.0.0.1:{port}/", flush=True)
+    print(f"S04_NOC_HISTORIAL_DB={HISTORY.DEFAULT_DB}", flush=True)
     print("S04_NOC_SOLO_LECTURA=SI", flush=True)
     try:
         server.serve_forever(poll_interval=0.5)
     except KeyboardInterrupt:
         pass
     finally:
+        stop.set()
         server.server_close()
+        monitor.join(timeout=5)
         print("S04_NOC_DETENIDO=SI", flush=True)
 
 
