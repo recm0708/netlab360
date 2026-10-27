@@ -47,7 +47,7 @@ from pathlib import Path
 import sys
 template, rule, output = (Path(v) for v in sys.argv[1:])
 source = template.read_text(encoding="utf-8")
-target = "servicios/observabilidad/prometheus/rules/s04-alerts.yml"
+target = "rules/s04-alerts.yml"
 if source.count(target) != 1 or rule.is_symlink() or output.is_symlink():
     raise SystemExit("S04_ERROR=PLANTILLA_REGLAS_O_SYMLINK")
 output.write_text(source.replace(target, str(rule.resolve())), encoding="utf-8")
