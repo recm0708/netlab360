@@ -21,11 +21,25 @@ class TestCapturasPorFase(unittest.TestCase):
             "LOTE_20261025_SHA256_Y_BLOB=21/21",
             "FASE_2_PNG_VERSIONADOS=9",
             "FASE_3_PNG_VERSIONADOS=8",
-            "FASE_4_PNG_VERSIONADOS=7",
-            "LOTE_MANIFIESTO_SHA256_S04_LOTE01_2026-10-26.csv_SHA256_Y_DIMENSIONES=7/7",
             "AUDITORIA_CAPTURAS_POR_FASE=OK",
         ):
             self.assertIn(comprobacion, completed.stdout)
+
+        # La cantidad S04 depende de lotes publicados, no de una cifra fija.
+        folder = ROOT / "evidencias/manifiestos"
+        manifestos = sorted(folder.glob("MANIFIESTO_SHA256_S04_LOTE[0-9][0-9]_*.csv"))
+        self.assertTrue(manifestos, "Debe existir al menos el lote 01 S04")
+        total = 0
+        for manifest in manifestos:
+            with manifest.open(encoding="utf-8-sig", newline="") as stream:
+                rows = list(csv.DictReader(stream))
+            self.assertGreater(len(rows), 0)
+            total += len(rows)
+            self.assertIn(
+                f"LOTE_{manifest.name}_SHA256_Y_DIMENSIONES={len(rows)}/{len(rows)}",
+                completed.stdout,
+            )
+        self.assertIn(f"FASE_4_PNG_VERSIONADOS={total}", completed.stdout)
 
     def test_lote_21_solo_evidencias_aprobadas(self):
         with LOTE.open(encoding="utf-8", newline="") as f:
