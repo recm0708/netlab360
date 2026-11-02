@@ -20,7 +20,7 @@ Desarrollamos NETLAB360 como proyecto semestral de **Tópicos Especiales II** en
 | S04 | NOC multisede, alertas WAN, persistencia y medición SLI | Implementación validada; decisiones académicas pendientes |
 | S05–S08 | Ampliaciones, integración y entregables finales | Pendientes |
 
-No atribuímos al proyecto capacidades que todavía no implementamos: OpenTofu S03 administra **metadatos locales**, el objetivo de SLO 99 % sigue pendiente de ratificación y no hemos acreditado notificaciones externas ni modelos ML.
+No atribuimos al proyecto capacidades que todavía no implementamos: OpenTofu S03 administra **metadatos locales**, el objetivo de SLO 99 % sigue pendiente de ratificación y no hemos acreditado notificaciones externas ni modelos ML.
 
 ## Documentación y evidencias
 
