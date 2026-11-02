@@ -1,9 +1,5 @@
-# NETLAB360 S01 — NOC histórico del laboratorio inicial
+# NOC histórico — Prototipo S01
 
-**Estado: prototipo de la fase 1 ejecutado y validado**, anterior al NOC multisede S04.
+Desarrollamos este componente como visualizador de datos de un ensayo inicial de **76 sondeos ICMP**. Su [aplicación](app.py) permite consultar el historial local y rutas observadas mediante `127.0.0.1:8765`.
 
-El módulo `servicios/noc-historico/app.py` representa registros derivados de un ensayo auténtico de **76 sondeos ICMP**, con consultas del historial y presentación de rutas observadas. Su interfaz usa solo loopback `127.0.0.1:8765`. La salud de este servicio de lectura **no acredita el estado actual de los routers**.
-
-Este prototipo no modifica interfaces, Docker, FRR, rutas ni administración de VMware. Su información es histórica y no debe mezclarse con muestras en vivo para inferir disponibilidad actual.
-
-La implementación multisede de la cuarta fase se encuentra en [NOC S04](../noc-s04/README.md), con integración Prometheus, alertas y persistencia SQLite comprobadas. No ejecutar servicios de S01 únicamente para editar el informe académico.
+Los datos son **históricos**: no representan el estado actual de HQ, S1 o S2, ni generan cambios sobre FRRouting, Docker o las interfaces. Conservamos el prototipo para reproducibilidad de S01 y lo distinguimos del [NOC multisede S04](../noc-s04/README.md), que utiliza observación real y SQLite.
