@@ -1,13 +1,13 @@
-# NETLAB360 — Evidencias oficiales de la fase 3 (S03)
+# Capturas S03 — Automatización y GitOps
 
-**8 PNG originales S03_01–S03_08**, verificadas mediante manifiesto SHA-256.
+Conservamos **8 PNG originales**, agrupadas por evidencia:
 
-| Imágenes | Alcance |
+| Identificadores | Resultado |
 |---|---|
-| S03_01–S03_02 | SoT e inventario de tres sedes y correspondencia con la red operativa |
-| S03_03–S03_05 | Cumplimiento Ansible FRR 8/8, desviación controlada 100→150, reconciliación 150→100 e idempotencia |
-| S03_06–S03_08 | OpenTofu: plan de 17 metadatos, aplicación 17/17 y segundo plan sin cambios |
+| S03_01–S03_02 | Inventario SoT y correspondencia con tres sedes |
+| S03_03–S03_05 | Auditoría FRR Ansible 8/8, desviación y reconciliación 100→150→100 |
+| S03_06–S03_08 | OpenTofu: 17 metadatos aplicados y segundo plan sin cambios |
 
-El ciclo GitOps/CI está registrado con pruebas y enlaces auténticos en [S03_09](../../../docs/evidencias/S03_09_GitOps_CI_Regresion_PullRequest.md). OpenTofu no aprovisionó por sí solo routers ni enlaces.
+Documentamos por separado el PR y la CI real en [S03_09 (Markdown)](../../../docs/evidencias/S03_09_GitOps_CI_Regresion_PullRequest.md). La SoT se conserva como candidata para el laboratorio y OpenTofu no administró routers ni enlaces externos.
 
-[Manifiesto de las capturas](../../manifiestos/MANIFIESTO_SHA256_CAPTURAS_2026-10-25.csv)
+[Manifiesto](../../manifiestos/MANIFIESTO_SHA256_CAPTURAS_2026-10-25.csv) · [Contrato de fase](../../../docs/control/07-puertas-cierre-fases1-a-3-2026-10-25.md).
