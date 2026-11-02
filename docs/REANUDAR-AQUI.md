@@ -1,20 +1,29 @@
-# NETLAB360 — Reanudar aquí
+# NETLAB360 — Punto de reanudación
 
-**Corte 01/11/2026.** Fases S01, S02 y S03 **cerradas internamente**. S04 validada técnicamente; ratificación del SLO académico y reporte de revisión docente pendientes. Fases S05–S08 aún no completadas.
+**Corte de trabajo: 01/11/2026.** S01–S04 cerradas por sus criterios de implementación interna, con todas sus issues de milestones completadas. La profesora confirmó en la sesión del **30/10/2026** que el avance estaba bien y que continuáramos con el siguiente entregable, según informó el equipo. El proyecto semestral **aún no está entregado ni aprobado en su totalidad**.
 
-## Estado de los componentes
+## Estado
 
-- **S01:** plataforma VMware/Ubuntu operativa; SSH endurecido y acceso por clave ED25519 verificado, respaldo de configuración y recuperación local VMware comprobados. [Cierre #1](https://github.com/recm0708/netlab360/issues/1) y [seguridad #38](https://github.com/recm0708/netlab360/issues/38).
-- **S02:** 3 sedes HQ/S1/S2, cuatro WAN, nueve VLAN, OSPF Full 4/2/2 y failover, HTTP/ACL. [Cierre #2](https://github.com/recm0708/netlab360/issues/2).
-- **S03:** SoT `candidate` validada **para laboratorio**, Ansible FRR 8/8 y reconciliación de drift, OpenTofu de **17 metadatos `terraform_data`**, CI/GitOps. [Cierre #3](https://github.com/recm0708/netlab360/issues/3). La integración de recursos externos se **reprogramó S05+** en [#17](https://github.com/recm0708/netlab360/issues/17), sin considerarla ejecutada.
-- **S04:** colector, Prometheus, NOC, alerta WAN real, estado UNKNOWN y persistencia TSDB/SQLite comprobados. Scrapes 15m 450/450 (100 %) y 60m 1698/1740 (**97,586 %**, 42 fallos); 99 % sigue siendo objetivo académico candidato. [Fase #4](https://github.com/recm0708/netlab360/issues/4) y [decisión SLO #21](https://github.com/recm0708/netlab360/issues/21) abiertas.
-- **Escrito:** informe único 4.6, 113 páginas, figuras 1–20 y tablas 1–13, con S01–S04 analizadas; aprobación docente no confirmada.
-- **Evidencias:** 83+9+8+22 = **122 PNG oficiales** con manifiestos de integridad.
+| Fase | Resultado | Issue |
+|---|---|---|
+| S01 | VMware/Ubuntu, red protegida, OSPF, VLAN/ACL, LACP, SSH ED25519 endurecido | [#1](https://github.com/recm0708/netlab360/issues/1) |
+| S02 | HQ/S1/S2, 4 WAN, 9 VLAN, OSPF 4/2/2, fallos y recuperación | [#2](https://github.com/recm0708/netlab360/issues/2) |
+| S03 | SoT candidate, Ansible FRR 8/8, drift 100→150→100, OpenTofu metadata-only 17/17 y CI | [#3](https://github.com/recm0708/netlab360/issues/3) |
+| S04 | Colector/NOC/Prometheus, alertas y eventos, TSDB/SQLite, SLI medidos | [#4](https://github.com/recm0708/netlab360/issues/4) |
+| S05 | Redundancia avanzada, SDN OVS/Faucet y visualización de topología | [#5](https://github.com/recm0708/netlab360/issues/5) |
 
-## VM y continuidad
+**S03:** OpenTofu no gestionó recursos externos; ampliación reprogramada a [#17](https://github.com/recm0708/netlab360/issues/17) sin darla por implementada. **S04:** SLI 15m 450/450 (100 %) y 60m 1698/1740 (**97,586 %**, 42 fallos). El umbral 99 % se adoptó como referencia interna, incumplida en 60m; no es SLA ni aprobación individual docente del indicador. Avisos únicamente locales.
 
-`netlab360-lab` utiliza `192.168.47.40/24` en `ens33` y gateway `192.168.47.2`. Fue encendida el 01/11 para cerrar S01; no asumir que siga apagada por el cierre histórico S04. Verificar el estado VMware cuando se termine la sesión y usar apagado ordenado. Los respaldos y credenciales permanecen fuera de Git.
+**Documento:** borrador 4.6, 113 páginas, figuras 1–20 y tablas 1–13. **Evidencias:** 122 PNG oficiales (83/9/8/22) y manifiestos SHA-256. El próximo encuentro docente previsto es **13/11/2026**, con fundamento técnico y diseño [#48](https://github.com/recm0708/netlab360/issues/48). No se ha celebrado aún.
 
-**Prioridad inmediata:** resolver la aceptación interna de S04 sin reproducir sus incidentes; registrar qué ocurrió realmente en la revisión del 30/10 y después comenzar S05. No repetir FRR, Ansible, OpenTofu ni los ensayos WAN de fases cerradas.
+## Reanudar S05 sin repetir S01–S04
 
-[Control de fases](control/06-tablero-porcentajes-cierre-fases-2026-10-25.md) · [S01–S03](control/07-puertas-cierre-fases1-a-3-2026-10-25.md) · [Github Issues](https://github.com/recm0708/netlab360/issues).
+1. Encender la **misma VM** `netlab360-lab` solo cuando se retome el trabajo; no clonar ni restaurar snapshots sin necesidad.
+2. Comprobar `ens33=192.168.47.40/24`, gateway `192.168.47.2` y acceso por clave ED25519 desde Windows.
+3. Ejecutar `git pull --ff-only origin main` después de confirmar un árbol local limpio.
+4. Diseñar primero prechecks, fuentes de estado y reversión para LACP multistream, OVS/Faucet, alta disponibilidad y grafo NOC [#64](https://github.com/recm0708/netlab360/issues/64). Sin inventar tráfico ni alterar la interfaz administrativa.
+5. Conservar las pruebas y documentación S01–S04 como historial ya aceptado; crear nuevas evidencias solo para funcionalidades realmente implementadas.
+
+El 01/11 la VM estaba **encendida** durante el cierre de S01; su apagado final de sesión se verificará desde VMware antes de apagar el PC. No deducir estado Powered Off de la bitácora anterior de octubre.
+
+[Control de fases](control/06-tablero-porcentajes-cierre-fases-2026-10-25.md) · [Corte académico](academico/s04-guion-de-actualizacion-del-informe.md).
