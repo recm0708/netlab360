@@ -1,20 +1,17 @@
-# NETLAB360 S03 — Ansible y cumplimiento de FRRouting
+# Automatización y cumplimiento FRRouting — S03
 
-**Estado comprobado al 27/10/2026: implementación y pruebas S03 ejecutadas sobre FRR activo.** La VM está apagada después del cierre operativo S04.
+Implementamos el flujo de auditoría y reconciliación con Ansible sobre los routers FRRouting de HQ, S1 y S2. Consumimos el inventario candidato [`topologia-s02.yaml`](../../inventario/ipam/topologia-s02.yaml) y el inventario de ejecución generado fuera del repositorio en `~/netlab360-bootstrap/s03/rendered/inventory-s03.yml`.
 
-## Funciones verificadas
+## Componentes
 
-Ansible utiliza el SoT derivado de `inventario/ipam/topologia-s02.yaml` y el inventario renderizado en `~/netlab360-bootstrap/s03/rendered/inventory-s03.yml` para evaluar los parámetros de tres routers FRRouting. Comprobó ocho costos OSPF (10 en las WAN principales y 100 en las de respaldo) y vecindades Full HQ/S1/S2 = 4/2/2.
+- [`compliance-frr.yml`](compliance-frr.yml): evaluación de los parámetros de FRR en funcionamiento.
+- Roles y tareas de este directorio: reconciliación selectiva de la configuración autorizada.
+- [Validador de cumplimiento](../../scripts/validacion/s03-frr-compliance.py) y [pruebas offline](../../tests/test_s03_frr_compliance.py).
 
-Se realizó una desviación real sobre R-S1/s1b, costo **100→150**, que fue detectada como `NON_COMPLIANT`; la reconciliación selectiva restauró **150→100** y una segunda ejecución produjo `changed=0`. Se validaron el estado final de OSPF, la administración `ens33` y los procedimientos de privilegios.
+## Resultados
 
-## Código y seguridad
+Comprobamos **8/8 costos OSPF**, con costos principales de 10 y de respaldo de 100. Introdujimos una desviación controlada en R-S1/s1b (**100→150**), obtuvimos `NON_COMPLIANT`, restablecimos **150→100** y verificamos idempotencia (`changed=0`). Las vecindades OSPF registradas fueron **4/2/2 Full**.
 
-- `ansible/s03/compliance-frr.yml`: consultas de cumplimiento.
-- `ansible/s03/`: roles y procedimientos de reconciliación controlados.
-- `scripts/validacion/s03-frr-compliance.py`: validación del estado activo.
-- `tests/test_s03_frr_compliance.py`: pruebas offline correspondientes.
+**Alcance:** Ansible administra configuración FRR activa; OpenTofu S03 mantiene exclusivamente metadatos locales. El estado de la SoT sigue siendo `candidate`, válido para el laboratorio y no equivalente a aprobación de producción. No ejecutamos una nueva reconciliación sin un precheck y una necesidad técnica concreta.
 
-Las tareas privilegiadas deben restringirse exclusivamente a los contenedores autorizados y disponer de comprobación previa, copia de estado y reversión. **No volver a desplegar FRR para editar el Word**. Al iniciar S05, consultar [continuidad](../../docs/REANUDAR-AQUI.md) y revalidar el entorno antes de cualquier prueba.
-
-La aceptación formal del SoT `candidate` y los límites de propiedad de los cambios continúan en [issue #16](https://github.com/recm0708/netlab360/issues/16).
+[Contrato SoT](../../docs/control/07-puertas-cierre-fases1-a-3-2026-10-25.md) · [OpenTofu](../../iac/s03/README.md).
