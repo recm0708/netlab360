@@ -1,50 +1,34 @@
-**CORTE ACADEMICO VIGENTE — borrador 4.6, 27/10/2026:** informe único de **113 páginas** revisado frente a la guía docente `1457-Formato Proyecto Final.pdf`: portada, introducción, objetivos, problema, fundamento, diseño, implementación, pruebas, análisis, conclusiones, referencias y anexos técnicos remitidos al TAR separado previsto para la entrega final. Contiene **20 figuras (1–20), 13 tablas (1–13), 10 referencias** y **122 PNG oficiales** (S01=83, S02=9, S03=8, S04=22). Capítulos 7.10 y 8 actualizados al cierre técnico de S04; el SLO del 99 % sigue **candidato**, con muestra real 60 min 97,586 %. **Cierre editorial interno del texto hasta S04: validado; aprobación docente pendiente**. S01 conserva cierre SSH/compatibilidad/aceptación; S03 decisiones SoT y alcance de OpenTofu externo; S04 ratificación SLO y aceptación interna/docente. Fechas de revisión previstas: 30/10 y 13/11, no presumir realizadas. La VM se apagó ordenadamente, con sesión SSH cerrada; estado gráfico Powered Off aún por constatar.
+# NETLAB360 — Control del documento académico único
 
-*Las menciones posteriores a PDF 4.4/4.5 son registros históricos y no sustituyen este corte vigente.*
+**Versión interna revisada:** `1457-Proyecto Semestral_borrador4.6.pdf` (**113 páginas**), corte 01/11/2026. Editamos el Word original como documento maestro; el repositorio conserva el seguimiento y las evidencias, no reemplaza su contenido por un segundo informe.
 
-**ÚLTIMA VERSIÓN REVISADA: borrador 4.4 (110 páginas, 27/10).** S04 5.6 y validaciones 6.9 completas, Figuras16–20 y Tabla13. Pendiente análisis 7.10, actualización de conclusión/recomendaciones S04 y consolidación de Tabla12 para **122 PNG oficiales (83/9/8/22)**. Un solo informe académico, TAR técnico separado, sin anexos al Word. No presumir SLO formal ni revisión docente celebrada.
+## Estructura y estado de los capítulos
 
-**CONTROL 27/10 — PDF 4.3, 99 páginas.** Confirmado en el PDF adjunto que 4.7 p.32 ya no contiene el párrafo obsoleto, 5.5.9 fue ajustado y 5.6.1–5.6.5 están redactados (pp.66–70). No rehacer 5.6. El informe único aún requiere 6.9, interpretación de S04 en capítulo7, conclusiones y recomendaciones S04 y actualización de Tabla12; el capítulo6 todavía habla solo de tres primeras fases. La VM ejecutó `sudo systemctl poweroff` y cerró SSH, **falta observar `Powered Off` en VMware**. [Registro](../sesiones/2026-10-27-s04-poweroff-solicitado-borrador43.md).
+| Apartado | Estado del borrador 4.6 |
+|---|---|
+| Portada e índices | Verificados editorialmente, sujetos a título final comunicado a la docente |
+| Introducción y objetivos | Presentados en revisión del 30/10 sin observaciones comunicadas |
+| Planteamiento del problema | Incluido en la revisión académica del 30/10 |
+| Fundamento técnico | Desarrollado para la revisión del 13/11 |
+| Diseño y topología | HQ/S1/S2, redes, servicios y componentes documentados; revisión del 13/11 pendiente |
+| Implementación (cap. 5) | S01–S04 integradas |
+| Pruebas y validación (cap. 6) | S01–S04 con resultados reales |
+| Análisis (cap. 7) | S04 incluida en 7.10 |
+| Conclusiones y recomendaciones (cap. 8) | Actualizadas a S04 |
+| Referencias | 10 referencias revisadas internamente |
 
-**VERSIÓN VIGENTE AL 27/10/2026:** `1457-Proyecto Semestral_borrador4.2.pdf` (**95 páginas**), todas las correcciones 1–13 confirmadas. El único párrafo antiguo repetido está en 4.7 p.32 y debe eliminarse. Falta incorporar texto nuevo de S04 en 5.6/6.9/7.10, conclusiones y Tabla12 en Word; SLO sigue propuesto, y no existe aceptación docente. Bitácora de preapagado y desmontaje 4.69–4.75 OK; los servicios están detenidos y la red S02 desmontada, pero no consta poweroff de Ubuntu. [Registro](../sesiones/2026-10-27-s04-borrador42-desmontaje-validado.md).
+**Numeración del corte:** 20 figuras consecutivas, 13 tablas consecutivas y **122 capturas oficiales** con integridad SHA-256 (83/9/8/22). No agregar capturas de administración rutinaria solo para aumentar el volumen del repositorio.
 
-# NETLAB360 — Índice maestro y situación del informe único
+## Alcance documentado y límites
 
-**Actualizado el 27/10/2026.** Documento principal: Word institucional editado por el equipo. Última exportación recibida: `1457-Proyecto Semestral_borrador4.1.pdf` (**95 páginas**): incorporadas cinco correcciones intro/fundamento/diseño/Tabla5, pero todavía no los apartados completos 5.6, 6.9 y 7.10. Las correcciones se entregarán **por mensajes de chat**, para copiar y pegar en el Word original, y se comprobará un PDF posterior antes de declarar aceptación.
+En S03 demostramos Ansible operando FRR y OpenTofu manteniendo 17 recursos declarativos de **metadatos**, no aprovisionamiento externo. En S04 medimos 15m 100 % y 60m 97,586 % de éxito de recolección; la referencia interna del 99 % **no se alcanzó en 60m**. Registramos avisos locales y no atribuimos notificaciones externas, IA entrenada o disponibilidad contractual de servicios.
 
-**Título comunicado en Teams el 17/10/2026:** «Diseño e implementación de una plataforma virtualizada para la automatización, observabilidad y diagnóstico de redes empresariales multisede». Aprobación docente pendiente. Encabezado abreviado del proyecto: `NETLAB360 | Redes Empresariales Multisede`.
+## Próximas incorporaciones
 
-## Estructura real verificada en borrador 4.0
+- Resultados **reales** de S05–S08, con nuevas pruebas, análisis, figuras y referencias solo cuando correspondan.
+- Revisión de fundamento y diseño por Teams del **13/11/2026** y correcciones que la profesora solicite realmente.
+- Versión final en Word/PDF y preparación del **TAR técnico independiente**, PowerPoint y demostración al cierre del semestral.
 
-1. **Introducción** y portada/índice.
-2. **1. Objetivos** (general/específicos).
-3. **2. Planteamiento del problema** (contexto, problema, formulación y justificación).
-4. **3. Fundamento técnico** (virtualización, VLAN, OSPF, LACP, SoT, OpenTofu, Ansible, Prometheus/NOC, datos y límites de AIOps).
-5. **4. Diseño de la solución** (topología real HQ/S1/S2, direcciones, VLAN, WAN redundante, gestión aislada, automatización y NOC).
-6. **5. Implementación**: `5.3` S01, `5.4` S02, `5.5` S03 **ya presentes**; agregar `5.6` S04 de collector/Prometheus/NOC/SQLite/SLI con límites documentados.
-7. **6. Pruebas y validación**: `6.1–6.8` ya presentes; agregar `6.9` para alerta G3, persistencia TSDB/SQLite, UNKNOWN, regresión y mediciones 15/60 minutos.
-8. **7. Análisis**: `7.1–7.9` presentes, centrados en tres fases. Añadir `7.10` y actualizar frases de estado vigente en `7.1,7.6,7.8,7.9`.
-9. **8. Conclusiones y recomendaciones**: actualizar `8.1`, convertir `8.2.2` de «integrar NOC» en mejoras realmente futuras, mantener los demás límites.
-10. **Referencias APA 7** al final, sin capítulo de anexos.
+La reunión del 30/10 se celebró y, según informó el equipo, la profesora indicó que el trabajo presentado estaba bien y que continuaran con el siguiente entregable. Esta conformidad no constituye calificación final del proyecto completo.
 
-Hasta el borrador 4.0 hay **15 figuras** y **12 tablas**, por lo que las nuevas S04 seguirán la secuencia **solo al insertarlas y revisar índice**, sin numerarlas por anticipado. Actualizar **Tabla 1** (NOC integrado), **Tabla 5** (S04 no «Planificada») y **Tabla 12** (objetivos de observabilidad y **129 PNG**, no 107). Nota de Tabla 12 aparece separada en p. 89 de la tabla p. 88; revisar saltos de párrafo en Word.
-
-## Fuente de evidencia técnica
-
-- **S01**: validaciones de mecanismos experimentales; 90 PNG finales.
-- **S02**: integración 3 FRRouting, cuatro WAN, nueve VLAN, pruebas WAN/ACL y 9 PNG; cierre interno #2.
-- **S03**: auditoría y reconciliación Ansible sobre FRR, OpenTofu 17 recursos `terraform_data` **solo metadatos**, GitHub Actions; 8 PNG y evidencia GitOps Markdown (no PNG).
-- **S04**: NOC central y por sede, exporter 9110 y Prometheus 9091, alerta real G3, UNKNOWN sin falsas WAN/VLAN, TSDB tras restart 68/68+28/28, SQLite G3 3/3 tras reinicio NOC, 22 PNG S04 y regresión OSPF/LAN final. G5 medición 15m 450/450=100% y 60m 1698/1740=97.586%, 99 % SLO **solo propuesto**, presupuesto -25. Sin notificaciones externas ni modelo IA acreditado.
-
-**No insertar en el informe** scripts extensos, contraseñas, tokens, estados operativos OpenTofu, anexos o PDF originales de la docente. Todo lo distribuible y necesario se preparará en un **TAR técnico separado, auditado**, en S08. No prometer OVA/OVF ni manual separado como requisito confirmado.
-
-## Prioridades editoriales
-
-- [ ] Incorporar al Word los bloques corregidos de Introducción, 3/4 (NOC real), 5.6, 6.9, 7 y 8; contrastar tablas y seleccionar figuras legibles con preámbulos/títulos/notas y referencias cruzadas.
-- [ ] Exportar nuevo PDF (borrador 4.0 **no** cambia por actualizar GitHub), comprobar paginación, índice, las notas huérfanas y coherencia APA 7.
-- [ ] Presentar Introducción, Objetivos y Problema por Teams **30/10**, registrar revisión real; Fundamento y Diseño **13/11**.
-- [ ] Formalizar por el grupo SLO candidato, alcance de alertas solo locales y decisiones de inclusión de datos antes de aceptación S04; continuar S05–S08 en el mismo informe.
-
-[Guion de S04 para Word](../academico/s04-guion-de-actualizacion-del-informe.md) · [Matriz de pruebas S04](../operaciones/s04-g6-matriz-aceptacion-evidencias-2026-10-27.md) · [Criterios docentes](../academico/00-criterios-docentes-y-hitos.md) · [TAR técnico final](../academico/03-anexos-y-demostracion.md).
-
-**Control 27/10 (borrador 4.1):** se validaron 5 correcciones efectivamente incluidas, sin alterar datos originales del informe. Quedan textos de estado anterior a S04, en especial 2.4.1, 3.8, Tabla1 y nota de Tabla5; la edición se suministra por chat y se coteja después con una nueva exportación. En paralelo se respaldaron estados WAN/LAN y SQLite G3, se detuvieron servicios NOC/Prometheus/exporter; la topología FRR/LAN/WAN todavía no consta desmontada. [Bitácora S04](../sesiones/2026-10-27-s04-borrador41-preapagado.md).
+[Guion editorial](../academico/s04-guion-de-actualizacion-del-informe.md) · [Control académico](https://github.com/recm0708/netlab360/issues/36) · [TAR S08](https://github.com/recm0708/netlab360/issues/45).

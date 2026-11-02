@@ -1,27 +1,24 @@
-**CORTE ACADEMICO VIGENTE — borrador 4.6, 27/10/2026:** informe único de **113 páginas** revisado frente a la guía docente `1457-Formato Proyecto Final.pdf`: portada, introducción, objetivos, problema, fundamento, diseño, implementación, pruebas, análisis, conclusiones, referencias y anexos técnicos remitidos al TAR separado previsto para la entrega final. Contiene **20 figuras (1–20), 13 tablas (1–13), 10 referencias** y **122 PNG oficiales** (S01=83, S02=9, S03=8, S04=22). Capítulos 7.10 y 8 actualizados al cierre técnico de S04; el SLO del 99 % sigue **candidato**, con muestra real 60 min 97,586 %. **Cierre editorial interno del texto hasta S04: validado; aprobación docente pendiente**. S01 conserva cierre SSH/compatibilidad/aceptación; S03 decisiones SoT y alcance de OpenTofu externo; S04 ratificación SLO y aceptación interna/docente. Fechas de revisión previstas: 30/10 y 13/11, no presumir realizadas. La VM se apagó ordenadamente, con sesión SSH cerrada; estado gráfico Powered Off aún por constatar.
+# NETLAB360 — Control editorial del informe hasta S04
 
-*Las menciones posteriores a PDF 4.4/4.5 son registros históricos y no sustituyen este corte vigente.*
+**Corte: 01/11/2026.** Revisamos internamente el borrador **4.6 (113 páginas)** frente a la guía docente. Los apartados del informe hasta S04 están incorporados; no queda pendiente rehacer el análisis ni las conclusiones de estas cuatro fases.
 
-# NETLAB360 — Continuidad editorial del informe académico hasta S04
+## Contenido verificado
 
-**Documento fuente recibido:** `1457-Proyecto Semestral_borrador4.4.pdf`, **110 páginas**, 27/10/2026. Se actualiza en Word por el equipo; no se modifica el PDF por el repositorio. Un solo informe académico y TAR técnico independiente, sin capítulo de anexos.
+- Introducción, objetivos y planteamiento del problema, fundamentos técnicos y diseño.
+- Capítulo 5: implementación de S01–S04, hasta 5.6.
+- Capítulo 6: pruebas y validación de S01–S04, hasta 6.9.
+- Capítulo 7: interpretación de resultados, incluida S04 en 7.10.
+- Capítulo 8: conclusiones y recomendaciones conforme a los módulos implementados.
+- **Figuras 1–20, tablas 1–13 y 10 referencias**; inventario oficial de **122 PNG**: S01=83, S02=9, S03=8, S04=22.
 
-## Secciones incorporadas y comprobadas
+## Resultados S04 que conservamos
 
-- Introducción y fundamentos contextualizados para cuatro primeras fases.
-- Capítulo 5: S01–S04, apartado **5.6.1–5.6.5** de observabilidad multisede.
-- Capítulo 6: validación S01–S04, apartado **6.9.1–6.9.6**, Figuras 16–20 y Tabla 13.
-- Datos de S04: OSPF 4/2/2, WAN 6/6, LAN 9/9 y 6/6; colector/Prometheus/NOC; alerta G3, TSDB 68/68 y 28/28, historial SQLite 3/3; SLI 15m 450/450 y 60m 1698/1740 (97,586 %). SLO 99 % **candidato**, sin notificaciones externas.
-- Catálogo de evidencias del repositorio: **122 PNG oficiales: 83/9/8/22**.
+Se observaron OSPF Full 4/2/2, WAN 6/6, LAN gateways 9/9 y conectividad 6/6. El incidente HQ/s1p se recuperó tras disparar la alarma; las historias TSDB y SQLite sobrevivieron a reinicios. El SLI de scrapes fue 450/450 (100 %) en 15 minutos y 1698/1740 (97,586 %) en 60 minutos. **El valor 99 % es nuestra referencia experimental de comparación y no se cumplió en la ventana de 60 minutos**. No lo presentamos como SLA ni como nivel formalmente ratificado por la docente; los avisos demostrados son locales.
 
-## Siguiente bloque de corrección del Word
+## Seguimiento académico
 
-1. Actualizar inicio del capítulo **7 ANÁLISIS DE RESULTADOS** (p.98) para incluir S04, sin reescribir análisis histórico de S01–S03 si ya es correcto.
-2. Conservar los resultados específicos de 7.1–7.9 para su alcance, agregando **7.10 Interpretación de la observabilidad multisede y sus limitaciones** tras 7.9 y antes del capítulo 8.
-3. Sustituir conclusiones que todavía afirman que la observabilidad centralizada no se implementó; actualizar recomendaciones 8.2.2 y otras referencias de futuro.
-4. Ajustar **Tabla 12** y cualquier párrafo global de 129 PNG por el catálogo oficial de 122; conservar la numeración de figuras 1–20 y tablas 1–13 y actualizar el índice general.
-5. Comprobar títulos, preámbulos y notas de figuras, referencias bibliográficas, lenguaje profesional de equipo y ausencia de atribuciones no probadas.
+La presentación del **30/10/2026 se realizó**. Según confirmó el equipo el 01/11, la profesora indicó que todo estaba bien y autorizó avanzar al siguiente entregable. No se comunicaron correcciones específicas de este corte. La revisión del **13/11/2026** aún debe celebrarse, centrada en fundamento y diseño, con la versión de informe vigente.
 
-Se revisará el próximo PDF exportado después de los cambios. No se declara aceptado el escrito por la docente antes de la reunión real del 30/10.
+Continuaremos trabajando sobre el **mismo documento Word/PDF**, incorporando los resultados reales de S05–S08 cuando se ejecuten. El material técnico se preparará en un TAR separado de la entrega escrita, sin duplicar documentos ni alterar las evidencias originales.
 
-[Resumen de validaciones S04](../operaciones/s04-g6-matriz-aceptacion-evidencias-2026-10-27.md) · [Continuidad](../REANUDAR-AQUI.md).
+[Control de fases](../control/06-tablero-porcentajes-cierre-fases-2026-10-25.md) · [Revisión del 30/10](https://github.com/recm0708/netlab360/issues/47) · [Siguiente revisión](https://github.com/recm0708/netlab360/issues/48).

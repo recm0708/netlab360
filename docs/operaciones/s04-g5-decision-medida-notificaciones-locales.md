@@ -1,6 +1,6 @@
 # NETLAB360 — S04 G5: criterios y decisión acotada de observabilidad
 
-**Fecha:** 2026-10-27 (Panamá), basado en mediciones de la VM y NOC verdaderas. **Tipo:** propuesta de aceptación **técnica interna**, sin certificar aprobación docente, SLA contractual ni SLO formal autorizado por el usuario.
+**Mediciones originales:** 27/10/2026 (Panamá). **Aceptación de alcance interno:** 01/11/2026. Adoptamos el 99 % como referencia experimental comparativa y los avisos visuales locales como alcance de S04. La profesora dio conformidad general al avance del 30/10, según el equipo; no atribuimos a esa revisión ratificación individual del SLO ni SLA contractual.
 
 ## Indicadores comprobados
 
@@ -15,15 +15,15 @@
 
 El presupuesto de errores observados se computa `floor(N × (1 - SLO))` y el remanente `presupuesto - errores`, ambos discretos. Con ~1800 posiciones nominales cada 60 minutos y 1740 scrapes existentes no es válido declarar fallidas las 60 oportunidades no representadas. Tampoco se puede atribuir sin traza específica la totalidad de 42 fallos al corte de exporter; hubo tal ensayo durante la ventana amplia, pero no se demuestra aquí correspondencia uno a uno.
 
-## Decisión de alcance de G5 propuesta para S04
+## Decisión de alcance aplicada en S04
 
-**Alcance mínimo defendible para cierre técnico S04:**
+**Alcance técnico que verificamos y aceptamos para cerrar S04:**
 
 - **Alertas y notificación local:** Prometheus evalúa reglas de colector/WAN/VLAN; el NOC muestra estados en vivo y transiciones/historial SQLite, con CSV por sede; esto es una **notificación visual local dentro del tablero**, no entrega asincrónica fuera de la aplicación.
 - **Sin canal externo en S04:** Alertmanager, correo, Telegram, WhatsApp, SMS y webhooks **no implementados ni acreditados** en esta fase. Registrar como ampliación independiente en S05–S07 si se incorpora receptor, suscripción, reintentos y prueba real de recepción.
-- **SLO académico candidato:** adoptar **99 % de éxito de scrape entre muestras existentes** como objetivo de diseño **sujeto a ratificación**; ventana de evaluación exploratoria **15 y 60 minutos**. El caso de 60 minutos **incumple** el candidato y demuestra sensibilidad a interrupciones controladas. No ajustar el objetivo a 97 % para ocultarlo, ni excluir fallos auténticos.
+- **SLO académico candidato:** adoptar **99 % de éxito de scrape entre muestras existentes** como **referencia experimental interna de comparación**; ventana de evaluación exploratoria **15 y 60 minutos**. El caso de 60 minutos **incumple** el candidato y demuestra sensibilidad a interrupciones controladas. No ajustar el objetivo a 97 % para ocultarlo, ni excluir fallos auténticos.
 - Los resultados de G5 prueban el **método de medición y evaluación**; la aceptación de un sistema de observabilidad en fase S04 **no exige que jamás se supere el presupuesto** durante pruebas intencionales de fallas. Exige reportar fallos y recuperación verificables.
-- La política operacional necesita un paso posterior de **revisión/ratificación** por el equipo/operador antes de llamarse SLO aprobado. Hasta entonces `S04_G5_SLO_ESTADO=PROPUESTA_NO_APROBADA`.
+- El registro histórico de ejecución conservó el literal `S04_G5_SLO_ESTADO=PROPUESTA_NO_APROBADA`; no lo alteramos ni lo interpretamos como aprobación formal de SLO. Adoptamos internamente la referencia 99 % para interpretar la medición, sin afirmar cumplimiento en 60 minutos.
 
 ## Evidencias y conservación
 
@@ -34,4 +34,4 @@ El presupuesto de errores observados se computa `floor(N × (1 - SLO))` y el rem
 
 ## Estado de aceptación
 
-**G5: criterios medidos, decisión técnica de alcance propuesta; pendiente ratificación interna y escrito.** No se pone la milestone S04 a 100 % por mera cantidad de PNG ni se cierra la issue transversal #47 antes de la reunión del 30/10.
+**G5: mediciones verificadas y alcance técnico adoptado internamente.** El 99 % fue incumplido en 60m; la aceptación de una prueba con fallo medido no modifica ese resultado. La issue #21 y la revisión del 30/10 (#47) están cerradas por sus criterios específicos, sin afirmar aprobación docente final del proyecto.

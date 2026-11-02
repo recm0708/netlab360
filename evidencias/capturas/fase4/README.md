@@ -12,7 +12,7 @@ Versionamos **22 PNG auténticas**, distribuidas en tres lotes con SHA-256. Docu
 | S04_15–S04_16 | Historial de incidentes y persistencia SQLite |
 | S04_17 | SLI de recolección de 15m y 60m |
 
-**Resultados de SLI:** 450/450 (100 %) en 15m y 1698/1740 (97,586 %) en 60m. El SLO académico del 99 % aún requiere ratificación y no se alcanzó en la ventana mayor. El NOC registra avisos locales; no acreditamos envíos a servicios externos.
+**Resultados de SLI:** 450/450 (100 %) en 15m y 1698/1740 (97,586 %) en 60m. El 99 % fue adoptado como referencia experimental interna de comparación y no se alcanzó en la ventana mayor; no lo presentamos como SLA contractual ni como aprobación específica de la docente. El NOC registra avisos locales; no acreditamos envíos a servicios externos.
 
 **Selección:** las imágenes S04_16 y S04_17 ya están incluidas y verificadas. Los controles de preapagado/desmontaje S04_18 y S04_19 se conservaron como resultados operativos, **sin agregarse al catálogo PNG académico**.
 
