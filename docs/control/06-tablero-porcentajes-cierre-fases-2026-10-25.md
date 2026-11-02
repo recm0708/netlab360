@@ -1,17 +1,19 @@
 # NETLAB360 — Control de fases y milestones
 
-**Estado auditado el 01/11/2026.** Los porcentajes son **issues cerradas sobre el total de cada milestone**. No representan una calificación académica. El cierre administrativo de los hitos en GitHub se realiza por separado de su porcentaje de avance.
+**Estado auditado el 01/11/2026.** Los porcentajes son **issues cerradas sobre el total de cada milestone**. No representan una calificación académica. Las milestones S01–S04 quedaron **cerradas administrativamente en GitHub** mediante la ejecución temporal [Actions #41383586585](https://github.com/recm0708/netlab360/actions/runs/41383586585), después de verificar cero issues abiertas reales en cada una. El backend todavía puede mostrar contadores antiguos dentro de algunos objetos milestone; esta tabla procede de las **issues individuales**, no de esos contadores desfasados.
 
 | Milestone | Issues cerradas | Porcentaje | Estado del alcance |
 |---|---:|---:|---|
-| S01 | 14/14 | **100 %** | Base y seguridad SSH cerradas |
-| S02 | 3/3 | **100 %** | Multisede cerrada |
-| S03 | 5/5 | **100 %** | SoT/Ansible/OpenTofu metadata-only cerrada |
-| S04 | 6/6 | **100 %** | Observabilidad, incidentes y métricas documentadas |
+| S01 | 14/14 | **100 %** | Milestone cerrada; base y seguridad SSH cerradas |
+| S02 | 3/3 | **100 %** | Milestone cerrada; multisede completada |
+| S03 | 5/5 | **100 %** | Milestone cerrada; SoT/Ansible/OpenTofu metadata-only |
+| S04 | 6/6 | **100 %** | Milestone cerrada; observabilidad, incidentes y SLI |
 | S05 | 0/7 | 0 % | Pendiente |
-| S06 | 0/4 | 0 % | Pendiente |
+| S06 | 0/3 | 0 % | Datos, diagnóstico ML y comparación contra reglas pendientes |
 | S07 | 0/1 | 0 % | Pendiente |
-| S08 | 2/10 | 20 % | Entregables finales pendientes |
+| S08 | 2/11 | 18,2 % de issues cerradas | Entregables finales y revisión académica 13/11 pendientes |
+
+**Auditoría de issues cerradas:** revisamos las **30 issues cerradas**; ninguna contiene una casilla `- [ ]` pendiente. Se actualizaron ocho cuerpos con referencias históricas obsoletas, preservando las pruebas originales. Dos cierres no representan funcionalidades entregadas: #37 consolidada como duplicado y #28 cerrada como no planificada. La revisión del 13/11 (#48) se reasignó de S06 a S08 por ser un hito académico transversal. Las milestones S05–S08 siguen abiertas deliberadamente.
 
 **S03:** la ampliación de `data sources` y propiedad OpenTofu de recursos externos quedó registrada en S05 ([#17](https://github.com/recm0708/netlab360/issues/17)); no representa funcionalidad realizada.
 
