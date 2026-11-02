@@ -1,0 +1,47 @@
+name: NETLAB360 - Cierre administrativo unico S01 a S04
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/cierre-unico-milestones-s01-s04.yml'
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  cierre-milestones:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Verificar issues abiertas reales y cerrar hitos terminados
+        shell: bash
+        run: |
+          set -euo pipefail
+          for n in 1 2 3 4; do
+            echo "========== NETLAB360 S0${n} =========="
+            actual_open="$(gh api "repos/$GH_REPO/issues?milestone=$n&state=open&per_page=100" --jq 'length')"
+            if [ "$actual_open" -ne 0 ]; then
+              echo "S0${n}_ISSUES_ABIERTAS_REALES=$actual_open"
+              exit 1
+            fi
+            echo "S0${n}_ISSUES_ABIERTAS_REALES=0"
+            estado="$(gh api "repos/$GH_REPO/milestones/$n" --jq '.state')"
+            if [ "$estado" = "closed" ]; then
+              echo "S0${n}_MILESTONE=YA_CERRADA"
+            elif [ "$estado" = "open" ]; then
+              gh api --method PATCH "repos/$GH_REPO/milestones/$n" -f state=closed --jq '"S0${n}_MILESTONE=" + .state'
+            else
+              echo "S0${n}_ESTADO_INESPERADO=$estado"
+              exit 1
+            fi
+            nuevo="$(gh api "repos/$GH_REPO/milestones/$n" --jq '.state')"
+            test "$nuevo" = "closed"
+            echo "S0${n}_CIERRE=VERIFICADO"
+          done
+          echo "S01_S04_MILESTONES_CERRADAS=OK"
