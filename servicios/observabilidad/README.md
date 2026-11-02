@@ -12,7 +12,7 @@ En este directorio conservamos dos implementaciones diferenciadas: el primer pro
 
 Prometheus 3.7.0 se ejecutó en `127.0.0.1:9091`, con [configuración S04](prometheus/s04-prometheus.yml) y [reglas de alerta](prometheus/rules/s04-alerts.yml). Verificamos persistencia **68/68** muestras de WAN y **28/28** de alerta después de reiniciar Prometheus; el NOC mostró `UNKNOWN` durante la interrupción del colector sin inventar fallas WAN.
 
-**SLI medido:** 450/450 scrapes (100 %) en 15 minutos y 1698/1740 (97,586 %) en 60 minutos. El 99 % es un **SLO académico candidato no ratificado**, incumplido en la ventana de 60 minutos. Ninguna de estas medidas representa por sí sola un SLA de aplicaciones.
+**SLI medido:** 450/450 scrapes (100 %) en 15 minutos y 1698/1740 (97,586 %) en 60 minutos. El 99 % se adoptó como **referencia experimental interna de evaluación**, incumplida en la ventana de 60 minutos; no equivale a un SLA ni a aprobación individual docente del indicador. Ninguna de estas medidas representa por sí sola un SLA de aplicaciones.
 
 No ejecutamos `s04_exporter_multisede.py` para cambiar interfaces o routers; el componente es de observación. Su visualización e historial corresponden al [NOC S04](../noc-s04/README.md). Conservamos los datos TSDB y SQLite fuera de Git.
 
