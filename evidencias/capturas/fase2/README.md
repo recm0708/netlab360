@@ -1,7 +1,7 @@
-# NETLAB360 — Evidencias oficiales de la fase 2 (S02)
+# Capturas S02 — Infraestructura multisede
 
-**9 PNG originales S02_01–S02_09**, publicadas y comprobadas por SHA-256. Comprenden preparación y consistencia IPAM, generación y validación de configuraciones FRR, arranque de tres routers, OSPF sobre cuatro WAN, conmutación/restauración S1 y S2, nueve VLAN con tres switches, comunicación HTTP entre sedes y política ACL selectiva.
+Reunimos **9 PNG**, de S02_01 a S02_09, para mostrar la configuración y validación de HQ/S1/S2: cuatro WAN, nueve VLAN, OSPF **4/2/2 Full**, selección de rutas, failover y restauración, pruebas HTTP y política ACL.
 
-Resultados de referencia: OSPF Full 4/2/2; FIB 6/6, ICMP WAN 6/6; gateways VLAN 9/9, comunicación LAN 6/6; denegación HTTP de 2 paquetes y 120 bytes con puertos autorizados operativos. Las redes son virtuales y no constituyen redundancia física.
+Registramos los resultados de los estados de prueba sin presentar una red virtual como redundancia física ni extrapolar su continuidad a intervalos no medidos.
 
-[Manifiesto y SHA-256](../../manifiestos/MANIFIESTO_SHA256_CAPTURAS_2026-10-25.csv) · [Guion técnico S02](../../../docs/control/05-s02-aceptacion-y-documentacion-2026-10-24.md)
+[Manifiesto de integridad](../../manifiestos/MANIFIESTO_SHA256_CAPTURAS_2026-10-25.csv) · [Cierre S02](../../../docs/control/05-s02-aceptacion-y-documentacion-2026-10-24.md).
