@@ -6,7 +6,7 @@ on:
     branches: [main]
     paths:
       - 'servicios/observabilidad/s04_exporter_multisede.py'
-      - 'servicios/observabilidad/README-S04.md'
+      - 'servicios/observabilidad/README.md'
       - 'tests/test_s04_exporter_multisede.py'
       - 'servicios/noc-s04/**'
       - 'tests/test_s04_noc_central.py'
@@ -18,7 +18,7 @@ on:
   pull_request:
     paths:
       - 'servicios/observabilidad/s04_exporter_multisede.py'
-      - 'servicios/observabilidad/README-S04.md'
+      - 'servicios/observabilidad/README.md'
       - 'tests/test_s04_exporter_multisede.py'
       - 'servicios/noc-s04/**'
       - 'tests/test_s04_noc_central.py'

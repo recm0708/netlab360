@@ -1,9 +1,12 @@
-# NETLAB360 S01 — FRRouting dual-WAN, primer laboratorio
+# Topología FRRouting dual-WAN — S01
 
-**Estado validado durante la fase 1.** Este directorio conserva configuraciones del ensayo HQ/S1 ejecutado con FRRouting 10.7.1 sobre enlaces virtuales aislados de la gestión del host.
+Construimos un escenario inicial de **dos routers HQ/S1** con configuraciones FRRouting 10.7.1 versionadas en [`configs/`](configs/). Evaluamos preferencia OSPF, caída de WAN principal, conmutación y restauración de enlace.
 
-Se emplearon enlaces principal `10.78.0.0/30` (costo OSPF 10) y alternativo `10.78.0.4/30` (costo 100), con router HQ `10.79.0.1/32` y router S1 `10.79.0.2/32`. Las pruebas comprobaron adyacencias OSPF Full, selección de WAN preferida, conmutación hacia respaldo, restauración y solicitudes HTTP satisfactorias en los estados estables correspondientes.
+| Enlace | Prefijo | Costo OSPF |
+|---|---|---:|
+| HQ–S1 principal | `10.78.0.0/30` | 10 |
+| HQ–S1 respaldo | `10.78.0.4/30` | 100 |
 
-Los ensayos fueron aislados y no constituyen por sí solos la topología integrada de tres sedes, que se implementó y validó posteriormente en [topologías S02](../s02-frr/README.md). La comunicación HTTP medida no implica cero pérdida durante cada transición.
+Las loopbacks fueron `10.79.0.1/32` (HQ) y `10.79.0.2/32` (S1). Registramos adyacencias Full, rutas preferidas y comunicación HTTP en estados estables. No extrapolamos esa prueba a disponibilidad continua.
 
-**Seguridad:** no conectar redes de laboratorio a `ens33`, VMnet8 ni cambiar la ruta de gestión; verificar snapshot/prechecks para nuevos despliegues.
+Este prototipo es distinto del [despliegue integrado S02](../s02-frr/README.md). Mantuvimos separado `ens33` y la red de gestión VMware durante las pruebas.

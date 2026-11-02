@@ -1,11 +1,19 @@
-# NETLAB360 S03 — Infraestructura como código OpenTofu
+# Infraestructura declarativa OpenTofu — S03
 
-**Estado técnico al 27/10/2026: aplicado y validado en Ubuntu.** La implementación comprende **17 recursos `terraform_data`**: guarda de red administrativa (1), sedes (3), enlaces WAN (4) y VLAN (9).
+Utilizamos **OpenTofu 1.13.1** para registrar y verificar metadatos derivados del [inventario candidato multisede](../../inventario/ipam/topologia-s02.yaml).
 
-Se comprobaron `tofu init`, `validate`, plan de 17 adiciones, `apply` **17 added / 0 changed / 0 destroyed**, manifiesto de 3 sedes/4 WAN/9 VLAN y segundo plan **sin cambios**. El archivo `iac/s03/main.tf` consume el inventario declarado, en condición SoT `candidate`.
+## Recursos implementados
 
-**Límite:** OpenTofu **administra metadatos y estado declarativo**, no crea los contenedores FRRouting, dispositivos, interfaces, VLAN ni enlaces. Los cambios de parámetros FRRouting en ejecución se evaluaron con Ansible en S03. No atribuir a los 17 recursos aprovisionamiento de una red externa.
+| Categoría | `terraform_data` |
+|---|---:|
+| Resguardo de gestión administrativa | 1 |
+| Sedes HQ, S1 y S2 | 3 |
+| Enlaces WAN | 4 |
+| VLAN | 9 |
+| **Total** | **17** |
 
-Los estados, planes con datos operativos y el workspace se mantienen **fuera de Git**, bajo `~/netlab360-bootstrap/s03/`, y requieren manejo prudente. No usar `tofu destroy` ni volver a aplicar el estado existente para editar el informe. La decisión sobre data sources y ownership de recursos externos continúa abierta en [#17](https://github.com/recm0708/netlab360/issues/17).
+Completamos `tofu init`, `validate`, `plan` y `apply` (**17 recursos añadidos, 0 modificados y 0 destruidos**). Un segundo plan no detectó cambios. Conservamos el `state` y los archivos de trabajo operativos fuera de Git, en `~/netlab360-bootstrap/s03/`.
 
-[Sesión verificada](../../docs/sesiones/2026-10-25-s03-opentofu-metadata-ci.md) · [Continuidad](../../docs/REANUDAR-AQUI.md).
+**Límite del componente:** nuestros `terraform_data` representan metadatos; no crean routers FRRouting, enlaces WAN, interfaces ni VLAN. La configuración FRR en ejecución corresponde a [Ansible](../../ansible/s03/README.md). La integración de `data sources` y propiedad de recursos externos **no se implementó** en S03 y se registró como ampliación futura en [#17](https://github.com/recm0708/netlab360/issues/17).
+
+No utilizamos `tofu apply` ni `tofu destroy` para tareas documentales. [Registro técnico de S03](../../docs/sesiones/2026-10-25-s03-opentofu-metadata-ci.md).

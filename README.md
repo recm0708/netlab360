@@ -1,25 +1,32 @@
-# NETLAB360 — Plataforma virtualizada de redes empresariales multisede
+# NETLAB360
 
-Proyecto académico de Tópicos Especiales II (UTP), desarrollado en Ubuntu Desktop con FRRouting, OSPF, Python, Ansible, OpenTofu, Prometheus y NOC web.
+**Plataforma virtualizada para la automatización, observabilidad y diagnóstico de redes empresariales multisede.**
 
-## Estado interno — 01/11/2026
+Desarrollamos NETLAB360 como proyecto semestral de **Tópicos Especiales II** en la Universidad Tecnológica de Panamá. Integramos tres sedes virtuales (HQ, S1 y S2) para diseñar, validar y documentar escenarios de conectividad, automatización, supervisión y recuperación de fallos.
 
-| Fase | Estado | Capacidad demostrada |
+## Tecnologías
+
+- **Infraestructura:** VMware Workstation, Ubuntu Desktop, Docker y FRRouting/OSPF.
+- **Automatización:** Python, Ansible, OpenTofu y GitHub Actions.
+- **Observabilidad:** Prometheus, exportadores propios, NOC web y SQLite.
+
+## Avance del proyecto
+
+| Fase | Alcance | Estado |
 |---|---|---|
-| S01 | **Cerrada** | Base VMware/Ubuntu, IPAM, OSPF dual WAN, VLAN/ACL, bonding, observabilidad inicial, SSH protegido por clave |
-| S02 | **Cerrada** | HQ/S1/S2, cuatro WAN, nueve VLAN, OSPF 4/2/2, conmutación y restauración |
-| S03 | **Cerrada por alcance validado** | SoT candidate, Ansible FRR 8/8 y reconciliación 100→150→100, OpenTofu 17 metadatos, GitOps/CI |
-| S04 | **Verificada técnicamente; aceptación pendiente** | NOC multisede, Prometheus, incidente WAN real, UNKNOWN, SQLite/TSDB y métricas SLI |
-| S05–S08 | Pendientes | SDN/redundancia, análisis inteligente, integración y defensa final |
+| S01 | Laboratorio base, conectividad, redundancia y primeros prototipos | Cerrada internamente |
+| S02 | Topología HQ/S1/S2, cuatro enlaces WAN y nueve VLAN | Cerrada |
+| S03 | SoT candidata, cumplimiento Ansible, 17 metadatos OpenTofu y GitOps | Cerrada por alcance implementado |
+| S04 | NOC multisede, alertas WAN, persistencia y medición SLI | Implementación validada; decisiones académicas pendientes |
+| S05–S08 | Ampliaciones, integración y entregables finales | Pendientes |
 
-**Delimitación:** la SoT `candidate` está validada para laboratorio, no para producción. OpenTofu S03 maneja 17 objetos locales `terraform_data`, **no** recursos FRR/WAN externos. El uso de `data sources` y propiedad de recursos externos fue reprogramado a S05+ ([#17](https://github.com/recm0708/netlab360/issues/17)) y no se presenta como cumplido.
+No atribuimos al proyecto capacidades que todavía no implementamos: OpenTofu S03 administra **metadatos locales**, el objetivo de SLO 99 % sigue pendiente de ratificación y no hemos acreditado notificaciones externas ni modelos ML.
 
-**S04:** SLI de scrapes 450/450 (100 %) en 15m y 1698/1740 (97,586 %) en 60m, con 42 fallos. Objetivo académico 99 % candidato, todavía pendiente de decisión. No se acredita un SLA de aplicaciones, notificaciones externas ni modelo ML.
+## Documentación y evidencias
 
-**Informe académico de corte:** versión 4.6 de 113 páginas, 20 figuras y 13 tablas. **122 PNG oficiales**: 83 de S01, 9 de S02, 8 de S03 y 22 de S04. La aprobación docente, demostración, PowerPoint y TAR de anexos se gestionan en el cronograma de entrega final.
+- [Punto de reanudación](docs/REANUDAR-AQUI.md) y [control de fases](docs/control/06-tablero-porcentajes-cierre-fases-2026-10-25.md).
+- [Topología multisede](topologias/s02-frr/README.md), [Ansible S03](ansible/s03/README.md) y [OpenTofu S03](iac/s03/README.md).
+- [Observabilidad](servicios/observabilidad/README.md), [NOC multisede](servicios/noc-s04/README.md) y [catálogo de capturas](evidencias/capturas/README.md).
+- [Seguimiento de tareas e hitos](https://github.com/recm0708/netlab360/issues).
 
-## Seguridad y operación
-
-VM `netlab360-lab`, red de gestión `ens33 192.168.47.40/24`, gateway `192.168.47.2`. El 01/11 se verificó la autenticación SSH mediante ED25519, respaldos y recuperación local VMware, con contraseñas remotas deshabilitadas. La VM está en uso nuevamente desde esa fecha; no inferir que continúa apagada por el cierre de S04. No publicar secretos ni respaldos SSH.
-
-[Reanudar aquí](docs/REANUDAR-AQUI.md) · [Control de fases](docs/control/06-tablero-porcentajes-cierre-fases-2026-10-25.md) · [Evidencias](evidencias/capturas/README.md) · [Issues](https://github.com/recm0708/netlab360/issues).
+Conservamos **122 capturas oficiales** con manifiestos de integridad: S01 (83), S02 (9), S03 (8) y S04 (22). El informe académico unificado, el TAR técnico y la presentación se gestionan como entregables del proyecto; el cierre interno de cada fase no implica aprobación docente.

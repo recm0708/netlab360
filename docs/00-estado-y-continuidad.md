@@ -1,21 +1,19 @@
-**CORTE ACADEMICO VIGENTE — borrador 4.6, 27/10/2026:** informe único de **113 páginas** revisado frente a la guía docente `1457-Formato Proyecto Final.pdf`: portada, introducción, objetivos, problema, fundamento, diseño, implementación, pruebas, análisis, conclusiones, referencias y anexos técnicos remitidos al TAR separado previsto para la entrega final. Contiene **20 figuras (1–20), 13 tablas (1–13), 10 referencias** y **122 PNG oficiales** (S01=83, S02=9, S03=8, S04=22). Capítulos 7.10 y 8 actualizados al cierre técnico de S04; el SLO del 99 % sigue **candidato**, con muestra real 60 min 97,586 %. **Cierre editorial interno del texto hasta S04: validado; aprobación docente pendiente**. S01 conserva cierre SSH/compatibilidad/aceptación; S03 decisiones SoT y alcance de OpenTofu externo; S04 ratificación SLO y aceptación interna/docente. Fechas de revisión previstas: 30/10 y 13/11, no presumir realizadas. La VM se apagó ordenadamente, con sesión SSH cerrada; estado gráfico Powered Off aún por constatar.
+# NETLAB360 — Estado consolidado
 
-*Las menciones posteriores a PDF 4.4/4.5 son registros históricos y no sustituyen este corte vigente.*
+**Actualizado: 01/11/2026.** Cerramos técnicamente las fases S01–S04 conforme a los resultados implementados. La aceptación académica y la ratificación del objetivo SLO S04 continúan pendientes; el trabajo funcional S05–S08 aún no se ha ejecutado.
 
-# NETLAB360 — Estado general y continuidad
+## Componentes demostrados
 
-**Fecha de corte: 27 de octubre de 2026.** Se trabaja sobre un repositorio privado único, fases S01–S08.
+Desplegamos un laboratorio HQ/S1/S2 con cuatro enlaces WAN, nueve VLAN, costos OSPF preferidos y de respaldo, verificación Ansible FRR y 17 metadatos OpenTofu. En S04 incorporamos colector multisede, Prometheus, NOC e historial de eventos persistente. La funcionalidad externa de OpenTofu quedó reprogramada y no se considera implementada.
 
-| Fase | Estado |
-|---|---|
-| S01 | Fundamentos técnicos comprobados; pendientes internos de aceptación/seguridad SSH |
-| S02 | Cierre por alcance técnico documentado |
-| S03 | Ansible FRR y OpenTofu declarativo validados; decisiones SoT/ciclo de vida abiertas |
-| S04 | Observabilidad multisede G0–G4 y G6 técnicos aprobados, G5 SLI medido; aceptación académica/SLO pendiente |
-| S05–S08 | Pendientes de implementación y demostración |
+**Métricas S04:** 15m: 450/450 (100 %); 60m: 1698/1740 (97,586 %, 42 fallos). El objetivo 99 % es candidato no ratificado. No demostramos SLA de aplicaciones ni avisos externos.
 
-**Inventario oficial:** 122 PNG auténticas S01–S04 (83, 9, 8 y 22 respectivamente), protegidas con manifiestos y validaciones. El trabajo escrito **borrador 4.4 (110 pp)** contiene implementación 5.6 y pruebas 6.9, Figuras16–20 y Tabla13; pendiente interpretación S04 y adecuación de conclusiones, recomendaciones e inventario del Word.
+## Evidencias y escrito
 
-**Operación de VM:** red de gestión `ens33 192.168.47.40/24`, gateway `192.168.47.2`; S04 respaldada y desmontada. Ubuntu recibió orden `sudo systemctl poweroff`, cerrando conexión SSH. Confirmar estado de VMware `Powered Off` desde el anfitrión antes de considerar completado el último control del apagado.
+Conservamos 122 PNG oficiales (83/9/8/22) sometidas a manifiestos SHA-256. El informe único, borrador 4.6, consta de 113 páginas, 20 figuras y 13 tablas, con resultados hasta S04. La revisión docente sigue sin dictamen registrado.
 
-[Reanudar aquí](REANUDAR-AQUI.md) · [Tablero por fases](control/06-tablero-porcentajes-cierre-fases-2026-10-25.md) · [Control editorial](academico/s04-guion-de-actualizacion-del-informe.md).
+## Administración de la VM
+
+La VM `netlab360-lab` funciona en `192.168.47.40/24`, `ens33`, gateway `192.168.47.2`. Verificamos acceso SSH ED25519, respaldo privado de configuración, consola de recuperación y contraseñas remotas deshabilitadas el 01/11. La VM volvió a encenderse ese día; el apagado anterior de S04 es histórico, no su estado actual.
+
+[Reanudación](REANUDAR-AQUI.md) · [Fases](control/06-tablero-porcentajes-cierre-fases-2026-10-25.md).
