@@ -1,18 +1,19 @@
-# NETLAB360 S04 — NOC multisede centralizado
+# NOC centralizado multisede — S04
 
-**Estado verificado 27/10/2026: funcionamiento real sobre HQ, S1 y S2, incidentes y persistencia histórica validados.**
+Implementamos un panel web y API local de consulta para **HQ, S1 y S2**, junto con un historial persistente de incidentes.
 
-## Arquitectura
-- `servicios/noc-s04/app.py` sirve panel web y API de solo lectura en `127.0.0.1:9120`, con vistas CENTRAL/HQ/S1/S2.
-- Consulta el [colector S04](../observabilidad/README-S04.md) (`127.0.0.1:9110`) y Prometheus local (`127.0.0.1:9091`); la UI presenta estados operativos, frescura de fuente y alertas.
-- Estado `UNKNOWN` cuando no existe fuente fiable; `offline` cuando la topología está intencionalmente desmontada; `active` cuando se detectan los tres routers autorizados. Ninguno de estos estados certifica disponibilidad contractual HTTP o pérdida de paquetes continua.
-- Diario SQLite externo al repositorio en `~/netlab360-bootstrap/s04/historial/incidentes.sqlite3`; API de historial por sede y exportación CSV.
-- Sin cambios automáticos a FRR, sin envío de correo/mensajería externa ni diagnóstico ML.
+## Componentes y fuentes
 
-## Pruebas auténticas realizadas
+- [`app.py`](app.py): vistas centralizadas y por sucursal en `127.0.0.1:9120`.
+- [`historial_s04.py`](historial_s04.py): almacenamiento y consulta del historial SQLite, con exportación CSV.
+- [Exportador y Prometheus S04](../observabilidad/README.md): métricas en `127.0.0.1:9110` y `127.0.0.1:9091`, respectivamente.
 
-G3: WAN principal HQ/s1p interrumpida por procedimiento protegido durante 60s, alarma `pending→firing`, ruta secundaria s1b y recuperación comprobada; S2 estable. G4: importación idempotente desde log G3 verificado SHA-256, tres eventos `pending/firing/resolved` persistentes tras reiniciar NOC (PID `248883→263894`). La pérdida controlada del colector se representó como `UNKNOWN`, sin falsas alertas WAN/VLAN; posterior retorno a `active`.
+Distinguimos `active` (topología operativa), `offline` (escenario desmontado) y `UNKNOWN` (fuente de observación no fiable). La ausencia de un exportador no se traduce automáticamente en una caída WAN ficticia.
 
-[Pruebas de historial](../../docs/operaciones/s04-g4-historial-persistente-noc.md) · [Matriz de aceptación](../../docs/operaciones/s04-g6-matriz-aceptacion-evidencias-2026-10-27.md) · [Evidencias S04](../../evidencias/capturas/fase4/README.md).
+## Resultados
 
-La VM se apagó ordenadamente tras desmontaje y respaldos; **no iniciar servicios sin los prechecks de S05 y la red administrativa protegida**.
+Durante el incidente controlado HQ/s1p observamos la transición `pending → firing → resolved`, con conmutación al respaldo y recuperación. Conservamos **3/3 eventos** en SQLite tras reiniciar el NOC. El sistema solo ofrece avisos visuales y registros locales; no envía correos, SMS, Telegram ni webhooks, y tampoco ejecuta acciones autónomas sobre FRR.
+
+Los datos operativos de SQLite permanecen en `~/netlab360-bootstrap/s04/historial/incidentes.sqlite3`, fuera de Git.
+
+[Validaciones G4](../../docs/operaciones/s04-g4-historial-persistente-noc.md) · [Evidencias S04](../../evidencias/capturas/fase4/README.md).
