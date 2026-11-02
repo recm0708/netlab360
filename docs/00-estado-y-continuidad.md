@@ -1,19 +1,19 @@
-# NETLAB360 — Estado consolidado
+# NETLAB360 — Estado consolidado de continuidad
 
-**Actualizado: 01/11/2026.** Cerramos técnicamente las fases S01–S04 conforme a los resultados implementados. La aceptación académica y la ratificación del objetivo SLO S04 continúan pendientes; el trabajo funcional S05–S08 aún no se ha ejecutado.
+**Actualizado: 01/11/2026.** Finalizamos por alcance técnico interno S01–S04. La profesora consideró adecuado el avance presentado el 30/10 y autorizó continuar con el siguiente entregable, según confirmó el equipo. El trabajo funcional y la aceptación final de S05–S08 continúan pendientes.
 
-## Componentes demostrados
+## Implementación comprobada
 
-Desplegamos un laboratorio HQ/S1/S2 con cuatro enlaces WAN, nueve VLAN, costos OSPF preferidos y de respaldo, verificación Ansible FRR y 17 metadatos OpenTofu. En S04 incorporamos colector multisede, Prometheus, NOC e historial de eventos persistente. La funcionalidad externa de OpenTofu quedó reprogramada y no se considera implementada.
+- **S01–S02:** base Ubuntu/VMware, FRRouting/OSPF, tres sedes, cuatro WAN, nueve VLAN, fallos y recuperación.
+- **S03:** SoT `candidate`, auditoría y reconciliación Ansible FRR real, 17 recursos locales `terraform_data` y CI. Recursos externos OpenTofu: **no implementados**, reprogramados a S05+.
+- **S04:** observabilidad NOC/Prometheus, eventos WAN, UNKNOWN, SQLite/TSDB persistentes; SLI 15m **100 %** y 60m **97,586 %**, por debajo de la referencia experimental 99 %.
 
-**Métricas S04:** 15m: 450/450 (100 %); 60m: 1698/1740 (97,586 %, 42 fallos). El objetivo 99 % es candidato no ratificado. No demostramos SLA de aplicaciones ni avisos externos.
+## Entregables
 
-## Evidencias y escrito
+Conservamos el informe único 4.6 de 113 páginas, 20 figuras, 13 tablas y 122 PNG oficiales bajo control criptográfico. La siguiente revisión por Teams es el **13/11/2026**; TAR, PowerPoint y defensa se prepararán durante S08.
 
-Conservamos 122 PNG oficiales (83/9/8/22) sometidas a manifiestos SHA-256. El informe único, borrador 4.6, consta de 113 páginas, 20 figuras y 13 tablas, con resultados hasta S04. La revisión docente sigue sin dictamen registrado.
+## Infraestructura y seguridad
 
-## Administración de la VM
+VM `netlab360-lab`, Ubuntu Desktop 26.04.1, gestión `ens33 192.168.47.40/24` y gateway `192.168.47.2`. SSH ED25519 sin contraseña remota, respaldo local protegido y consola VMware probados. La VM estaba encendida en la sesión del 01/11; verificar apagado real al finalizar.
 
-La VM `netlab360-lab` funciona en `192.168.47.40/24`, `ens33`, gateway `192.168.47.2`. Verificamos acceso SSH ED25519, respaldo privado de configuración, consola de recuperación y contraseñas remotas deshabilitadas el 01/11. La VM volvió a encenderse ese día; el apagado anterior de S04 es histórico, no su estado actual.
-
-[Reanudación](REANUDAR-AQUI.md) · [Fases](control/06-tablero-porcentajes-cierre-fases-2026-10-25.md).
+[Reanudar](REANUDAR-AQUI.md) · [Tablero de fases](control/06-tablero-porcentajes-cierre-fases-2026-10-25.md).
