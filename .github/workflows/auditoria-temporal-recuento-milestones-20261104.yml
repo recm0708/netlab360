@@ -1,0 +1,53 @@
+name: NETLAB360 - Auditoria temporal recuento milestones 2026-11-04
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/auditoria-temporal-recuento-milestones-20261104.yml'
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  reconciliar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Validar issues y reconciliar contadores sin falsear estados
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          restaurar_cerradas() {
+            for n in 1 2 3 4; do
+              estado="$(gh api "repos/$GH_REPO/milestones/$n" --jq '.state' 2>/dev/null || true)"
+              if [ "$estado" = "open" ]; then
+                gh api --method PATCH "repos/$GH_REPO/milestones/$n" -f state=closed >/dev/null || true
+              fi
+            done
+          }
+          trap restaurar_cerradas EXIT
+
+          for n in 1 2 3 4; do
+            echo "========== MILESTONE S0$n =========="
+            issues="$(gh api "repos/$GH_REPO/issues?milestone=$n&state=all&per_page=100")"
+            total="$(jq '[.[] | select(.pull_request == null)] | length' <<<"$issues")"
+            pendientes="$(jq '[.[] | select(.pull_request == null and .state == "open")] | length' <<<"$issues")"
+            sin_check="$(jq -r '[.[] | select(.pull_request == null and .state == "closed") | select((.body // "") | test("(?m)^ *[-*] +\\[ \\]")) | .number] | join(",")' <<<"$issues")"
+            echo "S0${n}_TOTAL_ISSUES=$total"
+            echo "S0${n}_ABIERTAS_REALES=$pendientes"
+            echo "S0${n}_CERRADAS_SIN_CHECK=$sin_check"
+            test "$total" -gt 0
+            test "$pendientes" -eq 0
+            test -z "$sin_check"
+            gh api "repos/$GH_REPO/milestones/$n" --jq '"ANTES S0${n}: estado=" + .state + " closed=" + (.closed_issues|tostring) + " open=" + (.open_issues|tostring)'
+            gh api --method PATCH "repos/$GH_REPO/milestones/$n" -f state=open >/dev/null
+            gh api "repos/$GH_REPO/milestones/$n" --jq '"REABIERTA S0${n}: closed=" + (.closed_issues|tostring) + " open=" + (.open_issues|tostring)'
+            gh api --method PATCH "repos/$GH_REPO/milestones/$n" -f state=closed >/dev/null
+            gh api "repos/$GH_REPO/milestones/$n" --jq '"DESPUES S0${n}: estado=" + .state + " closed=" + (.closed_issues|tostring) + " open=" + (.open_issues|tostring)'
+          done
+          echo "RECONCILIACION_COMPLETADA=SI"
