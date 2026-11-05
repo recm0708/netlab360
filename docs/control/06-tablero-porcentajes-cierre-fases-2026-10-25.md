@@ -1,6 +1,6 @@
 # NETLAB360 — Control de fases y milestones
 
-**Estado auditado el 01/11/2026.** Los porcentajes son **issues cerradas sobre el total de cada milestone**. No representan una calificación académica. Las milestones S01–S04 quedaron **cerradas administrativamente en GitHub** mediante la ejecución temporal [Actions #41383586585](https://github.com/recm0708/netlab360/actions/runs/41383586585), después de verificar cero issues abiertas reales en cada una. El backend todavía puede mostrar contadores antiguos dentro de algunos objetos milestone; esta tabla procede de las **issues individuales**, no de esos contadores desfasados.
+**Corte auditado el 04/11/2026 (Panamá).** Los porcentajes de esta tabla se calculan a partir del estado individual de las issues, no del objeto `milestone` de GitHub. Son indicadores de seguimiento técnico/documental, no notas académicas ni aceptación final de la profesora. S01–S04 están administrativamente cerradas y sin issues abiertas reales. La auditoría original de cierres fue [Actions #41383586585](https://github.com/recm0708/netlab360/actions/runs/41383586585).
 
 | Milestone | Issues cerradas | Porcentaje | Estado del alcance |
 |---|---:|---:|---|
@@ -12,6 +12,19 @@
 | S06 | 0/3 | 0 % | Datos, diagnóstico ML y comparación contra reglas pendientes |
 | S07 | 0/1 | 0 % | Pendiente |
 | S08 | 2/11 | 18,2 % de issues cerradas | Entregables finales y revisión académica 13/11 pendientes |
+
+## Discrepancia de contadores internos de GitHub — verificada el 04/11/2026
+
+La API de GitHub continúa devolviendo **contadores obsoletos** pese a que las consultas de las issues asociadas no devuelven ninguna abierta:
+
+| Hito | Contador interno `closed/open` | Resultado comprobado por listado de issues |
+|---|---:|---:|
+| S01 | 11/3 (79 %) | 14 cerradas / 0 abiertas = **100 %** |
+| S02 | 3/0 (100 %) | 3 cerradas / 0 abiertas = **100 %** |
+| S03 | 3/3 (50 %) | 5 cerradas / 0 abiertas = **100 %** |
+| S04 | 3/3 (50 %) | 6 cerradas / 0 abiertas = **100 %** |
+
+La [ejecución de diagnóstico #41948944162](https://github.com/recm0708/netlab360/actions/runs/41948944162) contrastó para cada hito los listados reales, verificó ausencia de checkboxes pendientes y probó reabrir/cerrar el milestone con permisos de Issues. **El contador no se recalculó**: persistió idéntico antes y después. Se retiró del repositorio el workflow temporal tras la prueba; no quedó automatización privilegiada activa. Existe un [reporte público del mismo síntoma en GitHub Community](https://github.com/orgs/community/discussions/211801). Los campos `open_issues` y `closed_issues` de los milestones son contadores administrados por GitHub; no deben falsificarse ni reemplazarse mediante cambios artificiales de estado de issues. **Hasta que GitHub sincronice sus contadores, la fuente verificable de avance es el listado individual de issues.**
 
 **Auditoría de issues cerradas:** revisamos las **30 issues cerradas**; ninguna contiene una casilla `- [ ]` pendiente. Se actualizaron ocho cuerpos con referencias históricas obsoletas, preservando las pruebas originales. Dos cierres no representan funcionalidades entregadas: #37 consolidada como duplicado y #28 cerrada como no planificada. La revisión del 13/11 (#48) se reasignó de S06 a S08 por ser un hito académico transversal. Las milestones S05–S08 siguen abiertas deliberadamente.
 
