@@ -15,7 +15,7 @@
 
 ## Discrepancia de contadores internos de GitHub — verificada el 04/11/2026
 
-La API de GitHub continúa devolviendo **contadores obsoletos** pese a que las consultas de las issues asociadas no devuelven ninguna abierta:
+La API de GitHub continúa devolviendo **contadores obsoletos**: S01/S03/S04 muestran issues abiertas inexistentes y S05 omite una issue abierta recientemente incorporada (#64). Las consultas de issues individuales son la fuente de verdad:
 
 | Hito | Contador interno `closed/open` | Resultado comprobado por listado de issues |
 |---|---:|---:|
@@ -23,6 +23,7 @@ La API de GitHub continúa devolviendo **contadores obsoletos** pese a que las c
 | S02 | 3/0 (100 %) | 3 cerradas / 0 abiertas = **100 %** |
 | S03 | 3/3 (50 %) | 5 cerradas / 0 abiertas = **100 %** |
 | S04 | 3/3 (50 %) | 6 cerradas / 0 abiertas = **100 %** |
+| S05 | 0/6 (0 %) | 0 cerradas / **7 abiertas** = **0 %** |
 
 La [ejecución de diagnóstico #41948944162](https://github.com/recm0708/netlab360/actions/runs/41948944162) contrastó para cada hito los listados reales, verificó ausencia de checkboxes pendientes y probó reabrir/cerrar el milestone con permisos de Issues. **El contador no se recalculó**: persistió idéntico antes y después. Se retiró del repositorio el workflow temporal tras la prueba; no quedó automatización privilegiada activa. Existe un [reporte público del mismo síntoma en GitHub Community](https://github.com/orgs/community/discussions/211801). Los campos `open_issues` y `closed_issues` de los milestones son contadores administrados por GitHub; no deben falsificarse ni reemplazarse mediante cambios artificiales de estado de issues. **Hasta que GitHub sincronice sus contadores, la fuente verificable de avance es el listado individual de issues.**
 
