@@ -129,6 +129,13 @@ class GeometryTests(unittest.TestCase):
         self.assertGreater(
             backup_s2["laneY"] - main_s2["laneY"], 60
         )
+        # Entrada principal más a la derecha que el retorno de respaldo:
+        # evita que la vertical principal cruce la fila del respaldo.
+        self.assertGreaterEqual(
+            main_s2["entryX"] - backup_s2["entryX"], 20
+        )
+        self.assertLess(main_s2["entryX"], s2["x"])
+        self.assertLess(backup_s2["entryX"], s2["x"])
         # Conservamos el orden funcional de las VLAN de ambas sucursales.
         self.assertLess(s1["ry"], s1["sy"])
         self.assertLess(s1["sy"], s1["hy"])
