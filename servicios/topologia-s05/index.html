@@ -205,6 +205,29 @@ function drawSite(site,nodes,links){
    txt("Adiciones verificadas: "+extras.map(x=>x.label).join(" · ").slice(0,58),b.x+18,b.y+b.h-11,"site-caption",group);
  }
 }
+function drawExtensions(data) {
+ const base=new Set(["R-HQ","SW-HQ","R-S1","SW-S1","R-S2","SW-S2",
+   ...data.nodes.filter(n=>n.type==="host").map(n=>n.id)]);
+ const sites=["HQ","S1","S2"];
+ const extras=Object.fromEntries(sites.map(site=>[site,
+   data.nodes.filter(n=>n.site===site&&!base.has(n.id))]));
+ const rows=Math.max(0,...sites.map(site=>extras[site].length));
+ if(!rows){svg.setAttribute("viewBox","0 0 1440 900");svg.style.aspectRatio="1440 / 900";return;}
+ const h=955+rows*95;
+ svg.setAttribute("viewBox","0 0 1440 "+h);
+ svg.style.aspectRatio="1440 / "+h;
+ txt("EQUIPOS INCORPORADOS CON EVIDENCIA",74,890,"site-heading");
+ txt("El estado de cada equipo es UNKNOWN hasta incorporar su fuente de observación",74,913,"site-caption");
+ const xcoords={HQ:270,S1:720,S2:1170};
+ for(const site of sites){
+   txt("Sede "+site,xcoords[site],943,"site-heading").setAttribute("text-anchor","middle");
+   extras[site].forEach((item,index)=>{
+     const y=1000+index*95;
+     drawDevice(item,xcoords[site],y);
+     txt((item.detail||"").slice(0,50),xcoords[site],y+50,"device-small");
+   });
+ }
+}
 function render(data){
  latest=data;
  const c=data.counts||{};
@@ -234,6 +257,7 @@ function render(data){
    const core=data.nodes.find(n=>n.id==="R-"+site);
    if(core)drawDevice(core,b.cx,b.ry);
  }
+ drawExtensions(data);
  if(selectedId)pick(selectedId);
 }
 async function update(){
