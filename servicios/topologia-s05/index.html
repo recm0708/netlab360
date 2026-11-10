@@ -207,13 +207,14 @@ function drawSite(site,nodes,links){
 }
 function drawExtensions(data) {
  const base=new Set(["R-HQ","SW-HQ","R-S1","SW-S1","R-S2","SW-S2",
-   ...data.nodes.filter(n=>n.type==="host").map(n=>n.id)]);
+   "H-HQ-110","H-HQ-120","H-HQ-130","H-S1-210","H-S1-220","H-S1-230",
+   "H-S2-310","H-S2-320","H-S2-330"]);
  const sites=["HQ","S1","S2"];
  const extras=Object.fromEntries(sites.map(site=>[site,
    data.nodes.filter(n=>n.site===site&&!base.has(n.id))]));
  const rows=Math.max(0,...sites.map(site=>extras[site].length));
  if(!rows){svg.setAttribute("viewBox","0 0 1440 900");svg.style.aspectRatio="1440 / 900";return;}
- const h=955+rows*95;
+ const h=1000+rows*100;
  svg.setAttribute("viewBox","0 0 1440 "+h);
  svg.style.aspectRatio="1440 / "+h;
  txt("EQUIPOS INCORPORADOS CON EVIDENCIA",74,890,"site-heading");
