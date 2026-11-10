@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import importlib.util
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import unittest
 
@@ -108,6 +109,22 @@ class TopologyGraphTests(unittest.TestCase):
         ext["nodes"][0]["id"] = "R-HQ"
         with self.assertRaises(ValueError):
             self.build(ext=ext)
+
+
+    def test_vm_clock_uses_panama_zone_and_keeps_utc(self):
+        d = self.build()
+        clock = d["vm_clock"]
+        self.assertEqual(clock["timezone"], "America/Panama")
+        self.assertEqual(clock["source"], "system_clock_vm")
+        instant_utc = datetime.fromisoformat(clock["utc"])
+        instant_local = datetime.fromisoformat(clock["panama"])
+        self.assertEqual(instant_local.utcoffset(), timedelta(hours=-5))
+        self.assertEqual(instant_utc.utcoffset(), timedelta(0))
+        self.assertEqual(
+            instant_utc.astimezone(timezone.utc),
+            instant_local.astimezone(timezone.utc),
+        )
+        self.assertEqual(d["observed_at_utc"], clock["utc"])
 
 
 if __name__ == "__main__":
