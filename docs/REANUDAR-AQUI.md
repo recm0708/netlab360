@@ -1,6 +1,6 @@
 # NETLAB360 — Punto de reanudación
 
-**Corte técnico: 01/11/2026; auditoría GitHub: 04/11/2026.** S01–S04 cerradas por criterios internos, con 28/28 issues de esos cuatro milestones cerradas y sus checkboxes completos. Los contadores nativos de GitHub S01/S03/S04 aún están desincronizados: ver [auditoría de milestones](control/06-tablero-porcentajes-cierre-fases-2026-10-25.md). La profesora confirmó en la sesión del **30/10/2026** que el avance estaba bien y que continuáramos con el siguiente entregable, según informó el equipo. El proyecto semestral **aún no está entregado ni aprobado en su totalidad**.
+**Corte técnico: 01/11/2026; sincronización GitHub corregida: 10/11/2026.** S01–S04 están cerradas por criterios internos, con 28/28 issues de esas cuatro milestones cerradas y todas las casillas de aceptación marcadas. Los **contadores nativos de GitHub ya muestran 100 % en S01–S04** y S05 reconoce sus siete issues abiertas. Ver [auditoría y solución verificada](control/06-tablero-porcentajes-cierre-fases-2026-10-25.md). La profesora confirmó en la sesión del **30/10/2026** que el avance estaba bien y que continuáramos con el siguiente entregable, según informó el equipo. El proyecto semestral **aún no está entregado ni aprobado en su totalidad**.
 
 ## Estado
 
@@ -25,7 +25,7 @@
 5. Conservar las pruebas y documentación S01–S04 como historial ya aceptado; crear nuevas evidencias solo para funcionalidades realmente implementadas.
 
 
-## Plan de arranque S05 aprobado documentalmente — 04/11/2026
+## Plan de arranque S05 preparado documentalmente — 10/11/2026
 
 **Estado:** diseño y backlog preparados en #5, #23, #24, #31, #32 y #64. **No hay pruebas nuevas S05 ni capturas S05 todavía.** El orden operativo recomendado es:
 
