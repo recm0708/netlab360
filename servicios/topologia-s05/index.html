@@ -88,6 +88,29 @@ body.presentation .canvas svg{flex:1 1 auto;min-height:0;min-width:0;max-width:1
 @media(max-width:660px){.summary{grid-template-columns:repeat(2,1fr)}.aside{display:block}header{padding:17px}.canvas-head span{display:none}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
 @media print{header,.toolbar,.summary,.aside,.warn,footer,.canvas-head{display:none!important}.shell{max-width:none;padding:0}.layout{display:block}.canvas{border:0}svg{min-width:0;max-height:98vh}}
+/* v3 — densidad de lectura y señalización no engañosa */
+header{padding-top:15px;padding-bottom:15px}
+.shell{padding-top:14px}
+.summary{margin-bottom:10px}
+.stat{padding:11px 14px}
+.stat b{font-size:1.32rem}
+.toolbar{margin-bottom:10px}
+.canvas{background:radial-gradient(circle at 50% 45%,#17283e,#101f33 67%)}
+.canvas-head{padding:9px 14px}
+.clockchip{font-size:.82rem;line-height:1.4;white-space:nowrap;color:#bce4f5;background:#112d41;border:1px solid #2c5a70;border-radius:10px;padding:9px 13px;font-variant-numeric:tabular-nums}
+.site-box{stroke:#50718e;stroke-width:2.4}
+.site-band{fill:#223e5a;fill-opacity:.8}
+.site-state-badge{fill:#243951;stroke:#70839d;stroke-width:1.4}
+.site-state-badge.running{fill:#174d40;stroke:#4cd7aa}
+.site-state-badge.offline{fill:#343f50;stroke:#8294a7}
+.site-state-text{fill:#d8e7f6;font-weight:750;font-size:12px;text-anchor:middle}
+.site-heading{font-size:21px}
+.wan-pill{fill:#18334b;stroke:#557b96;stroke-width:2.2}
+.wan-label:hover .wan-pill,.device:hover circle,.device:hover rect{stroke:#e8c374;stroke-width:3.4}
+.wan-line.unknown,.wan-line.offline{stroke:#7f92aa}
+.presentation-note{font-size:12px}
+@media(max-width:1120px){.clockchip{white-space:normal}}
+@media(max-width:660px){.clockchip{width:100%;text-align:center}}
 </style></head>
 <body>
 <header>
@@ -111,13 +134,13 @@ body.presentation .canvas svg{flex:1 1 auto;min-height:0;min-width:0;max-width:1
 <button data-site="S2" aria-pressed="false">Sucursal S2</button>
 </div>
 <div class="control-group"><button type="button" id="focus-toggle" aria-pressed="false" title="Muestra el diagrama completo sin paneles laterales">Modo presentación</button></div>
-<div class="small" id="updated" aria-live="polite">Cargando observaciones…</div>
+<div class="clockchip" id="updated" title="Hora proveniente del reloj del sistema de la VM, zona America/Panama">Consultando reloj de la VM…</div>
 </div>
 <div class="warn" id="warnings">El inventario previsto no demuestra equipos encendidos. Si no hay telemetría, se indica UNKNOWN.</div>
 <div class="layout">
 <section class="canvas" aria-label="Diagrama de red multisede">
-<div class="canvas-head"><strong>Mapa lógico · HQ / S1 / S2</strong><span>Enlaces principales: línea continua · respaldos: línea discontinua · sin datos: gris</span></div>
-<svg id="network" viewBox="0 0 1440 1040" role="img" aria-label="Topología de NETLAB360: sede HQ superior, sucursales S1 y S2 inferiores, cuatro WAN separadas y redes VLAN locales. Selecciona dispositivos o enlaces."></svg>
+<div class="canvas-head"><strong>Mapa corporativo · Sede central y sucursales</strong><span>Inventario lógico verificado · Observación en tiempo real cuando está disponible</span></div>
+<svg id="network" viewBox="0 0 1440 920" role="img" aria-label="Topología de NETLAB360: sede HQ superior, sucursales S1 y S2 inferiores, cuatro WAN separadas y redes VLAN locales. Selecciona dispositivos o enlaces."></svg>
 </section>
 <aside class="aside">
 <div class="panel">
@@ -151,17 +174,17 @@ const NS="http://www.w3.org/2000/svg", svg=document.querySelector("#network");
 const $=id=>document.getElementById(id);
 // Reservamos bandas exclusivas para encabezados, WAN y equipos. Ninguna posición
 // de dispositivos puede cruzar la banda de texto de su sede.
-const WIDTH=1440, BASE_HEIGHT=1040;
+const WIDTH=1440, BASE_HEIGHT=920;
 const siteGeometry={
- HQ:{x:500,y:20,w:440,h:370,cx:720,ry:147,sy:245,hy:338,step:132},
- S1:{x:38,y:606,w:648,h:382,cx:362,ry:730,sy:830,hy:921,step:166},
- S2:{x:754,y:606,w:648,h:382,cx:1078,ry:730,sy:830,hy:921,step:166}
+ HQ:{x:500,y:18,w:440,h:344,cx:720,ry:155,sy:244,hy:319,step:132},
+ S1:{x:38,y:516,w:648,h:356,cx:362,ry:649,sy:736,hy:823,step:166},
+ S2:{x:754,y:516,w:648,h:356,cx:1078,ry:649,sy:736,hy:823,step:166}
 };
 const wanGeometry={
- "WAN-PRIMARIA-HQ-S1":{sx:605,dx:415,lx:411,ly:488,mx:524,my:494},
- "WAN-RESPALDO-HQ-S1":{sx:661,dx:555,lx:603,ly:546,mx:615,my:495},
- "WAN-PRIMARIA-HQ-S2":{sx:835,dx:1025,lx:1029,ly:488,mx:916,my:494},
- "WAN-RESPALDO-HQ-S2":{sx:779,dx:885,lx:837,ly:546,mx:825,my:495}
+ "WAN-PRIMARIA-HQ-S1":{sx:605,dx:415,lx:411,ly:412,mx:524,my:417},
+ "WAN-RESPALDO-HQ-S1":{sx:661,dx:555,lx:603,ly:466,mx:615,my:448},
+ "WAN-PRIMARIA-HQ-S2":{sx:835,dx:1025,lx:1029,ly:412,mx:916,my:417},
+ "WAN-RESPALDO-HQ-S2":{sx:779,dx:885,lx:837,ly:466,mx:825,my:448}
 };
 let selected="ALL",latest=null,selectedId=null;
 function el(tag,attrs={},parent=svg){
@@ -235,9 +258,9 @@ function drawSiteBox(site,parent){
 }
 function wanPath(w){
  const g=wanGeometry[w.id],left=w.to==="R-S1";
- const x1=g.sx, x2=g.dx, y1=390,y2=606;
+ const x1=g.sx, x2=g.dx, y1=362,y2=516;
  const ctrl1=x1+(left?-20:20),ctrl2=x2+(left?20:-20);
- return "M "+x1+" "+y1+" C "+ctrl1+" 455 "+ctrl2+" 545 "+x2+" "+y2;
+ return "M "+x1+" "+y1+" C "+ctrl1+" 407 "+ctrl2+" 471 "+x2+" "+y2;
 }
 function wanBadge(w,parent){
  const g=wanGeometry[w.id];
@@ -254,8 +277,8 @@ function drawWan(w,parent){
  const layer=el("g",{},parent),path=wanPath(w);
  el("path",{d:path,class:"wan-line "+w.role+" "+w.status},layer);
  el("path",{d:path,class:"wan-click"},layer);
- el("circle",{cx:g.sx,cy:390,r:5,class:"wan-port"},layer);
- el("circle",{cx:g.dx,cy:606,r:5,class:"wan-port"},layer);
+ el("circle",{cx:g.sx,cy:362,r:5,class:"wan-port"},layer);
+ el("circle",{cx:g.dx,cy:516,r:5,class:"wan-port"},layer);
  attach(layer,w);
  wanBadge(w,parent);
 }
@@ -291,20 +314,20 @@ function drawExtensions(data){
  const extra=Object.fromEntries(sites.map(site=>[site,
    data.nodes.filter(n=>n.site===site&&!basic.has(n.id))]));
  const rows=Math.max(0,...sites.map(site=>extra[site].length));
- const height=rows?1240+(rows-1)*106:BASE_HEIGHT;
+ const height=rows?1120+(rows-1)*106:BASE_HEIGHT;
  svg.setAttribute("viewBox","0 0 "+WIDTH+" "+height);
  svg.style.aspectRatio=WIDTH+" / "+height;
  if(!rows)return;
  const g=el("g",{},svg);
- el("rect",{x:36,y:1033,width:1368,height:height-1050,rx:14,class:"underlay"},g);
- txt("DISPOSITIVOS ADICIONALES VERIFICADOS",720,1072,"zone-title",g);
+ el("rect",{x:36,y:936,width:1368,height:height-954,rx:14,class:"underlay"},g);
+ txt("DISPOSITIVOS ADICIONALES VERIFICADOS",720,966,"zone-title",g);
  const columns={HQ:270,S1:720,S2:1170};
  sites.forEach(site=>{
    const faded=selected!=="ALL"&&selected!==site;
    const column=el("g",{opacity:faded?".3":"1"},g);
-   txt("SEDE "+site,columns[site],1106,"site-caption",column).setAttribute("text-anchor","middle");
+   txt("SEDE "+site,columns[site],994,"site-caption",column).setAttribute("text-anchor","middle");
    extra[site].forEach((item,i)=>{
-      const y=1160+i*106;
+      const y=1040+i*106;
       drawDevice(item,columns[site],y,column);
       txt((item.detail||"").slice(0,45),columns[site],y+52,"device-detail",column);
    });
@@ -332,12 +355,12 @@ function render(data){
  svg.replaceChildren();
  const bg=el("g"),wan=el("g"),local=el("g");
  ["HQ","S1","S2"].forEach(site=>drawSiteBox(site,bg));
- txt("CONEXIONES WAN",170,432,"zone-title",bg);
- txt("2 PRINCIPALES · 2 RESPALDOS",1258,432,"zone-title",bg);
+ txt("CONEXIONES WAN",170,391,"zone-title",bg);
+ txt("2 PRINCIPALES · 2 RESPALDOS",1258,391,"zone-title",bg);
  data.links.filter(x=>x.type==="wan").forEach(w=>drawWan(w,wan));
  ["HQ","S1","S2"].forEach(site=>drawInSite(site,data.nodes,local));
  txt("INVENTARIO DEL LABORATORIO · LOS ESTADOS NO VERIFICADOS NO SE DAN POR ACTIVOS",
-  720,1020,"presentation-note");
+  720,903,"presentation-note");
  drawExtensions(data);
  if(selectedId)pick(selectedId);
 }
