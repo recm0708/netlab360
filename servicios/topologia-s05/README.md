@@ -42,7 +42,7 @@ Ejemplo documental, **NO desplegado** y no incluido en el inventario vigente:
  "realized":false,"evidence":"Issue con prueba real pendiente"}
 ```
 
-La primera versión tiene **layout visual fijo de las tres sedes**. Aunque el backend ya acepta el registro de nodos verificados de estas sedes, para incorporar más sedes o muchos equipos y enlaces al gráfico visual será necesario ampliar IPAM, posiciones de frontend, pruebas y colectores de estado. No afirmar expansión visual ilimitada ya implementada.
+La primera versión tiene **layout principal fijo de HQ/S1/S2** y un sector adicional automático para representar con fichas seleccionables los nodos verificados nuevos de cualquiera de esas tres sedes. Para **nuevas sedes**, conexiones extra con trayectorias gráficas y gran escala de equipos será necesario ampliar IPAM, layout del frontend, pruebas y colectores de estado. El catálogo JSON puede añadir enlaces al modelo/API, pero la geometría de conexiones adicionales todavía requiere desarrollo; no se presenta como implementada.
 
 ## Pendientes de aceptación
 
