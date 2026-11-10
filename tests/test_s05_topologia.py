@@ -4,7 +4,9 @@ from __future__ import annotations
 import importlib.util
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+import subprocess
 import unittest
+from unittest.mock import patch
 
 APP = Path(__file__).resolve().parents[1] / "servicios/topologia-s05/app.py"
 spec = importlib.util.spec_from_file_location("netlab360_s05_graph", APP)
@@ -125,6 +127,29 @@ class TopologyGraphTests(unittest.TestCase):
             instant_local.astimezone(timezone.utc),
         )
         self.assertEqual(d["observed_at_utc"], clock["utc"])
+
+
+    def test_namespaces_prefers_read_only_without_sudo(self):
+        result = subprocess.CompletedProcess(
+            ("ip", "netns", "list"), 0, "nl360-s02-sw-hq (id: 0)\n"
+        )
+        with patch.object(module, "command", return_value=result) as runner:
+            names, warning = module.namespaces()
+        self.assertEqual(names, {"nl360-s02-sw-hq"})
+        self.assertEqual(warning, "")
+        self.assertEqual(runner.call_args.args, ("ip", "netns", "list"))
+
+    def test_namespaces_falls_back_only_if_needed(self):
+        rejected = subprocess.CompletedProcess(("ip", "netns", "list"), 1, "")
+        accepted = subprocess.CompletedProcess(
+            ("sudo", "-n", "ip", "netns", "list"), 0, ""
+        )
+        with patch.object(module, "command", side_effect=(rejected, accepted)) as runner:
+            names, warning = module.namespaces()
+        self.assertEqual(names, set())
+        self.assertEqual(warning, "")
+        self.assertEqual(runner.call_count, 2)
+
 
 
 if __name__ == "__main__":
