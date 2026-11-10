@@ -172,6 +172,30 @@ header{padding-top:15px;padding-bottom:15px}
 "use strict";
 const NS="http://www.w3.org/2000/svg", svg=document.querySelector("#network");
 const $=id=>document.getElementById(id);
+const displayStates={
+ "running":"Router en ejecución",
+ "offline":"Detenido",
+ "unknown":"Sin datos verificables",
+ "namespace-present":"Namespace registrado",
+ "admin-up":"Interfaz administrativa UP",
+ "admin-down":"Interfaz administrativa DOWN"
+};
+function formatVMClock(data){
+ // No usa new Date() sin argumento: la hora viene del backend en la VM.
+ const value=(data.vm_clock||{}).panama||data.observed_at_utc;
+ if(typeof value!=="string")return "Reloj de la VM: no disponible";
+ const stamp=new Date(value);
+ if(!Number.isFinite(stamp.getTime()))return "Reloj de la VM: muestra inválida";
+ const format=new Intl.DateTimeFormat("es-PA",{
+  timeZone:"America/Panama",
+  day:"2-digit",month:"short",year:"numeric",
+  hour:"numeric",minute:"2-digit",second:"2-digit",hour12:true
+ });
+ return "Hora de la VM · "+format.format(stamp)+" · Panamá (UTC−5)";
+}
+function statusText(value){
+ return displayStates[value]||String(value||"No observado");
+}
 // Reservamos bandas exclusivas para encabezados, WAN y equipos. Ninguna posición
 // de dispositivos puede cruzar la banda de texto de su sede.
 const WIDTH=1440, BASE_HEIGHT=920;
@@ -211,9 +235,9 @@ function pick(id){
  const item=[...latest.nodes,...latest.links].find(x=>x.id===id);
  if(!item)return;
  $("info-title").textContent=item.label||item.id;
- $("info-desc").textContent=item.detail||"No hay detalle de origen";
+ $("info-desc").textContent=(item.detail||"No hay detalle de origen")+" · "+statusText(item.status);
  const attrs=[["Identificador",item.id],["Sede",item.site||"Entre sedes"],
- ["Tipo",item.type],["Estado observado",item.status],["Función",item.role],
+ ["Tipo",item.type],["Estado observado",statusText(item.status)],["Función",item.role==="primary"?"Principal":item.role==="backup"?"Respaldo":item.role],
  ["VLAN",item.vlan],["Gateway",item.gateway],["Fuente",item.origin],
  ["Extremo A",item.a],["Extremo B",item.b]];
  const dl=$("info-fields");dl.replaceChildren();
@@ -246,7 +270,7 @@ function drawDevice(item,x,y,parent=svg){
  }
  attach(g,item);return g;
 }
-function drawSiteBox(site,parent){
+function drawSiteBox(site,nodes,parent){
  const b=siteGeometry[site],g=el("g",{
    class:"site-background",opacity:selected!=="ALL"&&selected!==site?".4":"1"
  },parent);
@@ -255,6 +279,14 @@ function drawSiteBox(site,parent){
  el("path",{d:"M "+(b.x+20)+" "+(b.y+91)+" H "+(b.x+b.w-20),class:"site-rule"},g);
  txt(site==="HQ"?"SEDE CENTRAL · HQ":"SUCURSAL · "+site,b.x+25,b.y+37,"site-heading",g);
  txt("Router FRR · Switch L2 · tres VLAN",b.x+25,b.y+66,"site-caption",g);
+ const router=nodes.find(n=>n.id==="R-"+site);
+ const state=router?.status||"unknown";
+ const badgeX=b.x+b.w-155, badgeY=b.y+24;
+ el("rect",{x:badgeX,y:badgeY,width:138,height:33,rx:11,
+   class:"site-state-badge "+state},g);
+ const label=state==="running"?"RTR: EN EJECUCIÓN":
+   state==="offline"?"RTR: DETENIDO":"RTR: SIN DATOS";
+ txt(label,badgeX+69,badgeY+21,"site-state-text",g);
 }
 function wanPath(w){
  const g=wanGeometry[w.id],left=w.to==="R-S1";
@@ -347,14 +379,14 @@ function render(data){
  const t=data.telemetry||{},reliable=t.available===true,state=t.topology||"unknown";
  $("status").className="status "+(reliable&&state==="active"?"active":reliable?"partial":"");
  $("status").textContent=reliable?"Topología "+state.toUpperCase():"Estado UNKNOWN · sin exporter fiable";
- $("updated").textContent="Consulta UTC: "+(data.observed_at_utc||"—")+" · actualización 3 s";
+ $("updated").textContent=formatVMClock(data);
  const warnings=data.source_warnings||[];
  $("warnings").textContent=warnings.length?
   "Fuentes: "+warnings.join(" · ")+" · UNKNOWN no implica avería.":
   "Fuente S04 actualizada. ADMIN UP solo acredita estado administrativo, no ruta elegida ni tráfico.";
  svg.replaceChildren();
  const bg=el("g"),wan=el("g"),local=el("g");
- ["HQ","S1","S2"].forEach(site=>drawSiteBox(site,bg));
+ ["HQ","S1","S2"].forEach(site=>drawSiteBox(site,data.nodes,bg));
  txt("CONEXIONES WAN",170,391,"zone-title",bg);
  txt("2 PRINCIPALES · 2 RESPALDOS",1258,391,"zone-title",bg);
  data.links.filter(x=>x.type==="wan").forEach(w=>drawWan(w,wan));
@@ -373,7 +405,7 @@ async function update(){
   $("status").textContent="UNKNOWN · API sin respuesta";
   $("status").className="status";
   $("warnings").textContent="No se puede obtener el estado del NOC: "+error.message;
-  $("updated").textContent="Consulta no disponible";
+  $("updated").textContent="Hora de la VM: conexión no disponible";
  }
 }
 document.querySelectorAll("[data-site]").forEach(button=>button.addEventListener("click",()=>{
