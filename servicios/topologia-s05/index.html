@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NETLAB360 · Topología multisede</title>
+<style>
+:root{color-scheme:dark;--bg:#091323;--panel:#132238;--panel2:#182940;--line:#2e4260;--text:#ebf4ff;--muted:#9aafc8;--cyan:#52c7e6;--good:#51d8a8;--warn:#f7c971;--bad:#f97680;--quiet:#899cb3}
+*{box-sizing:border-box}body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);margin:0}
+header{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:24px max(18px,calc((100vw - 1500px)/2));border-bottom:1px solid #243a56;background:linear-gradient(125deg,#152c4b,#0e1e32)}
+h1{font-size:1.5rem;margin:0}h2{font-size:1.1rem;margin:0 0 11px}p{line-height:1.5}.sub{font-size:.88rem;color:var(--muted);margin-top:4px}
+.shell{max-width:1540px;margin:auto;padding:20px 16px 60px}
+.summary{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.stat{border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:14px}.stat b{font-size:1.4rem;display:block;margin:3px 0}.stat span{color:var(--muted);font-size:.78rem}
+.toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:12px}.tabs{display:flex;flex-wrap:wrap;gap:7px}
+button{cursor:pointer;font:inherit;color:var(--text);background:#1a314b;border:1px solid #345273;padding:9px 13px;border-radius:10px}
+button[aria-pressed=true]{border-color:var(--cyan);background:#1d4863}
+button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 315px;gap:14px;align-items:start}
+.canvas{min-width:0;overflow:auto;background:#101f33;border:1px solid var(--line);border-radius:15px}
+svg{display:block;min-width:860px;width:100%;height:auto;aspect-ratio:1440/900}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:17px;margin-bottom:13px}
+.kicker{font-size:.73rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+strong.key{font-size:1.15rem;display:block;margin:8px 0}
+.small{font-size:.82rem;color:var(--muted);line-height:1.5;overflow-wrap:anywhere}
+dl{margin:12px 0 0;font-size:.88rem}dt{color:var(--muted);font-size:.72rem;margin-top:12px}dd{margin:3px 0 0;overflow-wrap:anywhere}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:9px;font-size:.76rem;color:#d8e7f7}
+.swatch{display:inline-block;width:13px;height:13px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.warn{border:1px solid #745c2f;background:#2c2a2b;border-radius:11px;padding:12px;margin-bottom:14px;color:#ffe1a1;font-size:.85rem}
+.status{display:inline-flex;align-items:center;gap:6px;border:1px solid #3c526e;border-radius:30px;padding:6px 11px;font-size:.78rem;background:#1b3048}
+.status::before{content:"";width:9px;height:9px;background:#8a9db5;border-radius:50%}.status.active::before{background:var(--good)}.status.partial::before{background:var(--warn)}
+.site-box{fill:#172940;stroke:#3b5575;stroke-width:2;rx:18}
+.site-heading{fill:#e7f2fc;font-weight:700;font-size:23px}.site-caption{fill:#9cb5cf;font-size:14px}
+.local-line{stroke:#496b87;stroke-width:3;stroke-linecap:round;stroke-dasharray:4 6}
+.link{fill:none;stroke-width:5;stroke-linecap:round;cursor:pointer}
+.link.primary{stroke:#80afc5}.link.backup{stroke:#448ea2;stroke-dasharray:11 10}
+.link.admin-up{stroke:var(--warn)}.link.admin-down{stroke:var(--bad)}.link.offline,.link.unknown{stroke:#798aa0}
+.label-back{fill:#0c1a2d;stroke:#3a5671;stroke-width:1}
+.link-text{fill:#edf6ff;font-weight:600;font-size:14px}
+.device{cursor:pointer}.device rect,.device circle{stroke-width:2.5}
+.device.router circle{fill:#163b51;stroke:#78c7e7}
+.device.switch rect{fill:#203b54;stroke:#74acda}
+.device.host rect{fill:#21374e;stroke:#628fb6}
+.device.offline circle,.device.offline rect{stroke:#778b9f;fill:#243347}
+.device.unknown circle,.device.unknown rect{stroke:#60738c;fill:#1c2a3c}
+.device.running circle,.device.namespace-present rect{stroke:var(--good)}
+.device-title{fill:#fff;font-size:15px;font-weight:700;text-anchor:middle}
+.device-small{fill:#c4d4e8;font-size:12px;text-anchor:middle}
+footer{color:var(--muted);font-size:.82rem;line-height:1.65;margin:20px 0}
+@media(max-width:1120px){.layout{grid-template-columns:1fr}.aside{display:grid;grid-template-columns:1fr 1fr;gap:14px}.summary{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:660px){.summary{grid-template-columns:repeat(2,1fr)}.aside{display:block}header{padding:17px}}
+</style></head>
+<body>
+<header>
+<div><h1>NETLAB360 <span style="color:#79d2ea">/ Topología en vivo</span></h1>
+<div class="sub">Vista lógica multisede · Fase 5 · Inventario versionado + observaciones reales</div></div>
+<div class="status" id="status">Sin datos actuales</div>
+</header>
+<main class="shell">
+<div class="summary" aria-label="Resumen de inventario">
+<div class="stat"><span>Sedes registradas</span><b id="c-sites">—</b><span>HQ · S1 · S2</span></div>
+<div class="stat"><span>Routers FRR</span><b id="c-routers">—</b><span>Contenedores aislados</span></div>
+<div class="stat"><span>Switches virtuales</span><b id="c-switches">—</b><span>Puentes L2 por sede</span></div>
+<div class="stat"><span>Hosts / VLAN</span><b id="c-hosts">—</b><span>Nueve segmentos internos</span></div>
+<div class="stat"><span>Enlaces WAN</span><b id="c-wan">—</b><span>2 principales · 2 respaldos</span></div>
+</div>
+<div class="toolbar">
+<div class="tabs" role="group" aria-label="Filtrar sede">
+<button data-site="ALL" aria-pressed="true">Todas las sedes</button>
+<button data-site="HQ" aria-pressed="false">Sede central HQ</button>
+<button data-site="S1" aria-pressed="false">Sucursal S1</button>
+<button data-site="S2" aria-pressed="false">Sucursal S2</button>
+</div>
+<div class="small" id="updated" aria-live="polite">Cargando observaciones…</div>
+</div>
+<div class="warn" id="warnings">El inventario previsto no demuestra equipos encendidos. Si no hay telemetría, se indica UNKNOWN.</div>
+<div class="layout">
+<section class="canvas" aria-label="Diagrama de red multisede">
+<svg id="network" viewBox="0 0 1440 900" role="img" aria-label="Topología de NETLAB360 con sede HQ arriba y sucursales S1 y S2 abajo. Selecciona dispositivos para ver su detalle."></svg>
+</section>
+<aside class="aside">
+<div class="panel">
+<div class="kicker">Inspector</div><strong class="key" id="info-title">Selecciona un equipo</strong>
+<div class="small" id="info-desc">Pulsa sobre un router, switch, host o enlace para examinar su función, IP, VLAN y procedencia del dato.</div>
+<dl id="info-fields"></dl>
+</div>
+<div class="panel">
+<h2>Leyenda y seguridad semántica</h2>
+<div class="legend">
+<div><span class="swatch" style="background:#51d8a8"></span>Proceso observado</div>
+<div><span class="swatch" style="background:#f7c971"></span>Interfaz admin UP</div>
+<div><span class="swatch" style="background:#f97680"></span>Admin DOWN</div>
+<div><span class="swatch" style="background:#899cb3"></span>Sin datos / offline</div>
+<div>━━ Principal</div><div>┄┄ Respaldo</div>
+</div>
+<p class="small">ADMIN UP no acredita OSPF Full, ruta seleccionada, conectividad HTTP ni tráfico. Los respaldos NO se pintan como activos sin verificación de rutas.</p>
+</div>
+<div class="panel">
+<h2>Expansiones futuras</h2>
+<div class="small" id="expansions">Los equipos HA, OVS, controladores y nuevas sedes se incorporan únicamente después de implementarlos y verificarlos.</div>
+<p class="small">Actualización automática del grafo cada 3 segundos. Este visor no ejecuta cambios ni reparaciones.</p>
+</div>
+</aside>
+</div>
+<footer>La vista distingue <b>estado esperado (SoT/IPAM candidate)</b> de <b>estado observado</b>. El diagrama no conecta la LAN empresarial a VMnet8/ens33. No muestra flujos animados sin contadores verificables; su ausencia no implica que no haya tráfico. Despliegues y retiradas de S02–S04 se realizan únicamente con sus procedimientos controlados.</footer>
+</main>
+<script>
+"use strict";
+const NS="http://www.w3.org/2000/svg", svg=document.querySelector("#network");
+const $=id=>document.getElementById(id);
+const siteGeometry={HQ:{x:515,y:32,w:410,h:330,cx:720,ry:125,sy:216,hy:286},
+ S1:{x:72,y:490,w:590,h:350,cx:367,ry:580,sy:665,hy:756},
+ S2:{x:778,y:490,w:590,h:350,cx:1073,ry:580,sy:665,hy:756}};
+let selected="ALL", latest=null, selectedId=null;
+function el(tag, attrs={}, parent=svg) {
+ const node=document.createElementNS(NS,tag);
+ for(const [name,value] of Object.entries(attrs))node.setAttribute(name,value);
+ parent.appendChild(node);return node;
+}
+function txt(str,x,y,cls,parent=svg){
+ let t=el("text",{x,y,class:cls},parent);t.textContent=str;return t;
+}
+function pick(id){
+ selectedId=id;
+ if(!latest)return;
+ const item=[...latest.nodes,...latest.links].find(x=>x.id===id);
+ if(!item)return;
+ $("info-title").textContent=item.label||item.id;
+ $("info-desc").textContent=item.detail||"No hay detalle de origen";
+ const attrs=[["Identificador",item.id],["Sede",item.site||"Entre sedes"],
+ ["Tipo",item.type],["Estado observado",item.status],["Función",item.role],
+ ["VLAN",item.vlan],["Gateway",item.gateway],["Fuente",item.origin],
+ ["Extremo A",item.a],["Extremo B",item.b]];
+ const dl=$("info-fields");dl.replaceChildren();
+ for(const [key,value] of attrs){
+   if(value===undefined||value===null)continue;
+   const dt=document.createElement("dt"),dd=document.createElement("dd");
+   dt.textContent=key;dd.textContent=String(value);dl.append(dt,dd);
+ }
+}
+function attach(group,item){
+ group.setAttribute("tabindex","0");
+ group.setAttribute("role","button");
+ group.setAttribute("aria-label",(item.label||item.id)+", "+item.status);
+ group.addEventListener("click",()=>pick(item.id));
+ group.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();pick(item.id);}});
+}
+function drawDevice(item,x,y){
+ const group=el("g",{class:"device "+item.type+" "+item.status});
+ if(item.type==="router"){
+   el("circle",{cx:x,cy:y,r:35},group);
+   txt("RTR",x,y+5,"device-title",group);
+   txt(item.label,x,y+56,"device-small",group);
+ }else if(item.type==="switch"){
+   el("rect",{x:x-58,y:y-23,width:116,height:46,rx:10},group);
+   txt("SWITCH",x,y+5,"device-title",group);
+   txt(item.label,x,y+42,"device-small",group);
+ }else{
+   el("rect",{x:x-64,y:y-25,width:128,height:50,rx:10},group);
+   txt(item.type==="host"?"HOST":"EQUIPO",x,y-3,"device-title",group);
+   txt(item.label,x,y+17,"device-small",group);
+ }
+ attach(group,item);
+}
+function wanPath(link){
+ const isS1=link.to==="R-S1", startX=isS1?690:750, destX=isS1?367:1073;
+ const primary=link.role==="primary";
+ const sy=358, ey=541, off=primary?-38:38;
+ const cx1=startX+(isS1?-50:50)+off,cx2=destX+(isS1?70:-70)+off;
+ return "M "+startX+" "+sy+" C "+cx1+" 407 "+cx2+" 466 "+destX+" "+ey;
+}
+function drawWan(link,index){
+ const path=el("path",{d:wanPath(link),class:"link "+link.role+" "+link.status});
+ attach(path,link);
+ const s1=link.to==="R-S1";
+ const lx=s1?(link.role==="primary"?410:555):(link.role==="primary"?1030:880);
+ const ly=link.role==="primary"?410:457;
+ const g=el("g",{class:"device "+link.status});
+ el("rect",{x:lx-67,y:ly-16,width:134,height:31,rx:13,class:"label-back"},g);
+ txt((s1?"HQ–S1":"HQ–S2")+(link.role==="primary"?" P":" B"),lx,ly+6,"link-text",g).setAttribute("text-anchor","middle");
+ attach(g,link);
+}
+function drawSite(site,nodes,links){
+ const b=siteGeometry[site],faded=selected!=="ALL"&&selected!==site;
+ const group=el("g",{opacity:faded?".24":"1"});
+ el("rect",{x:b.x,y:b.y,width:b.w,height:b.h,rx:19,class:"site-box"},group);
+ txt(site==="HQ"?"SEDE CENTRAL · HQ":"SUCURSAL · "+site,b.x+26,b.y+39,"site-heading",group);
+ txt("Red de pruebas virtualizada · 3 VLAN",b.x+26,b.y+63,"site-caption",group);
+ const r=nodes.find(n=>n.id==="R-"+site),sw=nodes.find(n=>n.id==="SW-"+site);
+ if(r&&sw){
+   el("path",{d:"M "+b.cx+" "+(b.ry+38)+" L "+b.cx+" "+(b.sy-25),class:"local-line"},group);
+   drawDevice(r,b.cx,b.ry);drawDevice(sw,b.cx,b.sy);
+ }
+ const hosts=nodes.filter(n=>n.site===site&&n.type==="host");
+ const step=site==="HQ"?132:164;
+ const xs=hosts.length?hosts.slice(0,3).map((_,i)=>b.cx+(i-1)*step):[];
+ for(const [index,item] of hosts.slice(0,3).entries()){
+   const x=xs[index];
+   const branchY=b.sy+49;
+   el("path",{d:"M "+b.cx+" "+(b.sy+25)+" V "+branchY+" H "+x+" V "+(b.hy-26),class:"local-line"},group);
+   drawDevice(item,x,b.hy);
+ }
+ const extras=nodes.filter(n=>n.site===site&&!["R-"+site,"SW-"+site].includes(n.id)&&n.type!=="host");
+ if(extras.length){
+   txt("Adiciones verificadas: "+extras.map(x=>x.label).join(" · ").slice(0,58),b.x+18,b.y+b.h-11,"site-caption",group);
+ }
+}
+function render(data){
+ latest=data;
+ const c=data.counts||{};
+ $("c-sites").textContent=c.sites??"—";
+ $("c-routers").textContent=c.routers??"—";
+ $("c-switches").textContent=c.switches??"—";
+ $("c-hosts").textContent=(c.hosts??"—")+" / "+(c.vlans??"—");
+ $("c-wan").textContent=c.wan??"—";
+ $("expansions").textContent=c.extensions?
+   c.extensions+" equipos verificados añadidos al inventario; pulsa en sus fichas para ver detalles.":
+   "Sin equipos HA/SDN adicionales verificados. Nuevas sedes y equipos se añadirán mediante revisión de inventario.";
+ const t=data.telemetry||{},reliable=t.available===true;
+ const state=t.topology||"unknown";
+ $("status").className="status "+(reliable&&state==="active"?"active":reliable?"partial":"");
+ $("status").textContent=reliable?"Topología "+state.toUpperCase():"Estado UNKNOWN · sin exporter fiable";
+ $("updated").textContent="Consulta UTC: "+(data.observed_at_utc||"—")+" · actualización 3 s";
+ const warnings=(data.source_warnings||[]);
+ $("warnings").textContent=warnings.length?
+ "Fuentes: "+warnings.join(" · ")+" · Los datos desconocidos NO indican avería.":
+ "Fuente S04 actualizada. ADMIN UP solo acredita estado administrativo, no ruta elegida ni tráfico.";
+ svg.replaceChildren();
+ for(const site of ["HQ","S1","S2"])drawSite(site,data.nodes,data.links);
+ for(const [i,w] of data.links.filter(x=>x.type==="wan").entries())drawWan(w,i);
+ // Las conexiones extra se muestran en el inspector y catálogo; nunca se inventa un enlace.
+ for(const site of ["HQ","S1","S2"]){
+   const b=siteGeometry[site];
+   const core=data.nodes.find(n=>n.id==="R-"+site);
+   if(core)drawDevice(core,b.cx,b.ry);
+ }
+ if(selectedId)pick(selectedId);
+}
+async function update(){
+ try{
+  const response=await fetch("/api/v1/graph",{cache:"no-store"});
+  if(!response.ok)throw Error("HTTP "+response.status);
+  render(await response.json());
+ }catch(error){
+  $("status").textContent="UNKNOWN · API sin respuesta";
+  $("status").className="status";
+  $("warnings").textContent="No se puede obtener el estado del NOC: "+error.message;
+  $("updated").textContent="Consulta no disponible";
+ }
+}
+document.querySelectorAll("[data-site]").forEach(button=>button.addEventListener("click",()=>{
+ selected=button.dataset.site;
+ document.querySelectorAll("[data-site]").forEach(b=>b.setAttribute("aria-pressed",String(b===button)));
+ if(latest)render(latest);
+}));
+update();setInterval(update,3000);
+</script>
+</body></html>
