@@ -1,6 +1,6 @@
 # NETLAB360 S05 — Topología gráfica multisede
 
-**Estado:** primera versión del visor, API y pruebas offline versionadas 10/11/2026; ejecución en VM y capturas del visor **pendientes**. No equivale a aceptar [issue #64](https://github.com/recm0708/netlab360/issues/64).
+**Estado:** primera versión del visor y API comprobada en la VM el 10/11/2026: 6/6 pruebas del contrato, `--check` correcto, `/healthz` sano y `/api/v1/graph` consultable desde Windows por SSH. El usuario aportó tres pantallas de revisión **no oficiales** que identificaron solapamientos de geometría. Se creó un rediseño visual S05 v2 en GitHub **pendiente de verificación en navegador y aprobación de capturas finales**. No equivale a aceptar [issue #64](https://github.com/recm0708/netlab360/issues/64).
 
 ## Inventario representado
 
@@ -29,6 +29,22 @@ ssh -N -L 9130:127.0.0.1:9130 rc-aa-ec@192.168.47.40
 ```
 
 Abrir **http://127.0.0.1:9130/** en Windows. Todo se sirve en localhost de la VM, sin publicar en VMnet8 ni Internet; los datos viajan por SSH. Actualiza cada 3 segundos, con panel para seleccionar dispositivos y enlaces. Detener con Ctrl+C. No crea ni elimina equipos, modifica interfaces ni lanza FRR/Docker.
+
+
+## Revisión visual v2 — 10/11/2026
+
+Después de inspeccionar las tres capturas **provisionales** tomadas por el operador, se corrigieron los siguientes defectos del frontend sin alterar la API, inventario ni equipos de red:
+
+- **Bandas separadas:** cada sede tiene encabezado reservado, router, switch y tres hosts sin posiciones coincidentes con los textos. Los nombres de routers y switches van **dentro** de sus símbolos, sin atravesar conexiones LAN.
+- **Corredor WAN exclusivo:** cuatro caminos curvos entre el borde inferior de HQ y el borde superior de cada sucursal, con rotulación de principal/respaldo aislada de los nodos. Los cables no pasan por los títulos de sede. Los enlaces se dibujan como rutas lógicas entre routers del IPAM; no representar como interfaces físicas.
+- **Dispositivos únicos:** eliminado el renderizado duplicado del router que podía ocultar etiquetas y complicar la selección.
+- **Modo presentación:** pulsar `Modo presentación` oculta paneles laterales y resumen, adapta el gráfico al espacio del navegador y facilita una captura general completa. Pulsar de nuevo o `Esc` devuelve la vista de detalle. Fuera de ese modo, el inspector sigue disponible para consultar IP/VLAN/enlaces.
+- **Escalabilidad:** los dispositivos adicionales verificados de HQ/S1/S2 se distribuyen bajo el grafo principal, manteniendo su estado `UNKNOWN` hasta tener observación. Las WAN adicionales entre nuevos nodos todavía requieren trazado visual y prueba separados.
+- **Regresiones:** además del contrato API, se incluyeron pruebas geométricas offline `tests/test_s05_layout.py` y análisis `node --check` del JavaScript inline mediante CI S05.
+
+La página se lee del archivo `index.html` por cada GET, de modo que **si el servidor `app.py --serve` y el túnel SSH siguen abiertos, basta sincronizar Git y realizar recarga forzada del navegador (Ctrl+Mayús+R); no es necesario reiniciar el proceso Python**.
+
+No convertir las capturas preliminares del defectuoso diseño v1 en evidencias oficiales. Tomar S05_10/S05_11/S05_12 solo después de la verificación de v2.
 
 ## Actualización por fases
 
