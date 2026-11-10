@@ -1,0 +1,42 @@
+name: NETLAB360 - Diagnostico seguro de milestone S01 2026-11-10
+
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/auditoria-temporal-sincronizar-milestones-20261110.yml']
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  probar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Probar desvinculacion y reposicion de una issue cerrada preservando su estado
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          i=39
+          m=1
+          restaurar() {
+            gh api --method PATCH "repos/$GH_REPO/issues/$i" --input - <<< '{"milestone":1}' >/dev/null || true
+          }
+          trap restaurar EXIT
+          estado="$(gh api "repos/$GH_REPO/issues/$i" --jq .state)"
+          asignacion="$(gh api "repos/$GH_REPO/issues/$i" --jq .milestone.number)"
+          test "$estado" = closed
+          test "$asignacion" = "$m"
+          gh api "repos/$GH_REPO/milestones/$m" --jq '"ANTES: state=" + .state + " closed=" + (.closed_issues|tostring) + " open=" + (.open_issues|tostring)'
+          echo '{"milestone":null}' | gh api --method PATCH "repos/$GH_REPO/issues/$i" --input - >/dev/null
+          test "$(gh api "repos/$GH_REPO/issues/$i" --jq .milestone)" = null
+          gh api "repos/$GH_REPO/milestones/$m" --jq '"SIN_ISSUE: state=" + .state + " closed=" + (.closed_issues|tostring) + " open=" + (.open_issues|tostring)'
+          echo '{"milestone":1}' | gh api --method PATCH "repos/$GH_REPO/issues/$i" --input - >/dev/null
+          test "$(gh api "repos/$GH_REPO/issues/$i" --jq .milestone.number)" = 1
+          test "$(gh api "repos/$GH_REPO/issues/$i" --jq .state)" = closed
+          gh api "repos/$GH_REPO/milestones/$m" --jq '"DESPUES: state=" + .state + " closed=" + (.closed_issues|tostring) + " open=" + (.open_issues|tostring)'
+          echo "PRUEBA_DE_REASIGNACION=OK"
