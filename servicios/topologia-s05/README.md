@@ -1,12 +1,12 @@
 # NETLAB360 S05 — Topología gráfica multisede
 
-**Estado:** primera versión del visor y API comprobada en la VM el 10/11/2026: 6/6 pruebas del contrato, `--check` correcto, `/healthz` sano y `/api/v1/graph` consultable desde Windows por SSH. El usuario aportó tres pantallas de revisión **no oficiales** que identificaron solapamientos de geometría. Se creó un rediseño visual S05 v2 en GitHub **pendiente de verificación en navegador y aprobación de capturas finales**. No equivale a aceptar [issue #64](https://github.com/recm0708/netlab360/issues/64).
+**Estado al 10/11/2026:** v3 del visor probado en VM y Windows (13/13 pruebas offline, JavaScript válido, API y reloj Panamá correctos). Las imágenes compartidas son **preliminares**, no evidencias académicas oficiales. V4 de conexiones ortogonales **preparada en GitHub, pendiente de comprobar en la VM y aprobar visualmente**. La [issue #64](https://github.com/recm0708/netlab360/issues/64) permanece abierta.
 
 ## Inventario representado
 
 Deriva de `inventario/ipam/topologia-s02.yaml`, estado `candidate`. Dibuja **HQ, S1 y S2**, 3 routers FRR, 3 switches de prueba, 9 VLAN, 9 hosts de namespaces aislados y 4 WAN (primaria y respaldo de HQ a cada sucursal). Los equipos que aparecen en diseño no se declaran operativos sin evidencia real. Un host VLAN servicios **no es automáticamente un servidor dedicado**. No hay equipos HA/OVS/Faucet adicionales confirmados todavía.
 
-La API recoge el exporter S04 en `127.0.0.1:9110/api/v1/state` con antigüedad de muestra máxima de 15 segundos, identidad y fuente fiables, y consulta `sudo -n ip netns list` para identificar namespaces. Si la fuente no funciona o el usuario no puede consultar namespaces, el estado correspondiente es **UNKNOWN**, no DOWN falso. Si se observa apagado intencional, queda **OFFLINE**.
+La API recoge el exporter S04 en `127.0.0.1:9110/api/v1/state` con antigüedad de muestra máxima de 15 segundos, identidad y fuente fiables, y consulta primero `ip netns list` sin privilegios (recurre a `sudo -n` solo si no puede leer) para identificar namespaces. Si la fuente no funciona o el usuario no puede consultar namespaces, el estado correspondiente es **UNKNOWN**, no DOWN falso. Si se observa apagado intencional, queda **OFFLINE**.
 
 Las WAN distinguen trazado primario continuo y respaldo discontinuo. `admin-up` exige ambas puntas con `admin_up=1`, pero **no** demuestra vecindad OSPF Full, ruta activa/FIB, servicio HTTP, tráfico ni utilización de backup. Por ello el visor no anima paquetes ni pinta rutas como seleccionadas solo por flags administrativos.
 
@@ -48,15 +48,28 @@ No convertir las capturas preliminares del defectuoso diseño v1 en evidencias o
 
 ## Revisión visual v3 — hora Panamá y mejor aprovechamiento del espacio (10/11/2026)
 
-La revisión v2 pasó las **10 pruebas** de API/geometría y su JavaScript superó `node --check`. El operador mostró el diseño en navegador Windows, todavía como **capturas preliminares**. Se refinó una tercera versión, **pendiente de validar visualmente**:
+La revisión v2 pasó las **10 pruebas** de API/geometría. La v3 **pasó 13/13 pruebas y `node --check` en Ubuntu**, con reloj VM UTC/Panamá correcto; el operador confirmó el formato en Windows mediante capturas **preliminares**, todavía no oficiales:
 
 - **Hora presentada:** la API entrega `vm_clock.utc` y `vm_clock.panama` correspondientes al *mismo instante del reloj de la VM*. El servidor convierte UTC a `America/Panama` (UTC−5) mediante `zoneinfo`; JavaScript solo da formato legible a ese dato usando `Intl.DateTimeFormat("es-PA")`. El navegador no inventa ni consulta su hora actual. El valor UTC `observed_at_utc` sigue disponible para logs, correlación y monitoreo.
 - **Diseño compacto:** reducida la altura base del SVG de 1040 a 920 unidades, sin superponer títulos, routers, switches ni hosts. Se conserva el corredor WAN principal/respaldo, el inspector y el modo presentación.
 - **Estado por sede:** chip `RTR: EN EJECUCIÓN / DETENIDO / SIN DATOS`, basado exclusivamente en el estado observado del router FRR; **no** diagnostica por sí mismo el estado de toda la sede.
 - **Mejor accesibilidad:** el inspector traduce los estados de `unknown`, `admin-up` y `admin-down` a texto entendible, conservando la distinción entre habilitación administrativa y prueba de disponibilidad.
-- **Regresión ampliada:** prueba adicional de reloj UTC/Panamá y verificaciones geométricas de cables/etiquetas. Se esperan **13 tests offline** (7 de grafo y 6 de diseño). Los resultados deben revalidarse en VM después del `git pull`.
+- **Regresión ampliada:** prueba adicional de reloj UTC/Panamá y verificaciones geométricas de cables/etiquetas. Se validaron **13 tests offline** (7 de grafo y 6 de diseño) en la VM con Git limpio.
 
 **Secuencia operacional v3:** detener `python3 servicios/topologia-s05/app.py --serve --port 9130` con Ctrl+C en la terminal del servidor, sincronizar Git en otra terminal, pasar tests y `--check`, volver a iniciarlo, comprobar JSON `vm_clock` y recargar el navegador Windows. No cerrar el túnel SSH ni modificar `ens33`, Docker, rutas u otros servicios.
+
+## Revisión visual v4 — conexiones WAN ortogonales entre routers (10/11/2026)
+
+La revisión de las capturas de la versión v3 detectó que las curvas WAN parecían salir de la zona de **hosts VLAN** en vez de los routers. El trazado se cambió a conexiones ortogonales (segmentos horizontales/verticales, ángulos de 90°) que **comienzan en el símbolo R-HQ y terminan en los símbolos R-S1/R-S2**, por carriles periféricos. Se comprueba que no cruzan switches, hosts, encabezados ni otros circuitos.
+
+- **Principal:** línea continua, camino externo por el costado de la sucursal.
+- **Respaldo:** línea discontinua, camino interior por el espacio entre S1/S2.
+- **Etiquetas únicas y legibles:** `HQ ↔ SUCURSAL S1/S2`, tipo de enlace y subred (ej.: `WAN PRINCIPAL · 10.78.0.0/30`). La etiqueta es interactiva y abre el inspector de enlace con ambos extremos.
+- **Sin falsos estados:** `unknown` se mantiene como no observado. Ni el color ni el dibujo prueban OSPF Full o uso del respaldo.
+- **Fuente de LAN:** la API intenta `ip netns list` sin sudo y conserva el fallback seguro `sudo -n`; así evita avisos innecesarios de permisos en entornos donde la enumeración es pública.
+- **Pruebas nuevas:** comprobar puntos de conexión en routers, trayectorias `H/V`, corredor WAN, ausencia de intersecciones y lectura de namespaces sin sudo. Están versionadas, **aún no ejecutadas contra la VM por el operador**.
+
+**Arranque v4:** detener solo el proceso del visor Python (`Ctrl+C`), conservar túnel SSH, sincronizar `main`, ejecutar tests `test_s05_*.py`, comprobar sintaxis JS y `--check`, iniciar `--serve --port 9130` y forzar recarga del navegador (`Ctrl+Mayús+R`). **No tomar capturas oficiales antes de confirmar que la v4 se muestra completa y sin cruces.** No alterar `ens33`, Docker ni los namespaces de otras fases.
 
 ## Actualización por fases
 
