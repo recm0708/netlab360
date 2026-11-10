@@ -45,7 +45,7 @@ jobs:
           from pathlib import Path
           import re
           p=Path('servicios/topologia-s05/index.html').read_text(encoding='utf-8')
-          blocks=re.findall(r'<script>([\\s\\S]*?)</script>',p)
+          blocks=re.findall(r'<script>([\s\S]*?)</script>',p)
           assert len(blocks)==1, 'Se espera un unico bloque de JS propio'
           Path('/tmp/netlab360-s05-visor.js').write_text(blocks[0],encoding='utf-8')
           PY
