@@ -1,6 +1,6 @@
 # NETLAB360 — Control de fases y milestones
 
-**Corte auditado el 04/11/2026 (Panamá).** Los porcentajes de esta tabla se calculan a partir del estado individual de las issues, no del objeto `milestone` de GitHub. Son indicadores de seguimiento técnico/documental, no notas académicas ni aceptación final de la profesora. S01–S04 están administrativamente cerradas y sin issues abiertas reales. La auditoría original de cierres fue [Actions #41383586585](https://github.com/recm0708/netlab360/actions/runs/41383586585).
+**Corte auditado el 10/11/2026 (Panamá).** Los porcentajes de la tabla coinciden ahora tanto con las issues individuales como con los contadores nativos del objeto `milestone` de GitHub. Son indicadores de seguimiento técnico/documental, no notas académicas ni aceptación final de la profesora. S01–S04 están administrativamente cerradas, con cero issues abiertas. El cierre original consta en [Actions #41383586585](https://github.com/recm0708/netlab360/actions/runs/41383586585).
 
 | Milestone | Issues cerradas | Porcentaje | Estado del alcance |
 |---|---:|---:|---|
@@ -13,19 +13,24 @@
 | S07 | 0/1 | 0 % | Pendiente |
 | S08 | 2/11 | 18,2 % de issues cerradas | Entregables finales y revisión académica 13/11 pendientes |
 
-## Discrepancia de contadores internos de GitHub — verificada el 04/11/2026
+## Reconciliación de los contadores internos de GitHub — RESUELTA 10/11/2026
 
-La API de GitHub continúa devolviendo **contadores obsoletos**: S01/S03/S04 muestran issues abiertas inexistentes y S05 omite una issue abierta recientemente incorporada (#64). Las consultas de issues individuales son la fuente de verdad:
+El 04/11 la API de GitHub mostraba contadores desincronizados pese a que todas las issues de S01–S04 estaban cerradas: S01=11/3, S03=3/3 y S04=3/3, mientras S05 indicaba 0/6 (faltaba reconocer una issue abierta). Un intento anterior de reabrir/cerrar los propios milestones [#41948944162](https://github.com/recm0708/netlab360/actions/runs/41948944162) no corrigió las cifras.
 
-| Hito | Contador interno `closed/open` | Resultado comprobado por listado de issues |
-|---|---:|---:|
-| S01 | 11/3 (79 %) | 14 cerradas / 0 abiertas = **100 %** |
-| S02 | 3/0 (100 %) | 3 cerradas / 0 abiertas = **100 %** |
-| S03 | 3/3 (50 %) | 5 cerradas / 0 abiertas = **100 %** |
-| S04 | 3/3 (50 %) | 6 cerradas / 0 abiertas = **100 %** |
-| S05 | 0/6 (0 %) | 0 cerradas / **7 abiertas** = **0 %** |
+**Solución comprobada:** desvincular temporalmente una issue de cada milestone afectado y restablecer su asignación original, **sin cambiar el estado abierto/cerrado ni los checkboxes**. El primer ensayo sincronizó S01; la [ejecución #42830631303](https://github.com/recm0708/netlab360/actions/runs/42830631303) corrigió S03, S04 y S05. Todos los scripts temporales con permiso `issues:write` fueron eliminados del repositorio tras las pruebas. Las referencias y números de los milestones originales se conservaron.
 
-La [ejecución de diagnóstico #41948944162](https://github.com/recm0708/netlab360/actions/runs/41948944162) contrastó para cada hito los listados reales, verificó ausencia de checkboxes pendientes y probó reabrir/cerrar el milestone con permisos de Issues. **El contador no se recalculó**: persistió idéntico antes y después. Se retiró del repositorio el workflow temporal tras la prueba; no quedó automatización privilegiada activa. Existe un [reporte público del mismo síntoma en GitHub Community](https://github.com/orgs/community/discussions/211801). Los campos `open_issues` y `closed_issues` de los milestones son contadores administrados por GitHub; no deben falsificarse ni reemplazarse mediante cambios artificiales de estado de issues. **Hasta que GitHub sincronice sus contadores, la fuente verificable de avance es el listado individual de issues.**
+| Hito | Contador nativo corregido (`closed/open`) | Progreso | Estado |
+|---|---:|---:|---|
+| S01 | 14/0 | **100 %** | Cerrado |
+| S02 | 3/0 | **100 %** | Cerrado |
+| S03 | 5/0 | **100 %** | Cerrado |
+| S04 | 6/0 | **100 %** | Cerrado |
+| S05 | 0/7 | 0 % | Abierto |
+| S06 | 0/3 | 0 % | Abierto |
+| S07 | 0/1 | 0 % | Abierto |
+| S08 | 2/9 | 18,2 % | Abierto |
+
+**Validación posterior:** los recuentos del objeto milestone coinciden con las issues asignadas y su estado real, sin duplicaciones, sin reabrir trabajo terminado ni declarar S05–S08 completadas. Este incidente queda como antecedente resuelto, no como bloqueo de S05.
 
 **Auditoría de issues cerradas:** revisamos las **30 issues cerradas**; ninguna contiene una casilla `- [ ]` pendiente. Se actualizaron ocho cuerpos con referencias históricas obsoletas, preservando las pruebas originales. De las 30 cerradas, 27 tienen motivo `completed`, dos (#9 y #37) tienen motivo `duplicate` por consolidación documental y una (#28) tiene motivo `not_planned`; estas últimas tres **no deben presentarse como funcionalidades implementadas**. La revisión del 13/11 (#48) se reasignó de S06 a S08 por ser un hito académico transversal. Las milestones S05–S08 siguen abiertas deliberadamente.
 
