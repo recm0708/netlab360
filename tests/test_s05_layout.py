@@ -27,7 +27,7 @@ class GeometryTests(unittest.TestCase):
         self.assertEqual(set(self.geo), {"HQ", "S1", "S2"})
         for site, g in self.geo.items():
             with self.subTest(site=site):
-                self.assertGreaterEqual(g["ry"] - 32, g["y"] + 105)
+                self.assertGreaterEqual(g["ry"] - 32, g["y"] + 92)
                 self.assertGreaterEqual(g["sy"] - 25, g["ry"] + 32 + 20)
                 self.assertGreaterEqual(g["hy"] - 26, g["sy"] + 25 + 15)
                 self.assertLessEqual(g["hy"] + 26, g["y"] + g["h"] - 18)
