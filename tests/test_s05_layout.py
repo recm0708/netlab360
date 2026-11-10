@@ -42,13 +42,13 @@ class GeometryTests(unittest.TestCase):
 
     def test_wan_exclusive_corridor(self):
         hq = self.geo["HQ"]
-        self.assertEqual(hq["y"] + hq["h"], 390)
+        self.assertEqual(hq["y"] + hq["h"], 362)
         for site in ("S1", "S2"):
-            self.assertEqual(self.geo[site]["y"], 606)
-        self.assertIn('y1=390,y2=606', self.html)
-        for ly in (488, 546):
-            self.assertGreaterEqual(ly - 23, 390 + 30)
-            self.assertLessEqual(ly + 23, 606 - 30)
+            self.assertEqual(self.geo[site]["y"], 516)
+        self.assertIn('y1=362,y2=516', self.html)
+        for ly in (412, 466):
+            self.assertGreaterEqual(ly - 23, 362 + 20)
+            self.assertLessEqual(ly + 23, 516 - 20)
 
     def test_accessibility_presentation_mode_and_no_duplicated_router(self):
         self.assertIn('id="focus-toggle"', self.html)
@@ -60,6 +60,24 @@ class GeometryTests(unittest.TestCase):
         self.assertIn('if(selectedId)pick(selectedId)', self.html)
         self.assertIn('txt("RTR",x,y-2', self.html)
         self.assertIn('txt(item.label,x,y+18', self.html)
+
+
+    def test_wiring_never_enters_host_or_switch(self):
+        self.assertIn('const yJunction=b.sy+40;', self.html)
+        for site, g in self.geo.items():
+            with self.subTest(site=site):
+                self.assertGreater(g["sy"] + 40, g["sy"] + 25)
+                self.assertLess(g["sy"] + 40, g["hy"] - 26)
+                self.assertGreater(g["hy"] - 26, g["sy"] + 25)
+
+    def test_vm_panama_clock_and_router_status_badges(self):
+        self.assertIn('function formatVMClock(data)', self.html)
+        self.assertIn('America/Panama', self.html)
+        self.assertIn('data.vm_clock', self.html)
+        self.assertIn('Hora de la VM', self.html)
+        self.assertIn('site-state-badge', self.html)
+        self.assertIn('function drawSiteBox(site,nodes,parent)', self.html)
+        self.assertIn('formatVMClock(data)', self.html)
 
 
 if __name__ == "__main__":
