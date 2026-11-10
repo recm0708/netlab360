@@ -119,6 +119,18 @@ header{padding-top:15px;padding-bottom:15px}
 .wan-label:hover .wan-pill,.wan-label:focus-visible .wan-pill{stroke:#f7c971}
 .wan-line.unknown,.wan-line.offline{stroke:#879cb4}
 .wan-label{cursor:pointer}
+
+/* V5: dos módulos WAN legibles y conexiones independientes. */
+.wan-bundle-box{fill:#172c44;stroke:#3e647f;stroke-width:2}
+.wan-bundle-title{fill:#b9e0f2;font-weight:750;font-size:18px}
+.wan-bundle-rule{stroke:#355875;stroke-width:1.4}
+.wan-line{stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round}
+.wan-line.backup{stroke-dasharray:9 9}
+.wan-pill{fill:#102941;stroke:#718ca8;stroke-width:2}
+.wan-pill-title{fill:#e9f4ff;font-size:14px;font-weight:700}
+.wan-line.unknown,.wan-line.offline{stroke:#8095ac}
+.wan-circuit.selected .wan-line,.wan-circuit:focus-visible .wan-line{stroke:#65d2e9;stroke-width:5}
+.wan-label.selected .wan-pill,.wan-label:focus-visible .wan-pill{stroke:#65d2e9;stroke-width:3}
 </style></head>
 <body>
 <header>
@@ -148,7 +160,7 @@ header{padding-top:15px;padding-bottom:15px}
 <div class="layout">
 <section class="canvas" aria-label="Diagrama de red multisede">
 <div class="canvas-head"><strong>Mapa corporativo · Sede central y sucursales</strong><span>Inventario lógico verificado · Observación en tiempo real cuando está disponible</span></div>
-<svg id="network" viewBox="0 0 1440 920" role="img" aria-label="Topología de NETLAB360: sede HQ superior, sucursales S1 y S2 inferiores, cuatro WAN separadas y redes VLAN locales. Selecciona dispositivos o enlaces."></svg>
+<svg id="network" viewBox="0 0 1440 930" role="img" aria-label="Topología de NETLAB360: sede HQ superior, sucursales S1 y S2 inferiores, cuatro WAN separadas y redes VLAN locales. Selecciona dispositivos o enlaces."></svg>
 </section>
 <aside class="aside">
 <div class="panel">
@@ -206,19 +218,19 @@ function statusText(value){
 }
 // Reservamos bandas exclusivas para encabezados, WAN y equipos. Ninguna posición
 // de dispositivos puede cruzar la banda de texto de su sede.
-const WIDTH=1440, BASE_HEIGHT=920;
+const WIDTH=1440, BASE_HEIGHT=930;
 const siteGeometry={
- HQ:{x:500,y:18,w:440,h:344,cx:720,ry:155,sy:244,hy:318,step:132},
- S1:{x:38,y:516,w:648,h:356,cx:362,ry:649,sy:736,hy:823,step:166},
- S2:{x:754,y:516,w:648,h:356,cx:1078,ry:649,sy:736,hy:823,step:166}
+ // Sede HQ izquierda, sucursales a la derecha, dos grupos WAN centrales.
+ HQ:{x:32,y:200,w:440,h:560,cx:252,ry:365,sy:495,hy:636,step:128},
+ S1:{x:990,y:50,w:425,h:370,cx:1200,ry:187,sy:280,hy:360,step:128},
+ S2:{x:990,y:515,w:425,h:370,cx:1200,ry:651,sy:743,hy:823,step:128}
 };
 const wanGeometry={
- // Cada enlace parte de R-HQ y termina en el router de su sucursal.
- // El tendido ortogonal usa carriles periféricos; nunca nace de hosts/VLAN.
- "WAN-PRIMARIA-HQ-S1":{sx:690,sy:143,outX:468,crossY:401,edgeX:26,dy:637,dx:332,lx:248,ly:401},
- "WAN-RESPALDO-HQ-S1":{sx:690,sy:167,outX:487,crossY:463,edgeX:708,dy:661,dx:392,lx:604,ly:463},
- "WAN-PRIMARIA-HQ-S2":{sx:750,sy:143,outX:972,crossY:401,edgeX:1414,dy:637,dx:1108,lx:1192,ly:401},
- "WAN-RESPALDO-HQ-S2":{sx:750,sy:167,outX:953,crossY:463,edgeX:732,dy:661,dx:1048,lx:836,ly:463}
+ // Trayectorias individuales router-a-router, con pistas distintas y sin cruces.
+ "WAN-PRIMARIA-HQ-S1":{sx:278,sy:346,kneeX:552,laneY:222,entryX:967,tailY:187,dx:1168,dy:187,lx:777,ly:222},
+ "WAN-RESPALDO-HQ-S1":{sx:283,sy:360,kneeX:570,laneY:289,entryX:980,tailY:203,dx:1172,dy:203,lx:777,ly:289},
+ "WAN-PRIMARIA-HQ-S2":{sx:281,sy:379,kneeX:552,laneY:604,entryX:965,tailY:651,dx:1168,dy:651,lx:777,ly:604},
+ "WAN-RESPALDO-HQ-S2":{sx:266,sy:394,kneeX:535,laneY:679,entryX:980,tailY:669,dx:1172,dy:669,lx:777,ly:679}
 };
 let selected="ALL",latest=null,selectedId=null;
 function el(tag,attrs={},parent=svg){
@@ -244,7 +256,7 @@ function pick(id){
  if(!latest)return;
  const item=[...latest.nodes,...latest.links].find(x=>x.id===id);
  if(!item)return;
- $("info-title").textContent=item.label||item.id;
+ $("info-title").textContent=item.type==="wan"?("WAN "+(item.role==="primary"?"principal":"respaldo")+" · HQ ↔ "+item.to.replace("R-","")):(item.label||item.id);
  $("info-desc").textContent=(item.detail||"No hay detalle de origen")+" · "+statusText(item.status);
  const attrs=[["Identificador",item.id],["Sede",item.site||"Entre sedes"],
  ["Tipo",item.type],["Estado observado",statusText(item.status)],["Función",item.role==="primary"?"Principal":item.role==="backup"?"Respaldo":item.role],
@@ -271,7 +283,7 @@ function drawDevice(item,x,y,parent=svg){
    txt("SWITCH",x,y-3,"device-title",g);
    txt(item.label,x,y+18,"device-small",g);
  }else{
-   el("rect",{x:x-63,y:y-26,width:126,height:52,rx:10},g);
+   el("rect",{x:x-55,y:y-26,width:110,height:52,rx:10},g);
    const kind=item.type==="host"?
       (item.vlan%100===10?"USUARIOS":item.vlan%100===20?"SERVICIOS":"GESTIÓN"):
       item.type.toUpperCase();
@@ -298,30 +310,31 @@ function drawSiteBox(site,nodes,parent){
    state==="offline"?"RTR: DETENIDO":"RTR: SIN DATOS";
  txt(label,badgeX+69,badgeY+21,"site-state-text",g);
 }
+function drawWanBundles(parent){
+ for(const e of [{site:"S1",y:155},{site:"S2",y:540}]){
+  const g=el("g",{class:"wan-bundle"},parent);
+  el("rect",{x:605,y:e.y,width:345,height:173,rx:18,class:"wan-bundle-box"},g);
+  txt("HQ ↔ SUCURSAL "+e.site,777,e.y+32,"wan-bundle-title",g)
+    .setAttribute("text-anchor","middle");
+  el("path",{d:"M 625 "+(e.y+49)+" H 930",class:"wan-bundle-rule"},g);
+ }
+}
 function wanPath(w){
  const g=wanGeometry[w.id];
  if(!g)return "";
- // Tramo desde la interfaz lógica del router HQ, fuera del contenedor, 
- // corredor intersedes y entrada lateral al router S1/S2.
  return "M "+g.sx+" "+g.sy+
-        " H "+g.outX+
-        " V "+g.crossY+
-        " H "+g.edgeX+
-        " V "+g.dy+
-        " H "+g.dx;
+        " H "+g.kneeX+" V "+g.laneY+
+        " H "+g.entryX+" V "+g.tailY+" H "+g.dx;
 }
 function wanBadge(w,parent){
  const g=wanGeometry[w.id];
  if(!g)return;
  const badge=el("g",{class:"wan-label "+w.status},parent);
- el("rect",{x:g.lx-114,y:g.ly-23,width:228,height:46,rx:10,class:"wan-pill"},badge);
- txt(w.to==="R-S1"?"HQ ↔ SUCURSAL S1":"HQ ↔ SUCURSAL S2",
-     g.lx,g.ly-4,"wan-pill-title",badge);
+ el("rect",{x:g.lx-130,y:g.ly-17,width:260,height:34,rx:11,class:"wan-pill"},badge);
  const subnet=(w.detail||"").split(" · ")[0];
- txt((w.role==="primary"?"WAN PRINCIPAL":"WAN RESPALDO")+
+ txt((w.role==="primary"?"PRINCIPAL":"RESPALDO")+
      (subnet?" · "+subnet:""),
-     g.lx,g.ly+13,"wan-pill-state",badge);
- badge.querySelectorAll("text").forEach(t=>t.setAttribute("text-anchor","middle"));
+     g.lx,g.ly+5,"wan-pill-title",badge).setAttribute("text-anchor","middle");
  attach(badge,w);
 }
 function drawWan(w,parent){
@@ -330,7 +343,6 @@ function drawWan(w,parent){
  const layer=el("g",{class:"wan-circuit"},parent),path=wanPath(w);
  el("path",{d:path,class:"wan-line "+w.role+" "+w.status},layer);
  el("path",{d:path,class:"wan-click"},layer);
- // Extremos asociados a routers, no a host/vlan o panel físico de red.
  el("circle",{cx:g.sx,cy:g.sy,r:4.5,class:"wan-port"},layer);
  el("circle",{cx:g.dx,cy:g.dy,r:4.5,class:"wan-port"},layer);
  attach(layer,w);
@@ -409,12 +421,11 @@ function render(data){
  svg.replaceChildren();
  const bg=el("g"),wan=el("g"),local=el("g");
  ["HQ","S1","S2"].forEach(site=>drawSiteBox(site,data.nodes,bg));
- txt("CIRCUITOS WAN · ROUTER A ROUTER",720,388,"zone-title",bg);
- txt("PRINCIPAL: CONTINUA · RESPALDO: DISCONTINUA",720,504,"presentation-note",bg);
+ drawWanBundles(bg);
  data.links.filter(x=>x.type==="wan").forEach(w=>drawWan(w,wan));
  ["HQ","S1","S2"].forEach(site=>drawInSite(site,data.nodes,local));
  txt("INVENTARIO DEL LABORATORIO · LOS ESTADOS NO VERIFICADOS NO SE DAN POR ACTIVOS",
-  720,903,"presentation-note");
+  720,915,"presentation-note");
  drawExtensions(data);
  if(selectedId)pick(selectedId);
 }
