@@ -85,13 +85,16 @@ def telemetry() -> tuple[dict | None, str]:
 
 
 def namespaces() -> tuple[set[str] | None, str]:
-    try:
-        p = command("sudo", "-n", "ip", "netns", "list", timeout=3.0)
-    except (OSError, subprocess.TimeoutExpired):
-        return None, "No se pudo consultar netns"
-    if p.returncode:
-        return None, "netns no consultable sin credenciales; estado UNKNOWN"
-    return {row.split()[0] for row in p.stdout.splitlines() if row.strip()}, ""
+    # Listar netns suele ser legible sin privilegios. Intentarlo primero
+    # evita depender de la caché sudo y no modifica namespaces.
+    for argv in (("ip", "netns", "list"), ("sudo", "-n", "ip", "netns", "list")):
+        try:
+            p = command(*argv, timeout=3.0)
+        except (OSError, subprocess.TimeoutExpired):
+            continue
+        if p.returncode == 0:
+            return {row.split()[0] for row in p.stdout.splitlines() if row.strip()}, ""
+    return None, "netns no consultable; estado UNKNOWN"
 
 
 def observed_router(site: str, snapshot: dict | None) -> str:
