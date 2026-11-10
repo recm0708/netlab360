@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "description": "Extensiones del diagrama S05: inventario adicional solo despues de despliegue y pruebas; no confundir diseño con equipos existentes.",
+  "nodes": [],
+  "links": []
+}
