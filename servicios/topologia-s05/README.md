@@ -1,6 +1,6 @@
 # NETLAB360 S05 — Topología gráfica multisede
 
-**Estado al 10/11/2026:** v3 del visor probado en VM y Windows (13/13 pruebas offline, JavaScript válido, API y reloj Panamá correctos). Las imágenes compartidas son **preliminares**, no evidencias académicas oficiales. V4 de conexiones ortogonales **preparada en GitHub, pendiente de comprobar en la VM y aprobar visualmente**. La [issue #64](https://github.com/recm0708/netlab360/issues/64) permanece abierta.
+**Estado al 10/11/2026:** V4 probada en la VM y en Windows (16/16 pruebas, sintaxis JS y API correctas), pero **rechazada visualmente por circuitos amontonados y superposición de etiquetas**. La revisión **V5 se diseñó en formato apaisado con dos módulos WAN y previsualización SVG local**, y quedó versionada en GitHub. **La V5 aún no se ha ejecutado ni revisado en la VM**. No hay capturas oficiales; [issue #64](https://github.com/recm0708/netlab360/issues/64) permanece abierta.
 
 ## Inventario representado
 
@@ -70,6 +70,24 @@ La revisión de las capturas de la versión v3 detectó que las curvas WAN parec
 - **Pruebas nuevas:** comprobar puntos de conexión en routers, trayectorias `H/V`, corredor WAN, ausencia de intersecciones y lectura de namespaces sin sudo. Están versionadas, **aún no ejecutadas contra la VM por el operador**.
 
 **Arranque v4:** detener solo el proceso del visor Python (`Ctrl+C`), conservar túnel SSH, sincronizar `main`, ejecutar tests `test_s05_*.py`, comprobar sintaxis JS y `--check`, iniciar `--serve --port 9130` y forzar recarga del navegador (`Ctrl+Mayús+R`). **No tomar capturas oficiales antes de confirmar que la v4 se muestra completa y sin cruces.** No alterar `ens33`, Docker ni los namespaces de otras fases.
+
+## V5 — Diagrama apaisado y dos módulos WAN (10/11/2026)
+
+La ejecución **V4** completó **16/16 pruebas**, `node --check`, `--check`, consulta de los cuatro WAN desde IPAM y lectura `netns` sin credenciales (`NAMESPACES_OBSERVABLES=True`). Las capturas provisionales del operador mostraron una limitación visual no detectada por los tests de V4: cables perimetrales, etiquetas cercanas y nota inferior sobre los enlaces de respaldo. Aunque técnicamente válido, **V4 no se acepta como captura final**.
+
+Se diseñó **V5** sobre una previsualización SVG local y se sustituyó el esquema superior/inferior por una disposición horizontal:
+
+- **Sede central HQ:** columna izquierda, con router, switch y VLAN/hosts claramente diferenciados.
+- **Dos sucursales S1/S2:** tarjetas independientes a la derecha, S1 arriba y S2 abajo.
+- **Dos módulos WAN centrales:** un módulo por sucursal, cada uno con **PRINCIPAL · subred /30** y **RESPALDO · subred /30** en pistas diferentes. La línea continua y la discontinua siguen representando los dos circuitos de IPAM, sin duplicarlos.
+- **Conexiones lógicas entre routers:** las cuatro rutas terminan en los símbolos `R-HQ`, `R-S1` y `R-S2` y pasan por sus respectivas pistas WAN. Los módulos son agrupadores visuales, **no switches, routers adicionales ni dispositivos desplegados**.
+- **Sin texto inferior cruzado:** se eliminó la anotación central `PRINCIPAL: CONTINUA · RESPALDO: DISCONTINUA` que se superponía con la ruta; la leyenda del panel derecho continúa vigente.
+- **Inspector simplificado:** seleccionando cada circuito se visualiza un nombre legible, subred, extremos, función y estado observado. La selección se resalta en cian, mientras que estado administrativo y respaldo mantienen sus significados.
+- **Regresión geométrica V5:** conserva validaciones de títulos y dispositivos y añade pruebas de separación de etiquetas en cada módulo, cuatro extremos sobre routers y ausencia de intersecciones entre circuitos. **Pendiente de ejecutar en Ubuntu; se esperan 17 pruebas** (8 de geometría + 9 del backend).
+
+La V5 cambia solo frontend y pruebas; **si el backend V4 continúa abierto, basta `git pull --ff-only` con árbol limpio y recarga forzada del navegador**. Si el servidor se ha detenido, iniciarlo como siempre en localhost 9130. Conserva la hora Panamá calculada del reloj de la VM, `UNKNOWN` si S04 está detenido, lectura de namespaces solo lectura y protección de `ens33`.
+
+Las próximas ampliaciones deben mostrar enlaces y equipos reales en la misma estructura, pero no marcar primaria elegida, failover exitoso o dispositivos activos sin telemetría verificable.
 
 ## Actualización por fases
 
