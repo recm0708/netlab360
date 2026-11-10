@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import ipaddress
 import json
@@ -130,6 +131,10 @@ def wan_state(w: dict, snap: dict | None) -> str:
 
 
 def graph(inv: dict, snap: dict | None, ns: set[str] | None, ext: dict) -> dict:
+    # El instante se toma del reloj de la VM; UTC se conserva para trazabilidad
+    # y America/Panama se ofrece explícitamente para su presentación.
+    now_utc = datetime.now(timezone.utc)
+    now_panama = now_utc.astimezone(ZoneInfo("America/Panama"))
     nodes: list[dict] = []
     links: list[dict] = []
     for site in SITES:
@@ -199,7 +204,13 @@ def graph(inv: dict, snap: dict | None, ns: set[str] | None, ext: dict) -> dict:
                       "status": "unknown"})
     return {
         "project": "NETLAB360", "phase": "S05", "schema_version": 1,
-        "observed_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "observed_at_utc": now_utc.isoformat(timespec="seconds"),
+        "vm_clock": {
+            "utc": now_utc.isoformat(timespec="seconds"),
+            "panama": now_panama.isoformat(timespec="seconds"),
+            "timezone": "America/Panama",
+            "source": "system_clock_vm",
+        },
         "source": "S02 IPAM candidate + S04 exporter solo lectura + netns solo lectura",
         "telemetry": {"available": snap is not None,
                       "topology": snap["topology"] if snap else "unknown",
