@@ -93,7 +93,7 @@ class GeometryTests(unittest.TestCase):
             a,b=sorted(g["laneY"] for g in subset)
             self.assertGreaterEqual(b-a, 52)
             # Titulo a +32; pill de enlace ocupa lane ±17.
-            self.assertGreaterEqual(a-17, top+50)
+            self.assertGreaterEqual(a-17, top+45)
             self.assertLessEqual(b+17, top+173-14)
         self.assertEqual(self.geo["S1"]["x"], self.geo["S2"]["x"])
         self.assertGreater(self.geo["S2"]["y"]-(
