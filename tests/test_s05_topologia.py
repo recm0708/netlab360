@@ -27,6 +27,8 @@ class TopologyGraphTests(unittest.TestCase):
     def active_snapshot():
         return {
             "topology": "active",
+            "observed_at_utc": "2026-11-10T16:00:00+00:00",
+            "source_ok": True,
             "sites": {
                 site: {
                     "running": 1,
