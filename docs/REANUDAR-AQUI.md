@@ -27,7 +27,7 @@
 
 ## Plan de arranque S05 preparado documentalmente — 10/11/2026
 
-**Estado:** diseño y backlog preparados en #5, #23, #24, #31, #32 y #64. **No hay pruebas nuevas S05 ni capturas S05 todavía.** El orden operativo recomendado es:
+**Estado:** diseño y backlog preparados en #5, #23, #24, #31, #32 y #64. El [precheck S05/P0 de solo lectura](../scripts/validacion/s05-precheck-solo-lectura.sh) quedó versionado el 10/11/2026, pero **no se ha ejecutado contra la VM ni hay pruebas o capturas S05 todavía**. Tras sincronizar `main` con árbol limpio, ejecutarlo como usuario normal mediante `bash scripts/validacion/s05-precheck-solo-lectura.sh`; validar la salida antes de habilitar cualquier ensayo. El orden operativo recomendado es:
 
 1. **P0, baseline seguro:** comprobar estado real de la misma VM, acceso SSH, `ens33`, Git `main`, topología desmontada, respaldos SQLite/TSDB y ausencia de procesos previos. No restaurar snapshots permanentes ni duplicar VMs.
 2. **P1, LACP medido (#31):** instrumentar `iperf3` multistream o equivalente reproducible; separar tasa agregada, distribución por flujo, pérdida/conmutación, retorno y límites de los enlaces virtuales. Reutilizar pruebas S01 como referencia, no como resultado S05.
