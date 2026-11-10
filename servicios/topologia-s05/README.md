@@ -42,9 +42,21 @@ Después de inspeccionar las tres capturas **provisionales** tomadas por el oper
 - **Escalabilidad:** los dispositivos adicionales verificados de HQ/S1/S2 se distribuyen bajo el grafo principal, manteniendo su estado `UNKNOWN` hasta tener observación. Las WAN adicionales entre nuevos nodos todavía requieren trazado visual y prueba separados.
 - **Regresiones:** además del contrato API, se incluyeron pruebas geométricas offline `tests/test_s05_layout.py` y análisis `node --check` del JavaScript inline mediante CI S05.
 
-La página se lee del archivo `index.html` por cada GET, de modo que **si el servidor `app.py --serve` y el túnel SSH siguen abiertos, basta sincronizar Git y realizar recarga forzada del navegador (Ctrl+Mayús+R); no es necesario reiniciar el proceso Python**.
+La página se lee del archivo `index.html` por cada GET. **Para cambios solo en HTML basta `git pull` y recarga forzada (Ctrl+Mayús+R)**. Para cambios en `app.py` —como la actualización de hora local de la VM en v3— **sí hay que detener con Ctrl+C y reiniciar el servidor Python**. El túnel SSH de Windows puede permanecer abierto.
 
 No convertir las capturas preliminares del defectuoso diseño v1 en evidencias oficiales. Tomar S05_10/S05_11/S05_12 solo después de la verificación de v2.
+
+## Revisión visual v3 — hora Panamá y mejor aprovechamiento del espacio (10/11/2026)
+
+La revisión v2 pasó las **10 pruebas** de API/geometría y su JavaScript superó `node --check`. El operador mostró el diseño en navegador Windows, todavía como **capturas preliminares**. Se refinó una tercera versión, **pendiente de validar visualmente**:
+
+- **Hora presentada:** la API entrega `vm_clock.utc` y `vm_clock.panama` correspondientes al *mismo instante del reloj de la VM*. El servidor convierte UTC a `America/Panama` (UTC−5) mediante `zoneinfo`; JavaScript solo da formato legible a ese dato usando `Intl.DateTimeFormat("es-PA")`. El navegador no inventa ni consulta su hora actual. El valor UTC `observed_at_utc` sigue disponible para logs, correlación y monitoreo.
+- **Diseño compacto:** reducida la altura base del SVG de 1040 a 920 unidades, sin superponer títulos, routers, switches ni hosts. Se conserva el corredor WAN principal/respaldo, el inspector y el modo presentación.
+- **Estado por sede:** chip `RTR: EN EJECUCIÓN / DETENIDO / SIN DATOS`, basado exclusivamente en el estado observado del router FRR; **no** diagnostica por sí mismo el estado de toda la sede.
+- **Mejor accesibilidad:** el inspector traduce los estados de `unknown`, `admin-up` y `admin-down` a texto entendible, conservando la distinción entre habilitación administrativa y prueba de disponibilidad.
+- **Regresión ampliada:** prueba adicional de reloj UTC/Panamá y verificaciones geométricas de cables/etiquetas. Se esperan **13 tests offline** (7 de grafo y 6 de diseño). Los resultados deben revalidarse en VM después del `git pull`.
+
+**Secuencia operacional v3:** detener `python3 servicios/topologia-s05/app.py --serve --port 9130` con Ctrl+C en la terminal del servidor, sincronizar Git en otra terminal, pasar tests y `--check`, volver a iniciarlo, comprobar JSON `vm_clock` y recargar el navegador Windows. No cerrar el túnel SSH ni modificar `ens33`, Docker, rutas u otros servicios.
 
 ## Actualización por fases
 
