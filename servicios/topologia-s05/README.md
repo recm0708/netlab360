@@ -1,6 +1,6 @@
 # NETLAB360 S05 — Topología gráfica multisede
 
-**Estado al 10/11/2026:** V4 probada en la VM y en Windows (16/16 pruebas, sintaxis JS y API correctas), pero **rechazada visualmente por circuitos amontonados y superposición de etiquetas**. La revisión **V5 se diseñó en formato apaisado con dos módulos WAN y previsualización SVG local**, y quedó versionada en GitHub. **La V5 aún no se ha ejecutado ni revisado en la VM**. No hay capturas oficiales; [issue #64](https://github.com/recm0708/netlab360/issues/64) permanece abierta.
+**Estado al 10/11/2026:** V4 validada técnicamente (16/16 pruebas) y rechazada visualmente; V5 cargada y observada en Chrome mediante capturas preliminares, con una mejora clara pero una conexión de respaldo hacia S2 aún poco equilibrada. **V6 preparada en GitHub** para centrar visualmente R-HQ entre ambas sucursales y reducir el codo final de WAN de respaldo S2; falta sincronizar, ejecutar pruebas y evaluar el resultado en navegador. No existen capturas oficiales ni aceptación final; [issue #64](https://github.com/recm0708/netlab360/issues/64) sigue abierta.
 
 ## Inventario representado
 
@@ -88,6 +88,19 @@ Se diseñó **V5** sobre una previsualización SVG local y se sustituyó el esqu
 La V5 cambia solo frontend y pruebas; **si el backend V4 continúa abierto, basta `git pull --ff-only` con árbol limpio y recarga forzada del navegador**. Si el servidor se ha detenido, iniciarlo como siempre en localhost 9130. Conserva la hora Panamá calculada del reloj de la VM, `UNKNOWN` si S04 está detenido, lectura de namespaces solo lectura y protección de `ens33`.
 
 Las próximas ampliaciones deben mostrar enlaces y equipos reales en la misma estructura, pero no marcar primaria elegida, failover exitoso o dispositivos activos sin telemetría verificable.
+
+## V6 — Ajuste de simetría y llegada al router S2 (10/11/2026)
+
+La revisión visual de **V5 en Windows** confirmó que el nuevo diseño apaisado resulta más legible: HQ a la izquierda, S1 arriba a la derecha, S2 abajo, y módulos de enlaces separados. El operador detectó un detalle en la **WAN de respaldo HQ–S2** y propuso, como alternativa, invertir la disposición de S2. Se decidió **conservar la estructura uniforme en ambas sucursales** (título → router → switch → tres VLAN) y corregir únicamente la geometría para no crear una segunda convención visual.
+
+- Se desplazó `R-HQ` a una posición cercana al punto medio vertical entre `R-S1` y `R-S2`, y el switch y los hosts de HQ en correspondencia.
+- Los cuatro puntos de salida de WAN desde HQ se distribuyen en orden por el costado derecho del router; principal y respaldo siguen representando enlaces distintos, sin implicar tráfico real.
+- El módulo visual `HQ ↔ SUCURSAL S2` subió 30 unidades de SVG; el enlace principal utiliza el carril 577 y el respaldo el 644, manteniendo suficiente separación vertical entre ambos.
+- El respaldo HQ–S2 finaliza en `R-S2` mediante un codo corto de 25 unidades verticales, en lugar de un trazado que pareciera perseguir al circuito principal. Los caminos siguen siendo independientes y terminan en los routers.
+- Se añadió una prueba `test_v6_hq_balanced_and_s2_backup_entry` para conservar simetría, separación, orden de VLAN y proximidad del último codo. En total se esperan **18 pruebas S05 (9 API y 9 geometría)**.
+- No cambian la API, telemetría, hora Panamá, IPAM, Docker, namespaces ni ningún dispositivo de la VM. El servidor en ejecución puede seguir abierto; basta sincronizar Git y refrescar Chrome.
+
+**Estado:** V6 versionada, **pendiente** de ejecutar las 18 pruebas y comprobar las dos vistas en Windows. Las capturas de V5/V6 permanecen provisionales hasta una aprobación visual explícita.
 
 ## Actualización por fases
 
