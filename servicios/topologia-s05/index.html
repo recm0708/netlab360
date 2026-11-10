@@ -200,7 +200,7 @@ function statusText(value){
 // de dispositivos puede cruzar la banda de texto de su sede.
 const WIDTH=1440, BASE_HEIGHT=920;
 const siteGeometry={
- HQ:{x:500,y:18,w:440,h:344,cx:720,ry:155,sy:244,hy:319,step:132},
+ HQ:{x:500,y:18,w:440,h:344,cx:720,ry:155,sy:244,hy:318,step:132},
  S1:{x:38,y:516,w:648,h:356,cx:362,ry:649,sy:736,hy:823,step:166},
  S2:{x:754,y:516,w:648,h:356,cx:1078,ry:649,sy:736,hy:823,step:166}
 };
@@ -324,7 +324,7 @@ function drawInSite(site,nodes,parent){
  // Trazar conexiones primero; ningún conductor cruza las tarjetas o sus textos.
  el("path",{d:"M "+b.cx+" "+(b.ry+34)+" V "+(b.sy-27),class:"local-line"},g);
  const hosts=nodes.filter(n=>n.site===site&&n.type==="host").slice(0,3);
- const yJunction=b.sy+59;
+ const yJunction=b.sy+40;
  const xs=hosts.map((_,i)=>b.cx+(i-1)*b.step);
  if(hosts.length){
    el("path",{d:"M "+b.cx+" "+(b.sy+26)+" V "+yJunction,class:"local-line"},g);
