@@ -220,17 +220,17 @@ function statusText(value){
 // de dispositivos puede cruzar la banda de texto de su sede.
 const WIDTH=1440, BASE_HEIGHT=930;
 const siteGeometry={
- // Sede HQ izquierda, sucursales a la derecha, dos grupos WAN centrales.
- HQ:{x:32,y:200,w:440,h:560,cx:252,ry:365,sy:495,hy:636,step:128},
+ // HQ equilibrada entre R-S1 y R-S2; tarjetas LAN conservan lectura superior→inferior.
+ HQ:{x:32,y:200,w:440,h:560,cx:252,ry:405,sy:535,hy:676,step:128},
  S1:{x:990,y:50,w:425,h:370,cx:1200,ry:187,sy:280,hy:360,step:128},
  S2:{x:990,y:515,w:425,h:370,cx:1200,ry:651,sy:743,hy:823,step:128}
 };
 const wanGeometry={
- // Trayectorias individuales router-a-router, con pistas distintas y sin cruces.
- "WAN-PRIMARIA-HQ-S1":{sx:278,sy:346,kneeX:552,laneY:222,entryX:967,tailY:187,dx:1168,dy:187,lx:777,ly:222},
- "WAN-RESPALDO-HQ-S1":{sx:283,sy:360,kneeX:570,laneY:289,entryX:980,tailY:203,dx:1172,dy:203,lx:777,ly:289},
- "WAN-PRIMARIA-HQ-S2":{sx:281,sy:379,kneeX:552,laneY:604,entryX:965,tailY:651,dx:1168,dy:651,lx:777,ly:604},
- "WAN-RESPALDO-HQ-S2":{sx:266,sy:394,kneeX:535,laneY:679,entryX:980,tailY:669,dx:1172,dy:669,lx:777,ly:679}
+ // WAN S1 y S2 simétricas desde R-HQ; S2 se aproxima por corredores despejados.
+ "WAN-PRIMARIA-HQ-S1":{sx:278,sy:386,kneeX:552,laneY:222,entryX:967,tailY:187,dx:1168,dy:187,lx:777,ly:222},
+ "WAN-RESPALDO-HQ-S1":{sx:283,sy:398,kneeX:570,laneY:289,entryX:980,tailY:203,dx:1172,dy:203,lx:777,ly:289},
+ "WAN-PRIMARIA-HQ-S2":{sx:283,sy:412,kneeX:552,laneY:577,entryX:965,tailY:651,dx:1168,dy:651,lx:777,ly:577},
+ "WAN-RESPALDO-HQ-S2":{sx:278,sy:424,kneeX:535,laneY:644,entryX:980,tailY:669,dx:1172,dy:669,lx:777,ly:644}
 };
 let selected="ALL",latest=null,selectedId=null;
 function el(tag,attrs={},parent=svg){
@@ -311,7 +311,7 @@ function drawSiteBox(site,nodes,parent){
  txt(label,badgeX+69,badgeY+21,"site-state-text",g);
 }
 function drawWanBundles(parent){
- for(const e of [{site:"S1",y:155},{site:"S2",y:540}]){
+ for(const e of [{site:"S1",y:155},{site:"S2",y:510}]){
   const g=el("g",{class:"wan-bundle"},parent);
   el("rect",{x:605,y:e.y,width:345,height:173,rx:18,class:"wan-bundle-box"},g);
   txt("HQ ↔ SUCURSAL "+e.site,777,e.y+32,"wan-bundle-title",g)
