@@ -29,26 +29,65 @@ dl{margin:12px 0 0;font-size:.88rem}dt{color:var(--muted);font-size:.72rem;margi
 .warn{border:1px solid #745c2f;background:#2c2a2b;border-radius:11px;padding:12px;margin-bottom:14px;color:#ffe1a1;font-size:.85rem}
 .status{display:inline-flex;align-items:center;gap:6px;border:1px solid #3c526e;border-radius:30px;padding:6px 11px;font-size:.78rem;background:#1b3048}
 .status::before{content:"";width:9px;height:9px;background:#8a9db5;border-radius:50%}.status.active::before{background:var(--good)}.status.partial::before{background:var(--warn)}
-.site-box{fill:#172940;stroke:#3b5575;stroke-width:2;rx:18}
-.site-heading{fill:#e7f2fc;font-weight:700;font-size:23px}.site-caption{fill:#9cb5cf;font-size:14px}
-.local-line{stroke:#496b87;stroke-width:3;stroke-linecap:round;stroke-dasharray:4 6}
-.link{fill:none;stroke-width:5;stroke-linecap:round;cursor:pointer}
-.link.primary{stroke:#80afc5}.link.backup{stroke:#448ea2;stroke-dasharray:11 10}
-.link.admin-up{stroke:var(--warn)}.link.admin-down{stroke:var(--bad)}.link.offline,.link.unknown{stroke:#798aa0}
-.label-back{fill:#0c1a2d;stroke:#3a5671;stroke-width:1}
-.link-text{fill:#edf6ff;font-weight:600;font-size:14px}
-.device{cursor:pointer}.device rect,.device circle{stroke-width:2.5}
-.device.router circle{fill:#163b51;stroke:#78c7e7}
-.device.switch rect{fill:#203b54;stroke:#74acda}
-.device.host rect{fill:#21374e;stroke:#628fb6}
-.device.offline circle,.device.offline rect{stroke:#778b9f;fill:#243347}
-.device.unknown circle,.device.unknown rect{stroke:#60738c;fill:#1c2a3c}
-.device.running circle,.device.namespace-present rect{stroke:var(--good)}
-.device-title{fill:#fff;font-size:15px;font-weight:700;text-anchor:middle}
-.device-small{fill:#c4d4e8;font-size:12px;text-anchor:middle}
+
+/* Topología v2: geometría separada por capas, sin etiquetas bajo objetos. */
+.site-box{fill:#142741;stroke:#42617f;stroke-width:2;rx:20}
+.site-band{fill:#203955;fill-opacity:.65}
+.site-rule{stroke:#42617f;stroke-width:1.5}
+.site-heading{fill:#edf6ff;font-weight:750;font-size:22px}
+.site-caption{fill:#a8bfd6;font-size:14px}
+.zone-title{fill:#a8bfd6;font-size:16px;letter-spacing:1.5px;font-weight:700;text-anchor:middle}
+.local-line{fill:none;stroke:#537695;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.local-line.access{stroke-dasharray:4 6}
+.wan-line{fill:none;stroke-width:6;stroke-linecap:round;cursor:pointer}
+.wan-line.primary{stroke:#7ec7dd}
+.wan-line.backup{stroke:#4b91b8;stroke-dasharray:12 12}
+.wan-line.unknown,.wan-line.offline{stroke:#8295a9}
+.wan-line.admin-up{stroke:#f6c56b}
+.wan-line.admin-down{stroke:#f67483}
+.wan-port{fill:#142741;stroke:#8caec9;stroke-width:3}
+.wan-pill{fill:#132b43;stroke:#55718d;stroke-width:2}
+.wan-pill-title{font-size:14px;fill:#f0f8ff;font-weight:700;text-anchor:middle}
+.wan-pill-state{font-size:11px;fill:#b1c6dd;text-anchor:middle}
+.device{cursor:pointer}
+.device rect,.device circle{stroke-width:2.8}
+.device.router circle{fill:#173f56;stroke:#78c7e7}
+.device.switch rect{fill:#203f57;stroke:#74acda}
+.device.host rect{fill:#20384e;stroke:#628fb6}
+.device.offline circle,.device.offline rect{stroke:#8295a9;fill:#243449}
+.device.unknown circle,.device.unknown rect{stroke:#617b99;fill:#203049}
+.device.running circle,.device.namespace-present rect{stroke:#51d8a8}
+.device-title{fill:#fff;font-size:16px;font-weight:750;text-anchor:middle}
+.device-small{fill:#c6d9ec;font-size:13px;text-anchor:middle}
+.device-detail{fill:#9db4cf;font-size:12px;text-anchor:middle}
+.device:focus-visible circle,.device:focus-visible rect{stroke:#f6c56b;stroke-width:4}
+.device.selected circle,.device.selected rect{stroke:#f6c56b;stroke-width:4}
+.wan-click{stroke:transparent;stroke-width:22;fill:none;cursor:pointer}
+.wan-label{cursor:pointer}
+.wan-label:focus-visible .wan-pill,.wan-label.selected .wan-pill{stroke:#f6c56b;stroke-width:3}
+.underlay{fill:#112337;stroke:#284661;stroke-width:1}
+.presentation-note{fill:#96b3cd;font-size:12px;text-anchor:middle}
 footer{color:var(--muted);font-size:.82rem;line-height:1.65;margin:20px 0}
+svg{display:block;width:100%;height:auto;min-width:890px;aspect-ratio:1440/1040}
+.canvas{min-width:0;overflow:auto;background:#101f33;border:1px solid var(--line);border-radius:15px}
+.canvas-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 15px;background:#182a40;border-bottom:1px solid #2e4862}
+.canvas-head strong{font-size:.86rem}
+.canvas-head span{font-size:.76rem;color:var(--muted)}
+.control-group{display:flex;flex-wrap:wrap;gap:8px}
+#focus-toggle[aria-pressed=true]{background:#245974;border-color:#65c9ea}
+body.presentation header{padding:11px 24px}
+body.presentation .shell{max-width:none;padding:10px 12px}
+body.presentation .summary,body.presentation .aside,body.presentation footer,
+body.presentation .warn{display:none}
+body.presentation .layout{display:block}
+body.presentation .toolbar{margin-bottom:9px}
+body.presentation .canvas{height:calc(100vh - 152px);display:flex;flex-direction:column;align-items:center;overflow:hidden}
+body.presentation .canvas-head{width:100%;flex:0 0 auto}
+body.presentation .canvas svg{flex:1 1 auto;min-height:0;min-width:0;max-width:100%;width:auto;height:100%;aspect-ratio:auto}
 @media(max-width:1120px){.layout{grid-template-columns:1fr}.aside{display:grid;grid-template-columns:1fr 1fr;gap:14px}.summary{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:660px){.summary{grid-template-columns:repeat(2,1fr)}.aside{display:block}header{padding:17px}}
+@media(max-width:660px){.summary{grid-template-columns:repeat(2,1fr)}.aside{display:block}header{padding:17px}.canvas-head span{display:none}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+@media print{header,.toolbar,.summary,.aside,.warn,footer,.canvas-head{display:none!important}.shell{max-width:none;padding:0}.layout{display:block}.canvas{border:0}svg{min-width:0;max-height:98vh}}
 </style></head>
 <body>
 <header>
@@ -71,12 +110,14 @@ footer{color:var(--muted);font-size:.82rem;line-height:1.65;margin:20px 0}
 <button data-site="S1" aria-pressed="false">Sucursal S1</button>
 <button data-site="S2" aria-pressed="false">Sucursal S2</button>
 </div>
+<div class="control-group"><button type="button" id="focus-toggle" aria-pressed="false" title="Muestra el diagrama completo sin paneles laterales">Modo presentación</button></div>
 <div class="small" id="updated" aria-live="polite">Cargando observaciones…</div>
 </div>
 <div class="warn" id="warnings">El inventario previsto no demuestra equipos encendidos. Si no hay telemetría, se indica UNKNOWN.</div>
 <div class="layout">
 <section class="canvas" aria-label="Diagrama de red multisede">
-<svg id="network" viewBox="0 0 1440 900" role="img" aria-label="Topología de NETLAB360 con sede HQ arriba y sucursales S1 y S2 abajo. Selecciona dispositivos para ver su detalle."></svg>
+<div class="canvas-head"><strong>Mapa lógico · HQ / S1 / S2</strong><span>Enlaces principales: línea continua · respaldos: línea discontinua · sin datos: gris</span></div>
+<svg id="network" viewBox="0 0 1440 1040" role="img" aria-label="Topología de NETLAB360: sede HQ superior, sucursales S1 y S2 inferiores, cuatro WAN separadas y redes VLAN locales. Selecciona dispositivos o enlaces."></svg>
 </section>
 <aside class="aside">
 <div class="panel">
@@ -108,17 +149,38 @@ footer{color:var(--muted);font-size:.82rem;line-height:1.65;margin:20px 0}
 "use strict";
 const NS="http://www.w3.org/2000/svg", svg=document.querySelector("#network");
 const $=id=>document.getElementById(id);
-const siteGeometry={HQ:{x:515,y:32,w:410,h:330,cx:720,ry:125,sy:216,hy:286},
- S1:{x:72,y:490,w:590,h:350,cx:367,ry:580,sy:665,hy:756},
- S2:{x:778,y:490,w:590,h:350,cx:1073,ry:580,sy:665,hy:756}};
-let selected="ALL", latest=null, selectedId=null;
-function el(tag, attrs={}, parent=svg) {
+// Reservamos bandas exclusivas para encabezados, WAN y equipos. Ninguna posición
+// de dispositivos puede cruzar la banda de texto de su sede.
+const WIDTH=1440, BASE_HEIGHT=1040;
+const siteGeometry={
+ HQ:{x:500,y:20,w:440,h:370,cx:720,ry:147,sy:245,hy:338,step:132},
+ S1:{x:38,y:606,w:648,h:382,cx:362,ry:730,sy:830,hy:921,step:166},
+ S2:{x:754,y:606,w:648,h:382,cx:1078,ry:730,sy:830,hy:921,step:166}
+};
+const wanGeometry={
+ "WAN-PRIMARIA-HQ-S1":{sx:605,dx:415,lx:411,ly:488,mx:524,my:494},
+ "WAN-RESPALDO-HQ-S1":{sx:661,dx:555,lx:603,ly:546,mx:615,my:495},
+ "WAN-PRIMARIA-HQ-S2":{sx:835,dx:1025,lx:1029,ly:488,mx:916,my:494},
+ "WAN-RESPALDO-HQ-S2":{sx:779,dx:885,lx:837,ly:546,mx:825,my:495}
+};
+let selected="ALL",latest=null,selectedId=null;
+function el(tag,attrs={},parent=svg){
  const node=document.createElementNS(NS,tag);
  for(const [name,value] of Object.entries(attrs))node.setAttribute(name,value);
  parent.appendChild(node);return node;
 }
 function txt(str,x,y,cls,parent=svg){
- let t=el("text",{x,y,class:cls},parent);t.textContent=str;return t;
+ const t=el("text",{x,y,class:cls},parent);t.textContent=str;return t;
+}
+function attach(group,item){
+ group.setAttribute("tabindex","0");
+ group.setAttribute("role","button");
+ group.setAttribute("data-resource-id",item.id);
+ group.setAttribute("aria-label",(item.label||item.id)+": "+item.status);
+ group.addEventListener("click",()=>pick(item.id));
+ group.addEventListener("keydown",e=>{
+   if(e.key==="Enter"||e.key===" "){e.preventDefault();pick(item.id);}
+ });
 }
 function pick(id){
  selectedId=id;
@@ -137,97 +199,116 @@ function pick(id){
    const dt=document.createElement("dt"),dd=document.createElement("dd");
    dt.textContent=key;dd.textContent=String(value);dl.append(dt,dd);
  }
+ document.querySelectorAll("[data-resource-id]").forEach(n=>{
+   n.classList.toggle("selected",n.getAttribute("data-resource-id")===id);
+ });
 }
-function attach(group,item){
- group.setAttribute("tabindex","0");
- group.setAttribute("role","button");
- group.setAttribute("aria-label",(item.label||item.id)+", "+item.status);
- group.addEventListener("click",()=>pick(item.id));
- group.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();pick(item.id);}});
-}
-function drawDevice(item,x,y){
- const group=el("g",{class:"device "+item.type+" "+item.status});
+function drawDevice(item,x,y,parent=svg){
+ const g=el("g",{class:"device "+item.type+" "+item.status},parent);
  if(item.type==="router"){
-   el("circle",{cx:x,cy:y,r:35},group);
-   txt("RTR",x,y+5,"device-title",group);
-   txt(item.label,x,y+56,"device-small",group);
+   el("circle",{cx:x,cy:y,r:32},g);
+   txt("R",x,y+7,"device-title",g);
+   txt(item.label,x,y+54,"device-small",g);
  }else if(item.type==="switch"){
-   el("rect",{x:x-58,y:y-23,width:116,height:46,rx:10},group);
-   txt("SWITCH",x,y+5,"device-title",group);
-   txt(item.label,x,y+42,"device-small",group);
+   el("rect",{x:x-60,y:y-25,width:120,height:50,rx:11},g);
+   txt("SWITCH",x,y+6,"device-title",g);
+   txt(item.label,x,y+47,"device-small",g);
  }else{
-   el("rect",{x:x-64,y:y-25,width:128,height:50,rx:10},group);
-   txt(item.type==="host"?"HOST":"EQUIPO",x,y-3,"device-title",group);
-   txt(item.label,x,y+17,"device-small",group);
+   el("rect",{x:x-63,y:y-26,width:126,height:52,rx:10},g);
+   const kind=item.type==="host"?
+      (item.vlan%100===10?"USUARIOS":item.vlan%100===20?"SERVICIOS":"GESTIÓN"):
+      item.type.toUpperCase();
+   txt(kind,x,y-2,"device-title",g);
+   txt(item.type==="host"?"VLAN "+item.vlan:item.label,x,y+18,"device-small",g);
  }
- attach(group,item);
+ attach(g,item);return g;
 }
-function wanPath(link){
- const isS1=link.to==="R-S1", startX=isS1?690:750, destX=isS1?367:1073;
- const primary=link.role==="primary";
- const sy=358, ey=541, off=primary?-38:38;
- const cx1=startX+(isS1?-50:50)+off,cx2=destX+(isS1?70:-70)+off;
- return "M "+startX+" "+sy+" C "+cx1+" 407 "+cx2+" 466 "+destX+" "+ey;
+function drawSiteBox(site,parent){
+ const b=siteGeometry[site],g=el("g",{
+   class:"site-background",opacity:selected!=="ALL"&&selected!==site?".4":"1"
+ },parent);
+ el("rect",{x:b.x,y:b.y,width:b.w,height:b.h,rx:18,class:"site-box"},g);
+ el("rect",{x:b.x+2,y:b.y+2,width:b.w-4,height:87,rx:16,class:"site-band"},g);
+ el("path",{d:"M "+(b.x+20)+" "+(b.y+91)+" H "+(b.x+b.w-20),class:"site-rule"},g);
+ txt(site==="HQ"?"SEDE CENTRAL · HQ":"SUCURSAL · "+site,b.x+25,b.y+37,"site-heading",g);
+ txt("Router FRR · Switch L2 · tres VLAN",b.x+25,b.y+66,"site-caption",g);
 }
-function drawWan(link,index){
- const path=el("path",{d:wanPath(link),class:"link "+link.role+" "+link.status});
- attach(path,link);
- const s1=link.to==="R-S1";
- const lx=s1?(link.role==="primary"?410:555):(link.role==="primary"?1030:880);
- const ly=link.role==="primary"?410:457;
- const g=el("g",{class:"device "+link.status});
- el("rect",{x:lx-67,y:ly-16,width:134,height:31,rx:13,class:"label-back"},g);
- txt((s1?"HQ–S1":"HQ–S2")+(link.role==="primary"?" P":" B"),lx,ly+6,"link-text",g).setAttribute("text-anchor","middle");
- attach(g,link);
+function wanPath(w){
+ const g=wanGeometry[w.id],left=w.to==="R-S1";
+ const x1=g.sx, x2=g.dx, y1=390,y2=606;
+ const ctrl1=x1+(left?-20:20),ctrl2=x2+(left?20:-20);
+ return "M "+x1+" "+y1+" C "+ctrl1+" 455 "+ctrl2+" 545 "+x2+" "+y2;
 }
-function drawSite(site,nodes,links){
- const b=siteGeometry[site],faded=selected!=="ALL"&&selected!==site;
- const group=el("g",{opacity:faded?".24":"1"});
- el("rect",{x:b.x,y:b.y,width:b.w,height:b.h,rx:19,class:"site-box"},group);
- txt(site==="HQ"?"SEDE CENTRAL · HQ":"SUCURSAL · "+site,b.x+26,b.y+39,"site-heading",group);
- txt("Red de pruebas virtualizada · 3 VLAN",b.x+26,b.y+63,"site-caption",group);
- const r=nodes.find(n=>n.id==="R-"+site),sw=nodes.find(n=>n.id==="SW-"+site);
- if(r&&sw){
-   el("path",{d:"M "+b.cx+" "+(b.ry+38)+" L "+b.cx+" "+(b.sy-25),class:"local-line"},group);
-   drawDevice(r,b.cx,b.ry);drawDevice(sw,b.cx,b.sy);
+function wanBadge(w,parent){
+ const g=wanGeometry[w.id];
+ const badge=el("g",{class:"wan-label "+w.status},parent);
+ el("rect",{x:g.lx-82,y:g.ly-23,width:164,height:46,rx:12,class:"wan-pill"},badge);
+ txt(w.to==="R-S1"?"HQ ↔ S1":"HQ ↔ S2",g.lx,g.ly-3,"wan-pill-title",badge);
+ txt(w.role==="primary"?"PRINCIPAL":"RESPALDO",g.lx,g.ly+14,"wan-pill-state",badge);
+ badge.querySelectorAll("text").forEach(t=>t.setAttribute("text-anchor","middle"));
+ attach(badge,w);
+}
+function drawWan(w,parent){
+ const g=wanGeometry[w.id];
+ if(!g)return;
+ const layer=el("g",{},parent),path=wanPath(w);
+ el("path",{d:path,class:"wan-line "+w.role+" "+w.status},layer);
+ el("path",{d:path,class:"wan-click"},layer);
+ el("circle",{cx:g.sx,cy:390,r:5,class:"wan-port"},layer);
+ el("circle",{cx:g.dx,cy:606,r:5,class:"wan-port"},layer);
+ attach(layer,w);
+ wanBadge(w,parent);
+}
+function drawInSite(site,nodes,parent){
+ const b=siteGeometry[site],g=el("g",{
+   opacity:selected!=="ALL"&&selected!==site?".35":"1"
+ },parent);
+ const router=nodes.find(n=>n.id==="R-"+site);
+ const sw=nodes.find(n=>n.id==="SW-"+site);
+ if(!router||!sw)return;
+ // Trazar conexiones primero; ningún conductor cruza las tarjetas o sus textos.
+ el("path",{d:"M "+b.cx+" "+(b.ry+34)+" V "+(b.sy-27),class:"local-line"},g);
+ const hosts=nodes.filter(n=>n.site===site&&n.type==="host").slice(0,3);
+ const yJunction=b.sy+59;
+ const xs=hosts.map((_,i)=>b.cx+(i-1)*b.step);
+ if(hosts.length){
+   el("path",{d:"M "+b.cx+" "+(b.sy+26)+" V "+yJunction,class:"local-line"},g);
+   const min=Math.min(...xs),max=Math.max(...xs);
+   if(min<max)el("path",{d:"M "+min+" "+yJunction+" H "+max,class:"local-line access"},g);
+   hosts.forEach((_,i)=>el("path",{
+     d:"M "+xs[i]+" "+yJunction+" V "+(b.hy-28),class:"local-line access"
+   },g));
  }
- const hosts=nodes.filter(n=>n.site===site&&n.type==="host");
- const step=site==="HQ"?132:164;
- const xs=hosts.length?hosts.slice(0,3).map((_,i)=>b.cx+(i-1)*step):[];
- for(const [index,item] of hosts.slice(0,3).entries()){
-   const x=xs[index];
-   const branchY=b.sy+49;
-   el("path",{d:"M "+b.cx+" "+(b.sy+25)+" V "+branchY+" H "+x+" V "+(b.hy-26),class:"local-line"},group);
-   drawDevice(item,x,b.hy);
- }
- const extras=nodes.filter(n=>n.site===site&&!["R-"+site,"SW-"+site].includes(n.id)&&n.type!=="host");
- if(extras.length){
-   txt("Adiciones verificadas: "+extras.map(x=>x.label).join(" · ").slice(0,58),b.x+18,b.y+b.h-11,"site-caption",group);
- }
+ drawDevice(router,b.cx,b.ry,g);
+ drawDevice(sw,b.cx,b.sy,g);
+ hosts.forEach((host,i)=>drawDevice(host,xs[i],b.hy,g));
 }
-function drawExtensions(data) {
- const base=new Set(["R-HQ","SW-HQ","R-S1","SW-S1","R-S2","SW-S2",
-   "H-HQ-110","H-HQ-120","H-HQ-130","H-S1-210","H-S1-220","H-S1-230",
-   "H-S2-310","H-S2-320","H-S2-330"]);
+function drawExtensions(data){
+ const basic=new Set(["R-HQ","SW-HQ","R-S1","SW-S1","R-S2","SW-S2",
+   "H-HQ-110","H-HQ-120","H-HQ-130","H-S1-210","H-S1-220",
+   "H-S1-230","H-S2-310","H-S2-320","H-S2-330"]);
  const sites=["HQ","S1","S2"];
- const extras=Object.fromEntries(sites.map(site=>[site,
-   data.nodes.filter(n=>n.site===site&&!base.has(n.id))]));
- const rows=Math.max(0,...sites.map(site=>extras[site].length));
- if(!rows){svg.setAttribute("viewBox","0 0 1440 900");svg.style.aspectRatio="1440 / 900";return;}
- const h=1000+rows*100;
- svg.setAttribute("viewBox","0 0 1440 "+h);
- svg.style.aspectRatio="1440 / "+h;
- txt("EQUIPOS INCORPORADOS CON EVIDENCIA",74,890,"site-heading");
- txt("El estado de cada equipo es UNKNOWN hasta incorporar su fuente de observación",74,913,"site-caption");
- const xcoords={HQ:270,S1:720,S2:1170};
- for(const site of sites){
-   txt("Sede "+site,xcoords[site],943,"site-heading").setAttribute("text-anchor","middle");
-   extras[site].forEach((item,index)=>{
-     const y=1000+index*95;
-     drawDevice(item,xcoords[site],y);
-     txt((item.detail||"").slice(0,50),xcoords[site],y+50,"device-small");
+ const extra=Object.fromEntries(sites.map(site=>[site,
+   data.nodes.filter(n=>n.site===site&&!basic.has(n.id))]));
+ const rows=Math.max(0,...sites.map(site=>extra[site].length));
+ const height=rows?1095+rows*106:BASE_HEIGHT;
+ svg.setAttribute("viewBox","0 0 "+WIDTH+" "+height);
+ svg.style.aspectRatio=WIDTH+" / "+height;
+ if(!rows)return;
+ const g=el("g",{},svg);
+ el("rect",{x:36,y:1033,width:1368,height:height-1065,rx:14,class:"underlay"},g);
+ txt("DISPOSITIVOS ADICIONALES VERIFICADOS",720,1072,"zone-title",g);
+ const columns={HQ:270,S1:720,S2:1170};
+ sites.forEach(site=>{
+   const faded=selected!=="ALL"&&selected!==site;
+   const column=el("g",{opacity:faded?".3":"1"},g);
+   txt("SEDE "+site,columns[site],1106,"site-caption",column).setAttribute("text-anchor","middle");
+   extra[site].forEach((item,i)=>{
+      const y=1160+i*106;
+      drawDevice(item,columns[site],y,column);
+      txt((item.detail||"").slice(0,45),columns[site],y+52,"device-detail",column);
    });
- }
+ });
 }
 function render(data){
  latest=data;
@@ -238,26 +319,24 @@ function render(data){
  $("c-hosts").textContent=(c.hosts??"—")+" / "+(c.vlans??"—");
  $("c-wan").textContent=c.wan??"—";
  $("expansions").textContent=c.extensions?
-   c.extensions+" equipos verificados añadidos al inventario; pulsa en sus fichas para ver detalles.":
-   "Sin equipos HA/SDN adicionales verificados. Nuevas sedes y equipos se añadirán mediante revisión de inventario.";
- const t=data.telemetry||{},reliable=t.available===true;
- const state=t.topology||"unknown";
+  c.extensions+" equipos adicionales verificados; consulta su ficha inferior en el diagrama.":
+  "Sin equipos HA/SDN adicionales verificados. Las siguientes fases ampliarán el inventario y la visualización.";
+ const t=data.telemetry||{},reliable=t.available===true,state=t.topology||"unknown";
  $("status").className="status "+(reliable&&state==="active"?"active":reliable?"partial":"");
  $("status").textContent=reliable?"Topología "+state.toUpperCase():"Estado UNKNOWN · sin exporter fiable";
  $("updated").textContent="Consulta UTC: "+(data.observed_at_utc||"—")+" · actualización 3 s";
- const warnings=(data.source_warnings||[]);
+ const warnings=data.source_warnings||[];
  $("warnings").textContent=warnings.length?
- "Fuentes: "+warnings.join(" · ")+" · Los datos desconocidos NO indican avería.":
- "Fuente S04 actualizada. ADMIN UP solo acredita estado administrativo, no ruta elegida ni tráfico.";
+  "Fuentes: "+warnings.join(" · ")+" · UNKNOWN no implica avería.":
+  "Fuente S04 actualizada. ADMIN UP solo acredita estado administrativo, no ruta elegida ni tráfico.";
  svg.replaceChildren();
- for(const site of ["HQ","S1","S2"])drawSite(site,data.nodes,data.links);
- for(const [i,w] of data.links.filter(x=>x.type==="wan").entries())drawWan(w,i);
- // Las conexiones extra se muestran en el inspector y catálogo; nunca se inventa un enlace.
- for(const site of ["HQ","S1","S2"]){
-   const b=siteGeometry[site];
-   const core=data.nodes.find(n=>n.id==="R-"+site);
-   if(core)drawDevice(core,b.cx,b.ry);
- }
+ const bg=el("g"),wan=el("g"),local=el("g");
+ ["HQ","S1","S2"].forEach(site=>drawSiteBox(site,bg));
+ txt("WAN · ENLACES ENTRE SEDES",720,432,"zone-title",bg);
+ data.links.filter(x=>x.type==="wan").forEach(w=>drawWan(w,wan));
+ ["HQ","S1","S2"].forEach(site=>drawInSite(site,data.nodes,local));
+ txt("INVENTARIO DEL LABORATORIO · LOS ESTADOS NO VERIFICADOS NO SE DAN POR ACTIVOS",
+  720,1020,"presentation-note");
  drawExtensions(data);
  if(selectedId)pick(selectedId);
 }
@@ -278,6 +357,17 @@ document.querySelectorAll("[data-site]").forEach(button=>button.addEventListener
  document.querySelectorAll("[data-site]").forEach(b=>b.setAttribute("aria-pressed",String(b===button)));
  if(latest)render(latest);
 }));
+$("focus-toggle").addEventListener("click",()=>{
+ const on=document.body.classList.toggle("presentation");
+ $("focus-toggle").setAttribute("aria-pressed",String(on));
+ $("focus-toggle").textContent=on?"Volver a vista completa":"Modo presentación";
+ if(latest)render(latest);
+});
+document.addEventListener("keydown",event=>{
+ if(event.key==="Escape"&&document.body.classList.contains("presentation")){
+   $("focus-toggle").click();
+ }
+});
 update();setInterval(update,3000);
 </script>
 </body></html>
