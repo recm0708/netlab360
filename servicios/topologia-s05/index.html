@@ -207,12 +207,12 @@ function drawDevice(item,x,y,parent=svg){
  const g=el("g",{class:"device "+item.type+" "+item.status},parent);
  if(item.type==="router"){
    el("circle",{cx:x,cy:y,r:32},g);
-   txt("R",x,y+7,"device-title",g);
-   txt(item.label,x,y+54,"device-small",g);
+   txt("RTR",x,y-2,"device-title",g);
+   txt(item.label,x,y+18,"device-small",g);
  }else if(item.type==="switch"){
    el("rect",{x:x-60,y:y-25,width:120,height:50,rx:11},g);
-   txt("SWITCH",x,y+6,"device-title",g);
-   txt(item.label,x,y+47,"device-small",g);
+   txt("SWITCH",x,y-3,"device-title",g);
+   txt(item.label,x,y+18,"device-small",g);
  }else{
    el("rect",{x:x-63,y:y-26,width:126,height:52,rx:10},g);
    const kind=item.type==="host"?
@@ -291,12 +291,12 @@ function drawExtensions(data){
  const extra=Object.fromEntries(sites.map(site=>[site,
    data.nodes.filter(n=>n.site===site&&!basic.has(n.id))]));
  const rows=Math.max(0,...sites.map(site=>extra[site].length));
- const height=rows?1095+rows*106:BASE_HEIGHT;
+ const height=rows?1240+(rows-1)*106:BASE_HEIGHT;
  svg.setAttribute("viewBox","0 0 "+WIDTH+" "+height);
  svg.style.aspectRatio=WIDTH+" / "+height;
  if(!rows)return;
  const g=el("g",{},svg);
- el("rect",{x:36,y:1033,width:1368,height:height-1065,rx:14,class:"underlay"},g);
+ el("rect",{x:36,y:1033,width:1368,height:height-1050,rx:14,class:"underlay"},g);
  txt("DISPOSITIVOS ADICIONALES VERIFICADOS",720,1072,"zone-title",g);
  const columns={HQ:270,S1:720,S2:1170};
  sites.forEach(site=>{
@@ -332,7 +332,8 @@ function render(data){
  svg.replaceChildren();
  const bg=el("g"),wan=el("g"),local=el("g");
  ["HQ","S1","S2"].forEach(site=>drawSiteBox(site,bg));
- txt("WAN · ENLACES ENTRE SEDES",720,432,"zone-title",bg);
+ txt("CONEXIONES WAN",170,432,"zone-title",bg);
+ txt("2 PRINCIPALES · 2 RESPALDOS",1258,432,"zone-title",bg);
  data.links.filter(x=>x.type==="wan").forEach(w=>drawWan(w,wan));
  ["HQ","S1","S2"].forEach(site=>drawInSite(site,data.nodes,local));
  txt("INVENTARIO DEL LABORATORIO · LOS ESTADOS NO VERIFICADOS NO SE DAN POR ACTIVOS",
