@@ -114,6 +114,8 @@ header{padding-top:15px;padding-bottom:15px}
 @media(max-width:1120px){.clockchip{white-space:normal}}
 @media(max-width:660px){.clockchip{width:100%;text-align:center}}
 .wan-label .wan-pill{fill:#132a42;stroke:#607f9b;stroke-width:2.2}
+.wan-circuit.selected .wan-line{stroke:#f6c971;stroke-width:5.5}
+.wan-circuit:focus-visible .wan-line{stroke:#f6c971;stroke-width:5.5}
 .wan-label:hover .wan-pill,.wan-label:focus-visible .wan-pill{stroke:#f7c971}
 .wan-line.unknown,.wan-line.offline{stroke:#879cb4}
 .wan-label{cursor:pointer}
@@ -325,7 +327,7 @@ function wanBadge(w,parent){
 function drawWan(w,parent){
  const g=wanGeometry[w.id];
  if(!g)return;
- const layer=el("g",{},parent),path=wanPath(w);
+ const layer=el("g",{class:"wan-circuit"},parent),path=wanPath(w);
  el("path",{d:path,class:"wan-line "+w.role+" "+w.status},layer);
  el("path",{d:path,class:"wan-click"},layer);
  // Extremos asociados a routers, no a host/vlan o panel físico de red.
