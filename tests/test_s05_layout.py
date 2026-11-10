@@ -40,15 +40,93 @@ class GeometryTests(unittest.TestCase):
                 self.assertGreaterEqual(left, g["x"] + 15)
                 self.assertLessEqual(right, g["x"] + g["w"] - 15)
 
-    def test_wan_exclusive_corridor(self):
+    def test_wan_links_are_orthogonal_router_to_router(self):
+        pattern = (
+            r'"(WAN-(PRIMARIA|RESPALDO)-HQ-(S1|S2))":'
+            r'\{sx:(\d+),sy:(\d+),outX:(\d+),crossY:(\d+),'
+            r'edgeX:(\d+),dy:(\d+),dx:(\d+),lx:(\d+),ly:(\d+)\}'
+        )
+        links = {}
+        for m in re.finditer(pattern, self.html):
+            full, kind, site = m.group(1, 2, 3)
+            vals = list(map(int, m.groups()[3:]))
+            links[full] = (kind, site, dict(zip(
+                ("sx", "sy", "outX", "crossY", "edgeX",
+                 "dy", "dx", "lx", "ly"), vals
+            )))
+        self.assertEqual(len(links), 4, "Deben existir cuatro circuitos WAN")
         hq = self.geo["HQ"]
         self.assertEqual(hq["y"] + hq["h"], 362)
-        for site in ("S1", "S2"):
-            self.assertEqual(self.geo[site]["y"], 516)
-        self.assertIn('y1=362,y2=516', self.html)
-        for ly in (412, 466):
-            self.assertGreaterEqual(ly - 23, 362 + 20)
-            self.assertLessEqual(ly + 23, 516 - 20)
+        self.assertIn('" H "+g.outX+', self.html)
+        self.assertIn('" V "+g.crossY+', self.html)
+        self.assertIn('" H "+g.edgeX+', self.html)
+        self.assertIn('" V "+g.dy+', self.html)
+        self.assertIn('" H "+g.dx;', self.html)
+        self.assertNotIn('return "M "+x1+" "+y1+" C "', self.html)
+
+        for name, (kind, site, g) in links.items():
+            with self.subTest(wan=name):
+                remote = self.geo[site]
+                # Tanto el origen como el destino se fijan a laterales
+                # del símbolo router, NO a los hosts ni al borde de VLAN.
+                self.assertLessEqual(abs(g["sx"] - hq["cx"]), 33)
+                self.assertEqual(abs(g["sy"] - hq["ry"]), 12)
+                self.assertLessEqual(abs(g["dx"] - remote["cx"]), 33)
+                self.assertEqual(abs(g["dy"] - remote["ry"]), 12)
+                self.assertGreater(g["crossY"], hq["y"] + hq["h"] + 15)
+                self.assertLess(g["crossY"], remote["y"] - 20)
+                self.assertGreater(g["dy"], remote["y"] + 105)
+                self.assertEqual(g["crossY"], g["ly"])
+                self.assertGreaterEqual(g["lx"] - 114, 0)
+                self.assertLessEqual(g["lx"] + 114, 1440)
+                self.assertGreaterEqual(g["crossY"] - 23, 362 + 15)
+                self.assertLessEqual(g["crossY"] + 23, 516 - 20)
+                if kind == "PRIMARIA":
+                    self.assertTrue(
+                        g["edgeX"] < remote["x"] if site == "S1"
+                        else g["edgeX"] > remote["x"] + remote["w"]
+                    )
+                else:
+                    self.assertGreater(g["edgeX"], self.geo["S1"]["x"] + self.geo["S1"]["w"])
+                    self.assertLess(g["edgeX"], self.geo["S2"]["x"])
+
+    def test_wan_circuits_do_not_cross_each_other(self):
+        pattern = (
+            r'"(WAN-(?:PRIMARIA|RESPALDO)-HQ-(?:S1|S2))":'
+            r'\{sx:(\d+),sy:(\d+),outX:(\d+),crossY:(\d+),'
+            r'edgeX:(\d+),dy:(\d+),dx:(\d+),lx:(\d+),ly:(\d+)\}'
+        )
+        segments = {}
+        for match in re.finditer(pattern, self.html):
+            x0, y0, x1, y1, x2, y2, x3 = map(int, match.groups()[1:8])
+            points = [(x0, y0), (x1, y0), (x1, y1),
+                      (x2, y1), (x2, y2), (x3, y2)]
+            segments[match.group(1)] = list(zip(points, points[1:]))
+
+        def intersects(a, b):
+            (x1, y1), (x2, y2) = a
+            (x3, y3), (x4, y4) = b
+            av, bv = x1 == x2, x3 == x4
+            if av and not bv:
+                return (min(y1, y2) <= y3 <= max(y1, y2) and
+                        min(x3, x4) <= x1 <= max(x3, x4))
+            if not av and bv:
+                return (min(x1, x2) <= x3 <= max(x1, x2) and
+                        min(y3, y4) <= y1 <= max(y3, y4))
+            if av and bv:
+                return x1 == x3 and max(min(y1, y2), min(y3, y4)) <= min(max(y1, y2), max(y3, y4))
+            return y1 == y3 and max(min(x1, x2), min(x3, x4)) <= min(max(x1, x2), max(x3, x4))
+
+        names = list(segments)
+        self.assertEqual(len(names), 4)
+        for i, first in enumerate(names):
+            for second in names[i+1:]:
+                with self.subTest(one=first, other=second):
+                    self.assertFalse(any(
+                        intersects(s1, s2)
+                        for s1 in segments[first] for s2 in segments[second]
+                    ), "Los enlaces deben transitar por carriles sin cruces")
+
 
     def test_accessibility_presentation_mode_and_no_duplicated_router(self):
         self.assertIn('id="focus-toggle"', self.html)
