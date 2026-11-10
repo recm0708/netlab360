@@ -87,7 +87,7 @@ class GeometryTests(unittest.TestCase):
     def test_circuit_labels_have_no_overlap_or_header_collision(self):
         links=self.wan_paths()
         self.assertEqual(len(links), 4)
-        for site, top in (("S1", 155), ("S2", 540)):
+        for site, top in (("S1", 155), ("S2", 510)):
             subset=[g for _kind, where, g in links.values() if where==site]
             self.assertEqual(len(subset), 2)
             a,b=sorted(g["laneY"] for g in subset)
@@ -98,6 +98,43 @@ class GeometryTests(unittest.TestCase):
         self.assertEqual(self.geo["S1"]["x"], self.geo["S2"]["x"])
         self.assertGreater(self.geo["S2"]["y"]-(
             self.geo["S1"]["y"]+self.geo["S1"]["h"]), 60)
+
+    def test_v6_hq_balanced_and_s2_backup_entry(self):
+        hq, s1, s2 = self.geo["HQ"], self.geo["S1"], self.geo["S2"]
+        # HQ permanece a la misma distancia vertical aproximada de S1 y S2.
+        midpoint = (s1["ry"] + s2["ry"]) / 2
+        self.assertLessEqual(abs(hq["ry"] - midpoint), 15)
+
+        links = self.wan_paths()
+        main_s2 = links["WAN-PRIMARIA-HQ-S2"][2]
+        backup_s2 = links["WAN-RESPALDO-HQ-S2"][2]
+        main_s1 = links["WAN-PRIMARIA-HQ-S1"][2]
+        backup_s1 = links["WAN-RESPALDO-HQ-S1"][2]
+
+        # Salidas ordenadas del lado derecho de R-HQ y sin invertir S2.
+        start_ys = [
+            main_s1["sy"], backup_s1["sy"],
+            main_s2["sy"], backup_s2["sy"],
+        ]
+        self.assertEqual(start_ys, sorted(start_ys))
+        self.assertGreaterEqual(main_s2["laneY"], 550)
+        self.assertLessEqual(backup_s2["laneY"], 650)
+        # El respaldo de S2 se acerca al router sin codo lejano/excesivo.
+        self.assertLessEqual(
+            abs(backup_s2["tailY"] - backup_s2["laneY"]), 30
+        )
+        self.assertLessEqual(
+            abs(main_s2["tailY"] - main_s2["laneY"]), 80
+        )
+        self.assertGreater(
+            backup_s2["laneY"] - main_s2["laneY"], 60
+        )
+        # Conservamos el orden funcional de las VLAN de ambas sucursales.
+        self.assertLess(s1["ry"], s1["sy"])
+        self.assertLess(s1["sy"], s1["hy"])
+        self.assertLess(s2["ry"], s2["sy"])
+        self.assertLess(s2["sy"], s2["hy"])
+        self.assertIn('{site:"S2",y:510}', self.html)
 
     def test_wan_circuits_do_not_cross_each_other(self):
         links=self.wan_paths()
