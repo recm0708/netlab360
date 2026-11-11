@@ -1,6 +1,6 @@
 # NETLAB360 S05 — Topología gráfica multisede
 
-**Estado al 10/11/2026:** V4 validada técnicamente (16/16 pruebas) y rechazada visualmente; V5 cargada y observada en Chrome mediante capturas preliminares, con una mejora clara pero una conexión de respaldo hacia S2 aún poco equilibrada. **V6 preparada en GitHub** para centrar visualmente R-HQ entre ambas sucursales y reducir el codo final de WAN de respaldo S2; falta sincronizar, ejecutar pruebas y evaluar el resultado en navegador. No existen capturas oficiales ni aceptación final; [issue #64](https://github.com/recm0708/netlab360/issues/64) sigue abierta.
+**Estado al 10/11/2026:** diseño visual **V6 aprobado por el operador** tras inspeccionar capturas preliminares en Windows; cuatro WAN distinguibles, HQ a la izquierda y S1/S2 a la derecha, sin superposiciones relevantes en la vista recibida. **Pendientes:** recibir salida completa de las 18 pruebas de V6 (no mostrada en el chat), obtener capturas oficiales de vista completa/inspector y conectar fuentes reales S04/OSPF/FIB. Issue [#64](https://github.com/recm0708/netlab360/issues/64) permanece abierta. La aprobación de diseño no confirma disponibilidad de routers o enlaces.
 
 ## Inventario representado
 
@@ -101,6 +101,19 @@ La revisión visual de **V5 en Windows** confirmó que el nuevo diseño apaisado
 - No cambian la API, telemetría, hora Panamá, IPAM, Docker, namespaces ni ningún dispositivo de la VM. El servidor en ejecución puede seguir abierto; basta sincronizar Git y refrescar Chrome.
 
 **Estado:** V6 versionada, **pendiente** de ejecutar las 18 pruebas y comprobar las dos vistas en Windows. Las capturas de V5/V6 permanecen provisionales hasta una aprobación visual explícita.
+
+## Aceptación visual V6 y evidencias definitivas — 10/11/2026
+
+Se recibieron **dos capturas provisionales de Chrome** con la V6. El operador indicó que la distribución visual ya era satisfactoria. La revisión muestra dos módulos WAN S1/S2 con etiquetas principal/respaldo, extremos en R-HQ/R-S1/R-S2, VLAN agrupadas y hora Panamá. Se declara **aprobación visual del diseño V6**, no cierre funcional de S05. Ambas capturas están parcialmente desplazadas; no acreditan un pantallazo completo del modo presentación ni el inspector del respaldo S2 seleccionado.
+
+Capturas oficiales a tomar cuando la V6 esté abierta:
+- `S05_10_Topologia_General_Tres_Sedes`: **obligatoria**, modo presentación mostrando HQ, S1, S2 y las cuatro WAN en una sola imagen, sin recortes de elementos.
+- `S05_11_Topologia_Inspector_Enlace_WAN`: **obligatoria**, vista normal, hacer clic en el circuito `WAN-RESPALDO-HQ-S2` (`10.78.0.12/30`), mostrar rol, extremos y estado en inspector, con diagrama legible.
+- `S05_12_Topologia_Estado_Sin_Telemetria`: complementaria, encabezado de estado `UNKNOWN`, fuente S04 no disponible y hora Panamá. No etiquetar `UNKNOWN` como fallo de equipos.
+
+Verificar el código V6 con `python3 -m unittest discover -s tests -p 'test_s05_*.py' -v` (se esperan 18 pruebas), `node --check` al JavaScript extraído, `git status` limpio y API `/healthz`/`/api/v1/graph`. **La transcripción disponible aún no contiene los resultados V6**, por lo que su regresión local sigue pendiente de registro.
+
+**Siguiente paso operacional seguro:** ejecutar auditoría de solo lectura del exporter S04 (`--check`, `--once`, endpoint 9110), SoT y estado Docker; no levantar topología/FRR ni modificar rutas hasta interpretar evidencias. Un `UNKNOWN` confiable es distinto de un equipo demostrado caído.
 
 ## Actualización por fases
 
