@@ -1,5 +1,11 @@
 # NETLAB360 S05 · Mapa de terminales y recuperación del NOC
 
+## Estado operativo recuperado — 11/11/2026 (supera el diagnóstico histórico siguiente)
+
+**Recuperación completada:** NOC T1 ahora PID **449431** en `127.0.0.1:9130`, exporter S04 T4 PID **425166** en `127.0.0.1:9110`, túnel T2 funcional y acceso Windows a `/healthz` + grafo. Dos muestras separadas cuatro segundos, **S04 `source_ok=True`, `topology=active`, `errors=[]`, NOC `routing.available=True`, `source_warnings=[]`**, FIB `S1=s1p/10.78.0.2`, `S2=s2p/10.78.0.10`; precheck S1 `OK_SIN_CAMBIOS`; `ens33 192.168.47.40/24` intacto. El procedimiento de recuperación que figura abajo es **histórico o de contingencia**, no se debe ejecutar mientras las fuentes sigan sanas.
+
+**Regla actual:** mantener abiertas T1 (NOC), T2 (túnel) y T4 (S04); T3 realiza git pull y comprobaciones sin reiniciar servidores. T5 registra failover; solo cuando T5 diga `S05_NOC_OBSERVADOR_LISTO=S1`, T6 (PowerShell tras `ssh rc-aa-ec@192.168.47.40`) ejecutará la conmutación S1 con `--hold-seconds 25` y supervisión de restauración. Para capturas 29/30 y lista exacta pendiente consultar [auditoría de cuatro PNG](../evidencias/10-auditoria-s05-png-y-capturas-pendientes-2026-11-11.md).
+
 **Corte:** 11/11/2026. **VM:** `netlab360-lab` / `192.168.47.40/24`; gateway `192.168.47.2` por `ens33`. **Snapshot VMware:** `NETLAB360_S05_PreLAN_20261110` (manual; no tocar).
 
 ## Diagnóstico confirmado por el operador
