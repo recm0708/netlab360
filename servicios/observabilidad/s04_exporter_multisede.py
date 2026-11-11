@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import socket
 import subprocess
@@ -22,6 +23,7 @@ ADMIN_IP = "192.168.47.40/24"
 ADMIN_ROUTE = "default via 192.168.47.2 dev ens33"
 EXPECTED = {"R-HQ": 4, "R-S1": 2, "R-S2": 2}
 DOCKER_PROJECT = "netlab360-s02-wan"
+PRIV_HELPER = "/usr/local/libexec/netlab360-observer"
 
 
 class ObserveError(RuntimeError):
@@ -80,6 +82,23 @@ def load_sot(path: Path = SOT_PATH) -> dict:
     return data
 
 
+
+
+def trusted_snapshot(runner=run) -> dict | None:
+    """Modo servicio: lector root solo lectura y sudoers de comando exacto."""
+    if os.environ.get("NETLAB360_PRIV_OBSERVER") != PRIV_HELPER:
+        return None
+    raw = execute(["sudo", "-n", PRIV_HELPER, "snapshot"], runner)
+    try:
+        data = json.loads(raw)
+        if (data.get("project") != "NETLAB360" or
+                data.get("owner") != "NETLAB360_S02_WAN_LINKS_V1" or
+                set(data.get("routers", {})) != set(EXPECTED)):
+            raise ObserveError("Respuesta del observador privilegiado inválida")
+    except (ValueError, TypeError, AttributeError) as exc:
+        raise ObserveError("Snapshot privilegiado malformado") from exc
+    return data
+
 def inspect_router(container: str, runner=run) -> dict:
     command = ["sudo", "-n", "docker", "inspect", container]
     try:
@@ -133,9 +152,21 @@ def collect(sot: dict, runner=run, hostname=None) -> dict:
     }
     try:
         management_guard(runner, hostname)
+        privileged = trusted_snapshot(runner)
         discovered = {}
         for logical, device in sorted(sot["devices"].items()):
-            discovered[logical] = inspect_router(device["container"], runner)
+            if privileged is None:
+                discovered[logical] = inspect_router(device["container"], runner)
+            else:
+                value = privileged["routers"][logical]
+                if (value.get("id") is None or
+                        value.get("running") not in (True, False) or
+                        not isinstance(value.get("links"), dict)):
+                    raise ObserveError("Router observado con estructura inválida")
+                discovered[logical] = {
+                    "running": value["running"], "pid": value.get("pid"),
+                    "links": value["links"],
+                }
         active = sum(int(x["running"]) for x in discovered.values())
         state["topology"] = "offline" if active == 0 else "partial" if active < 3 else "active"
         for logical, device in sorted(sot["devices"].items()):
@@ -143,7 +174,7 @@ def collect(sot: dict, runner=run, hostname=None) -> dict:
             site = logical.replace("R-", "")
             info = {"router": logical, "container": device["container"],
                     "running": int(runtime["running"]), "wan": {}, "vlans": {}}
-            links = read_links(runtime["pid"], runner) if runtime["running"] else {}
+            links = (read_links(runtime["pid"], runner) if runtime["running"] else {}) if privileged is None else runtime["links"]
             for w in device["wan"]:
                 info["wan"][w["interface"]] = {
                     "admin_up": status_of_link(links.get(w["interface"])) if runtime["running"] else -1,
