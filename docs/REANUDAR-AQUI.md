@@ -1,5 +1,14 @@
 # NETLAB360 — Punto de reanudación
 
+## S05 · Lotes 84–85 ejecutados; lote 86 pendiente por error de sintaxis (11/11/2026)
+
+- [x] **Lote 84 red HA:** Git sincronizado en commit `ff252b9`, **51 pruebas S05 OK**, plan de 3 nodos HA, `S05_HA_RED_PRECHECK=OK_SIN_CAMBIOS`, NOC/FIB S1 `s1p` y S2 `s2p`; `LOTE84_HA=OK`. Evidencia delimitada `INICIO_CAPTURA_S05_34` → `FIN_CAPTURA_S05_34` mostrada en log.
+- [x] **Lote 85 red HA:** creados **3 namespaces/puertos exclusivos** `nl360-s05-ha-hq` `10.70.20.21/24` (HQ VLAN120), `nl360-s05-ha-s1` `10.71.20.21/24` (S1 VLAN220), `nl360-s05-ha-fe` `10.70.20.23/24` (HQ VLAN120). `S05_HA_RED_UP=OK`, `S05_HA_RED_STATUS=OK`, S2 alcanza los tres destinos, `S05_GESTION_INTACTA=SI`, `S05_S02_CONSERVADO=SI`, `LOTE85_HA=OK`. Evidencia S05_35 delimitada INICIO→FIN. `S05_HA_SERVIDORES_HTTP=NO_INICIADOS`: **aún NO hay alta disponibilidad HTTP**.
+- [ ] **Lote 86 NO EJECUTADO.** El bloque de comandos anterior tenía **un paréntesis final `)` faltante**: Bash mostró prompt secundario `>` y quedó esperando cierre, no estaba bloqueado ni ejecutó postcheck. Se pulsó `Ctrl+C` una vez, luego se pegó de nuevo y quedó en `>`. Resolver completando `)` en prompt actual o cancelando y ejecutando versión corregida. **No volver a ejecutar `up` ni borrar/recrear la red HA.**
+- [ ] **Captura S05_36 pendiente** hasta obtener `INICIO_CAPTURA_S05_36` → `FIN_CAPTURA_S05_36` de postcheck real y `LOTE86_HA=OK`. No afirmar que la captura existe.
+- [ ] Tras L86, desplegar backends HTTP y frontal con healthcheck/failover y registrar NOC dinámicamente, sin modificar `ens33` ni snapshot manual VMware.
+
+
 ## Corte verificado 11/11/2026 — Supervisión persistente cerrada; iniciar HA
 
 - [x] **Lote 84R-L completado tras cerrar y reabrir SSH normal con túnel 9130 integrado:** `systemctl is-active netlab360-s04-exporter` y `netlab360-s05-noc` => **active/active**; `is-enabled` => **enabled/enabled**.
