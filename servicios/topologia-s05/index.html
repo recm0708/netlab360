@@ -385,12 +385,12 @@ function drawSiteBox(site,nodes,parent){
  txt("Enrutador FRR · Conmutador L2 · 3 VLAN",b.x+25,b.y+66,"site-caption",g);
  const router=nodes.find(n=>n.id==="R-"+site);
  const state=router?.status||"unknown";
- const badgeX=b.x+b.w-155, badgeY=b.y+24;
- el("rect",{x:badgeX,y:badgeY,width:138,height:33,rx:11,
+ const badgeX=b.x+b.w-112, badgeY=b.y+26;
+ el("rect",{x:badgeX,y:badgeY,width:94,height:30,rx:10,
    class:"site-state-badge "+state},g);
- const label=state==="running"?"RTR: EN EJECUCIÓN":
-   state==="offline"?"RTR: DETENIDO":"RTR: SIN DATOS";
- txt(label,badgeX+69,badgeY+21,"site-state-text",g);
+ const label=state==="running"?"ACTIVO":
+   state==="offline"?"INACTIVO":"SIN DATOS";
+ txt(label,badgeX+47,badgeY+20,"site-state-text",g);
 }
 function drawWanBundles(parent){
  for(const e of [{site:"S1",y:155},{site:"S2",y:510}]){
