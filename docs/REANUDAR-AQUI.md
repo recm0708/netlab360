@@ -1,5 +1,16 @@
 # NETLAB360 — Punto de reanudación
 
+## CORTE OPERATIVO 11/11/2026 · S05 HA RED EN REPOSITORIO, AÚN SIN DESPLIEGUE
+
+**Ejecución aportada en este chat:**
+- **Lote 81:** `main` sincronizado en VM a `2a3f899`, `40/40` pruebas S05 OK, sintaxis del precheck HA OK, Git limpio.
+- **Lote 82:** `S05_HA_PRECHECK=OK_DISENO_PENDIENTE`; 12 namespaces S02; routers HQ/S1/S2, VLAN servicio HQ120, S1220 y S2320; IP candidatas `10.70.20.21`, `10.71.20.21`, `10.70.20.23` sin asignación observada; S04 NOC/FIB principal sanas; gestión ens33 intacta; sin nuevos recursos HA.
+- **Lote 83:** S2 VLAN320 alcanzó HQ VLAN120 y S1 VLAN220, 2/2 pings en ambos casos; puertos S02 `a120/a220` etiquetados correctamente; `ens33` y `main` sin cambios. **Capturas S05_32 y S05_33 subidas a la conversación y revisadas como válidas; aún no incorporadas en binario a GitHub.**
+- **Nuevo código versionado GitHub:** `scripts/laboratorio/s05-ha-red-servicios.py`, `tests/test_s05_ha_red.py`, CI S05 [run 42974399828](https://github.com/recm0708/netlab360/actions/runs/42974399828) resultado `success`; diseño [docs/diseno/s05-ha-servicios-multisede.md](diseno/s05-ha-servicios-multisede.md) ampliado. Ofrece `plan`, `precheck`, `up --confirm-isolated`, `status`, `down --confirm-isolated`, ownership `NETLAB360_S05_HA_RED_V1`, rollback solo S05, sin FRR ni host. **NINGÚN SERVICIO HA desplegado ni red HA creada todavía**.
+- **Próximos lotes:** 84 sincronización/plan/precheck, 85 `up` 3 netns/puertos veth exclusivos a VLAN 120 y 220, 86 status y postcheck gestión/FIB. Capturas S05_34 de plan y S05_35 de creación/estado. **No ejecutar 85 si 84 falla**. Solo después crear backends HTTP y balanceador/proxy con failover observado.
+- **Terminales:** T1 NOC 9130, T2 túnel PowerShell, T3 Ubuntu control Git/sudo, T4 exporter S04 9110. Mantener T1/T2/T4, sin lanzar duplicados ni reiniciar por actualizar Git. T5/T6 libres de observador/failover del paso anterior.
+- **Cierre GitHub:** issues #5/#32 actualizadas; #64 captura/nodos futuros; #31 LACP y #23 SDN pendientes; milestone S05 ABIERTA. Snapshot VMware manual `NETLAB360_S05_PreLAN_20261110` NO modificar. Los cortes siguientes más antiguos son historia y no deben interpretarse como pendientes presentes.
+
 ## CORTE VIGENTE — 11/11/2026 · Lotes 79/80 OK; precheck HA versionado, NO desplegado
 
 **Ejecutado y verificado por usuario:**
