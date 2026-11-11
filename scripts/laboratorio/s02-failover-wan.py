@@ -3,7 +3,7 @@
 
 Solo baja/sube una interfaz WAN primaria en el namespace de R-HQ.
 Nunca modifica interfaces o rutas del host. Mantener LAN/servicios activos.
-Uso: sudo -v; python3 scripts/laboratorio/s02-failover-wan.py S1|S2
+Uso: sudo -v; python3 scripts/laboratorio/s02-failover-wan.py S1|S2 [--hold-seconds 0-30]
 """
 from __future__ import annotations
 
@@ -12,6 +12,7 @@ import json
 import os
 from pathlib import Path
 import re
+import signal
 import subprocess
 import sys
 import time
@@ -99,7 +100,17 @@ def host_guard(before: tuple[str, str]) -> None:
 def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("branch", choices=sorted(CASES))
+    p.add_argument("--hold-seconds", type=int, default=0,
+                   help="Ventana acotada de observación NOC (0-30 s), con recuperación automática")
     args = p.parse_args()
+    if not 0 <= args.hold_seconds <= 30:
+        p.error("--hold-seconds debe estar entre 0 y 30")
+
+    def stop_and_restore(signum: int, _frame: object) -> None:
+        raise KeyboardInterrupt(f"Señal {signum}; se iniciará la restauración WAN")
+
+    signal.signal(signal.SIGTERM, stop_and_restore)
+    signal.signal(signal.SIGHUP, stop_and_restore)
     if os.geteuid() == 0:
         raise RuntimeError("Ejecutar como usuario normal; autenticar sudo previamente")
     x = CASES[args.branch]
@@ -140,6 +151,11 @@ def main() -> None:
         print(f"S02_{args.branch}_RUTA_RESPALDO_SUCURSAL={peer_new}")
         print(f"S02_{args.branch}_OTRA_SEDE_ESTABLE=SI")
         print(f"S02_{args.branch}_CONMUTACION=OK", flush=True)
+        if args.hold_seconds:
+            print(f"S05_{args.branch}_VENTANA_NOC_SEG={args.hold_seconds}", flush=True)
+            print(f"S05_{args.branch}_OBSERVACION_DE_RESPALDO=EN_CURSO", flush=True)
+            time.sleep(args.hold_seconds)
+            print(f"S05_{args.branch}_OBSERVACION_DE_RESPALDO=FINALIZADA", flush=True)
     except BaseException as e:
         failure = e
         print(f"S02_{args.branch}_FALLO_DURANTE_CORTE={type(e).__name__}: {e}", file=sys.stderr)
