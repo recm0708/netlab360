@@ -41,6 +41,25 @@ class HADeploymentContract(TestCase):
             with self.assertRaisesRegex(RuntimeError, "inválido"):
                 m.read_state()
 
+    def test_vlan1_removal_is_optional_and_new_access_vlan_is_required(self):
+        calls = []
+        def fake_cmd(*argv, **kwargs):
+            calls.append((argv, kwargs))
+            return ""
+        with patch.object(m, "cmd", side_effect=fake_cmd):
+            m.attach(m.ROWS[0])
+        deleted = [(args, kwargs) for args, kwargs in calls
+                   if "bridge" in args and "del" in args]
+        self.assertEqual(len(deleted), 1)
+        self.assertEqual(deleted[0][1].get("check"), False)
+        self.assertIn("1", deleted[0][0])
+        added = [args for args, _ in calls
+                 if "bridge" in args and "add" in args]
+        self.assertEqual(len(added), 1)
+        self.assertIn("120", added[0])
+        self.assertIn("pvid", added[0])
+        self.assertIn("untagged", added[0])
+
     def test_plan_only_prints_desired_resources(self):
         with patch("builtins.print") as printed:
             m.plan()
