@@ -177,7 +177,9 @@ header{padding-top:15px;padding-bottom:15px}
 .ha-application-link.standby{stroke:#62bafa;stroke-dasharray:7 8}
 .ha-application-link.offline{stroke:#f97680;stroke-dasharray:5 7}
 .ha-application-link.unknown{stroke:#879bb0;stroke-dasharray:4 7}
-.ha-application-label{fill:#bcd4eb;font-size:12px;text-anchor:middle}
+.ha-application-label{fill:#bcd4eb;font-size:14px;font-weight:650;text-anchor:middle}
+.ha-overview{row-gap:7px;line-height:1.55}
+.ha-overview #ha-source{white-space:normal}
 body.presentation .ha-overview{margin:6px 0;padding:8px 14px}
 </style></head>
 <body>
@@ -276,18 +278,23 @@ function topologyText(value){return topologyLabels[value]||"SIN DATOS";}
 function typeText(value){
  return ({wan:"Enlace WAN",router:"Enrutador",switch:"Conmutador",host:"Equipo final",server:"Servidor HTTP",redundancy:"Ruta de aplicación",access:"Acceso VLAN"})[value]||String(value||"No especificado");
 }
-function formatVMClock(data){
- // No usa new Date() sin argumento: la hora viene del backend en la VM.
- const value=(data.vm_clock||{}).panama||data.observed_at_utc;
- if(typeof value!=="string")return "Reloj de la VM: no disponible";
+function formatPanamaStamp(value){
+ // Hora de la VM y monitor S2 comparten fecha/hora es-PA, zona Panamá.
+ // La marca UTC llega de Ubuntu, no del reloj local del navegador.
+ if(typeof value!=="string")return null;
  const stamp=new Date(value);
- if(!Number.isFinite(stamp.getTime()))return "Reloj de la VM: muestra inválida";
- const format=new Intl.DateTimeFormat("es-PA",{
+ if(!Number.isFinite(stamp.getTime()))return null;
+ const fmt=new Intl.DateTimeFormat("es-PA",{
   timeZone:"America/Panama",
   day:"2-digit",month:"short",year:"numeric",
   hour:"numeric",minute:"2-digit",second:"2-digit",hour12:true
  });
- return "Hora de la VM · "+format.format(stamp)+" · Panamá (UTC−5)";
+ return fmt.format(stamp)+" · Panamá (UTC−5)";
+}
+function formatVMClock(data){
+ const value=(data.vm_clock||{}).panama||data.observed_at_utc;
+ const formatted=formatPanamaStamp(value);
+ return formatted?"Hora de la VM · "+formatted:"Reloj de la VM: muestra inválida";
 }
 function routeText(value){
  return ({
@@ -393,6 +400,10 @@ function drawDevice(item,x,y,parent=svg){
    el("rect",{x:x-60,y:y-25,width:120,height:50,rx:11},g);
    txt("SW",x,y-3,"device-title",g);
    txt(item.label,x,y+18,"device-small",g);
+ }else if(item.type==="server"){
+   el("rect",{x:x-84,y:y-26,width:168,height:52,rx:11},g);
+   txt("SERVIDOR",x,y-3,"device-title",g);
+   txt(item.label,x,y+18,"device-small",g);
  }else{
    el("rect",{x:x-55,y:y-26,width:110,height:52,rx:10},g);
    const kind=item.type==="host"?
@@ -492,7 +503,7 @@ function drawExtensions(data){
  const extra=Object.fromEntries(sites.map(site=>[site,
    data.nodes.filter(n=>n.site===site&&!basic.has(n.id))]));
  const rows=Math.max(0,...sites.map(site=>extra[site].length));
- const height=rows?1120+(rows-1)*106:BASE_HEIGHT;
+ const height=rows?1140+(rows-1)*106:BASE_HEIGHT;
  svg.setAttribute("viewBox","0 0 "+WIDTH+" "+height);
  svg.style.aspectRatio=WIDTH+" / "+height;
  if(!rows)return;
@@ -508,16 +519,24 @@ function drawExtensions(data){
   const a=positions[link.from],b=positions[link.to];
   if(!a||!b)return;
   const same=a.x===b.x;
-  const ax=a.x+(same?0:55),ay=a.y-(same?26:10);
-  const bx=b.x-(same?0:55),by=b.y+(same?26:10);
   const state=link.status==="offline"?"offline":
    link.application_selection==="selected"?"selected":
    link.application_selection==="standby"?"standby":"unknown";
-  const line=el("path",{d:"M "+ax+" "+ay+" L "+bx+" "+by,
-   class:"ha-application-link "+state},g);
+  // Principal HQ por carril izquierdo evitando etiquetas e IP.
+  // Respaldo S1 por diagonal: elección HTTP, no FIB ni WAN.
+  const path=same?
+   ("M "+(a.x-84)+" "+a.y+" H "+(a.x-124)+
+    " V "+b.y+" H "+(b.x-84)):
+   ("M "+(a.x+84)+" "+(a.y-9)+" L "+(b.x-84)+" "+(b.y+9));
+  const line=el("path",{d:path,class:"ha-application-link "+state},g);
   attach(line,link);
-  if(!same)txt("RESPALDO HTTP",(ax+bx)/2,(ay+by)/2-9,
+  if(same){
+   txt("PRINCIPAL HTTP",a.x-195,(a.y+b.y)/2+5,
     "ha-application-label",g);
+  }else{
+   txt("RESPALDO HTTP",(a.x+b.x)/2,(a.y+b.y)/2-16,
+    "ha-application-label",g);
+  }
  });
  sites.forEach(site=>{
    const faded=selected!=="ALL"&&selected!==site;
@@ -550,7 +569,8 @@ function render(data){
    active==="BACKEND_S1"?"ha-standby":"ha-unknown";
  const httpNodes=data.nodes.filter(n=>["BACKEND_HQ","BACKEND_S1","FRONTAL_HQ"].includes(n.id));
  $("ha-backends").textContent=httpNodes.map(n=>n.label+": "+statusText(n.status)).join(" · ");
- $("ha-source").textContent=known?"Observado desde S2 · "+(ha.observed_at_utc||"sin hora"):
+ const seen=known?formatPanamaStamp(ha.observed_at_utc):null;
+ $("ha-source").textContent=seen?"Observado desde S2 · "+seen:
    "Sin muestra HTTP reciente desde S2; no se presume disponibilidad";
  const t=data.telemetry||{},reliable=t.available===true,state=t.topology||"unknown";
  $("status").className="status "+(reliable?(state==="active"?"active":state==="offline"?"offline":"partial"):"");
