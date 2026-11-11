@@ -56,7 +56,8 @@ console.log("S05_HA_FORMATO_HORA_PANAMA=OK");
     def test_main_http_rail_does_not_cover_ip_labels(self):
         self.assertIn('a.x-124', self.html)
         self.assertIn('b.x-84', self.html)
-        self.assertIn('PRINCIPAL HTTP', self.html)
+        self.assertIn('txt("PRINCIPAL",a.x-175', self.html)
+        self.assertIn('txt("HTTP",a.x-175', self.html)
         self.assertIn('RESPALDO HTTP', self.html)
         self.assertIn('class:"ha-application-link "+state', self.html)
         self.assertIn(".ha-application-link.selected", self.html)
