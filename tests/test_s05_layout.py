@@ -193,6 +193,24 @@ class GeometryTests(unittest.TestCase):
         self.assertIn('txt(item.label,x,y+18', self.html)
 
 
+    def test_v71_selection_distinct_from_operational_status(self):
+        """El contorno violeta depende del clic, no del color de FIB."""
+        self.assertIn(".wan-selection-halo{display:none;", self.html)
+        self.assertIn(".wan-circuit.selected .wan-selection-halo", self.html)
+        self.assertIn('class:"wan-selection-halo"', self.html)
+        self.assertIn(".wan-label.selected .wan-pill", self.html)
+        self.assertIn("stroke:var(--focus)", self.html)
+        self.assertIn('n.classList.toggle("selected"', self.html)
+        self.assertIn('id="selection-note" hidden', self.html)
+        self.assertIn('$("selection-note").hidden=false', self.html)
+        self.assertIn('classList.add("inspector-selected")', self.html)
+        self.assertIn("Contorno violeta: tu selección", self.html)
+        self.assertIn("Principal elegida por FIB", self.html)
+        self.assertIn("Respaldo elegido por FIB", self.html)
+        self.assertIn("Respaldo en espera", self.html)
+        self.assertIn("Interfaz DOWN confirmada", self.html)
+        self.assertIn("no se inventan alertas", self.html)
+
     def test_fib_route_color_semantics_and_inspector(self):
         self.assertIn(".wan-line.primary.route-selected", self.html)
         self.assertIn(".wan-line.backup.route-selected", self.html)
