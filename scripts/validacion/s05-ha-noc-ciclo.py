@@ -126,8 +126,8 @@ def run_trial(hold: int) -> None:
         print("S05_HA_NOC_JSONL=" + str(path), flush=True)
         print("S05_HA_NOC_FASE_1=BACKEND_HQ", flush=True)
         try:
+            stopped = True  # Restaurar también si stop devuelve error tras efectuar cambios.
             cmd("sudo", "-n", "systemctl", "stop", ROOT)
-            stopped = True
             print("S05_HA_NOC_BACKEND_HQ=DETENIDO_CONTROLADO", flush=True)
             wait_phase("BACKEND_S1", timeout=12, sink=record)
             print("S05_HA_NOC_FASE_2=BACKEND_S1", flush=True)
