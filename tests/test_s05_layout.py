@@ -288,6 +288,11 @@ console.log("S05_V72_TOGGLE_NODE=OK");
         self.assertIn('data.vm_clock', self.html)
         self.assertIn('Hora de la VM', self.html)
         self.assertIn('site-state-badge', self.html)
+        self.assertIn('const badgeX=b.x+b.w-112, badgeY=b.y+26;', self.html)
+        self.assertIn('width:94,height:30,rx:10', self.html)
+        self.assertIn('state==="running"?"ACTIVO"', self.html)
+        self.assertIn('state==="offline"?"INACTIVO":"SIN DATOS"', self.html)
+        self.assertNotIn("RTR: EN EJECUCIÓN", self.html)
         self.assertIn('function drawSiteBox(site,nodes,parent)', self.html)
         self.assertIn('formatVMClock(data)', self.html)
 
