@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 from pathlib import Path
 import subprocess
 import sys
@@ -67,7 +68,7 @@ def inspect(name: str, expected_id: str) -> dict:
 
 def interfaces(pid: int) -> dict:
     raw = json.loads(run("/usr/bin/nsenter", "-t", str(pid), "-n",
-                         "/usr/sbin/ip", "-j", "link", "show"))
+                         shutil.which("ip", path="/usr/sbin:/usr/bin:/sbin:/bin") or "/usr/sbin/ip", "-j", "link", "show"))
     if not isinstance(raw, list):
         raise RuntimeError("ip -j link no devolvió lista")
     return {str(x["ifname"]).split("@", 1)[0]:
@@ -79,7 +80,7 @@ def fib(pid: int, site: str, target: str) -> dict | None:
     # Una ruta ausente es información no observada, no un motivo para inventarla.
     try:
         raw = json.loads(run("/usr/bin/nsenter", "-t", str(pid), "-n",
-                             "/usr/sbin/ip", "-j", "-4", "route", "get", target))
+                             shutil.which("ip", path="/usr/sbin:/usr/bin:/sbin:/bin") or "/usr/sbin/ip", "-j", "-4", "route", "get", target))
         if not isinstance(raw, list) or len(raw) != 1:
             return None
         dev = raw[0].get("dev")
