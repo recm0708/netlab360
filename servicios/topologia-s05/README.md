@@ -2,6 +2,26 @@
 
 **Estado verificado al 10/11/2026:** diseño V6 aprobado visualmente y **regresión real 18/18 OK**; API, inventario y Git comprobados por el operador. Recibidas y auditadas las capturas **S05_10** (mapa completo), **S05_11** (inspector respaldo HQ–S2) y **S05_12** (UNKNOWN sin exporter, aviso histórico netns por actualizar). El exporter S04 `--once` obtuvo **fuente confiable y topología OFFLINE** con tres routers ausentes, pero el HTTP S04 `127.0.0.1:9110` estaba detenido, por lo que el visor mostró **UNKNOWN por falta de fuente activa**, de forma correcta. Pendientes: importación PNG/manifest y demostración de OSPF/FIB y failover real. [Auditoría de 14 capturas y observación S04](../../docs/sesiones/2026-11-10-s05-auditoria-capturas-y-fuente-s04.md). Mantener abierta la [issue #64](https://github.com/recm0708/netlab360/issues/64).
 
+## V7 — Rutas FIB observadas en tiempo real (código versionado 11/11/2026)
+
+**Estado:** la lectura FIB de HQ y la representación visual están **versionadas en GitHub**, con pruebas offline/CI. **Pendiente ejecutar en la VM original y recibir capturas de navegador/API**, por lo que todavía NO se declara aceptada la demostración visual de failover.
+
+Se consulta únicamente la FIB Linux del namespace del contenedor **`nl360-s02-r-hq`** a través de `sudo -n docker inspect` y `sudo -n nsenter -t PID -n ip -j -4 route get` para `10.79.0.2` y `10.79.0.3`. No se crea ni modifica ruta, interfaz, contenedor, FRR, puente ni equipo. Se compara `Id` de Docker con `~/netlab360-bootstrap/s02/wan-links-state.json` y la etiqueta `netlab360-s02-wan`; el observer rechaza recursos diferentes. La muestra solo se utiliza **si S04 está fresca y confiable** y si la fuente FIB valida ambas sucursales. Si caducan las credenciales `sudo -n`, el state/identidad cambia o el endpoint falla, la selección pasa a `unknown`, no a un verde ficticio.
+
+El grafo conserva `status=admin-up/admin-down/offline/unknown` (ambos extremos desde S04), y añade a las WAN `route_selection=selected/standby/unavailable/unknown`, `route_source` y `route_gateway` cuando realmente se observa la FIB. En `routing` declara explícitamente `traffic_measured=false`.
+
+**Semántica de colores:** principal seleccionada verde; respaldo seleccionado azul; disponible no seleccionada (standby) gris/azul tenue; caída administrativa verificada rojo. Un enlace de respaldo **en uso por FIB no implica tráfico medido**, y la lectura FIB tampoco acredita OSPF FULL sin el comando de OSPF de las pruebas anteriores. El inspector etiqueta `Selección FIB R-HQ` y `Próximo salto FIB`.
+
+### Puesta en servicio segura
+
+1. Mantener exporter S04 ejecutándose `--serve --port 9110 --interval 2`, con lectura Docker autorizada.
+2. En la **misma sesión SSH en la que se iniciará el visor**, ejecutar `sudo -v`, y reiniciar `python3 servicios/topologia-s05/app.py --serve --port 9130`. La cache sudo no es permanente: `routing.available=false` si caduca; esto es un resultado seguro, no un error de red.
+3. Ejecutar `python3 -m unittest discover -s tests -p 'test_s05_*.py' -v` y extraer el JS del HTML para `node --check`. Se esperan **24 pruebas** si el código nuevo está sincronizado (anterior V6: 18).
+4. Validar `/api/v1/graph`: con las 4 WAN y FIB principal, `WAN-PRIMARIA-HQ-S1` y `...S2` deben tener `route_selection=selected`, `WAN-RESPALDO...` `standby`. Si la fuente no está disponible, reportar `unknown` y **no** colorear rutas como elegidas.
+5. Capturar evidencia de baseline y de inspección en Windows. Demostración visual bajo failover se realizará **solo después de verificar el baseline**, con una prueba controlada que restaure la interfaz en `finally`.
+
+**Pendiente mayor de la issue #64:** test dinámico de ruta en respaldo durante falla, eventual uso de contadores reales (si se incorpora animación) y evidencias completas. Mantener abierto hasta que estén verificadas.
+
 ## Inventario representado
 
 Deriva de `inventario/ipam/topologia-s02.yaml`, estado `candidate`. Dibuja **HQ, S1 y S2**, 3 routers FRR, 3 switches de prueba, 9 VLAN, 9 hosts de namespaces aislados y 4 WAN (primaria y respaldo de HQ a cada sucursal). Los equipos que aparecen en diseño no se declaran operativos sin evidencia real. Un host VLAN servicios **no es automáticamente un servidor dedicado**. No hay equipos HA/OVS/Faucet adicionales confirmados todavía.
