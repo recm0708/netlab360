@@ -498,8 +498,27 @@ function drawExtensions(data){
  if(!rows)return;
  const g=el("g",{},svg);
  el("rect",{x:36,y:936,width:1368,height:height-954,rx:14,class:"underlay"},g);
- txt("DISPOSITIVOS ADICIONALES VERIFICADOS",720,966,"zone-title",g);
+ txt("SERVICIOS Y EQUIPOS ADICIONALES · ESTADO EN VIVO",720,966,"zone-title",g);
  const columns={HQ:270,S1:720,S2:1170};
+ const positions={};
+ sites.forEach(site=>extra[site].forEach((item,i)=>{
+  positions[item.id]={x:columns[site],y:1040+i*106};
+ }));
+ data.links.filter(link=>link.type==="redundancy").forEach(link=>{
+  const a=positions[link.from],b=positions[link.to];
+  if(!a||!b)return;
+  const same=a.x===b.x;
+  const ax=a.x+(same?0:55),ay=a.y-(same?26:10);
+  const bx=b.x-(same?0:55),by=b.y+(same?26:10);
+  const state=link.status==="offline"?"offline":
+   link.application_selection==="selected"?"selected":
+   link.application_selection==="standby"?"standby":"unknown";
+  const line=el("path",{d:"M "+ax+" "+ay+" L "+bx+" "+by,
+   class:"ha-application-link "+state},g);
+  attach(line,link);
+  if(!same)txt("RESPALDO HTTP",(ax+bx)/2,(ay+by)/2-9,
+    "ha-application-label",g);
+ });
  sites.forEach(site=>{
    const faded=selected!=="ALL"&&selected!==site;
    const column=el("g",{opacity:faded?".3":"1"},g);
