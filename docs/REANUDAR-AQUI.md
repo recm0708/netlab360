@@ -16,6 +16,12 @@
 
 **Documento:** borrador 4.6, 113 páginas, figuras 1–20 y tablas 1–13. **Evidencias:** 122 PNG oficiales (83/9/8/22) y manifiestos SHA-256. El próximo encuentro docente previsto es **13/11/2026**, con fundamento técnico y diseño [#48](https://github.com/recm0708/netlab360/issues/48). No se ha celebrado aún.
 
+## Actualización operativa — reactivación S02 en S05 (10/11/2026)
+
+El **lote 44, ejecutado en la VM**, terminó con `S05_S02_PREPARACION=OK`, `S02_PRECHECK_RESULTADO=0` y `RESULTADO_VALIDACION_S02=0`. Git `main` limpio, `ens33 192.168.47.40/24` y GW `192.168.47.2` preservados, 8 vCPU, 13 GiB RAM disponibles y 132 GiB de disco. Docker, containerd y VMware Tools activos. Imagen FRR `quay.io/frrouting/frr:10.7.1` local, Compose válido, SoT/IPAM S02 correcto: 3 sedes, 4 WAN (costos 10/100), 9 VLAN y 17 redes; sin colisiones detectadas. **No existían contenedores Docker ni namespaces**, ni estados previos `wan-links-state.json`, `lan-vlan-state.json` o `estado-s02-wan`. No se desplegó infraestructura.
+
+El exporter S04 se levantó temporalmente en puerto 9110, y **S04→V6 respondió `source_ok=True`, `topology=offline` en ambas API**; captura `S05_13` recibida. La geometría V6 tiene aprobación visual y 18/18 tests. La siguiente acción es iniciar **solamente los tres routers FRR de S02 en `network_mode:none`**, validar el baseline sin WAN y ejecutar después el `precheck` WAN (sin `up`). Las operaciones `s02-wan-links.py up` y `s02-lan-vlan.py up` **requieren instantánea VMware confirmada** por sus opciones `--snapshot-confirmado`; no ejecutarlas sin dicha salvaguarda. No tocar `ens33`, el gateway ni recursos ajenos. Mantener registradas capturas nuevas con nombres `S05_14+` y manifiestos SHA-256.
+
 ## Reanudar S05 sin repetir S01–S04
 
 1. Encender la **misma VM** `netlab360-lab` solo cuando se retome el trabajo; no clonar ni restaurar snapshots sin necesidad.
