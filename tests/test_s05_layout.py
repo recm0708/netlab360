@@ -224,9 +224,9 @@ class GeometryTests(unittest.TestCase):
         self.assertNotIn('selectedId=id;', self.html)
 
     def test_v72_spanish_user_facing_state_labels(self):
-        self.assertIn('active:"ACTIVA"', self.html)
-        self.assertIn('offline:"FUERA DE LÍNEA"', self.html)
-        self.assertIn('unknown:"SIN DATOS"', self.html)
+        self.assertIn('"active":"ACTIVA"', self.html)
+        self.assertIn('"offline":"FUERA DE LÍNEA"', self.html)
+        self.assertIn('"unknown":"SIN DATOS"', self.html)
         self.assertIn('topologyText(state)', self.html)
         self.assertIn('Topología SIN DATOS', self.html)
         self.assertIn('Fuera de línea comprobado', self.html)
