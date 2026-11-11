@@ -1,5 +1,15 @@
 # NETLAB360 — Punto de reanudación
 
+## Corte verificado 11/11/2026 — Supervisión persistente cerrada; iniciar HA
+
+- [x] **Lote 84R-L completado tras cerrar y reabrir SSH normal con túnel 9130 integrado:** `systemctl is-active netlab360-s04-exporter` y `netlab360-s05-noc` => **active/active**; `is-enabled` => **enabled/enabled**.
+- [x] **API y FIB supervivientes a desconexión:** `S05_SERVICIOS_PERSISTENTES=OK`; FIB S1 `s1p` / `10.78.0.2` y S2 `s2p` / `10.78.0.10`; `ens33=192.168.47.40/24`, default `192.168.47.2`; `LOTE84R_L=OK`.
+- [x] **Sincronización Git en VM:** `8fde8ea → 404e730`, solo documentación académica; `## main...origin/main`, árbol limpio. La recuperación de SSH y de sudo interactivo queda **CERRADA**; no volver a abrir servidores manualmente, iniciar tmux, ni recrear FRR.
+- [x] **Corrección preventiva de VLAN HA en GitHub**: eliminación opcional de VID 1 al insertar nuevos puertos de acceso (equivalente a S02), más prueba de regresión; revisión CI en curso. No se ha ejecutado `up` HA todavía.
+- [ ] **Lotes siguientes (HA de servicios)**: sincronizar `main`, validación automática sin conteo fijo, `plan/precheck` de red HA, desplegar únicamente tres netns/puertos nuevos si ambos prechecks OK, realizar `status`, inventario IP/gateway/VLAN/ICMP, evidencia S05_34–36. Después HTTP backends+frontal, failover HTTP, integración NOC. **No confundir 84R-L (cerrado) con HA original 84–86 (pendientes).**
+- [ ] **Cierre S05 pendiente** por HA HTTP real (#32), LACP multisede (#31), OVS/Faucet (#23), grafo NOC actualizado (#64), importación de capturas binarios, pruebas globales. Por petición del operador **priorizar práctica; escritura académica de S05 se retomará al cerrar las implementaciones**; guion ya preparado en `docs/academico/s05-guion-de-actualizacion-del-informe.md`.
+- [ ] Snapshot manual VMware `NETLAB360_S05_PreLAN_20261110` intacto y fuera de comandos; no borrar/recrear VMs. Una PowerShell/SSH con `-L 9130` basta.
+
 ## CORTE MÁS RECIENTE 11/11/2026 · SYSTEMD INSTALADO Y NOC/FIB OPERATIVOS
 
 **VALIDADO DIRECTAMENTE EN VM POR EL OPERADOR (TXT `Texto pegado(20261111-130129).txt`):**
