@@ -1,0 +1,31 @@
+[Unit]
+Description=NETLAB360 S05 HTTP HA frontend-hq (10.70.20.23:8080)
+After=network-online.target
+ConditionPathExists=/run/netns/nl360-s05-ha-fe
+
+[Service]
+Type=simple
+User=rc-aa-ec
+Group=rc-aa-ec
+WorkingDirectory=/home/rc-aa-ec/proyectos/netlab360
+Environment=HOME=/home/rc-aa-ec
+Environment=PYTHONUNBUFFERED=1
+NetworkNamespacePath=/run/netns/nl360-s05-ha-fe
+ExecStart=/usr/bin/python3 /home/rc-aa-ec/proyectos/netlab360/servicios/ha-s05/http_ha.py --role frontend-hq
+Restart=on-failure
+RestartSec=2
+TimeoutStopSec=8
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target
