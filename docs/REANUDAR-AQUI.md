@@ -1,5 +1,16 @@
 # NETLAB360 — Punto de reanudación
 
+## CORTE VIGENTE — 11/11/2026 · Lotes 79/80 OK; precheck HA versionado, NO desplegado
+
+**Ejecutado y verificado por usuario:**
+- **Lote 79:** 119 muestras JSONL (**55 PRINCIPAL, 64 RESPALDO**); ruta S1 `s1p/10.78.0.2 → s1b/10.78.0.6 → s1p/10.78.0.2`. `S05_CICLO_JSONL=OK`, tres TXT de observador, simulador y postcheck coinciden. **SHA256 de 4 archivos OK**, `NETLAB360_S05_NOC_FAILOVER_S1_20261111.tar.gz` generado (más `.sha256`) bajo `~/netlab360-bootstrap/s05/evidencias`. **La imagen S05_32 aún no está confirmada como guardada.**
+- **Lote 80:** VM 8 vCPU / 15 GiB total, ~13 GiB RAM disponible / 132 GiB libres en `/`. Tres FRR Docker con red `none`, 12 namespaces S02 (9 hosts+3 switches), tres VLAN de servicios observadas con hosts HQ120=`10.70.20.20/24`, S1-220=`10.71.20.20/24`, S2-320=`10.72.20.20/24`. NOC 127.0.0.1:9130 y exporter 127.0.0.1:9110 escuchan. `ens33` está en `192.168.47.40/24`, GW `.2` inalterado; cero unidades systemd fallidas y Git limpio.
+- **Diseño S05 HA creado en GitHub sin desplegar:** [docs/diseno/s05-ha-servicios-multisede.md](diseno/s05-ha-servicios-multisede.md), `scripts/validacion/s05-ha-precheck.py --check` read-only, `tests/test_s05_ha_precheck.py` (4 pruebas), CI S05 ampliada. Hipótesis de dos servidores HTTP en **HQ VLAN120 (`10.70.20.21`) y S1 VLAN220 (`10.71.20.21`)**, frontal HQ `10.70.20.23`, cliente S2 `10.72.20.20`. Todas las IP nuevas son **candidatas, NO asignadas/reservadas**. Frontal único es posible SPOF.
+- **Próxima tarea de la VM:** en T3, con T1 NOC, T2 túnel y T4 exporter conservados, `git pull --ff-only`; ejecutar `python3 -m unittest discover -s tests -p 'test_s05_ha_precheck.py' -v` y `python3 scripts/validacion/s05-ha-precheck.py --check` tras `sudo -v`. Revisar ownership S02, endpoints de VLAN, IPAM, FIB S04, estado JSON, ocupación. No añadir netns, no modificar bridge `br0` ni IPs antes de confirmar.
+- **GitHub:** issues #5, #32 y #64 actualizadas (79/80 completados; HA no iniciada). #31 LACP y #23 OVS siguen abiertos. **La milestone S05 permanece abierta.** Snapshot VMware `NETLAB360_S05_PreLAN_20261110` fue creada por operador manualmente: NO crear ni eliminar snapshots.
+
+Los apartados siguientes conservan cortes históricos y no deben sobrescribir este estado vigente. La infraestructura S02/S04 continúa en producción de laboratorio.
+
 ## CORTE REAL MÁS RECIENTE — 11/11/2026 · S05 failover S1 OBSERVADO Y RESTAURADO; iniciar HA
 
 **Completado según evidencias textuales y visuales del operador**: lote 75 `36/36` tests S05, Git `main` limpio en commit VM `0a5500c`; interfaz con distintivos compactos `ACTIVO/INACTIVO/SIN DATOS`. Lote 76 monitor S1 `--watch --seconds 120 --interval 0.5`: `S05_NOC_OBSERVADOR_LISTO=S1`, **119 muestras**, transición NOC/FIB `PRINCIPAL(s1p,10.78.0.2)→RESPALDO(s1b,10.78.0.6)→PRINCIPAL(s1p,10.78.0.2)`; `S05_NOC_CICLO_COMPLETO=OK`. Archivo JSONL creado en `~/netlab360-bootstrap/s05/evidencias/failover-noc/S05_NOC_S1_OBSERVACION_20261111T052859Z.jsonl`. Lote 77 simuló `s02-failover-wan.py S1 --hold-seconds 25`: respaldo bidireccional y otra sucursal estable, `S02_S1_PRUEBA_COMPLETA=OK`. Lote 78 corroboró FIB S1 `s1p` / S2 `s2p`, `ens33=192.168.47.40/24`, puerta de enlace `192.168.47.2`, repositorio limpio y `LOTE78_POSTCHECK=OK`.
