@@ -1,5 +1,13 @@
 # NETLAB360 — Punto de reanudación
 
+## Corte de recuperación 11/11/2026 — todas las SSH cortadas, Lote 84 NO iniciado
+
+**Confirmación explícita del operador:** las seis terminales SSH/PowerShell de la VM `netlab360-lab` se desconectaron con `client_loop: send disconnect: Connection reset` por inactividad/posible suspensión de VMware. El visor NOC en 9130 y exporter S04 en 9110 se lanzaban en primer plano dentro de terminales SSH, de modo que **sus procesos pueden haberse detenido**. **No hay prueba aún del estado actual** de esos puertos ni de las tres FRR; no atribuir el corte a daño de la infraestructura. **No se ejecutaron lotes 84, 85 ni 86**, no existe despliegue HA nuevo confirmado, no reclamar capturas S05_34–36.
+
+**Próxima secuencia segura:** recuperar VM/SSH, auditar `uptime -s`, `ens33`, default gateway, contenedores FRR, 12 namespaces S02, puertos 9110/9130, `tmux` y estado HA antes de iniciar procesos; recuperar NOC/exporter preferiblemente en sesiones `tmux` persistentes para no depender de seis SSH, comprobando sudo cache por TTY para lecturas Docker; configurar un único túnel local PowerShell 9130; validar API S04/FIB/GUI; **solo entonces** repetir lote 84 (plan/precheck). No duplicar listeners ni ejecutar `up` si `~/netlab360-bootstrap/s05/ha/state.json` ya existe. No modificar VMware snapshot manual `NETLAB360_S05_PreLAN_20261110`.
+
+Los lotes 81–83 y capturas S05_32/S05_33 ya estaban validados; siguen siendo los últimos avances operativos acreditados. El corte SSH no prueba fallos de OSPF ni deshace evidencias históricas.
+
 ## CORTE OPERATIVO 11/11/2026 · S05 HA RED EN REPOSITORIO, AÚN SIN DESPLIEGUE
 
 **Ejecución aportada en este chat:**
