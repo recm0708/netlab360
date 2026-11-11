@@ -1,5 +1,14 @@
 # NETLAB360 — Punto de reanudación
 
+## 11/11/2026 · Reinicio limpio VALIDADO y hardening NOC preparado en GitHub
+
+- [x] **Resultado real de VM confirmado por usuario:** `REINICIO_LIMPIO_PREPARADO=OK`. Exporter 9110 ya estaba detenido; NOC antiguo PID **564662** identidad `servicios/topologia-s05/app.py --serve --port 9130` verificada y detenido por SIGTERM. Ambos puertos **libres** después; contenedores FRR HQ/S1/S2 **Up 12 hours**, `ens33 192.168.47.40/24`, default `192.168.47.2`, Git limpio; `HA_STATE=AUSENTE`. **No se alteró Docker, OSPF, interfaces ni snapshot manual**.
+- [x] **Solución persistente y de privilegios mínimos creada y versionada, pero NO instalada en VM:** [procedimiento systemd](https://github.com/recm0708/netlab360/blob/main/docs/operacion/s05-servicios-systemd-sin-tmux.md), `scripts/operacion/s05-observador-privilegiado.py`, dos units `servicios/systemd/netlab360-s04-exporter.service` y `netlab360-s05-noc.service`. Ejecutan Python web como usuario normal, 127.0.0.1:9110/9130, y consultan un helper root-owned que solo admite `snapshot` de 3 contenedores y rutas fijas. El cambio de permiso se limitará a un único comando exacto sudoers, **sin Docker group, NOPASSWD ALL ni servidor HTTP root**.
+- [x] **Integración de código y CI**: S04 exporter y NOC FIB adaptados para leer snapshot estructurado con `NETLAB360_PRIV_OBSERVER`; seis tests offline y workflow S05 ampliado. CI [run 43024220132](https://github.com/recm0708/netlab360/actions/runs/43024220132) éxito; **CI no sustituye instalación/prueba real del entorno**.
+- [ ] **Próxima acción, una sola PowerShell y SSH normal:** Git pull (si limpio), auditar preflight de rutas/units/puertos/binarios existentes, ejecutar pruebas. No entrar a tmux; no generar túneles duplicados; no iniciar 9110/9130 manualmente.
+- [ ] Instalar helper root:root 0755, sudoers de comando exacto 0440 (con `visudo -cf`), probar snapshot. Luego instalar dos units root:root 0644, habilitarlas secuencialmente y verificar API S04/FIB y continuidad tras desconectar SSH. Conservar logs en TXT y journalctl.
+- [ ] **Lotes HA 84/85/86 NO ejecutados**. No crear `veth`/namespaces hasta que supervisor y FIB sean confiables. Estado HA ausente, última prueba real HA = lotes 81–83.
+
 ## Corte operacional: reinicio ordenado de SSH solicitado por operador (11/11/2026)
 
 - [x] El operador confirmó que abrir sesiones interactivas con `tmux new-session` ocultó el historial visible de la terminal y generó confusión; se reconoce que el procedimiento anterior no fue apropiado para su flujo de trabajo. **No volver a indicar creación/entrada de sesiones tmux interactivas**.
