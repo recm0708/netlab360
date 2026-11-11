@@ -1,5 +1,13 @@
 # NETLAB360 — Punto de reanudación
 
+## Corte operacional: reinicio ordenado de SSH solicitado por operador (11/11/2026)
+
+- [x] El operador confirmó que abrir sesiones interactivas con `tmux new-session` ocultó el historial visible de la terminal y generó confusión; se reconoce que el procedimiento anterior no fue apropiado para su flujo de trabajo. **No volver a indicar creación/entrada de sesiones tmux interactivas**.
+- [x] Último diagnóstico factual: visor NOC `9130` escuchando (PID **564662**); exporter S04 `9110` **sin listener** en la última prueba `84R-G`, produjo `ConnectionRefusedError`; SSH `-N -L` informó `channel 2 ... Connection refused`. T1/T3/T4 y túneles duplicados provocaron confusión operativa. No hay evidencia de caída FRR o de `ens33`.
+- [ ] **Acción siguiente estricta:** cerrar **todas las conexiones SSH y túneles de Windows** sin apagar VM ni detener sshd; abrir **una PowerShell 7 nueva** y **un SSH normal** para auditar y apagar *solo* los procesos de observabilidad `app.py --serve --port 9130` y `s04_exporter_multisede.py --serve --port 9110` que sigan vivos, con identificación de PID y propietario. **No detener Docker, FRR, OSPF, netns S02, S04 datos ni snapshots**. No usar tmux interactivo ni `clear`.
+- [ ] Tras confirmar puertos 9110/9130 libres y red `ens33` correcta, diseñar servicios estables desacoplados de SSH con permisos mínimos de lectura, sin depender de credenciales `sudo -n` de TTY; **no prometer FIB disponible en procesos desatendidos mientras no exista colector autorizado**. Evitar nohup/tmux sin explicar su efecto o comprobar los privilegios.
+- [ ] **Lotes 84–86 HA NO ejecutados.** Mantener estado de milestone S05 e issue #32 pendientes; último avance real de HA son lotes 81–83, 40/40 pruebas y PNG 32/33. Cualquier instrucción de despliegue HA debe esperar auditoría y recuperación estable del NOC.
+
 ## Recuperación SSH/NOC 84R-G: situación observada y procedimiento (11/11/2026)
 
 - [x] **Lote 84R-G FALLÓ por fuente S04 caída**, no por failover ni por HA: `tmux list-sessions` mostró `nl360-noc` **attached**, `ss` mostró solo 127.0.0.1:9130 PID `564662`, y `urllib` falló al abrir `127.0.0.1:9110` con `ConnectionRefusedError`. El NOC fue reiniciado en el terminal 3 y puede seguir operando en la sesión `nl360-noc`. El túnel de PowerShell en terminal 2 recibió repetidos `channel 2: open failed: connect failed: Connection refused`; su estado no equivale a un fallo de SSH general.
