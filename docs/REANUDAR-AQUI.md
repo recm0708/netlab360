@@ -1,5 +1,17 @@
 # NETLAB360 — Punto de reanudación
 
+## Corte operativo 11/11/2026 · Lotes 91–94 completados; retoque NOC y captura 39 pendientes
+
+**Validación real aportada por el operador:**
+- [x] **91**: `main` a `58aebe4`, **76/76 pruebas S05 OK**, contrato monitor `SOLO_LECTURA`, cinco servicios activos, destino unit monitor libre; `LOTE91_NOC_HA=OK`.
+- [x] **92**: unit `netlab360-s05-ha-monitor-s2.service` instalada y **active** sin `enable` (namespace S2 requiere arranque de red). JSON desde VLAN320 fresco (edad <=6s), backend HQ/S1/frontal RUNNING, principal HQ; `LOTE92_NOC_HA=OK`.
+- [x] **93**: reinicio controlado de **solo NOC**, grafo API con tres servidores HA RUNNING, frontal HQ seleccionado, S1 standby y FIB WAN S1:s1p/S2:s2p intacta; `LOTE93_NOC_HA=OK`.
+- [x] **94**: prueba NOC API HQ→S1→HQ con **22 muestras JSONL**, `S05_HA_NOC_CICLO=HQ_S1_HQ_OK`, `S05_HA_NOC_SERVICIOS_RESTAURADOS=OK`, **seis** servicios active, integridad de 6 archivos OK; `LOTE94_NOC_HA=OK`. Salida delimitada de `S05_40`; no es necesario repetir failover para retoques visuales.
+- [x] **Revisión visual aportada por el operador**: panel HA correcto pero mostraba fecha ISO UTC `2026-11-11T14:15:50+00:00` mientras reloj superior en formato Panamá; la conexión HTTP principal HQ-frontal era poco visible en vista adicional, rótulo inglés `SERVER`. **Captura `S05_39` aún NO tomada**, se pospone hasta validar nueva vista. NO confundir capturas aportadas de inspección con captura oficial 39.
+- [x] **Correcciones hechas directamente en código GitHub, pendientes de `git pull` y refresco del navegador en VM:** formateador compartido `formatPanamaStamp` para fecha local Panamá de HA y reloj principal; nodos `SERVIDOR` más anchos; línea HTTP principal por carril lateral izquierdo, respaldo diagonal discontinua, etiquetas distintivas, mayor margen inferior. 4 nuevos tests `tests/test_s05_ha_ui.py` con verificación de hora real JS y geometría. [CI del commit `a51d492d` OK](https://github.com/recm0708/netlab360/actions/runs/43038684048) (más CI B1–B4 exitosa).
+- [ ] **Siguiente operativo:** lotes 95–96 (una PowerShell/SSH, Git sync, tests, restart únicamente NOC, verificar API y Chrome con Ctrl+Shift+R); luego tomar `S05_39_NOC_Servicios_HA_Hora_Panama` con barra HA y diagrama, revisar si carril principal y texto quedan legibles. No apagar/recrear namespaces, no reiniciar exporter ni HTTP, no habilitar units HA al boot.
+- [ ] **Después de captura** iniciar precheck LACP multisede de solo lectura (#31), diseñar integración sin bucles en switches S02 ni toques `ens33`; SDN OVS/Faucet (#23) sigue pendiente. Word académico se retomará tras práctica.
+
 ## 11/11/2026 · S05 HTTP HA real completada (87–90); integración NOC preparada
 
 **Ejecutado y confirmado por el operador:**
