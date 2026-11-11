@@ -15,6 +15,7 @@ on:
       - 'tests/test_s05_ha_red.py'
       - 'tests/test_s05_servicios_persistentes.py'
       - 'tests/test_s05_ha_http.py'
+      - 'tests/test_s05_ha_monitor.py'
       - 'servicios/ha-s05/**'
       - 'scripts/operacion/s05-observador-privilegiado.py'
       - 'servicios/systemd/**'
@@ -37,6 +38,7 @@ on:
       - 'tests/test_s05_ha_red.py'
       - 'tests/test_s05_servicios_persistentes.py'
       - 'tests/test_s05_ha_http.py'
+      - 'tests/test_s05_ha_monitor.py'
       - 'servicios/ha-s05/**'
       - 'scripts/operacion/s05-observador-privilegiado.py'
       - 'servicios/systemd/**'
@@ -72,8 +74,9 @@ jobs:
           python -m unittest discover -s tests -p 'test_s05_ha_red.py' -v
           python -m unittest discover -s tests -p 'test_s05_servicios_persistentes.py' -v
           python -m unittest discover -s tests -p 'test_s05_ha_http.py' -v
+          python -m unittest discover -s tests -p 'test_s05_ha_monitor.py' -v
           python -m unittest discover -s tests -p 'test_s04_exporter_multisede.py' -v
-          python -m py_compile scripts/validacion/s05-observar-conmutacion-noc.py scripts/laboratorio/s02-failover-wan.py scripts/validacion/s05-ha-precheck.py scripts/laboratorio/s05-ha-red-servicios.py scripts/operacion/s05-observador-privilegiado.py servicios/observabilidad/s04_exporter_multisede.py servicios/ha-s05/http_ha.py scripts/validacion/s05-ha-http-precheck.py scripts/laboratorio/s05-ha-http-failover.py
+          python -m py_compile scripts/validacion/s05-observar-conmutacion-noc.py scripts/laboratorio/s02-failover-wan.py scripts/validacion/s05-ha-precheck.py scripts/laboratorio/s05-ha-red-servicios.py scripts/operacion/s05-observador-privilegiado.py servicios/observabilidad/s04_exporter_multisede.py servicios/ha-s05/http_ha.py servicios/ha-s05/monitor_http_s2.py scripts/validacion/s05-ha-http-precheck.py scripts/laboratorio/s05-ha-http-failover.py
       - name: Comprobar sintaxis JavaScript del visor
         run: |
           python - <<'PY'
@@ -93,7 +96,10 @@ jobs:
           p = Path('inventario/topologia-extensiones-s05.json')
           e = json.loads(p.read_text(encoding='utf8'))
           assert e['schema_version'] == 1
-          assert e['nodes'] == [] and e['links'] == []
+          assert len(e['nodes']) == 3 and len(e['links']) == 5
+          assert {n['id'] for n in e['nodes']} == {'BACKEND_HQ','BACKEND_S1','FRONTAL_HQ'}
+          assert all(n.get('realized') is True for n in e['nodes'])
+          assert all(link.get('realized') is True for link in e['links'])
           html = Path('servicios/topologia-s05/index.html').read_text(encoding='utf8')
           for name in ('/api/v1/graph', 'HQ', 'S1', 'S2', 'SIN DATOS', 'route_selection'):
               assert name in html, name
