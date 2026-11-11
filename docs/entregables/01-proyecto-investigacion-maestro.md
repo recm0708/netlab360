@@ -23,6 +23,12 @@
 
 En S03 demostramos Ansible operando FRR y OpenTofu manteniendo 17 recursos declarativos de **metadatos**, no aprovisionamiento externo. En S04 medimos 15m 100 % y 60m 97,586 % de éxito de recolección; la referencia interna del 99 % **no se alcanzó en 60m**. Registramos avisos locales y no atribuimos notificaciones externas, IA entrenada o disponibilidad contractual de servicios.
 
+## Seguimiento editorial S05 — corte 11/11/2026
+
+La fase S05 se encuentra **en desarrollo técnico**. Se validaron el piloto LACP P1 y la comparación P1B, el NOC interactivo multisede, la observación de la conmutación HQ–S1 por FIB (119 muestras) y la instalación de servicios S04/S05 mediante `systemd` con lector privilegiado de solo lectura. El registro más reciente confirma **50 pruebas S05 exitosas**, `S05_OBSERVADOR_PRIVILEGIADO=OK` y `S05_SERVICIOS_SYSTEMD=OK`, aunque el lote 84R-H se interrumpió por un `grep` antiguo de 46 pruebas y queda por confirmar la persistencia tras desconectarse y reconectarse por SSH. HA HTTP, integración LACP multisede y OVS/Faucet **no** están implementados todavía.
+
+**Ya se inició el guion de incorporación de S05 al mismo informe académico**: [`s05-guion-de-actualizacion-del-informe.md`](../academico/s05-guion-de-actualizacion-del-informe.md). Contiene párrafos base para capítulos 5, 6 y 7 y sugerencias de tablas/figuras; **todavía no están pegados en el Word/PDF maestro**. El último documento inspeccionado sigue siendo el borrador 4.6 de 113 páginas (01/11). Cuando se revise la versión actual del Word se ajustará la numeración correlativa de figuras y tablas, citas y referencias según APA 7. No duplicar como informe independiente ni abrir capítulo de anexos.
+
 ## Próximas incorporaciones
 
 - Resultados **reales** de S05–S08, con nuevas pruebas, análisis, figuras y referencias solo cuando correspondan.
