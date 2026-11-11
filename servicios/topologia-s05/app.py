@@ -12,6 +12,7 @@ from zoneinfo import ZoneInfo
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import ipaddress
 import json
+import os
 from pathlib import Path
 import socket
 import subprocess
@@ -24,6 +25,7 @@ IPAM = ROOT / "inventario/ipam/topologia-s02.yaml"
 EXT = ROOT / "inventario/topologia-extensiones-s05.json"
 STATIC = Path(__file__).with_name("index.html")
 EXPORTER = "http://127.0.0.1:9110/api/v1/state"
+PRIV_HELPER = "/usr/local/libexec/netlab360-observer"
 WAN_STATE = Path.home() / "netlab360-bootstrap/s02/wan-links-state.json"
 SITES = ("HQ", "S1", "S2")
 IFACE = {"WAN-PRIMARIA-HQ-S1": "s1p",
@@ -149,6 +151,30 @@ def fib_routes() -> tuple[dict | None, str]:
         expected_id = (state.get("ids") or {}).get("R-HQ")
         if not isinstance(expected_id, str) or len(expected_id) < 12:
             return None, "FIB: ID de router no valido"
+        if os.environ.get("NETLAB360_PRIV_OBSERVER") == PRIV_HELPER:
+            output = command("sudo", "-n", PRIV_HELPER, "snapshot", timeout=6.0)
+            if output.returncode:
+                return None, "FIB: observador autorizado sin respuesta confiable"
+            trusted = json.loads(output.stdout)
+            hq = (trusted.get("routers") or {}).get("R-HQ") or {}
+            if (trusted.get("project") != "NETLAB360" or
+                    trusted.get("owner") != "NETLAB360_S02_WAN_LINKS_V1" or
+                    hq.get("id") != expected_id or
+                    hq.get("running") is not True):
+                return None, "FIB: identidad del observador no coincide"
+            routes = trusted.get("routes") or {}
+            validated = {}
+            allowed = {"S1": {"s1p": "10.78.0.2", "s1b": "10.78.0.6"},
+                       "S2": {"s2p": "10.78.0.10", "s2b": "10.78.0.14"}}
+            for site, target in (("S1", "10.79.0.2"), ("S2", "10.79.0.3")):
+                row = routes.get(site)
+                if (not isinstance(row, dict) or
+                        row.get("gateway") != allowed[site].get(row.get("dev")) or
+                        row.get("target") != target or
+                        row.get("origin") != "Linux FIB R-HQ"):
+                    return None, "FIB: ruta verificada ausente para " + site
+                validated[site] = row
+            return validated, ""
         inspected = command("sudo", "-n", "docker", "inspect",
                             "nl360-s02-r-hq", timeout=2.5)
         if inspected.returncode:
