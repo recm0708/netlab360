@@ -14,6 +14,8 @@ on:
       - 'tests/test_s05_ha_precheck.py'
       - 'tests/test_s05_ha_red.py'
       - 'tests/test_s05_servicios_persistentes.py'
+      - 'tests/test_s05_ha_http.py'
+      - 'servicios/ha-s05/**'
       - 'scripts/operacion/s05-observador-privilegiado.py'
       - 'servicios/systemd/**'
       - 'scripts/validacion/s05-observar-conmutacion-noc.py'
@@ -32,6 +34,8 @@ on:
       - 'tests/test_s05_ha_precheck.py'
       - 'tests/test_s05_ha_red.py'
       - 'tests/test_s05_servicios_persistentes.py'
+      - 'tests/test_s05_ha_http.py'
+      - 'servicios/ha-s05/**'
       - 'scripts/operacion/s05-observador-privilegiado.py'
       - 'servicios/systemd/**'
       - 'scripts/validacion/s05-observar-conmutacion-noc.py'
@@ -63,8 +67,9 @@ jobs:
           python -m unittest discover -s tests -p 'test_s05_ha_precheck.py' -v
           python -m unittest discover -s tests -p 'test_s05_ha_red.py' -v
           python -m unittest discover -s tests -p 'test_s05_servicios_persistentes.py' -v
+          python -m unittest discover -s tests -p 'test_s05_ha_http.py' -v
           python -m unittest discover -s tests -p 'test_s04_exporter_multisede.py' -v
-          python -m py_compile scripts/validacion/s05-observar-conmutacion-noc.py scripts/laboratorio/s02-failover-wan.py scripts/validacion/s05-ha-precheck.py scripts/laboratorio/s05-ha-red-servicios.py scripts/operacion/s05-observador-privilegiado.py servicios/observabilidad/s04_exporter_multisede.py
+          python -m py_compile scripts/validacion/s05-observar-conmutacion-noc.py scripts/laboratorio/s02-failover-wan.py scripts/validacion/s05-ha-precheck.py scripts/laboratorio/s05-ha-red-servicios.py scripts/operacion/s05-observador-privilegiado.py servicios/observabilidad/s04_exporter_multisede.py servicios/ha-s05/http_ha.py
       - name: Comprobar sintaxis JavaScript del visor
         run: |
           python - <<'PY'
