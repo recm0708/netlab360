@@ -25,3 +25,25 @@ El comando `up` únicamente debe ejecutarse tras dicha confirmación. Genera las
 4. Crear LAN/9 VLAN mediante procedimiento distinto y su precheck/snapshot confirmado; demostrar conectividad extremo a extremo antes de ensayos de failover.
 
 **Estado al cierre de este registro:** routers activos y aislados, **WAN no desplegadas**, instantánea anterior a las WAN **aún no confirmada**.
+
+## Anexo: WAN operativas, adyacencias y FIB (lotes 48–51)
+
+**Fuente:** registro de terminal completo enviado por el operador el 10/11/2026 y capturas `S05_17` (3), `S05_18` (3) y `S05_19` (1). Estas capturas fueron inspeccionadas en el chat y cubren sus resultados, pero todavía no se han importado al repositorio como binarios con SHA-256.
+
+- **Lote 48:** baseline de 3 routers Docker en `network_mode:none`, sin vecinos OSPF, y gestión host `ens33 192.168.47.40/24` vía `192.168.47.2` intacta. `LOTE48_BASELINE_PREWAN=OK`.
+- **Lote 50:** `S02_WAN_LINKS_UP=4`, loopbacks `10.79.0.1/32`, `.2/32`, `.3/32`, `ip_forward=1` exclusivamente en los namespaces de FRR; cuatro pares `veth` principales/respaldos creados. FRR reaplicada en R-HQ/S1/S2. `wan-links-state.json` válido, `S02_HOST_GESTION_INTACTO=SI`, `LOTE50_WAN_CREADAS=OK`. Una lectura inmediata de OSPF mostró vecinos `Init`, compatible con convergencia inicial.
+- **Lote 51:** convergencia inmediata en la siguiente comprobación, **R-HQ 4 FULL, R-S1 2 FULL, R-S2 2 FULL**; OSPF instaló las rutas preferidas. FIB de R-HQ hacia `10.79.0.2`: `via 10.78.0.2 dev s1p`; hacia `10.79.0.3`: `via 10.78.0.10 dev s2p`. `S05_FIB_PRIMARIAS=OK`, `LOTE51_OSPF_Y_FIB=OK`. No se ha ejecutado todavía conmutación inducida ni LAN/9 VLAN.
+
+### Observación sobre la protección VMware
+
+En Windows `vmrun listSnapshots` mostraba **dos instantáneas previas y dos entradas llamadas `NETLAB360_S05_PreWAN_20261110`**. Tras el intento de creación con `vmrun`, el control que exigía exactamente una coincidencia arrojó una excepción, pero se imprimió manualmente después `S05_SNAPSHOT_PREWAN_CONFIRMADO=SI`. El operador informó que también había creado la instantánea manualmente. **Existen dos registros con el mismo nombre, pero su estructura/identidad individual no está verificada.** Por seguridad:
+
+1. Inspeccionar ambas entradas mediante el administrador de instantáneas de VMware, sin restaurar ni borrar ninguna por nombre.
+2. Si se prepara un punto de retorno específico anterior a LAN, usar un **nombre diferente y único** (por ejemplo `NETLAB360_S05_PreLAN_20261110`) y verificar exactamente una entrada antes de `s02-lan-vlan.py up --snapshot-confirmado`.
+3. Tras finalizar la fase y completar validaciones, planificar limpieza controlada de snapshots temporales; evitar acumulación permanente. No eliminar instantáneas históricas por automatismo.
+
+### Próximo bloque
+
+Ejecutar `s02-lan-vlan.py precheck` (no muta recursos) con tres FRR activos y cuatro WAN validadas. Después del resguardo VMware comprobado y únicamente si el precheck da `S02_LAN_PRECHECK=OK`, ejecutar `up --snapshot-confirmado`, `status` y pruebas de conectividad locales e intersede. Conservar sin cambios la interfaz de administración del host y no activar failover hasta verificar las nueve VLAN y sus hosts.
+
+**Estado actual:** tres routers FRR operativos, cuatro WAN desplegadas, ocho relaciones de vecindad vistas desde ambos extremos en FULL (4+2+2), rutas principales elegidas en FIB; **LAN aún no desplegada** y duplicación de nombres de snapshots por inspeccionar.
