@@ -538,7 +538,9 @@ function drawExtensions(data){
    txt("HTTP",a.x-80,middleY+28,
     "ha-application-label",g);
   }else{
-   txt("RESPALDO HTTP",(a.x+b.x)/2,(a.y+b.y)/2-16,
+   const backupLabelX=(a.x+b.x)/2;
+   const backupLabelY=Math.min(a.y,b.y)-34;
+   txt("RESPALDO HTTP",backupLabelX,backupLabelY,
     "ha-application-label",g);
   }
  });
