@@ -28,6 +28,14 @@ En la sesión del 10/11/2026 el operador validó los tres archivos runtime FRR (
 
 **Siguiente barrera:** comprobar/salvar baseline y crear **snapshot VMware temporal real** con confirmación externa antes de `s02-wan-links.py up --snapshot-confirmado`. El argumento no realiza la snapshot. Conectar WAN solo después de confirmar; verificar FULL 4/2/2, FIB/rutas y acceso de gestión; posteriormente LAN/hosts, falla/restauración, observabilidad avanzada y consolidación SHA-256. No revertir ni borrar servicios si hay un fallo parcial.
 
+## Actualización LAN/OSPF completa — S05, capturas oficiales 21A–23
+
+La topología multisede **ya está desplegada** (estado posterior a los lotes 54R y 55R). Tras 3 FRR, cuatro WAN y OSPF FULL 4/2/2 con primarias `s1p/s2p` en la FIB, la LAN S02 se creó exitosamente con **3 switches, 9 VLAN, 9 namespaces de host y 12 namespaces en total**. `S02_LAN_UP=OK`, `S02_LAN_ESTADO=OK`, `LOTE54R_LAN_COMPLETADA=OK`. Los 9 gateways y tres comunicaciones HQ–S1, HQ–S2 y S1–S2 responden: `S05_GATEWAYS_9_DE_9=OK`, `S05_CONECTIVIDAD_INTERSEDE=OK`, `LOTE55R_CONECTIVIDAD=OK`. La gestión `ens33=192.168.47.40/24`/GW `192.168.47.2` sigue intacta y Git `main` limpio.
+
+Se recibieron **cuatro PNG** y quedaron aceptados: `S05_21A`, `S05_21B`, `S05_22`, `S05_23`. La [bitácora de validación LAN](sesiones/2026-11-10-s05-lan-vlan-conectividad-validada.md) conserva criterios y SHA-256 de copias recibidas en chat. Los PNG no se han integrado todavía a GitHub. El pegado inicial de 55R estuvo interrumpido por secuencia terminal, pero el registro posterior contiene todas las pruebas y termina OK.
+
+El usuario indicó que **eliminó las instantáneas anteriores y creó manualmente una sola denominada `NETLAB360_S05_PreLAN_20261110`**. No proponer comandos para crear instantáneas ni borrar/restaurar la actual. Siguiente paso: preflight solo lectura y **failover WAN S1**, verificar retorno total; únicamente después ejecutar **failover WAN S2**. El script `scripts/laboratorio/s02-failover-wan.py` opera exclusivamente en el namespace de R-HQ, con restauración `finally`, y registra FIB/ICMP/otra sede. El NOC S04 actual observa procesos e interfaces admin, no rutas FIB ni tráfico real: `ACTIVE` no implica selección de WAN.
+
 ## Reanudar S05 sin repetir S01–S04
 
 1. Encender la **misma VM** `netlab360-lab` solo cuando se retome el trabajo; no clonar ni restaurar snapshots sin necesidad.
