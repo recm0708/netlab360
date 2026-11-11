@@ -1,6 +1,6 @@
 # NETLAB360 S05 — Topología gráfica multisede
 
-**Estado al 10/11/2026:** diseño visual **V6 aprobado por el operador** tras inspeccionar capturas preliminares en Windows; cuatro WAN distinguibles, HQ a la izquierda y S1/S2 a la derecha, sin superposiciones relevantes en la vista recibida. **Pendientes:** recibir salida completa de las 18 pruebas de V6 (no mostrada en el chat), obtener capturas oficiales de vista completa/inspector y conectar fuentes reales S04/OSPF/FIB. Issue [#64](https://github.com/recm0708/netlab360/issues/64) permanece abierta. La aprobación de diseño no confirma disponibilidad de routers o enlaces.
+**Estado verificado al 10/11/2026:** diseño V6 aprobado visualmente y **regresión real 18/18 OK**; API, inventario y Git comprobados por el operador. Recibidas y auditadas las capturas **S05_10** (mapa completo), **S05_11** (inspector respaldo HQ–S2) y **S05_12** (UNKNOWN sin exporter, aviso histórico netns por actualizar). El exporter S04 `--once` obtuvo **fuente confiable y topología OFFLINE** con tres routers ausentes, pero el HTTP S04 `127.0.0.1:9110` estaba detenido, por lo que el visor mostró **UNKNOWN por falta de fuente activa**, de forma correcta. Pendientes: importación PNG/manifest y demostración de OSPF/FIB y failover real. [Auditoría de 14 capturas y observación S04](../../docs/sesiones/2026-11-10-s05-auditoria-capturas-y-fuente-s04.md). Mantener abierta la [issue #64](https://github.com/recm0708/netlab360/issues/64).
 
 ## Inventario representado
 
@@ -115,6 +115,14 @@ Verificar el código V6 con `python3 -m unittest discover -s tests -p 'test_s05_
 
 **Siguiente paso operacional seguro:** ejecutar auditoría de solo lectura del exporter S04 (`--check`, `--once`, endpoint 9110), SoT y estado Docker; no levantar topología/FRR ni modificar rutas hasta interpretar evidencias. Un `UNKNOWN` confiable es distinto de un equipo demostrado caído.
 
+## Revisión de evidencias y auditoría S04 — resultado vigente
+
+- **Vista V6 y pruebas:** 18/18 tests, `S05_V6_ACEPTACION_TECNICA=OK`, `--check` del visor OK, JSON válido, Git limpio. Dos capturas finales, `S05_10` y `S05_11`, examinadas y aceptadas en contenido; `S05_12` es opcional e histórica (su alerta de namespaces pertenece a la sesión anterior).
+- **Fuente S04 offline, no caída comprobada:** `s04_exporter_multisede.py --check` OK; `--once` devolvió `source_ok=true`, `topology=offline`, routers R-HQ/R-S1/R-S2 detenidos o no existentes. Sin contenedores Docker ni namespaces; no se afirma un despliegue multisede activo.
+- **Por qué el NOC indica UNKNOWN:** `127.0.0.1:9110/healthz` no respondía porque el servidor S04 no estaba iniciado; `127.0.0.1:9130/healthz` sí estaba saludable. La API del visor no usa datos `--once` almacenados y exige fuente HTTP fresca; es correcto que indique `UNKNOWN` hasta levantar el servicio observador.
+- **Seguridad operacional:** iniciar S04 exporter en modo `--serve` **solo lectura** cuando se quiera demostrar `offline` observado, con autorización sudo temporal en la misma sesión SSH para `sudo -n docker inspect`. No levantar routers/FRR ni tocar `ens33`.
+- **Archivo académico:** [informe de auditoría de 14 PNG](../../docs/sesiones/2026-11-10-s05-auditoria-capturas-y-fuente-s04.md). Los archivos binarios PNG todavía no se han subido al repositorio; incorporar en lote con SHA-256 antes de cerrar issue.
+
 ## Actualización por fases
 
 El inventario S02 fija el núcleo. En `inventario/topologia-extensiones-s05.json` pueden añadirse **solo equipos que se hayan desplegado y verificado**; exige `schema_version=1` y listas `nodes` y `links`. Un elemento nuevo requiere ID único, sede, tipo, evidencia y `realized=true` para registrarse en el modelo; el estado se marca UNKNOWN hasta que se instrumente telemetría específica.
@@ -131,7 +139,7 @@ La primera versión tiene **layout principal fijo de HQ/S1/S2** y un sector adic
 
 ## Pendientes de aceptación
 
-1. Probar visor/API en VM (sin exporter, la topología sigue visible pero UNKNOWN; cero falsos verdes) y auditar capturas S05.
+1. **Completado**: visor/API probado en VM y Windows, 18/18 regresiones y capturas S05_10/S05_11 auditadas; fuente desconectada correctamente UNKNOWN.
 2. Comprobar el visor con exporter activo y S02 levantada mediante los procedimientos protegidos existentes.
 3. Instrumentar verificación de selección OSPF/FIB, conectividad entre extremos y tráfico real; diferenciar respaldo standby de respaldo en uso.
 4. Mejorar distribución escalable/zoom, visualización de elementos extendidos, accesibilidad y animación únicamente por contadores confiables.
