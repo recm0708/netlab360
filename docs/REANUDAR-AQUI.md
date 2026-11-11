@@ -1,5 +1,17 @@
 # NETLAB360 — Punto de reanudación
 
+## CORTE MÁS RECIENTE 11/11/2026 · SYSTEMD INSTALADO Y NOC/FIB OPERATIVOS
+
+**VALIDADO DIRECTAMENTE EN VM POR EL OPERADOR (TXT `Texto pegado(20261111-130129).txt`):**
+
+- `84R-H`: `git pull --ff-only` de `2a3f899` a `8fde8ea`; `python3 -m unittest discover -s tests -p 'test_s05_*.py'` **50/50 tests OK**. La instrucción `grep -Fq 'Ran 46 tests'` era obsoleta e interrumpió el lote antes de los controles 402–408. No interpretar esto como regresión fallida.
+- `84R-I=OK`: `/usr/local/libexec/netlab360-observer` instalado root:root, regla sudoers de comando **exacto** creada y `visudo -cf` **parsed OK**; `sudo -n ... snapshot` autentica 3 FRR, FIB S1 `s1p/10.78.0.2`, S2 `s2p/10.78.0.10`.
+- `84R-J=OK`: dos units `netlab360-s04-exporter.service` y `netlab360-s05-noc.service` **enable --now, active/active**; APIs S04 `source_ok=True` / `topology=active`, NOC `telemetry.available=True` / `routing.available=True`, FIB S1/S2 por principales; `S05_SERVICIOS_SYSTEMD=OK`.
+- **SIGUIENTE PRUEBA INMEDIATA:** guardar últimos registros, ejecutar `exit` en **único SSH actual** y desde **esa misma PowerShell** establecer `ssh -tt -L 127.0.0.1:9130:127.0.0.1:9130` con keepalives. Validar sin arrancar Python: `systemctl is-active` de ambas units, S04 9110, NOC 9130/FIB, `sudo journalctl`, `ens33` intacta y navegador. Si funciona, registrar **persistencia ante cierre de SSH = OK**.
+- **Después** continuar **lotes HA originales 84 plan/precheck, 85 up y 86 postcheck**, todavía **NO ejecutados**. HA state ausente en último preflight; no asignar IP ni redes HA hasta validar plan. Mantener snapshot `NETLAB360_S05_PreLAN_20261110` sin tocar.
+- **Informe académico único:** se creó [guion S05 de capítulos 5–7](academico/s05-guion-de-actualizacion-del-informe.md) y se actualizó [control de documento Word](entregables/01-proyecto-investigacion-maestro.md). **No se editó todavía el Word/PDF del usuario**; base más reciente documentada = borrador 4.6 (113 páginas, corte 01/11). S05 ronda **≈60 % técnico estimado**, pendiente HA, integración LACP, OVS/Faucet, NOC ampliado y cierre de evidencias. Milestone #5 ABIERTA.
+- Issues [#5](https://github.com/recm0708/netlab360/issues/5), [#32](https://github.com/recm0708/netlab360/issues/32), [#64](https://github.com/recm0708/netlab360/issues/64) y [#36](https://github.com/recm0708/netlab360/issues/36) actualizadas. El resto del archivo conserva estados históricos, **no utilizarlos para declarar que `systemd` todavía falta instalar**.
+
 ## 11/11/2026 · Reinicio limpio VALIDADO y hardening NOC preparado en GitHub
 
 - [x] **Resultado real de VM confirmado por usuario:** `REINICIO_LIMPIO_PREPARADO=OK`. Exporter 9110 ya estaba detenido; NOC antiguo PID **564662** identidad `servicios/topologia-s05/app.py --serve --port 9130` verificada y detenido por SIGTERM. Ambos puertos **libres** después; contenedores FRR HQ/S1/S2 **Up 12 hours**, `ens33 192.168.47.40/24`, default `192.168.47.2`, Git limpio; `HA_STATE=AUSENTE`. **No se alteró Docker, OSPF, interfaces ni snapshot manual**.
