@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import signal
 import subprocess
 import sys
 import time
@@ -118,7 +119,7 @@ def experiment(hold: int) -> None:
     try:
         sudo("systemctl", "stop", ROOT)
         paused = True
-        if cmd("systemctl", "is-active", ROOT) != "inactive":
+        if cmd("systemctl", "show", "-p", "ActiveState", "--value", ROOT) != "inactive":
             raise RuntimeError("Backend principal no se detuvo")
         log("S05_HTTP_BACKEND_HQ=DETENIDO_CONTROLADAMENTE")
         wait("BACKEND_S1", "RESPALDO")
@@ -145,6 +146,10 @@ def experiment(hold: int) -> None:
 
 
 def main() -> None:
+    def interrupt(_sig, _frame):
+        raise KeyboardInterrupt("Interrupción; restaurar backend HQ")
+    signal.signal(signal.SIGHUP, interrupt)
+    signal.signal(signal.SIGTERM, interrupt)
     p = argparse.ArgumentParser(description=__doc__)
     group = p.add_mutually_exclusive_group(required=True)
     group.add_argument("--precheck", action="store_true")
