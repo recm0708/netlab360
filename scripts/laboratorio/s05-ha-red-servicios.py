@@ -150,8 +150,11 @@ def attach(row: dict) -> None:
     cmd("ip", "-n", ns, "link", "set", peer, "name", "eth0", root=True)
     cmd("ip", "-n", sw, "link", "set", port, "master", "br0", root=True)
     # Reproduce el modo acceso untagged de S02; solo el puerto nuevo.
+    # Algunas versiones de bridge no asignan PVID 1 al puerto nuevo.
+    # La eliminacion de ese VLAN por defecto es idempotente y no debe abortar
+    # el despliegue si la pertenencia 1 no existe, igual que S02.
     cmd("ip", "netns", "exec", sw, "bridge", "vlan", "del",
-        "dev", port, "vid", "1", root=True)
+        "dev", port, "vid", "1", root=True, check=False)
     cmd("ip", "netns", "exec", sw, "bridge", "vlan", "add",
         "dev", port, "vid", vid, "pvid", "untagged", root=True)
     cmd("ip", "-n", sw, "link", "set", port, "up", root=True)
