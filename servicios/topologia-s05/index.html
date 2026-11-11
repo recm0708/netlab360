@@ -162,19 +162,23 @@ header{padding-top:15px;padding-bottom:15px}
 .legend-caption{margin:10px 0 7px;color:#b7cce4;font-size:.73rem;font-weight:750;letter-spacing:.04em}
 .status.offline::before{background:var(--bad)}
 .status.offline{border-color:#91505d}
+.device.offline circle,.device.offline rect{stroke:#ff7783;fill:#392936}
+.site-state-badge.offline{fill:#392936;stroke:#ff7783}
+.wan-line.offline{stroke:#ff7783}
+.device.offline.selected circle,.device.offline.selected rect{stroke:#ff7783;filter:drop-shadow(0 0 5px rgba(183,255,105,.82))}
 </style></head>
 <body>
 <header>
 <div><h1>NETLAB360 <span style="color:#79d2ea">/ Topología en vivo</span></h1>
 <div class="sub">Vista lógica multisede · Fase 5 · Inventario versionado + observaciones reales</div></div>
-<div class="status" id="status">Sin datos actuales</div>
+<div class="status" id="status">Sin observaciones disponibles</div>
 </header>
 <main class="shell">
 <div class="summary" aria-label="Resumen de inventario">
 <div class="stat"><span>Sedes registradas</span><b id="c-sites">—</b><span>HQ · S1 · S2</span></div>
-<div class="stat"><span>Routers FRR</span><b id="c-routers">—</b><span>Contenedores aislados</span></div>
-<div class="stat"><span>Switches virtuales</span><b id="c-switches">—</b><span>Puentes L2 por sede</span></div>
-<div class="stat"><span>Hosts / VLAN</span><b id="c-hosts">—</b><span>Nueve segmentos internos</span></div>
+<div class="stat"><span>Enrutadores FRR</span><b id="c-routers">—</b><span>Contenedores aislados</span></div>
+<div class="stat"><span>Conmutadores virtuales</span><b id="c-switches">—</b><span>Puentes L2 por sede</span></div>
+<div class="stat"><span>Equipos / VLAN</span><b id="c-hosts">—</b><span>Nueve segmentos internos</span></div>
 <div class="stat"><span>Enlaces WAN</span><b id="c-wan">—</b><span>2 principales · 2 respaldos</span></div>
 </div>
 <div class="toolbar">
@@ -191,12 +195,12 @@ header{padding-top:15px;padding-bottom:15px}
 <div class="layout">
 <section class="canvas" aria-label="Diagrama de red multisede">
 <div class="canvas-head"><strong>Mapa corporativo · Sede central y sucursales</strong><span>Inventario lógico verificado · Observación en tiempo real cuando está disponible</span></div>
-<svg id="network" viewBox="0 0 1440 930" role="img" aria-label="Topología de NETLAB360: sede HQ superior, sucursales S1 y S2 inferiores, cuatro WAN separadas y redes VLAN locales. Selecciona dispositivos o enlaces."></svg>
+<svg id="network" viewBox="0 0 1440 930" role="img" aria-label="Topología de NETLAB360: sede HQ a la izquierda, sucursales S1 y S2 a la derecha, cuatro conexiones WAN y redes VLAN locales. Selecciona dispositivos o enlaces."></svg>
 </section>
 <aside class="aside">
 <div class="panel">
 <div class="kicker">Inspector</div><strong class="key" id="info-title">Selecciona un equipo</strong>
-<div class="small" id="info-desc">Pulsa sobre un router, switch, host o enlace para examinar su función, IP, VLAN y procedencia del dato.</div>
+<div class="small" id="info-desc">Pulsa sobre un enrutador, conmutador, equipo final o enlace para consultar su función, dirección IP, VLAN y origen de los datos.</div>
 <dl id="info-fields"></dl>
 </div>
 <div class="panel">
