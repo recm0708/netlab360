@@ -1,6 +1,16 @@
 # NETLAB360 — Punto de reanudación
 
-## Corte actual · 11/11/2026 · Lotes 98–100 OK; LACP P1 completado; P1B siguiente
+## Corte vigente · 11/11/2026 · Lote 102R y capturas 41–44; evitar repetir P1B
+
+- [x] **Lote 101:** `main` sincronizado al commit `03439d5` después de comprobar identidad binaria del parche local; **82/82 tests S05 OK**, seis servicios operativos, árbol limpio; `LOTE101_GIT=OK`.
+- [x] **Lote 102R:** del registro `lacp-p1/S05_P1_20261111-100600.log` se extrajeron exactamente 27/7/41/6 líneas a `S05_41`/`42`/`43`/`44`. Marcador `LOTE102R=OK`. Operador ejecutó `cat` de las cuatro secciones y confirmó **capturas tomadas**. El contenido textual es consistente; los PNG de esta nueva serie no se han recibido para una auditoría visual.
+- [x] **Resultados piloto 11/11:** un flujo 120,05 Mb/s/0 retx; ocho flujos 959,36 Mb/s/9 retx; durante falla/restauración 2→1→2, 959,61 Mb/s/745 retx; limpieza satisfactoria. Diferenciarlo del piloto anterior del 10/11, con cifras distintas y capturas numeradas 01–04.
+- [x] **P1B ya ejecutado el 10/11** en la misma plataforma según [informe técnico](sesiones/2026-11-10-s05-lacp-p1b-capacidad-validada.md) y [issue #31](https://github.com/recm0708/netlab360/issues/31): cuatro mediciones sin limitador (70,21/113,30/127,39/118,30 Gb/s de tráfico virtual), cuatro JSON con manifiesto 5/5, limpieza y cinco capturas confirmadas; esas tasas no son capacidad física ni una certificación de mejor rendimiento al fallar. **No repetir P1B sin justificación experimental**.
+- [ ] **Siguiente:** auditar existencia e integridad de los archivos P1B originales y consultar estado read-only de los tres switches `nl360-s02-sw-{hq,s1,s2}`, sus puertos/VLAN y los FRR antes de diseñar una conexión LACP multisede. No añadir bonds a br0 ni tocar `ens33` hasta aprobar inventario, IPAM y rollback. Mantener evidencias de series distintas sin renombrar históricos.
+
+---
+
+## Corte histórico · 11/11/2026 · Lotes 98–100 OK; LACP P1 completado
 
 **Confirmado por salidas y capturas del operador:**
 - [x] **Lote 98:** Git sincronizado a `226b25b`; **81/81 pruebas S05 OK**; NOC reiniciado, BACKEND_HQ/S1/FRONTAL_HQ RUNNING, principal HQ, respaldo S1; `LOTE98_NOC=OK`. Gestión `ens33=192.168.47.40/24`, GW `.2`.
