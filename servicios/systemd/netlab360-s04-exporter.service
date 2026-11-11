@@ -1,0 +1,28 @@
+[Unit]
+Description=NETLAB360 S04 exporter de observabilidad multisede (solo lectura)
+Wants=network-online.target docker.service
+After=network-online.target docker.service
+ConditionPathExists=/usr/local/libexec/netlab360-observer
+
+[Service]
+Type=simple
+User=rc-aa-ec
+WorkingDirectory=/home/rc-aa-ec/proyectos/netlab360
+Environment=HOME=/home/rc-aa-ec
+Environment=PYTHONUNBUFFERED=1
+Environment=NETLAB360_PRIV_OBSERVER=/usr/local/libexec/netlab360-observer
+ExecStart=/usr/bin/python3 /home/rc-aa-ec/proyectos/netlab360/servicios/observabilidad/s04_exporter_multisede.py --serve --port 9110 --interval 2
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=12
+KillMode=control-group
+UMask=0027
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+
+[Install]
+WantedBy=multi-user.target
