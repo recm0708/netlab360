@@ -1,5 +1,16 @@
 # NETLAB360 — Punto de reanudación
 
+## 11/11/2026 · S05 HTTP HA real completada (87–90); integración NOC preparada
+
+**Ejecutado y confirmado por el operador:**
+- [x] **Lote 87:** `main` sincronizado a `855809a`, **62/62 pruebas S05 OK**; precheck HTTP 3 IP/puerto libres y FIB principales correcta; `LOTE87_HTTP=OK`.
+- [x] **Lote 88:** 3 units systemd HTTP instaladas **y active**, solo en netns S05: `10.70.20.21:8088`, `10.71.20.21:8088`, `10.70.20.23:8080`; `LOTE88_HTTP=OK`. No habilitadas al boot por dependencia de red efímera.
+- [x] **Lote 89:** cliente S2 recibió HTTP 200 de ambos backends y frontal, **elección HQ principal**; `LOTE89_HTTP=OK`, captura `S05_37_Servidores_HTTP_y_Frontal_Principal` confirmada.
+- [x] **Lote 90:** prueba controlada HQ→S1→HQ, deteniendo exclusivamente backend HQ, **15 muestras HTTP de respaldo correctas**, `S05_HTTP_FALLBACK_VERIFICADO=OK`, `S05_HTTP_RETORNO=OK`, `S05_HTTP_PRUEBA_CICLO_COMPLETO=OK`, FIB S1 `s1p` y S2 `s2p` sin cambios; tres units restituidas; `LOTE90_HTTP_HA=OK`, SHA256 **6/6 archivos**, captura `S05_38_Conmutacion_HTTP_Principal_Respaldo_Retorno` confirmada. Ningún PNG original importado en binario a GitHub.
+- [x] **Nuevos componentes NOC versionados y CI aprobada (NO desplegados aún):** `servicios/ha-s05/monitor_http_s2.py`, unit `netlab360-s05-ha-monitor-s2.service` (cliente S2 VLAN320, HTTP real, sin sudo), `inventario/topologia-extensiones-s05.json` con 3 servidores realizados/5 vínculos, NOC con panel selección HTTP y caducidad 6s **SIN DATOS** si fuente obsoleta; `scripts/validacion/s05-ha-noc-ciclo.py` para validar HQ→S1→HQ por NOC con JSONL/rollback. [CI S05 OK](https://github.com/recm0708/netlab360/actions/runs/43034894085), [registro técnico de resultados](https://github.com/recm0708/netlab360/blob/main/docs/sesiones/2026-11-11-s05-ha-http-failover-validado.md).
+- [ ] **SIGUIENTE en una sola PowerShell/SSH:** Git pull; 62+ nuevas pruebas y sintaxis; verificar 3 units HTTP y S04/NOC activas; `systemctl start` **sin enable** del monitor nuevo; esperar snapshot fresco y comprobar API del NOC tras `systemctl restart netlab360-s05-noc`; capturar nodos HA y selección HQ. Luego prueba NOC controlada y captura/logs. **Nunca ejecutar `s05-ha-red-servicios.py up` otra vez**.
+- [ ] Después: integrar LACP en multisede, OVS/Faucet aislado, observabilidad/diagrama actualizado, cierre final pruebas/inventario y evidencias binarias, **luego** Word/PDF maestro por petición del usuario. Milestone S05 abierta; snapshot VMware `NETLAB360_S05_PreLAN_20261110` sin tocar.
+
 ## Actualización real S05 — 11/11/2026 · Red HA validada 84–86; HTTP en preparación
 
 - [x] **Lote 84 red HA:** `main` sincronizado en `ff252b9`, **51/51 tests S05**, `S05_HA_RED_PRECHECK=OK_SIN_CAMBIOS`, captura S05_34 delimitada.
