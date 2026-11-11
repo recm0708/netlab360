@@ -140,28 +140,28 @@ header{padding-top:15px;padding-bottom:15px}
 .wan-label.route-selected .wan-pill{stroke:#66cfb2;stroke-width:3}
 .wan-label.route-selected.backup .wan-pill{stroke:#62bafa}
 
-/* V7.1: separar estado operativo, FIB e interacción. */
-:root{--focus:#d9acff;--route-primary:#52daa5;--route-backup:#62bafa;--route-standby:#879bb0;--route-error:#ff7783}
+/* V7.2: selección verde lima, FIB y condición operativa independientes. */
+:root{--focus:#b7ff69;--route-primary:#52daa5;--route-backup:#62bafa;--route-standby:#879bb0;--route-error:#ff7783}
 .wan-line.primary.route-selected{stroke:var(--route-primary);stroke-width:5}
 .wan-line.backup.route-selected{stroke:var(--route-backup);stroke-width:5;stroke-dasharray:9 9}
 .wan-line.route-standby{stroke:var(--route-standby)}
 .wan-line.route-unavailable,.wan-line.admin-down{stroke:var(--route-error)}
 .wan-label.route-selected .wan-pill{stroke:var(--route-primary)}
 .wan-label.route-selected.backup .wan-pill{stroke:var(--route-backup)}
-.wan-selection-halo{display:none;fill:none;stroke:var(--focus);stroke-width:17;stroke-opacity:.78;stroke-linejoin:round;stroke-linecap:round;pointer-events:none}
-.wan-circuit.selected .wan-selection-halo,.wan-circuit:focus-visible .wan-selection-halo{display:block}
-.wan-circuit.selected .wan-line,.wan-circuit:focus-visible .wan-line{stroke-width:5.5;filter:drop-shadow(0 0 3px rgba(219,173,255,.65))}
-.wan-circuit.selected .wan-port,.wan-circuit:focus-visible .wan-port{stroke:var(--focus);stroke-width:4;fill:#392653}
-.wan-label.selected .wan-pill,.wan-label:focus-visible .wan-pill{stroke:var(--focus);stroke-width:4.6;fill:#332444;filter:drop-shadow(0 0 5px rgba(217,172,255,.45))}
-.wan-label.selected .wan-pill-title{fill:#fff}
-.device.selected circle,.device.selected rect{stroke:var(--focus);stroke-width:4.6;filter:drop-shadow(0 0 4px rgba(217,172,255,.55))}
-.inspector-selected{border-color:#9e7ad5;box-shadow:inset 3px 0 0 var(--focus)}
-.selection-note{font-size:.77rem;color:#e7cbff;background:#302440;border:1px solid #6d5294;border-radius:8px;padding:8px 10px;margin-top:10px}
-.selection-note[hidden]{display:none}
+.wan-selection-halo{display:none;fill:none;stroke:var(--focus);stroke-width:10;stroke-opacity:.92;stroke-linejoin:round;stroke-linecap:round;pointer-events:none}
+.wan-circuit.selected .wan-selection-halo{display:block;filter:drop-shadow(0 0 3px rgba(183,255,105,.52))}
+.wan-circuit.selected .wan-line{stroke-width:5.7}
+.wan-circuit.selected .wan-line.primary.route-selected{stroke:#91ff48}
+.wan-circuit.selected .wan-port{stroke:var(--focus);stroke-width:3.5;fill:#15383b}
+.wan-label.selected .wan-pill{stroke:var(--focus);stroke-width:3.7;fill:#1a3933;filter:drop-shadow(0 0 3px rgba(183,255,105,.42))}
+.wan-label.selected .wan-pill-title{fill:#f8ffe7}
+.device.selected circle,.device.selected rect{stroke:var(--focus);stroke-width:4.4;filter:drop-shadow(0 0 3px rgba(183,255,105,.65))}
 .legend-route{display:inline-block;width:25px;height:0;border-top:4px solid currentColor;margin-right:7px;vertical-align:3px;border-radius:2px}
 .legend-route.dashed{border-top-style:dashed}
-.legend-focus{display:inline-block;width:16px;height:13px;border:3px solid var(--focus);border-radius:4px;vertical-align:-2px;margin-right:8px}
+.legend-focus{display:inline-block;width:25px;height:0;border-top:6px solid var(--focus);border-radius:3px;margin-right:7px;vertical-align:3px;filter:drop-shadow(0 0 2px rgba(183,255,105,.6))}
 .legend-caption{margin:10px 0 7px;color:#b7cce4;font-size:.73rem;font-weight:750;letter-spacing:.04em}
+.status.offline::before{background:var(--bad)}
+.status.offline{border-color:#91505d}
 </style></head>
 <body>
 <header>
@@ -187,7 +187,7 @@ header{padding-top:15px;padding-bottom:15px}
 <div class="control-group"><button type="button" id="focus-toggle" aria-pressed="false" title="Muestra el diagrama completo sin paneles laterales">Modo presentación</button></div>
 <div class="clockchip" id="updated" title="Hora proveniente del reloj del sistema de la VM, zona America/Panama">Consultando reloj de la VM…</div>
 </div>
-<div class="warn" id="warnings">El inventario previsto no demuestra equipos encendidos. Si no hay telemetría, se indica UNKNOWN.</div>
+<div class="warn" id="warnings">El inventario previsto no demuestra equipos encendidos. Si falta telemetría, se indica «Sin datos».</div>
 <div class="layout">
 <section class="canvas" aria-label="Diagrama de red multisede">
 <div class="canvas-head"><strong>Mapa corporativo · Sede central y sucursales</strong><span>Inventario lógico verificado · Observación en tiempo real cuando está disponible</span></div>
@@ -197,23 +197,27 @@ header{padding-top:15px;padding-bottom:15px}
 <div class="panel">
 <div class="kicker">Inspector</div><strong class="key" id="info-title">Selecciona un equipo</strong>
 <div class="small" id="info-desc">Pulsa sobre un router, switch, host o enlace para examinar su función, IP, VLAN y procedencia del dato.</div>
-<div class="selection-note" id="selection-note" hidden aria-live="polite">Contorno violeta = elemento seleccionado por ti; no significa falla ni cambio de ruta.</div>
 <dl id="info-fields"></dl>
 </div>
 <div class="panel">
-<h2>Leyenda y seguridad semántica</h2>
-<div class="legend-caption">RUTAS Y ESTADO OBSERVADO</div>
+<h2>Código de colores y estados</h2>
+<div class="legend-caption">SELECCIÓN Y CONEXIONES WAN</div>
 <div class="legend">
+<div><span class="legend-focus"></span>Seleccionado por ti</div>
 <div><span class="legend-route" style="color:#52daa5"></span>Principal elegida por FIB</div>
 <div><span class="legend-route dashed" style="color:#62bafa"></span>Respaldo elegido por FIB</div>
 <div><span class="legend-route dashed" style="color:#879bb0"></span>Respaldo en espera</div>
-<div><span class="legend-route" style="color:#ff7783"></span>Interfaz DOWN confirmada</div>
-<div><span class="swatch" style="background:#51d8a8"></span>Proceso en ejecución</div>
-<div><span class="swatch" style="background:#899cb3"></span>Offline / sin datos fiables</div>
+<div><span class="legend-route" style="color:#ff7783"></span>Interfaz deshabilitada</div>
+<div><span class="legend-route" style="color:#899cb3"></span>Estado sin verificar</div>
 </div>
-<div class="legend-caption">INTERACCIÓN Y LIMITACIONES</div>
-<div class="legend"><div><span class="legend-focus"></span>Contorno violeta: tu selección</div><div><span class="swatch" style="background:#f7c971"></span>Admin UP no prueba tráfico</div></div>
-<p class="small">Líneas continuas = WAN principales; discontinuas = respaldos. El color proviene de la FIB observada, no de una estimación. <strong>Ruta elegida no significa tráfico medido ni OSPF FULL.</strong> Ante telemetría ausente se muestra UNKNOWN; no se inventan alertas.</p>
+<div class="legend-caption">EQUIPOS Y SERVICIOS</div>
+<div class="legend">
+<div><span class="swatch" style="background:#51d8a8"></span>En ejecución</div>
+<div><span class="swatch" style="background:#f7c971"></span>Advertencia comprobada</div>
+<div><span class="swatch" style="background:#f97680"></span>Fuera de línea comprobado</div>
+<div><span class="swatch" style="background:#899cb3"></span>Sin datos suficientes</div>
+</div>
+<p class="small">Pulsa un equipo o enlace para resaltarlo en verde lima; vuelve a pulsarlo para deseleccionarlo. El resaltado no representa una falla ni altera el estado real. Línea continua = principal; línea discontinua = respaldo. <strong>La ruta FIB elegida no acredita tráfico ni una adyacencia OSPF FULL.</strong> Los estados no comprobados se muestran sin datos, no como errores.</p>
 </div>
 <div class="panel">
 <h2>Expansiones futuras</h2>
@@ -222,7 +226,7 @@ header{padding-top:15px;padding-bottom:15px}
 </div>
 </aside>
 </div>
-<footer>La vista distingue <b>estado esperado (SoT/IPAM candidate)</b> de <b>estado observado</b>. El diagrama no conecta la LAN empresarial a VMnet8/ens33. No muestra flujos animados sin contadores verificables; su ausencia no implica que no haya tráfico. Despliegues y retiradas de S02–S04 se realizan únicamente con sus procedimientos controlados.</footer>
+<footer>La vista distingue <b>estado esperado (SoT/IPAM candidato)</b> de <b>estado observado</b>. El diagrama no conecta la LAN empresarial a VMnet8/ens33. No muestra flujos animados sin contadores verificables; su ausencia no implica que no haya tráfico. Despliegues y retiradas de S02–S04 se realizan únicamente con sus procedimientos controlados.</footer>
 </main>
 <script>
 "use strict";
