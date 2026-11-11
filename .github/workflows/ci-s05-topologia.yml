@@ -10,6 +10,9 @@ on:
       - 'inventario/ipam/topologia-s02.yaml'
       - 'tests/test_s05_topologia.py'
       - 'tests/test_s05_layout.py'
+      - 'tests/test_s05_observador_failover.py'
+      - 'scripts/validacion/s05-observar-conmutacion-noc.py'
+      - 'scripts/laboratorio/s02-failover-wan.py'
       - '.github/workflows/ci-s05-topologia.yml'
   pull_request:
     paths:
@@ -18,6 +21,9 @@ on:
       - 'inventario/ipam/topologia-s02.yaml'
       - 'tests/test_s05_topologia.py'
       - 'tests/test_s05_layout.py'
+      - 'tests/test_s05_observador_failover.py'
+      - 'scripts/validacion/s05-observar-conmutacion-noc.py'
+      - 'scripts/laboratorio/s02-failover-wan.py'
       - '.github/workflows/ci-s05-topologia.yml'
 
 permissions:
@@ -39,6 +45,8 @@ jobs:
           python -m py_compile servicios/topologia-s05/app.py tests/test_s05_topologia.py
           python -m unittest discover -s tests -p 'test_s05_topologia.py' -v
           python -m unittest discover -s tests -p 'test_s05_layout.py' -v
+          python -m unittest discover -s tests -p 'test_s05_observador_failover.py' -v
+          python -m py_compile scripts/validacion/s05-observar-conmutacion-noc.py scripts/laboratorio/s02-failover-wan.py
       - name: Comprobar sintaxis JavaScript del visor
         run: |
           python - <<'PY'
