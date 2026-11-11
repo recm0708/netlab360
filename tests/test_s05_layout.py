@@ -2,6 +2,7 @@
 from pathlib import Path
 import re
 import unittest
+import subprocess
 
 PAGE = (Path(__file__).resolve().parents[1] /
         "servicios/topologia-s05/index.html")
@@ -222,6 +223,31 @@ class GeometryTests(unittest.TestCase):
         self.assertIn("renderSelection();", self.html)
         self.assertNotIn("if(selectedId)pick(selectedId)", self.html)
         self.assertNotIn('selectedId=id;', self.html)
+
+    def test_v72_real_javascript_toggle_in_node(self):
+        """Ejecuta el controlador real de clic sin servicios ni red."""
+        function = re.search(r"function pick\(id\)\{[\s\S]*?\n\}", self.html)
+        self.assertIsNotNone(function)
+        script = r"""
+const vm = require("node:vm");
+const snippet = process.argv[1];
+const context = vm.createContext({});
+vm.runInContext(
+ "let selectedId=null;let calls=[];" +
+ "function renderSelection(){calls.push(selectedId);}" + snippet +
+ "pick('WAN1');pick('WAN1');pick('R-HQ');pick('WAN1');" +
+ "if(JSON.stringify(calls)!==JSON.stringify(['WAN1',null,'R-HQ','WAN1']))" +
+ " throw Error('Toggle JS no reversible: '+JSON.stringify(calls));",
+ context
+);
+console.log("S05_V72_TOGGLE_NODE=OK");
+"""
+        result = subprocess.run(
+            ["node", "-e", script, function.group(0)],
+            text=True, capture_output=True, timeout=8, check=False
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("S05_V72_TOGGLE_NODE=OK", result.stdout)
 
     def test_v72_spanish_user_facing_state_labels(self):
         self.assertIn('"active":"ACTIVA"', self.html)
