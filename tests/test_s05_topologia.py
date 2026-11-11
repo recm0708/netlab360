@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import importlib.util
+import json
+import tempfile
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import subprocess
@@ -112,6 +114,103 @@ class TopologyGraphTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.build(ext=ext)
 
+
+    def test_fib_primary_selected_and_backup_standby(self):
+        snap = self.active_snapshot()
+        fib = {
+            "S1": {"dev": "s1p", "gateway": "10.78.0.2", "target": "10.79.0.2"},
+            "S2": {"dev": "s2p", "gateway": "10.78.0.10", "target": "10.79.0.3"},
+        }
+        out = module.graph(self.inventory, snap, set(), self.extensions, fib=fib)
+        wan = {l["id"]: l for l in out["links"] if l["type"] == "wan"}
+        self.assertTrue(out["routing"]["available"])
+        self.assertFalse(out["routing"]["traffic_measured"])
+        for site in ("S1", "S2"):
+            self.assertEqual(wan[f"WAN-PRIMARIA-HQ-{site}"]["route_selection"],
+                             "selected")
+            self.assertEqual(wan[f"WAN-RESPALDO-HQ-{site}"]["route_selection"],
+                             "standby")
+
+    def test_fib_selected_backup_when_primary_down(self):
+        snap = self.active_snapshot()
+        snap["sites"]["HQ"]["wan"]["s1p"]["admin_up"] = 0
+        fib = {
+            "S1": {"dev": "s1b", "gateway": "10.78.0.6", "target": "10.79.0.2"},
+            "S2": {"dev": "s2p", "gateway": "10.78.0.10", "target": "10.79.0.3"},
+        }
+        out = module.graph(self.inventory, snap, set(), self.extensions, fib=fib)
+        wan = {l["id"]: l for l in out["links"] if l["type"] == "wan"}
+        self.assertEqual(wan["WAN-PRIMARIA-HQ-S1"]["route_selection"],
+                         "unavailable")
+        self.assertEqual(wan["WAN-RESPALDO-HQ-S1"]["route_selection"],
+                         "selected")
+        self.assertEqual(wan["WAN-PRIMARIA-HQ-S2"]["route_selection"],
+                         "selected")
+        self.assertEqual(wan["WAN-RESPALDO-HQ-S2"]["route_selection"],
+                         "standby")
+
+    def test_fib_unknown_without_observation_or_admin_source(self):
+        snap = self.active_snapshot()
+        self.assertTrue(all(
+            l["route_selection"] == "unknown"
+            for l in self.build(snap)["links"] if l["type"] == "wan"
+        ))
+        snap["sites"]["S1"]["wan"]["s1p"]["admin_up"] = -1
+        fib = {"S1": {"dev": "s1p", "gateway": "10.78.0.2"}}
+        out = module.graph(self.inventory, snap, set(), self.extensions, fib=fib)
+        links = {l["id"]: l for l in out["links"] if l["type"] == "wan"}
+        self.assertEqual(links["WAN-PRIMARIA-HQ-S1"]["route_selection"],
+                         "unknown")
+        self.assertEqual(links["WAN-PRIMARIA-HQ-S2"]["route_selection"],
+                         "unknown")
+
+    def test_fib_observer_checks_identity_and_reads_only(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "wan-state.json"
+            path.write_text(json.dumps({
+                "owner": "NETLAB360_S02_WAN_LINKS_V1",
+                "ids": {"R-HQ": "b" * 64}
+            }))
+            info = {"Id": "b" * 64, "Name": "/nl360-s02-r-hq",
+                    "State": {"Running": True, "Pid": 12345},
+                    "HostConfig": {"NetworkMode": "none"},
+                    "Config": {"Labels": {
+                        "com.docker.compose.project": "netlab360-s02-wan"
+                    }}}
+            returns = [
+                subprocess.CompletedProcess([], 0, json.dumps([info]), ""),
+                subprocess.CompletedProcess([], 0, json.dumps([
+                    {"dev": "s1p", "gateway": "10.78.0.2"}
+                ]), ""),
+                subprocess.CompletedProcess([], 0, json.dumps([
+                    {"dev": "s2b", "gateway": "10.78.0.14"}
+                ]), ""),
+            ]
+            with patch.object(module, "WAN_STATE", path), patch.object(
+                module, "command", side_effect=returns
+            ) as call:
+                routes, warn = module.fib_routes()
+            self.assertEqual(warn, "")
+            self.assertEqual(routes["S1"]["dev"], "s1p")
+            self.assertEqual(routes["S2"]["dev"], "s2b")
+            self.assertEqual(call.call_count, 3)
+            for called in call.call_args_list:
+                argv = called.args
+                self.assertEqual(argv[:2], ("sudo", "-n"))
+                self.assertNotIn("set", argv)
+                self.assertNotIn("add", argv)
+                self.assertNotIn("delete", argv)
+
+    def test_fib_observer_never_fabricates_when_unavailable(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "missing.json"
+            with patch.object(module, "WAN_STATE", path), patch.object(
+                module, "command"
+            ) as call:
+                routes, warn = module.fib_routes()
+            self.assertIsNone(routes)
+            self.assertIn("sin estado", warn)
+            call.assert_not_called()
 
     def test_vm_clock_uses_panama_zone_and_keeps_utc(self):
         d = self.build()
