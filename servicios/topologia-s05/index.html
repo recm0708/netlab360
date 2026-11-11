@@ -303,6 +303,9 @@ function pick(id){
  if(!item)return;
  $("info-title").textContent=item.type==="wan"?("WAN "+(item.role==="primary"?"principal":"respaldo")+" · HQ ↔ "+item.to.replace("R-","")):(item.label||item.id);
  $("info-desc").textContent=(item.detail||"No hay detalle de origen")+" · "+statusText(item.status);
+ $("selection-note").hidden=false;
+ const inspector=$("info-title").closest(".panel");
+ if(inspector)inspector.classList.add("inspector-selected");
  const attrs=[["Identificador",item.id],["Sede",item.site||"Entre sedes"],
  ["Tipo",item.type],["Estado observado",statusText(item.status)],["Función",item.role==="primary"?"Principal":item.role==="backup"?"Respaldo":item.role],
  ["VLAN",item.vlan],["Gateway",item.gateway],["Fuente",item.origin],
@@ -388,6 +391,7 @@ function drawWan(w,parent){
  const g=wanGeometry[w.id];
  if(!g)return;
  const layer=el("g",{class:"wan-circuit"},parent),path=wanPath(w);
+ el("path",{d:path,class:"wan-selection-halo","aria-hidden":"true"},layer);
  el("path",{d:path,class:"wan-line "+w.role+" "+w.status+" route-"+(w.route_selection||"unknown")},layer);
  el("path",{d:path,class:"wan-click"},layer);
  el("circle",{cx:g.sx,cy:g.sy,r:4.5,class:"wan-port"},layer);
