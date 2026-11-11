@@ -44,3 +44,28 @@ Las tasas P1B pertenecen a pruebas virtuales dentro de una VM con afinidad CPU y
 4. Preparar despliegues de pruebas posteriores S05 (OSPF/FIB, conmutación de enlaces, HA/SDN) solo tras validar inventario/recursos y procedimientos de rollback, sin tocar `ens33`.
 
 **Dictamen:** evidencia visual del piloto LACP, comparativa P1B y mapa V6 **aceptada en su alcance específico**. Integración de estado real, pruebas de failover de red/equipos y empaquetado de evidencias siguen pendientes.
+
+## Anexo — primera integración HTTP S04 ↔ NOC V6 comprobada
+
+**Fecha:** 10/11/2026, hora Panamá, según las terminales y la captura aportadas posteriormente.
+
+El operador mantuvo iniciado en su sesión SSH `python3 servicios/observabilidad/s04_exporter_multisede.py --serve --port 9110 --interval 2` tras `sudo -v`. El exporter anunció `S04_EXPORTER_URL=http://127.0.0.1:9110/api/v1/state` y `S04_MODO=SOLO_LECTURA`; el NOC siguió activo en `127.0.0.1:9130`.
+
+En la **consulta cruzada ejecutada**, se obtuvo:
+
+```text
+S04_FUENTE= True
+S04_TOPOLOGIA= offline
+NOC_FUENTE= True
+NOC_TOPOLOGIA= offline
+R-HQ offline
+R-S1 offline
+R-S2 offline
+S05_S04_INTEGRACION_OFFLINE=OK
+```
+
+Se recibió la **captura número 15**, `S05_13_Topologia_Offline_Observado`, que muestra el encabezado `Topología OFFLINE` y el aviso `Fuente S04 actualizada` con reloj de Panamá. **Aceptada específicamente como prueba visual de estado observado**, no como representación íntegra de los circuitos WAN (esa función corresponde a `S05_10`). No se ha copiado todavía su archivo binario al repositorio ni calculado SHA-256 dentro de GitHub.
+
+La transición `UNKNOWN→OFFLINE` corresponde a **pasar de fuente HTTP ausente a fuente confiable que informa tres routers no desplegados**. No es una prueba de falla inducida, recuperación, OSPF Full ni transporte por respaldo. La sesión del exporter y el permiso `sudo -n` pueden caducar; en tal caso el estado debe volver a `UNKNOWN` y no conservar observaciones viejas como actuales.
+
+**Estado actualizado de evidencias:** 15 PNG recibidos y examinados: 2 de precheck, 4 P1, 5 P1B y 4 de topología/observabilidad. Las pruebas de configuración y de rendimiento P1/P1B no se repiten. La siguiente actividad será revisar el estado de ejecución, las dependencias y el procedimiento seguro de reconstrucción S02, **sin ejecutar `up` en el precheck**.
