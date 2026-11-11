@@ -531,7 +531,10 @@ function drawExtensions(data){
   const line=el("path",{d:path,class:"ha-application-link "+state},g);
   attach(line,link);
   if(same){
-   txt("PRINCIPAL HTTP",a.x-195,(a.y+b.y)/2+5,
+   // Etiqueta en dos líneas, dentro del panel y sin superponer el carril.
+   txt("PRINCIPAL",a.x-175,(a.y+b.y)/2-2,
+    "ha-application-label",g);
+   txt("HTTP",a.x-175,(a.y+b.y)/2+16,
     "ha-application-label",g);
   }else{
    txt("RESPALDO HTTP",(a.x+b.x)/2,(a.y+b.y)/2-16,
