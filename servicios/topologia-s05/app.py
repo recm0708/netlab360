@@ -178,7 +178,9 @@ def fib_routes() -> tuple[dict | None, str]:
             route = rows[0]
             device = route.get("dev")
             gateway = route.get("gateway")
-            if device not in devices or not isinstance(gateway, str):
+            expected_gateways = {"s1p": "10.78.0.2", "s1b": "10.78.0.6",
+                                 "s2p": "10.78.0.10", "s2b": "10.78.0.14"}
+            if device not in devices or gateway != expected_gateways.get(device):
                 return None, "FIB: ruta o gateway inesperado para " + site
             # La ruta se reporta como seleccionada, no como tráfico medido.
             routes[site] = {"dev": device, "gateway": gateway,
