@@ -54,17 +54,35 @@ console.log("S05_HA_FORMATO_HORA_PANAMA=OK");
         self.assertIn("S05_HA_FORMATO_HORA_PANAMA=OK", r.stdout)
 
     def test_main_http_rail_does_not_cover_ip_labels(self):
-        self.assertIn('a.x-124', self.html)
+        self.assertIn('a.x-172', self.html)
         self.assertIn('b.x-84', self.html)
-        self.assertIn('txt("PRINCIPAL",a.x-175', self.html)
-        self.assertIn('txt("HTTP",a.x-175', self.html)
+        self.assertIn('const middleY=(a.y+b.y)/2;', self.html)
+        self.assertIn('txt("PRINCIPAL",a.x-80,middleY+10', self.html)
+        self.assertIn('txt("HTTP",a.x-80,middleY+28', self.html)
         self.assertIn('RESPALDO HTTP', self.html)
         self.assertIn('class:"ha-application-link "+state', self.html)
         self.assertIn(".ha-application-link.selected", self.html)
         self.assertIn(".ha-application-link.standby", self.html)
         self.assertIn('txt("SERVIDOR",x,y-3', self.html)
         self.assertIn("width:168,height:52", self.html)
-        self.assertIn("rows?1140+(rows-1)*106", self.html)
+        self.assertIn("rows?1140+(rows-1)*140", self.html)
+        self.assertIn('y:1040+i*140', self.html)
+        self.assertIn('const y=1040+i*140;', self.html)
+
+    def test_main_http_rail_and_label_clearance(self):
+        # Geometría SVG determinista del NOC, en coordenadas viewBox.
+        x = 270
+        upper_y, lower_y = 1040, 1180
+        detail_y = upper_y + 52
+        rail_x = x - 172
+        self.assertGreater(rail_x, 36)  # Dentro del panel.
+        self.assertLess(rail_x, x - 140)  # Fuera de la anotación IP.
+        midpoint = (upper_y + lower_y) / 2
+        label_top = midpoint + 10 - 14  # Primera línea, altura SVG 14.
+        label_bottom = midpoint + 28
+        lower_card_top = lower_y - 26
+        self.assertGreater(label_top, detail_y + 8)
+        self.assertLess(label_bottom, lower_card_top - 8)
 
     def test_ui_keeps_application_selection_separate_from_wan(self):
         self.assertIn('appText(item.application_selection)', self.html)
