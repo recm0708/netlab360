@@ -246,7 +246,7 @@ class GeometryTests(unittest.TestCase):
         self.assertIn('["Selección FIB R-HQ"', self.html)
         self.assertIn('["Próximo salto FIB"', self.html)
         self.assertIn("w.route_selection", self.html)
-        self.assertIn("Ruta elegida no significa tráfico medido", self.html)
+        self.assertIn("La ruta FIB elegida no acredita tráfico", self.html)
 
     def test_wiring_never_enters_host_or_switch(self):
         self.assertIn('const yJunction=b.sy+40;', self.html)
