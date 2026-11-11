@@ -60,7 +60,7 @@ jobs:
           assert e['schema_version'] == 1
           assert e['nodes'] == [] and e['links'] == []
           html = Path('servicios/topologia-s05/index.html').read_text(encoding='utf8')
-          for name in ('/api/v1/graph', 'HQ', 'S1', 'S2', 'UNKNOWN'):
+          for name in ('/api/v1/graph', 'HQ', 'S1', 'S2', 'SIN DATOS', 'route_selection'):
               assert name in html, name
           print('S05_CI_DIAGRAMA=VALIDADO_CON_CONTRATO_OFFLINE')
           PY
