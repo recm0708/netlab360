@@ -1,5 +1,12 @@
 # NETLAB360 — Punto de reanudación
 
+## Recuperación SSH/NOC 84R-G: situación observada y procedimiento (11/11/2026)
+
+- [x] **Lote 84R-G FALLÓ por fuente S04 caída**, no por failover ni por HA: `tmux list-sessions` mostró `nl360-noc` **attached**, `ss` mostró solo 127.0.0.1:9130 PID `564662`, y `urllib` falló al abrir `127.0.0.1:9110` con `ConnectionRefusedError`. El NOC fue reiniciado en el terminal 3 y puede seguir operando en la sesión `nl360-noc`. El túnel de PowerShell en terminal 2 recibió repetidos `channel 2: open failed: connect failed: Connection refused`; su estado no equivale a un fallo de SSH general.
+- [ ] **Secuencia de recuperación en vez de crear más terminales:** desprender la sesión NOC desde T3 con Ctrl+B, D **sin Ctrl+C**; detener solamente el túnel SSH antiguo T2 con Ctrl+C; establecer una sola sesión PowerShell `ssh -tt -L 127.0.0.1:9130:127.0.0.1:9130` con ServerAliveInterval/Count; auditar tmux/listeners y reiniciar **solo exporter** 9110 dentro de `tmux new-session -s nl360-exporter` tras comprobar puerto libre y `sudo -v` dentro de tmux; desprender Ctrl+B,D; verificar API S04 y NOC.
+- [ ] El visor usa `sudo -n docker inspect/nsenter` y su autorización puede expirar por TTY: tratar FIB no disponible como aviso de observabilidad, NO como defecto de OSPF/FRR. No añadir a grupo Docker ni `NOPASSWD` genérico. Evaluar lector FIB de privilegios mínimos después de normalizar servicios.
+- [ ] **Lotes HA 84,85,86 siguen sin ejecutar**, no existen PNG S05_34–36. No tocar `ens33`, routers S02, snapshot manual VMware. Anteriores lotes 81–83 y capturas 32/33 permanecen aprobados.
+
 ## Incidente recuperable de supervisión — diagnóstico 84R-D (11/11/2026)
 
 - [x] **Auditoría de solo lectura ejecutada:** NOC 9130 PID `449431` ligado a terminal antigua `pts/2`, exporter 9110 PID `546643` en `pts/4`. Ambos escuchan en 127.0.0.1. FRR `nl360-s02-r-hq`, `-r-s1`, `-r-s2` **Up 12 hours**; S04 `source_ok=True`, `topology=active`, `errors=[]`.
