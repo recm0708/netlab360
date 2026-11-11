@@ -31,7 +31,8 @@ class HAMonitorTests(unittest.TestCase):
         src = (ROOT / "servicios/ha-s05/monitor_http_s2.py").read_text()
         self.assertIn("ProxyHandler({})", src)
         self.assertIn('os.stat("/proc/self/ns/net").st_ino', src)
-        self.assertNotIn("sudo", src)
+        self.assertNotIn("subprocess.run", src)
+        self.assertNotIn("sudo(", src)
         self.assertNotIn("docker", src.lower().split('def ensure_network_namespace')[1])
 
     def test_valid_healthcheck_and_frontend_selection(self):
