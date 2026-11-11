@@ -1,5 +1,18 @@
 # NETLAB360 · Auditoría de evidencias S05 y plan de capturas finales
 
+## ACTUALIZACIÓN VIGENTE — 11/11/2026: PNG S05_29–31 RECIBIDOS Y REVISADOS
+
+**Este apartado sustituye los renglones históricos «pendiente» más abajo; consérvense para trazabilidad de la auditoría original.**
+
+- [x] **S05_29_Inspector_FIB_Ruta_Principal.png:** PNG válido. Mapa y WAN HQ–S1 resaltada por selección de usuario en verde lima; inspector confirma FIB elegida con next-hop `10.78.0.2`, origen `Linux FIB R-HQ`.
+- [x] **S05_30_Codigo_Colores_y_Estados.png:** PNG válido, tarjeta `Código de colores y estados` completa; distingue verde lima (selección), verde (ruta FIB), azul (respaldo seleccionado), gris (espera), rojo (interfaz deshabilitada). Advertencia semántica: FIB no equivale a medición de tráfico.
+- [x] **S05_31_NOC_Conmutacion_S1_Respaldo_Seleccionado.png:** PNG visualmente válido como escenario dinámico: WAN principal HQ–S1 roja, WAN respaldo HQ–S1 azul discontinuo seleccionado, S2 sigue verde. **Salvedad:** no incluye inspector ni texto del next-hop `10.78.0.6`; **se acredita con el registro observador JSONL y la salida del simulador**. No repetir corte solo para mejorar encuadre.
+- [x] **Ejecución verificada:** lote 75 **36/36 tests**, lote 76 **119 muestras**, `S05_NOC_CICLO_COMPLETO=OK`, `s1p→s1b→s1p` next-hops `10.78.0.2→10.78.0.6→10.78.0.2`; lote 77 `S02_S1_PRUEBA_COMPLETA=OK`, ventana 25s; lote 78 `S05_FIB_RESTAURADA=OK`, S2 `s2p` y gestión `ens33` intactos.
+- [ ] **Pendiente antes de archivar evidencia:** verificar archivo real `S05_NOC_S1_OBSERVACION_20261111T052859Z.jsonl`, logs `10_Observador_Failover_S1.txt`, `11_Failover_Observado_S1.txt`, `12_Postcheck_Failover_Observado.txt` mediante script Python y generar SHA-256; importar los PNG originales al repositorio si la etapa de consolidación lo requiere. Los PNG están recibidos en chat, no commiteados.
+- [ ] **Fases técnicas adicionales:** diseño HA [#32](https://github.com/recm0708/netlab360/issues/32), OVS/Faucet [#23](https://github.com/recm0708/netlab360/issues/23), integración de LACP [#31](https://github.com/recm0708/netlab360/issues/31).
+
+Bitácora nueva: [observación y retorno S1 validados](../sesiones/2026-11-11-s05-observacion-failover-s1-validada.md).
+
 **Corte:** 11/11/2026, zona horaria América/Panamá. **Alcance:** cuatro PNG recibidos en la conversación del operador (dos de 00:12, uno de 23:01 y el archivo S05_28 duplicado con sufijo `(1)`), la evidencia previamente verificada en chat y el registro anterior `docs/sesiones/2026-11-10-s05-auditoria-capturas-y-fuente-s04.md`.
 
 ## PNG aportados en la revisión actual
