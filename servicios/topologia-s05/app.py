@@ -24,6 +24,7 @@ IPAM = ROOT / "inventario/ipam/topologia-s02.yaml"
 EXT = ROOT / "inventario/topologia-extensiones-s05.json"
 STATIC = Path(__file__).with_name("index.html")
 EXPORTER = "http://127.0.0.1:9110/api/v1/state"
+WAN_STATE = Path.home() / "netlab360-bootstrap/s02/wan-links-state.json"
 SITES = ("HQ", "S1", "S2")
 IFACE = {"WAN-PRIMARIA-HQ-S1": "s1p",
          "WAN-RESPALDO-HQ-S1": "s1b",
@@ -133,7 +134,78 @@ def wan_state(w: dict, snap: dict | None) -> str:
     return "unknown"
 
 
-def graph(inv: dict, snap: dict | None, ns: set[str] | None, ext: dict) -> dict:
+def fib_routes() -> tuple[dict | None, str]:
+    """Lee la FIB de R-HQ; nunca escribe en Docker, FRR, rutas o interfaces.
+
+    La identidad del contenedor debe coincidir con el state WAN creado por S02.
+    No hay datos de rutas si no se puede consultar sudo -n o si faltan recursos.
+    """
+    if WAN_STATE.is_symlink() or not WAN_STATE.is_file():
+        return None, "FIB sin estado WAN legitimo"
+    try:
+        state = json.loads(WAN_STATE.read_text(encoding="utf-8"))
+        if state.get("owner") != "NETLAB360_S02_WAN_LINKS_V1":
+            return None, "FIB: propietario WAN no reconocido"
+        expected_id = (state.get("ids") or {}).get("R-HQ")
+        if not isinstance(expected_id, str) or len(expected_id) < 12:
+            return None, "FIB: ID de router no valido"
+        inspected = command("sudo", "-n", "docker", "inspect",
+                            "nl360-s02-r-hq", timeout=2.5)
+        if inspected.returncode:
+            return None, "FIB: Docker no consultable sin privilegios interactivos"
+        doc = json.loads(inspected.stdout)[0]
+        if (doc.get("Id") != expected_id or
+                doc["Name"].lstrip("/") != "nl360-s02-r-hq" or
+                doc["State"]["Running"] is not True or
+                doc["HostConfig"]["NetworkMode"] != "none" or
+                (doc["Config"].get("Labels") or {}).get(
+                    "com.docker.compose.project") != "netlab360-s02-wan"):
+            return None, "FIB: identidad o estado del router inesperados"
+        pid = doc["State"]["Pid"]
+        if not isinstance(pid, int) or pid <= 1:
+            return None, "FIB: PID invalido"
+        routes = {}
+        for site, dest, devices in (
+                ("S1", "10.79.0.2", ("s1p", "s1b")),
+                ("S2", "10.79.0.3", ("s2p", "s2b"))):
+            p = command("sudo", "-n", "nsenter", "-t", str(pid), "-n",
+                        "ip", "-j", "-4", "route", "get", dest, timeout=2.5)
+            if p.returncode:
+                return None, "FIB: ruta a " + site + " no consultable"
+            rows = json.loads(p.stdout)
+            if not isinstance(rows, list) or len(rows) != 1:
+                return None, "FIB: respuesta JSON no valida"
+            route = rows[0]
+            device = route.get("dev")
+            gateway = route.get("gateway")
+            if device not in devices or not isinstance(gateway, str):
+                return None, "FIB: ruta o gateway inesperado para " + site
+            # La ruta se reporta como seleccionada, no como tráfico medido.
+            routes[site] = {"dev": device, "gateway": gateway,
+                            "target": dest, "origin": "Linux FIB R-HQ"}
+        return routes, ""
+    except (OSError, ValueError, KeyError, TypeError, IndexError,
+            subprocess.TimeoutExpired):
+        return None, "FIB: observacion no confiable"
+
+
+def fib_link_selection(w: dict, wan_status: str, fib: dict | None) -> str:
+    """Seleccion de WAN desde FIB de HQ, independiente del flag admin-up."""
+    if fib is None:
+        return "unknown"
+    site = w["b"]["router"].replace("R-", "")
+    observed = fib.get(site, {}).get("dev")
+    if observed not in (("s1p", "s1b") if site == "S1" else ("s2p", "s2b")):
+        return "unknown"
+    if wan_status == "admin-down":
+        return "unavailable"
+    if wan_status != "admin-up":
+        return "unknown"
+    return "selected" if observed == IFACE[w["id"]] else "standby"
+
+
+def graph(inv: dict, snap: dict | None, ns: set[str] | None, ext: dict,
+          fib: dict | None = None) -> dict:
     # El instante se toma del reloj de la VM; UTC se conserva para trazabilidad
     # y America/Panama se ofrece explícitamente para su presentación.
     now_utc = datetime.now(timezone.utc)
@@ -171,12 +243,25 @@ def graph(inv: dict, snap: dict | None, ns: set[str] | None, ext: dict) -> dict:
                           "role": "VLAN " + str(vid),
                           "status": "unknown", "detail": vlan["subnet"]})
     for w in inv["wan_links"]:
+        administrative = wan_state(w, snap)
+        selection = fib_link_selection(w, administrative, fib)
+        site_b = w["b"]["router"].replace("R-", "")
+        route_info = (fib or {}).get(site_b, {})
+        if selection == "selected":
+            route_detail = " · ruta FIB seleccionada en R-HQ"
+        elif selection == "standby":
+            route_detail = " · ruta de respaldo disponible en espera (sin tráfico acreditado)"
+        else:
+            route_detail = " · ruta seleccionada no verificada"
         links.append({"id": w["id"], "from": w["a"]["router"],
                       "to": w["b"]["router"], "type": "wan",
                       "role": "primary" if "PRIMARIA" in w["id"] else "backup",
-                      "status": wan_state(w, snap),
+                      "status": administrative,
+                      "route_selection": selection,
+                      "route_source": ("Linux FIB R-HQ" if fib is not None else None),
+                      "route_gateway": route_info.get("gateway") if selection == "selected" else None,
                       "detail": (w["subnet"] + " · costo OSPF esperado " +
-                                 str(w["ospf_cost"]) + " · ruta seleccionada no verificada"),
+                                 str(w["ospf_cost"]) + route_detail),
                       "a": w["a"]["address"], "b": w["b"]["address"]})
     # Adiciones futuras requieren registro explícito de recurso ya realizado.
     known = {n["id"] for n in nodes}
@@ -218,13 +303,15 @@ def graph(inv: dict, snap: dict | None, ns: set[str] | None, ext: dict) -> dict:
         "telemetry": {"available": snap is not None,
                       "topology": snap["topology"] if snap else "unknown",
                       "last_sample_utc": snap["observed_at_utc"] if snap else None},
+        "routing": {"available": fib is not None, "source": "FIB Linux ip route get en R-HQ",
+                    "routes": fib or {}, "traffic_measured": False},
         "counts": {"sites": 3, "routers": 3, "switches": 3, "hosts": 9,
                    "vlans": 9, "wan": 4, "extensions": len(nodes) - 15},
         "nodes": nodes, "links": links,
         "caveats": [
             "S02 IPAM es candidate: elementos dibujados no implican despliegue activo.",
             "admin-up es un flag administrativo; no confirma OSPF Full, FIB, HTTP o trafico.",
-            "Los enlaces backup son candidatos de respaldo; su uso activo no esta verificado.",
+            "Ruta FIB elegida no acredita tráfico ni estado OSPF FULL sin mediciones separadas.",
             "UNKNOWN no equivale a DOWN; las redes estan intencionalmente desmontadas si se conoce su estado.",
         ],
     }
@@ -235,8 +322,9 @@ def current() -> dict:
     ext = extensions()
     snap, s_error = telemetry()
     ns, ns_error = namespaces()
-    result = graph(inv, snap, ns, ext)
-    result["source_warnings"] = [x for x in (s_error, ns_error) if x]
+    fib, fib_error = fib_routes() if snap is not None and snap.get("topology") == "active" else (None, "")
+    result = graph(inv, snap, ns, ext, fib=fib)
+    result["source_warnings"] = [x for x in (s_error, ns_error, fib_error) if x]
     result["namespaces_observable"] = ns is not None
     return result
 
