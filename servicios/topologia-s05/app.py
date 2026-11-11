@@ -27,6 +27,14 @@ STATIC = Path(__file__).with_name("index.html")
 EXPORTER = "http://127.0.0.1:9110/api/v1/state"
 PRIV_HELPER = "/usr/local/libexec/netlab360-observer"
 WAN_STATE = Path.home() / "netlab360-bootstrap/s02/wan-links-state.json"
+HA_MONITOR = Path.home() / "netlab360-bootstrap/s05/ha/observacion-http-s2.json"
+HA_OWNER = "NETLAB360_S05_HA_MONITOR_V1"
+HA_SOURCE = "nl360-s02-h-s2-320"
+HA_SERVICES = {
+    "BACKEND_HQ": ("HQ", "10.70.20.21"),
+    "BACKEND_S1": ("S1", "10.71.20.21"),
+    "FRONTAL_HQ": ("HQ", "10.70.20.23"),
+}
 SITES = ("HQ", "S1", "S2")
 IFACE = {"WAN-PRIMARIA-HQ-S1": "s1p",
          "WAN-RESPALDO-HQ-S1": "s1b",
@@ -98,6 +106,43 @@ def namespaces() -> tuple[set[str] | None, str]:
         if p.returncode == 0:
             return {row.split()[0] for row in p.stdout.splitlines() if row.strip()}, ""
     return None, "netns no consultable; estado UNKNOWN"
+
+
+def ha_observation(path: Path = HA_MONITOR) -> tuple[dict | None, str]:
+    """Estado de servicio HTTP medido desde S2, no derivado de netns o systemd.
+
+    Un archivo ausente, futuro, obsoleto o malformado NUNCA pinta activo.
+    """
+    if path.is_symlink() or not path.is_file():
+        return None, "HA HTTP: sin observación de cliente S2"
+    try:
+        if path.stat().st_size > 8192:
+            raise ValueError("Snapshot demasiado grande")
+        d = json.loads(path.read_text(encoding="utf-8"))
+        stamp = datetime.fromisoformat(d["observed_at_utc"])
+        age = (datetime.now(timezone.utc) - stamp).total_seconds()
+        services = d["services"]
+        if (stamp.tzinfo is None or not (-2 <= age <= 6) or
+                d.get("owner") != HA_OWNER or
+                d.get("source_netns") != HA_SOURCE or
+                set(services) != set(HA_SERVICES)):
+            raise ValueError("Snapshot HA fuera de contrato")
+        for identity, (site, addr) in HA_SERVICES.items():
+            row = services[identity]
+            if (not isinstance(row, dict) or row.get("ip") != addr or
+                    row.get("site") != site or
+                    row.get("status") not in ("running", "offline", "unknown")):
+                raise ValueError("Estado HTTP sin identidad verificada")
+        frontal = services["FRONTAL_HQ"]
+        if (frontal.get("active_backend"), frontal.get("selected_path")) not in (
+            (None, None), ("BACKEND_HQ", "PRINCIPAL"), ("BACKEND_S1", "RESPALDO")
+        ):
+            raise ValueError("Selección del frontal fuera de contrato")
+        if frontal["status"] != "running" and frontal.get("active_backend") is not None:
+            raise ValueError("Frontal sin salud y con backend seleccionado")
+        return d, ""
+    except (OSError, ValueError, TypeError, KeyError, OverflowError):
+        return None, "HA HTTP: muestra obsoleta o no verificable desde S2"
 
 
 def observed_router(site: str, snapshot: dict | None) -> str:
@@ -233,7 +278,7 @@ def fib_link_selection(w: dict, wan_status: str, fib: dict | None) -> str:
 
 
 def graph(inv: dict, snap: dict | None, ns: set[str] | None, ext: dict,
-          fib: dict | None = None) -> dict:
+          fib: dict | None = None, ha: dict | None = None) -> dict:
     # El instante se toma del reloj de la VM; UTC se conserva para trazabilidad
     # y America/Panama se ofrece explícitamente para su presentación.
     now_utc = datetime.now(timezone.utc)
@@ -300,11 +345,28 @@ def graph(inv: dict, snap: dict | None, ns: set[str] | None, ext: dict,
                 extra.get("type") not in ("router", "switch", "host", "server", "controller")):
             raise ValueError("Nodo extendido sin identidad/ubicacion valida")
         known.add(extra["id"])
+        row = (ha or {}).get("services", {}).get(extra["id"])
+        # Estado de servicio solo si coincide con un identificador HA conocido y
+        # se dispone de una muestra reciente del cliente real S2.
+        if extra["id"] not in HA_SERVICES:
+            row = None
+        selected_backend = (ha or {}).get("services", {}).get(
+            "FRONTAL_HQ", {}
+        ).get("active_backend")
+        app_selection = (
+            "selected" if selected_backend == extra["id"] else
+            "standby" if extra["id"] in ("BACKEND_HQ", "BACKEND_S1")
+            and selected_backend in ("BACKEND_HQ", "BACKEND_S1") else
+            "unknown"
+        )
         nodes.append({"id": extra["id"], "label": str(extra.get("label", extra["id"]))[:80],
                       "site": extra["site"], "type": extra["type"],
                       "detail": str(extra.get("detail", ""))[:160],
                       "origin": str(extra.get("evidence", "Extensión registrada"))[:160],
-                      "status": "unknown"})
+                      "status": row["status"] if row else "unknown",
+                      "application_selection": app_selection if row else "unknown",
+                      "observed_from": HA_SOURCE if row else None,
+                      "ip": row.get("ip") if row else None})
     existing_links = {item["id"] for item in links}
     for extra in ext["links"]:
         if extra.get("realized") is not True:
@@ -314,10 +376,27 @@ def graph(inv: dict, snap: dict | None, ns: set[str] | None, ext: dict,
                 extra.get("type") not in ("wan", "lan", "access", "redundancy")):
             raise ValueError("Enlace extendido inválido")
         existing_links.add(extra["id"])
-        links.append({"id": extra["id"], "from": extra["from"], "to": extra["to"],
+        service_a = extra.get("from")
+        service_b = extra.get("to")
+        observed = (ha or {}).get("services", {})
+        selected = observed.get("FRONTAL_HQ", {}).get("active_backend")
+        is_ha = (extra.get("type") == "redundancy" and
+                 service_a == "FRONTAL_HQ" and
+                 service_b in ("BACKEND_HQ", "BACKEND_S1"))
+        status = "unknown"
+        app_selected = "unknown"
+        if is_ha and service_a in observed and service_b in observed:
+            if observed[service_a]["status"] == "offline" or observed[service_b]["status"] == "offline":
+                status = "offline"
+            elif observed[service_a]["status"] == "running" and observed[service_b]["status"] == "running":
+                status = "running"
+            if status == "running" and selected in ("BACKEND_HQ", "BACKEND_S1"):
+                app_selected = "selected" if selected == service_b else "standby"
+        links.append({"id": extra["id"], "from": service_a, "to": service_b,
                       "type": extra["type"], "role": str(extra.get("role", "additional"))[:48],
                       "detail": str(extra.get("detail", ""))[:160],
-                      "status": "unknown"})
+                      "status": status,
+                      "application_selection": app_selected})
     return {
         "project": "NETLAB360", "phase": "S05", "schema_version": 1,
         "observed_at_utc": now_utc.isoformat(timespec="seconds"),
@@ -333,6 +412,17 @@ def graph(inv: dict, snap: dict | None, ns: set[str] | None, ext: dict,
                       "last_sample_utc": snap["observed_at_utc"] if snap else None},
         "routing": {"available": fib is not None, "source": "FIB Linux ip route get en R-HQ",
                     "routes": fib or {}, "traffic_measured": False},
+        "ha_service": {
+            "available": ha is not None,
+            "source": "HTTP real desde S2 VLAN320; distinto de Linux FIB",
+            "observed_at_utc": ha.get("observed_at_utc") if ha else None,
+            "active_backend": ((ha or {}).get("services", {}).get("FRONTAL_HQ", {})
+                               .get("active_backend")),
+            "selected_path": ((ha or {}).get("services", {}).get("FRONTAL_HQ", {})
+                              .get("selected_path")),
+            "status": ((ha or {}).get("services", {}).get("FRONTAL_HQ", {})
+                       .get("status", "unknown")),
+        },
         "counts": {"sites": 3, "routers": 3, "switches": 3, "hosts": 9,
                    "vlans": 9, "wan": 4, "extensions": len(nodes) - 15},
         "nodes": nodes, "links": links,
@@ -351,8 +441,9 @@ def current() -> dict:
     snap, s_error = telemetry()
     ns, ns_error = namespaces()
     fib, fib_error = fib_routes() if snap is not None and snap.get("topology") == "active" else (None, "")
-    result = graph(inv, snap, ns, ext, fib=fib)
-    result["source_warnings"] = [x for x in (s_error, ns_error, fib_error) if x]
+    ha, ha_error = ha_observation() if ext["nodes"] else (None, "")
+    result = graph(inv, snap, ns, ext, fib=fib, ha=ha)
+    result["source_warnings"] = [x for x in (s_error, ns_error, fib_error, ha_error) if x]
     result["namespaces_observable"] = ns is not None
     return result
 
