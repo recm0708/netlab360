@@ -170,7 +170,7 @@ header{padding-top:15px;padding-bottom:15px}
 <body>
 <header>
 <div><h1>NETLAB360 <span style="color:#79d2ea">/ Topología en vivo</span></h1>
-<div class="sub">Vista lógica multisede · Fase 5 · Inventario versionado + observaciones reales</div></div>
+<div class="sub">Centro de operaciones de red · Infraestructura multisede · Supervisión operativa</div></div>
 <div class="status" id="status">Sin observaciones disponibles</div>
 </header>
 <main class="shell">
@@ -191,10 +191,10 @@ header{padding-top:15px;padding-bottom:15px}
 <div class="control-group"><button type="button" id="focus-toggle" aria-pressed="false" title="Muestra el diagrama completo sin paneles laterales">Modo presentación</button></div>
 <div class="clockchip" id="updated" title="Hora proveniente del reloj del sistema de la VM, zona America/Panama">Consultando reloj de la VM…</div>
 </div>
-<div class="warn" id="warnings">El inventario previsto no demuestra equipos encendidos. Si falta telemetría, se indica «Sin datos».</div>
+<div class="warn" id="warnings">Supervisión de infraestructura · Estado operativo sujeto a fuentes verificables</div>
 <div class="layout">
 <section class="canvas" aria-label="Diagrama de red multisede">
-<div class="canvas-head"><strong>Mapa corporativo · Sede central y sucursales</strong><span>Inventario lógico verificado · Observación en tiempo real cuando está disponible</span></div>
+<div class="canvas-head"><strong>Mapa corporativo · Sede central y sucursales</strong><span>Infraestructura multisede · Estado observado de equipos y enlaces</span></div>
 <svg id="network" viewBox="0 0 1440 930" role="img" aria-label="Topología de NETLAB360: sede HQ a la izquierda, sucursales S1 y S2 a la derecha, cuatro conexiones WAN y redes VLAN locales. Selecciona dispositivos o enlaces."></svg>
 </section>
 <aside class="aside">
@@ -224,13 +224,13 @@ header{padding-top:15px;padding-bottom:15px}
 <p class="small">Pulsa un equipo o enlace para resaltarlo en verde lima; vuelve a pulsarlo para deseleccionarlo. El resaltado no representa una falla ni altera el estado real. Línea continua = principal; línea discontinua = respaldo. <strong>La ruta FIB elegida no acredita tráfico ni una adyacencia OSPF FULL.</strong> Los estados no comprobados se muestran sin datos, no como errores.</p>
 </div>
 <div class="panel">
-<h2>Expansiones futuras</h2>
-<div class="small" id="expansions">Los equipos HA, OVS, controladores y nuevas sedes se incorporan únicamente después de implementarlos y verificarlos.</div>
-<p class="small">Actualización automática del grafo cada 3 segundos. Este visor no ejecuta cambios ni reparaciones.</p>
+<h2>Integraciones de infraestructura</h2>
+<div class="small" id="expansions">Activos de infraestructura adicionales integrados al inventario: 0.</div>
+<p class="small">Actualización del estado cada 3 segundos. Consola de supervisión en modo de solo lectura.</p>
 </div>
 </aside>
 </div>
-<footer>La vista distingue <b>estado esperado (SoT/IPAM candidato)</b> de <b>estado observado</b>. El diagrama no conecta la LAN empresarial a VMnet8/ens33. No muestra flujos animados sin contadores verificables; su ausencia no implica que no haya tráfico. Despliegues y retiradas de S02–S04 se realizan únicamente con sus procedimientos controlados.</footer>
+<footer>NETLAB360 · Centro de operaciones de red · Vista lógica de tres sedes. Las condiciones operativas se presentan según fuentes verificables; el inventario no sustituye la telemetría. Acceso de supervisión sin cambios de configuración.</footer>
 </main>
 <script>
 "use strict";
@@ -362,7 +362,7 @@ function drawDevice(item,x,y,parent=svg){
    txt(item.label,x,y+18,"device-small",g);
  }else if(item.type==="switch"){
    el("rect",{x:x-60,y:y-25,width:120,height:50,rx:11},g);
-   txt("SWITCH",x,y-3,"device-title",g);
+   txt("SW",x,y-3,"device-title",g);
    txt(item.label,x,y+18,"device-small",g);
  }else{
    el("rect",{x:x-55,y:y-26,width:110,height:52,rx:10},g);
@@ -382,7 +382,7 @@ function drawSiteBox(site,nodes,parent){
  el("rect",{x:b.x+2,y:b.y+2,width:b.w-4,height:87,rx:16,class:"site-band"},g);
  el("path",{d:"M "+(b.x+20)+" "+(b.y+91)+" H "+(b.x+b.w-20),class:"site-rule"},g);
  txt(site==="HQ"?"SEDE CENTRAL · HQ":"SUCURSAL · "+site,b.x+25,b.y+37,"site-heading",g);
- txt("Router FRR · Switch L2 · tres VLAN",b.x+25,b.y+66,"site-caption",g);
+ txt("Enrutador FRR · Conmutador L2 · 3 VLAN",b.x+25,b.y+66,"site-caption",g);
  const router=nodes.find(n=>n.id==="R-"+site);
  const state=router?.status||"unknown";
  const badgeX=b.x+b.w-155, badgeY=b.y+24;
@@ -491,16 +491,18 @@ function render(data){
  $("c-hosts").textContent=(c.hosts??"—")+" / "+(c.vlans??"—");
  $("c-wan").textContent=c.wan??"—";
  $("expansions").textContent=c.extensions?
-  c.extensions+" equipos adicionales verificados; consulta su ficha inferior en el diagrama.":
-  "Sin equipos HA/SDN adicionales verificados. Las siguientes fases ampliarán el inventario y la visualización.";
+  "Activos adicionales integrados al inventario: "+c.extensions+".":
+  "Activos adicionales integrados al inventario: 0.";
  const t=data.telemetry||{},reliable=t.available===true,state=t.topology||"unknown";
  $("status").className="status "+(reliable?(state==="active"?"active":state==="offline"?"offline":"partial"):"");
  $("status").textContent=reliable?"Topología "+topologyText(state):"Topología SIN DATOS · fuente no disponible";
  $("updated").textContent=formatVMClock(data);
  const warnings=data.source_warnings||[];
  $("warnings").textContent=warnings.length?
-  "Fuentes: "+warnings.join(" · ")+" · «Sin datos» no implica avería.":
-  "Fuente S04 actualizada. Una interfaz habilitada no confirma la ruta elegida ni el tráfico.";
+  "Supervisión parcial · "+warnings.join(" · ")+".":
+  (reliable?"Supervisión operativa · Telemetría de equipos e interfaces actualizada · "+
+   (data.routing?.available===true?"Rutas de encaminamiento verificadas por FIB.":"Rutas de encaminamiento pendientes de validación de la fuente."):
+   "Supervisión no disponible · No se dispone de una muestra confiable.");
  svg.replaceChildren();
  const bg=el("g"),wan=el("g"),local=el("g");
  ["HQ","S1","S2"].forEach(site=>drawSiteBox(site,data.nodes,bg));
