@@ -1,6 +1,80 @@
 {
   "schema_version": 1,
-  "description": "Extensiones del diagrama S05: inventario adicional solo despues de despliegue y pruebas; no confundir diseño con equipos existentes.",
-  "nodes": [],
-  "links": []
+  "description": "Tres nodos HTTP HA REALMENTE instalados y validados en lotes 87-90 (11/11/2026); estado dinámico medido desde S2, nunca derivado del inventario.",
+  "nodes": [
+    {
+      "id": "BACKEND_HQ",
+      "site": "HQ",
+      "type": "server",
+      "label": "HTTP principal HQ",
+      "detail": "10.70.20.21:8088 · VLAN 120 · HTTP backend A",
+      "realized": true,
+      "evidence": "Lotes 87-90: HTTP 200, failover y retorno; S05_37/S05_38"
+    },
+    {
+      "id": "FRONTAL_HQ",
+      "site": "HQ",
+      "type": "server",
+      "label": "Frontal HA HQ",
+      "detail": "10.70.20.23:8080 · VLAN 120 · backend elegido por HTTP",
+      "realized": true,
+      "evidence": "Lote 90: selección HQ→S1→HQ; fuente HTTP S2"
+    },
+    {
+      "id": "BACKEND_S1",
+      "site": "S1",
+      "type": "server",
+      "label": "HTTP respaldo S1",
+      "detail": "10.71.20.21:8088 · VLAN 220 · backend B",
+      "realized": true,
+      "evidence": "Lotes 87-90: HTTP 200 y 15 muestras de respaldo"
+    }
+  ],
+  "links": [
+    {
+      "id": "S05-HA-ACCESO-HQ",
+      "from": "SW-HQ",
+      "to": "BACKEND_HQ",
+      "type": "access",
+      "role": "VLAN 120",
+      "detail": "Puerto ha-hq21; estado L2 no medido en gráfico",
+      "realized": true
+    },
+    {
+      "id": "S05-HA-ACCESO-S1",
+      "from": "SW-S1",
+      "to": "BACKEND_S1",
+      "type": "access",
+      "role": "VLAN 220",
+      "detail": "Puerto ha-s121; estado L2 no medido en gráfico",
+      "realized": true
+    },
+    {
+      "id": "S05-HA-ACCESO-FRONTAL",
+      "from": "SW-HQ",
+      "to": "FRONTAL_HQ",
+      "type": "access",
+      "role": "VLAN 120",
+      "detail": "Puerto ha-hq23; estado L2 no medido en gráfico",
+      "realized": true
+    },
+    {
+      "id": "S05-HA-HTTP-PRINCIPAL",
+      "from": "FRONTAL_HQ",
+      "to": "BACKEND_HQ",
+      "type": "redundancy",
+      "role": "HTTP principal",
+      "detail": "Selección HTTP por healthcheck; independiente de ruta FIB",
+      "realized": true
+    },
+    {
+      "id": "S05-HA-HTTP-RESPALDO",
+      "from": "FRONTAL_HQ",
+      "to": "BACKEND_S1",
+      "type": "redundancy",
+      "role": "HTTP respaldo",
+      "detail": "Conmutación de aplicación; NO ruta WAN FIB",
+      "realized": true
+    }
+  ]
 }
