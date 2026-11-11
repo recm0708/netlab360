@@ -17,6 +17,7 @@ on:
       - 'tests/test_s05_ha_http.py'
       - 'tests/test_s05_ha_monitor.py'
       - 'tests/test_s05_ha_noc_ciclo.py'
+      - 'tests/test_s05_ha_ui.py'
       - 'servicios/ha-s05/**'
       - 'scripts/operacion/s05-observador-privilegiado.py'
       - 'servicios/systemd/**'
@@ -42,6 +43,7 @@ on:
       - 'tests/test_s05_ha_http.py'
       - 'tests/test_s05_ha_monitor.py'
       - 'tests/test_s05_ha_noc_ciclo.py'
+      - 'tests/test_s05_ha_ui.py'
       - 'servicios/ha-s05/**'
       - 'scripts/operacion/s05-observador-privilegiado.py'
       - 'servicios/systemd/**'
@@ -80,6 +82,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_s05_ha_http.py' -v
           python -m unittest discover -s tests -p 'test_s05_ha_monitor.py' -v
           python -m unittest discover -s tests -p 'test_s05_ha_noc_ciclo.py' -v
+          python -m unittest discover -s tests -p 'test_s05_ha_ui.py' -v
           python -m unittest discover -s tests -p 'test_s04_exporter_multisede.py' -v
           python -m py_compile scripts/validacion/s05-observar-conmutacion-noc.py scripts/laboratorio/s02-failover-wan.py scripts/validacion/s05-ha-precheck.py scripts/laboratorio/s05-ha-red-servicios.py scripts/operacion/s05-observador-privilegiado.py servicios/observabilidad/s04_exporter_multisede.py servicios/ha-s05/http_ha.py servicios/ha-s05/monitor_http_s2.py scripts/validacion/s05-ha-http-precheck.py scripts/laboratorio/s05-ha-http-failover.py scripts/validacion/s05-ha-noc-ciclo.py
       - name: Comprobar sintaxis JavaScript del visor
