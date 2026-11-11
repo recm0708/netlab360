@@ -22,6 +22,12 @@ El **lote 44, ejecutado en la VM**, terminó con `S05_S02_PREPARACION=OK`, `S02_
 
 El exporter S04 se levantó temporalmente en puerto 9110, y **S04→V6 respondió `source_ok=True`, `topology=offline` en ambas API**; captura `S05_13` recibida. La geometría V6 tiene aprobación visual y 18/18 tests. La siguiente acción es iniciar **solamente los tres routers FRR de S02 en `network_mode:none`**, validar el baseline sin WAN y ejecutar después el `precheck` WAN (sin `up`). Las operaciones `s02-wan-links.py up` y `s02-lan-vlan.py up` **requieren instantánea VMware confirmada** por sus opciones `--snapshot-confirmado`; no ejecutarlas sin dicha salvaguarda. No tocar `ens33`, el gateway ni recursos ajenos. Mantener registradas capturas nuevas con nombres `S05_14+` y manifiestos SHA-256.
 
+## Actualización: Lotes 45–47 FRR levantados, WAN pendientes de snapshot
+
+En la sesión del 10/11/2026 el operador validó los tres archivos runtime FRR (lote 45), inició los **tres routers Docker S02** con `network_mode:none` sin WAN (lote 46), verificó desde Windows acceso SSH por clave y ejecutó el precheck de los cuatro enlaces (lote 47). Estados: `LOTE45_FRR_PREPARADO=OK`, `LOTE46_ROUTERS_AISLADOS=OK`, `S02_WAN_PRECHECK=OK`, `LOTE47_WAN_PRECHECK_COMPLETADO=OK`; capturas `S05_14` y `S05_15` recibidas y aprobadas visualmente. **OSPF aún sin vecinos, esperado**. Exporter S04 y NOC V6 indican `active` por procesos; esto **no demuestra** rutas ni conectividad. Git limpio y `ens33 192.168.47.40/24` intacta. [Bitácora exacta](sesiones/2026-11-10-s05-reactivacion-routers-y-precheck-wan.md).
+
+**Siguiente barrera:** comprobar/salvar baseline y crear **snapshot VMware temporal real** con confirmación externa antes de `s02-wan-links.py up --snapshot-confirmado`. El argumento no realiza la snapshot. Conectar WAN solo después de confirmar; verificar FULL 4/2/2, FIB/rutas y acceso de gestión; posteriormente LAN/hosts, falla/restauración, observabilidad avanzada y consolidación SHA-256. No revertir ni borrar servicios si hay un fallo parcial.
+
 ## Reanudar S05 sin repetir S01–S04
 
 1. Encender la **misma VM** `netlab360-lab` solo cuando se retome el trabajo; no clonar ni restaurar snapshots sin necesidad.
