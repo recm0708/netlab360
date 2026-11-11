@@ -193,6 +193,17 @@ class GeometryTests(unittest.TestCase):
         self.assertIn('txt(item.label,x,y+18', self.html)
 
 
+    def test_fib_route_color_semantics_and_inspector(self):
+        self.assertIn(".wan-line.primary.route-selected", self.html)
+        self.assertIn(".wan-line.backup.route-selected", self.html)
+        self.assertIn(".wan-line.route-standby", self.html)
+        self.assertIn("function routeText(value)", self.html)
+        self.assertIn("item.route_selection", self.html)
+        self.assertIn('["Selección FIB R-HQ"', self.html)
+        self.assertIn('["Próximo salto FIB"', self.html)
+        self.assertIn("w.route_selection", self.html)
+        self.assertIn("Ruta elegida no significa tráfico medido", self.html)
+
     def test_wiring_never_enters_host_or_switch(self):
         self.assertIn('const yJunction=b.sy+40;', self.html)
         for site, g in self.geo.items():
