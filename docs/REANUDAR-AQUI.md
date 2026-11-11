@@ -1,5 +1,14 @@
 # NETLAB360 — Punto de reanudación
 
+## Actualización real S05 — 11/11/2026 · Red HA validada 84–86; HTTP en preparación
+
+- [x] **Lote 84 red HA:** `main` sincronizado en `ff252b9`, **51/51 tests S05**, `S05_HA_RED_PRECHECK=OK_SIN_CAMBIOS`, captura S05_34 delimitada.
+- [x] **Lote 85:** red HA implementada y verificada: BACKEND_HQ `nl360-s05-ha-hq` `10.70.20.21/24` VLAN120, BACKEND_S1 `nl360-s05-ha-s1` `10.71.20.21/24` VLAN220, FRONTAL_HQ `nl360-s05-ha-fe` `10.70.20.23/24` VLAN120; tres puertos `veth` S05, `S05_HA_RED_UP=OK`, `S05_HA_RED_STATUS=OK`, S2 llega a los tres, `S05_S02_CONSERVADO=SI`. Captura S05_35 delimitada.
+- [x] **Lote 86 ahora sí completado:** el bloque previo se había quedado en Bash `>` por faltar `)`; operador completó el cierre y ejecutó el postcheck real, `S05_HA_PING_10.70.20.21=OK`, `10.71.20.21=OK`, `10.70.20.23=OK`, `S05_HA_OWNER=OK`, `S05_HA_ESTADO=active`, `S05_HA_NAMESPACES=3`, `S05_HA_FIB_S1=s1p`, `S05_HA_FIB_S2=s2p`, NOC/Exporter active, `ens33=192.168.47.40/24` GW `.2`, Git limpio, `LOTE86_POSTCHECK=OK`, manifiesto **6/6 archivos SHA256 OK**, `LOTE86_HA=OK`. El operador **confirmó captura S05_36 tomada**. No repetir `up`, ni borrar/recrear namespaces.
+- [x] **Código HTTP HA nuevo en GitHub, NO instalado en VM:** `servicios/ha-s05/http_ha.py` (backend HQ preferido, backend S1 respaldo, frontal HQ con healthcheck y selección de identidad); tres units systemd con `NetworkNamespacePath=/run/netns/nl360-s05-ha-*` y usuario no privilegiado; precheck read-only `scripts/validacion/s05-ha-http-precheck.py`; ensayo de conmutación controlada con restauración en `finally` `scripts/laboratorio/s05-ha-http-failover.py`; tests `tests/test_s05_ha_http.py`. Puertos **solo en netns**: backends TCP 8088, frontal TCP 8080. **Sin exposición en ens33**. systemd units **NO deben habilitarse al boot** hasta definir recreación de namespaces S02/S05 tras reinicio.
+- [ ] **Próximo paso operativo:** Git pull, regresión Python S05 y `--check` del HTTP; precheck de tres direcciones/puertos y fuentes FIB, verificar units no instaladas. Luego instalar unidades y `systemctl start` (NO `enable`) de backend HQ, backend S1 y frontal; probar desde S2 retorno `active_backend=BACKEND_HQ` por `http://10.70.20.23:8080/api/v1/service` antes de simular fallas. Después failover controlado y recuperación.
+- [ ] **Aún pendiente:** demostrar fallback HTTP real, actualizar NOC solo con nodos verificados, LACP multisede #31, OVS/Faucet #23, pruebas integradas y entrega de evidencias. Mantener milestone S05 abierta. Snapshot VMware manual `NETLAB360_S05_PreLAN_20261110` intacto.
+
 ## S05 · Lotes 84–85 ejecutados; lote 86 pendiente por error de sintaxis (11/11/2026)
 
 - [x] **Lote 84 red HA:** Git sincronizado en commit `ff252b9`, **51 pruebas S05 OK**, plan de 3 nodos HA, `S05_HA_RED_PRECHECK=OK_SIN_CAMBIOS`, NOC/FIB S1 `s1p` y S2 `s2p`; `LOTE84_HA=OK`. Evidencia delimitada `INICIO_CAPTURA_S05_34` → `FIN_CAPTURA_S05_34` mostrada en log.
