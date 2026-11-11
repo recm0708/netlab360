@@ -22,6 +22,14 @@ El grafo conserva `status=admin-up/admin-down/offline/unknown` (ambos extremos d
 
 **Pendiente mayor de la issue #64:** test dinámico de ruta en respaldo durante falla, eventual uso de contadores reales (si se incorpora animación) y evidencias completas. Mantener abierto hasta que estén verificadas.
 
+## V7.1 — Diferenciar visualmente la selección del usuario (11/11/2026)
+
+**Origen de la revisión:** la imagen preliminar del inspector HQ–S1 mostraba FIB correcta (`10.78.0.2 dev s1p`) pero el circuito elegido por el usuario era casi indistinguible de los demás circuitos verdes. Esa captura **no se aprueba como S05_29 definitiva** hasta observar el contraste corregido.
+
+**Cambio exclusivamente visual de `index.html`:** la selección del operador utiliza un **halo violeta de 17 px alrededor del trayecto y de los extremos WAN**, contorno violeta del recuadro pulsado y borde del inspector; el color interno del enlace mantiene el significado de la FIB. Los equipos seleccionados también emplean borde violeta. Un texto explícito explica que la selección **no cambia estado ni rutas**. La leyenda nueva diferencia: **verde** principal seleccionada, **azul discontinuo** respaldo seleccionado, **gris discontinuo** respaldo `standby`, **rojo** admin DOWN comprobado, **gris neutro** offline/unknown y **violeta** elemento seleccionado por clic. `ADMIN UP` no acredita flujo de paquetes. **No** se introducen alarmas o pérdida de rendimiento sin fuente confiable.
+
+**Aceptación pendiente en la VM:** `git pull --ff-only`, 25 tests S05 OK (24 de V7 + 1 de selección V7.1), extracción JS + `node --check`; reiniciar únicamente el visor 9130 tras `sudo -v` en su propia terminal y forzar recarga Chrome con `Ctrl+Mayús+R`. Mantener exporter 9110 y tunel SSH. Seleccionar en vista normal `PRINCIPAL · 10.78.0.0/30` HQ–S1: el trayecto verde debe adquirir **halo violeta** y el inspector mostrar `Selección FIB R-HQ`, `Próximo salto FIB=10.78.0.2` y `Origen ruta=Linux FIB R-HQ` con contorno violeta. **Solo entonces guardar** `S05_29_Inspector_FIB_Ruta_Principal` con ruta y panel completos. La imagen de mapa completo `S05_28` sigue aprobada, sin repetir.
+
 ## Inventario representado
 
 Deriva de `inventario/ipam/topologia-s02.yaml`, estado `candidate`. Dibuja **HQ, S1 y S2**, 3 routers FRR, 3 switches de prueba, 9 VLAN, 9 hosts de namespaces aislados y 4 WAN (primaria y respaldo de HQ a cada sucursal). Los equipos que aparecen en diseño no se declaran operativos sin evidencia real. Un host VLAN servicios **no es automáticamente un servidor dedicado**. No hay equipos HA/OVS/Faucet adicionales confirmados todavía.
