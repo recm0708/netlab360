@@ -131,6 +131,14 @@ header{padding-top:15px;padding-bottom:15px}
 .wan-line.unknown,.wan-line.offline{stroke:#8095ac}
 .wan-circuit.selected .wan-line,.wan-circuit:focus-visible .wan-line{stroke:#65d2e9;stroke-width:5}
 .wan-label.selected .wan-pill,.wan-label:focus-visible .wan-pill{stroke:#65d2e9;stroke-width:3}
+
+/* Rutas FIB observadas en R-HQ; nunca confundir con tráfico medido. */
+.wan-line.primary.route-selected{stroke:#4ed5a4;stroke-width:5}
+.wan-line.backup.route-selected{stroke:#62bafa;stroke-width:5;stroke-dasharray:9 9}
+.wan-line.route-standby{stroke:#8ba7bf}
+.wan-line.route-unavailable{stroke:#f57880}
+.wan-label.route-selected .wan-pill{stroke:#66cfb2;stroke-width:3}
+.wan-label.route-selected.backup .wan-pill{stroke:#62bafa}
 </style></head>
 <body>
 <header>
@@ -177,7 +185,7 @@ header{padding-top:15px;padding-bottom:15px}
 <div><span class="swatch" style="background:#899cb3"></span>Sin datos / offline</div>
 <div>━━ Principal</div><div>┄┄ Respaldo</div>
 </div>
-<p class="small">ADMIN UP no acredita OSPF Full, ruta seleccionada, conectividad HTTP ni tráfico. Los respaldos NO se pintan como activos sin verificación de rutas.</p>
+<p class="small">FIB R-HQ observada: verde = principal seleccionada, azul = respaldo seleccionado, gris = standby. Se conserva UNKNOWN cuando falta lectura fiable. **Ruta elegida no significa tráfico medido ni OSPF FULL.** ADMIN UP por sí solo no certifica funcionamiento extremo a extremo.</p>
 </div>
 <div class="panel">
 <h2>Expansiones futuras</h2>
@@ -213,6 +221,14 @@ function formatVMClock(data){
  });
  return "Hora de la VM · "+format.format(stamp)+" · Panamá (UTC−5)";
 }
+function routeText(value){
+ return ({
+  selected:"Ruta FIB elegida en R-HQ (sin tráfico acreditado)",
+  standby:"Ruta disponible sin seleccionar (standby)",
+  unavailable:"Interfaz administrativamente DOWN (sin ruta seleccionada)",
+  unknown:"Ruta FIB no verificada"
+ })[value]||"Ruta FIB no verificada";
+}
 function statusText(value){
  return displayStates[value]||String(value||"No observado");
 }
@@ -245,7 +261,8 @@ function attach(group,item){
  group.setAttribute("tabindex","0");
  group.setAttribute("role","button");
  group.setAttribute("data-resource-id",item.id);
- group.setAttribute("aria-label",(item.label||item.id)+": "+item.status);
+ group.setAttribute("aria-label",(item.label||item.id)+": "+item.status+
+   (item.type==="wan"?" · "+routeText(item.route_selection):""));
  group.addEventListener("click",()=>pick(item.id));
  group.addEventListener("keydown",e=>{
    if(e.key==="Enter"||e.key===" "){e.preventDefault();pick(item.id);}
@@ -261,7 +278,9 @@ function pick(id){
  const attrs=[["Identificador",item.id],["Sede",item.site||"Entre sedes"],
  ["Tipo",item.type],["Estado observado",statusText(item.status)],["Función",item.role==="primary"?"Principal":item.role==="backup"?"Respaldo":item.role],
  ["VLAN",item.vlan],["Gateway",item.gateway],["Fuente",item.origin],
- ["Extremo A",item.a],["Extremo B",item.b]];
+ ["Extremo A",item.a],["Extremo B",item.b],
+ ["Selección FIB R-HQ",item.type==="wan"?routeText(item.route_selection):undefined],
+ ["Próximo salto FIB",item.route_gateway],["Origen ruta",item.route_source]];
  const dl=$("info-fields");dl.replaceChildren();
  for(const [key,value] of attrs){
    if(value===undefined||value===null)continue;
@@ -329,7 +348,7 @@ function wanPath(w){
 function wanBadge(w,parent){
  const g=wanGeometry[w.id];
  if(!g)return;
- const badge=el("g",{class:"wan-label "+w.status},parent);
+ const badge=el("g",{class:"wan-label "+w.status+" "+w.role+" route-"+(w.route_selection||"unknown")},parent);
  el("rect",{x:g.lx-130,y:g.ly-17,width:260,height:34,rx:11,class:"wan-pill"},badge);
  const subnet=(w.detail||"").split(" · ")[0];
  txt((w.role==="primary"?"PRINCIPAL":"RESPALDO")+
@@ -341,7 +360,7 @@ function drawWan(w,parent){
  const g=wanGeometry[w.id];
  if(!g)return;
  const layer=el("g",{class:"wan-circuit"},parent),path=wanPath(w);
- el("path",{d:path,class:"wan-line "+w.role+" "+w.status},layer);
+ el("path",{d:path,class:"wan-line "+w.role+" "+w.status+" route-"+(w.route_selection||"unknown")},layer);
  el("path",{d:path,class:"wan-click"},layer);
  el("circle",{cx:g.sx,cy:g.sy,r:4.5,class:"wan-port"},layer);
  el("circle",{cx:g.dx,cy:g.dy,r:4.5,class:"wan-port"},layer);
