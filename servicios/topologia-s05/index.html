@@ -503,7 +503,7 @@ function drawExtensions(data){
  const extra=Object.fromEntries(sites.map(site=>[site,
    data.nodes.filter(n=>n.site===site&&!basic.has(n.id))]));
  const rows=Math.max(0,...sites.map(site=>extra[site].length));
- const height=rows?1140+(rows-1)*106:BASE_HEIGHT;
+ const height=rows?1140+(rows-1)*140:BASE_HEIGHT;
  svg.setAttribute("viewBox","0 0 "+WIDTH+" "+height);
  svg.style.aspectRatio=WIDTH+" / "+height;
  if(!rows)return;
@@ -513,7 +513,7 @@ function drawExtensions(data){
  const columns={HQ:270,S1:720,S2:1170};
  const positions={};
  sites.forEach(site=>extra[site].forEach((item,i)=>{
-  positions[item.id]={x:columns[site],y:1040+i*106};
+  positions[item.id]={x:columns[site],y:1040+i*140};
  }));
  data.links.filter(link=>link.type==="redundancy").forEach(link=>{
   const a=positions[link.from],b=positions[link.to];
@@ -522,19 +522,20 @@ function drawExtensions(data){
   const state=link.status==="offline"?"offline":
    link.application_selection==="selected"?"selected":
    link.application_selection==="standby"?"standby":"unknown";
-  // Principal HQ por carril izquierdo evitando etiquetas e IP.
-  // Respaldo S1 por diagonal: elección HTTP, no FIB ni WAN.
+  // Principal HQ en carril lateral libre de las IP. Respaldo S1 en diagonal.
+  // La selección HTTP es independiente de la FIB y los enlaces WAN.
   const path=same?
-   ("M "+(a.x-84)+" "+a.y+" H "+(a.x-124)+
+   ("M "+(a.x-84)+" "+a.y+" H "+(a.x-172)+
     " V "+b.y+" H "+(b.x-84)):
    ("M "+(a.x+84)+" "+(a.y-9)+" L "+(b.x-84)+" "+(b.y+9));
   const line=el("path",{d:path,class:"ha-application-link "+state},g);
   attach(line,link);
   if(same){
-   // Etiqueta en dos líneas, dentro del panel y sin superponer el carril.
-   txt("PRINCIPAL",a.x-175,(a.y+b.y)/2-2,
+   // Rótulo entre la descripción superior y la tarjeta inferior, no sobre IP.
+   const middleY=(a.y+b.y)/2;
+   txt("PRINCIPAL",a.x-80,middleY+10,
     "ha-application-label",g);
-   txt("HTTP",a.x-175,(a.y+b.y)/2+16,
+   txt("HTTP",a.x-80,middleY+28,
     "ha-application-label",g);
   }else{
    txt("RESPALDO HTTP",(a.x+b.x)/2,(a.y+b.y)/2-16,
@@ -546,7 +547,7 @@ function drawExtensions(data){
    const column=el("g",{opacity:faded?".3":"1"},g);
    txt("SEDE "+site,columns[site],994,"site-caption",column).setAttribute("text-anchor","middle");
    extra[site].forEach((item,i)=>{
-      const y=1040+i*106;
+      const y=1040+i*140;
       drawDevice(item,columns[site],y,column);
       txt((item.detail||"").slice(0,45),columns[site],y+52,"device-detail",column);
    });
