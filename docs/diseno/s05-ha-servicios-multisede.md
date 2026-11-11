@@ -37,6 +37,16 @@ Los gateways S02 existentes son `10.70.20.1`, `10.71.20.1` y `10.72.20.1`. El ba
 - No tocar `ens33`, VMnet8, default gateway, Docker `network_mode:none` de FRR, bases S04, puertos NOC `9130` y exporter `9110`, ni el snapshot manual `NETLAB360_S05_PreLAN_20261110`.
 - **No desplegar por el mero resultado de precheck**: primero validar addresses, puertos, rutas OSPF de VLAN de servicios y plan de rollback; luego implementar por lotes con capturas precisas.
 
+## Módulo de red HA versionado (sin ejecutar en la VM)
+
+**Implementación lista para validación operativa:** [`scripts/laboratorio/s05-ha-red-servicios.py`](../../scripts/laboratorio/s05-ha-red-servicios.py) ofrece acciones `plan`, `precheck`, `up --confirm-isolated`, `status` y `down --confirm-isolated`. La CI [run 42974399828](https://github.com/recm0708/netlab360/actions/runs/42974399828) aprobó tests de contrato de recursos y sintaxis; **CI offline no certifica despliegue real**.
+
+Al ejecutarse `up`, el módulo comprueba el precheck S05 HA, ownership S02, Git limpio, dirección `ens33` y puertos sin ocupar. Reserva estado local en `~/netlab360-bootstrap/s05/ha/state.json` con owner `NETLAB360_S05_HA_RED_V1`; crea **tres namespaces exclusivos S05** y puertos `ha-hq21`, `ha-s121`, `ha-hq23` en switches S02, cada uno con VLAN de acceso 120/220 y ruta por defecto **dentro de su propio namespace**. Comprueba gateway local y conectividad desde S2 a cada IP. No crea ni modifica router FRR, `ens33`, rutas host, puertos `tr-sw/trunk0` ni servicios HTTP. Solo pasa a `status=active` después de validar; ante fallo intenta revertir únicamente interfaces y namespaces nuevos.
+
+La retirada `down` exige reconocer el estado HA y **rechaza borrar namespaces con procesos vivos**. Una vez implementados servidores HTTP, habrá que detener solo sus procesos antes de cualquier `down`. En caso de error de limpieza, conservar estado y revisar antes de reintentar; no usar `ip netns del` manualmente.
+
+**Condición de avance:** la CI resultó exitosa y los lotes 81–83 de VM registraron 40/40 tests S05, precheck `OK_DISENO_PENDIENTE`, comunicación S2→HQ/S1 (2/2 ICMP por destino). Falta ejecutar lote 84 plan/precheck del nuevo módulo, luego lote 85 `up` y lote 86 `status`. **No se ha desplegado red HA todavía.** Las direcciones IP son candidatas hasta que `up` confirme su asignación y el registro de IPAM sea actualizado.
+
 ## Validación siguiente
 
 Ejecutar `python3 scripts/validacion/s05-ha-precheck.py --check` con `sudo -v` previo en T3. El script tiene únicamente inspecciones y NO crea namespaces ni redes. Si emite `S05_HA_PRECHECK=OK_DISENO_PENDIENTE`, pasar al diseño del despliegue y pruebas; cualquier fallo obliga a revisar antes de introducir un nuevo recurso.
