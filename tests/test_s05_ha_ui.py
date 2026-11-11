@@ -59,7 +59,9 @@ console.log("S05_HA_FORMATO_HORA_PANAMA=OK");
         self.assertIn('const middleY=(a.y+b.y)/2;', self.html)
         self.assertIn('txt("PRINCIPAL",a.x-80,middleY+10', self.html)
         self.assertIn('txt("HTTP",a.x-80,middleY+28', self.html)
-        self.assertIn('RESPALDO HTTP', self.html)
+        self.assertIn('const backupLabelX=(a.x+b.x)/2;', self.html)
+        self.assertIn('const backupLabelY=Math.min(a.y,b.y)-34;', self.html)
+        self.assertIn('txt("RESPALDO HTTP",backupLabelX,backupLabelY,', self.html)
         self.assertIn('class:"ha-application-link "+state', self.html)
         self.assertIn(".ha-application-link.selected", self.html)
         self.assertIn(".ha-application-link.standby", self.html)
@@ -83,6 +85,22 @@ console.log("S05_HA_FORMATO_HORA_PANAMA=OK");
         lower_card_top = lower_y - 26
         self.assertGreater(label_top, detail_y + 8)
         self.assertLess(label_bottom, lower_card_top - 8)
+
+    def test_backup_http_label_above_diagonal_without_node_overlap(self):
+        # SVG: etiqueta de respaldo sobre la diagonal, entre HQ y S1.
+        # Fórmula dependiente de ambos nodos: se reutiliza al ampliar sedes.
+        x_hq, x_s1 = 270, 720
+        y_hq = y_s1 = 1040
+        label_x = (x_hq + x_s1) / 2
+        label_baseline_y = min(y_hq, y_s1) - 34
+        server_top = min(y_hq, y_s1) - 26
+        self.assertEqual(label_x, 495)
+        self.assertLess(label_baseline_y, server_top - 6)
+        self.assertGreater(label_baseline_y - 14, 966 + 16)
+        self.assertNotIn(
+            'txt("RESPALDO HTTP",(a.x+b.x)/2,(a.y+b.y)/2-16',
+            self.html,
+        )
 
     def test_ui_keeps_application_selection_separate_from_wan(self):
         self.assertIn('appText(item.application_selection)', self.html)

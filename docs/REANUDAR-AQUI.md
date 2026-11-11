@@ -1,6 +1,19 @@
 # NETLAB360 — Punto de reanudación
 
-## Corte operativo 11/11/2026 · Lotes 91–94 completados; retoque NOC y captura 39 pendientes
+## Corte actual · 11/11/2026 · Lotes 98–100 OK; LACP P1 completado; P1B siguiente
+
+**Confirmado por salidas y capturas del operador:**
+- [x] **Lote 98:** Git sincronizado a `226b25b`; **81/81 pruebas S05 OK**; NOC reiniciado, BACKEND_HQ/S1/FRONTAL_HQ RUNNING, principal HQ, respaldo S1; `LOTE98_NOC=OK`. Gestión `ens33=192.168.47.40/24`, GW `.2`.
+- [x] **Lote 99:** piloto LACP 802.3ad aislado `nl360-s05-la/lb` con **2 puertos activos** y ping OK. Un flujo TCP `120.05 Mbps` (0 retransmisiones, A1 predominante); ocho flujos `959.36 Mbps` (9 retransmisiones, A1/A2 activos). En falla/retorno, agregación **2→1→2**, `959.61 Mbps` promedio, **745 retransmisiones TCP**: NO afirmar cero pérdidas ni capacidad máxima. Limpieza `S05_RESULTADO_P1=0`, namespaces temporales retirados, servicios HTTP/NOC activos, `LOTE99_LACP_PILOTO=OK`.
+- [x] **Lote 100:** etiqueta `RESPALDO HTTP` movida sobre el enlace diagonal en `servicios/topologia-s05/index.html`, **5/5 pruebas UI OK**, NOC reiniciado y `LOTE100_UI_RESPALDO_HTTP=OK`. Las capturas aportadas `S05_39A_NOC_HA_Vista_General_Hora_Panama` y `S05_39B_NOC_HA_Diagrama_HTTP_Principal_Respaldo` fueron **aprobadas como evidencia S05_39**; sin solapamientos visibles.
+- [x] **Rótulo respaldado en GitHub:** corregido en código y prueba geométrica adicional; requiere sincronizar con la VM respetando el cambio local `M servicios/topologia-s05/index.html` para no perder trabajo. No reiniciar redes ni servicios HA; el NOC ya está sirviendo la corrección local.
+- [ ] **Inmediato:** en la VM, validar que el archivo local sea idéntico al archivo corregido en `origin/main`; solo entonces retirar el cambio local redundante y hacer `git pull --ff-only`. No ejecutar `git reset --hard` ni `git restore` sin comprobación y respaldo del archivo.
+- [ ] **LACP pendiente:** extraer evidencias P1 del registro `~/netlab360-bootstrap/s05/evidencias/lacp-p1/S05_P1_20261111-100600.log`; luego ejecutar `s05-lacp-capacidad-comparativa.sh --precheck` y `--run` con afinidad CPU y limpieza propia, verificar rendimiento y evitar confundir capacidad LACP con la suma automática para una sesión individual.
+- [ ] **Posterior:** definir integración LACP con switches multisede sin bucles L2, después OVS/Faucet. Mantener milestone S05 abierta; informe académico después del trabajo práctico. Evitar otro failover HTTP y conservar snapshots manuales.
+
+---
+
+## Registro histórico · 11/11/2026 · Lotes 91–94 y preparación de la captura 39
 
 **Validación real aportada por el operador:**
 - [x] **91**: `main` a `58aebe4`, **76/76 pruebas S05 OK**, contrato monitor `SOLO_LECTURA`, cinco servicios activos, destino unit monitor libre; `LOTE91_NOC_HA=OK`.
