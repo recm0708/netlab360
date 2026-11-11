@@ -60,11 +60,11 @@ dl{margin:12px 0 0;font-size:.88rem}dt{color:var(--muted);font-size:.72rem;margi
 .device-title{fill:#fff;font-size:16px;font-weight:750;text-anchor:middle}
 .device-small{fill:#c6d9ec;font-size:13px;text-anchor:middle}
 .device-detail{fill:#9db4cf;font-size:12px;text-anchor:middle}
-.device:focus-visible circle,.device:focus-visible rect{stroke:#f6c56b;stroke-width:4}
-.device.selected circle,.device.selected rect{stroke:#f6c56b;stroke-width:4}
+.device:focus-visible circle,.device:focus-visible rect{stroke-width:4}
+.device.selected circle,.device.selected rect{stroke-width:4}
 .wan-click{stroke:transparent;stroke-width:22;fill:none;cursor:pointer}
 .wan-label{cursor:pointer}
-.wan-label:focus-visible .wan-pill,.wan-label.selected .wan-pill{stroke:#f6c56b;stroke-width:3}
+.wan-label:focus-visible .wan-pill{stroke-width:3}
 .underlay{fill:#112337;stroke:#284661;stroke-width:1}
 .presentation-note{fill:#96b3cd;font-size:12px;text-anchor:middle}
 footer{color:var(--muted);font-size:.82rem;line-height:1.65;margin:20px 0}
@@ -106,7 +106,7 @@ header{padding-top:15px;padding-bottom:15px}
 .site-state-text{fill:#d8e7f6;font-weight:750;font-size:12px;text-anchor:middle}
 .site-heading{font-size:21px}
 .wan-pill{fill:#18334b;stroke:#557b96;stroke-width:2.2}
-.wan-label:hover .wan-pill,.device:hover circle,.device:hover rect{stroke:#e8c374;stroke-width:3.4}
+.wan-label:hover .wan-pill,.device:hover circle,.device:hover rect{stroke-width:3.4}
 .wan-line.unknown,.wan-line.offline{stroke:#7f92aa}
 .presentation-note{font-size:12px}
 .warn{background:#14283c;border-color:#335674;color:#c4d8eb}
@@ -114,9 +114,9 @@ header{padding-top:15px;padding-bottom:15px}
 @media(max-width:1120px){.clockchip{white-space:normal}}
 @media(max-width:660px){.clockchip{width:100%;text-align:center}}
 .wan-label .wan-pill{fill:#132a42;stroke:#607f9b;stroke-width:2.2}
-.wan-circuit.selected .wan-line{stroke:#f6c971;stroke-width:5.5}
-.wan-circuit:focus-visible .wan-line{stroke:#f6c971;stroke-width:5.5}
-.wan-label:hover .wan-pill,.wan-label:focus-visible .wan-pill{stroke:#f7c971}
+.wan-circuit.selected .wan-line{stroke-width:5.5}
+.wan-circuit:focus-visible .wan-line{stroke-width:5.5}
+.wan-label:hover .wan-pill,.wan-label:focus-visible .wan-pill{stroke-width:3}
 .wan-line.unknown,.wan-line.offline{stroke:#879cb4}
 .wan-label{cursor:pointer}
 
@@ -129,8 +129,8 @@ header{padding-top:15px;padding-bottom:15px}
 .wan-pill{fill:#102941;stroke:#718ca8;stroke-width:2}
 .wan-pill-title{fill:#e9f4ff;font-size:14px;font-weight:700}
 .wan-line.unknown,.wan-line.offline{stroke:#8095ac}
-.wan-circuit.selected .wan-line,.wan-circuit:focus-visible .wan-line{stroke:#65d2e9;stroke-width:5}
-.wan-label.selected .wan-pill,.wan-label:focus-visible .wan-pill{stroke:#65d2e9;stroke-width:3}
+.wan-circuit:focus-visible .wan-line{stroke-width:5}
+.wan-label:focus-visible .wan-pill{stroke-width:3}
 
 /* Rutas FIB observadas en R-HQ; nunca confundir con tráfico medido. */
 .wan-line.primary.route-selected{stroke:#4ed5a4;stroke-width:5}
@@ -233,13 +233,24 @@ header{padding-top:15px;padding-bottom:15px}
 const NS="http://www.w3.org/2000/svg", svg=document.querySelector("#network");
 const $=id=>document.getElementById(id);
 const displayStates={
- "running":"Router en ejecución",
- "offline":"Detenido",
+ "running":"En ejecución",
+ "offline":"Fuera de línea",
  "unknown":"Sin datos verificables",
- "namespace-present":"Namespace registrado",
- "admin-up":"Interfaz administrativa UP",
- "admin-down":"Interfaz administrativa DOWN"
+ "namespace-present":"Espacio de nombres registrado",
+ "admin-up":"Interfaz administrativamente habilitada",
+ "admin-down":"Interfaz administrativamente deshabilitada"
 };
+const topologyLabels={
+ "active":"ACTIVA",
+ "offline":"FUERA DE LÍNEA",
+ "degraded":"DEGRADADA",
+ "partial":"PARCIAL",
+ "unknown":"SIN DATOS"
+};
+function topologyText(value){return topologyLabels[value]||"SIN DATOS";}
+function typeText(value){
+ return ({wan:"Enlace WAN",router:"Enrutador",switch:"Conmutador",host:"Equipo final"})[value]||String(value||"No especificado");
+}
 function formatVMClock(data){
  // No usa new Date() sin argumento: la hora viene del backend en la VM.
  const value=(data.vm_clock||{}).panama||data.observed_at_utc;
@@ -256,8 +267,8 @@ function formatVMClock(data){
 function routeText(value){
  return ({
   selected:"Ruta FIB elegida en R-HQ (sin tráfico acreditado)",
-  standby:"Ruta disponible sin seleccionar (standby)",
-  unavailable:"Interfaz administrativamente DOWN (sin ruta seleccionada)",
+  standby:"Ruta disponible sin seleccionar (en espera)",
+  unavailable:"Interfaz administrativamente deshabilitada (sin ruta seleccionada)",
   unknown:"Ruta FIB no verificada"
  })[value]||"Ruta FIB no verificada";
 }
@@ -293,38 +304,51 @@ function attach(group,item){
  group.setAttribute("tabindex","0");
  group.setAttribute("role","button");
  group.setAttribute("data-resource-id",item.id);
- group.setAttribute("aria-label",(item.label||item.id)+": "+item.status+
+ group.setAttribute("aria-label",(item.label||item.id)+": "+statusText(item.status)+
    (item.type==="wan"?" · "+routeText(item.route_selection):""));
+ group.setAttribute("aria-pressed","false");
  group.addEventListener("click",()=>pick(item.id));
  group.addEventListener("keydown",e=>{
    if(e.key==="Enter"||e.key===" "){e.preventDefault();pick(item.id);}
  });
 }
-function pick(id){
- selectedId=id;
- if(!latest)return;
- const item=[...latest.nodes,...latest.links].find(x=>x.id===id);
- if(!item)return;
- $("info-title").textContent=item.type==="wan"?("WAN "+(item.role==="primary"?"principal":"respaldo")+" · HQ ↔ "+item.to.replace("R-","")):(item.label||item.id);
- $("info-desc").textContent=(item.detail||"No hay detalle de origen")+" · "+statusText(item.status);
- $("selection-note").hidden=false;
- const inspector=$("info-title").closest(".panel");
- if(inspector)inspector.classList.add("inspector-selected");
+// Separa la interacción de la actualización periódica: un refresco no hace clic.
+function clearInspector(){
+ $("info-title").textContent="Selecciona un equipo";
+ $("info-desc").textContent="Pulsa sobre un enrutador, conmutador, equipo final o enlace para examinar su función, dirección IP, VLAN y origen de los datos.";
+ $("info-fields").replaceChildren();
+}
+function renderSelection(){
+ const item=selectedId&&latest?
+  [...latest.nodes,...latest.links].find(x=>x.id===selectedId):null;
+ if(selectedId&&!item)selectedId=null;
+ document.querySelectorAll("[data-resource-id]").forEach(n=>{
+  const active=Boolean(item)&&n.getAttribute("data-resource-id")===selectedId;
+  n.classList.toggle("selected",active);
+  n.setAttribute("aria-pressed",String(active));
+ });
+ if(!item){clearInspector();return;}
+ $("info-title").textContent=item.type==="wan"?
+  ("WAN "+(item.role==="primary"?"principal":"respaldo")+" · HQ ↔ "+item.to.replace("R-","")):(item.label||item.id);
+ $("info-desc").textContent=(item.detail||"Sin información adicional del origen")+" · "+statusText(item.status);
  const attrs=[["Identificador",item.id],["Sede",item.site||"Entre sedes"],
- ["Tipo",item.type],["Estado observado",statusText(item.status)],["Función",item.role==="primary"?"Principal":item.role==="backup"?"Respaldo":item.role],
- ["VLAN",item.vlan],["Gateway",item.gateway],["Fuente",item.origin],
- ["Extremo A",item.a],["Extremo B",item.b],
- ["Selección FIB R-HQ",item.type==="wan"?routeText(item.route_selection):undefined],
- ["Próximo salto FIB",item.route_gateway],["Origen ruta",item.route_source]];
+  ["Tipo",typeText(item.type)],["Estado observado",statusText(item.status)],
+  ["Función",item.role==="primary"?"Principal":item.role==="backup"?"Respaldo":item.role],
+  ["VLAN",item.vlan],["Puerta de enlace",item.gateway],["Fuente",item.origin],
+  ["Extremo A",item.a],["Extremo B",item.b],
+  ["Selección FIB R-HQ",item.type==="wan"?routeText(item.route_selection):undefined],
+  ["Próximo salto FIB",item.route_gateway],["Origen ruta",item.route_source]];
  const dl=$("info-fields");dl.replaceChildren();
  for(const [key,value] of attrs){
-   if(value===undefined||value===null)continue;
-   const dt=document.createElement("dt"),dd=document.createElement("dd");
-   dt.textContent=key;dd.textContent=String(value);dl.append(dt,dd);
+  if(value===undefined||value===null)continue;
+  const dt=document.createElement("dt"),dd=document.createElement("dd");
+  dt.textContent=key;dd.textContent=String(value);dl.append(dt,dd);
  }
- document.querySelectorAll("[data-resource-id]").forEach(n=>{
-   n.classList.toggle("selected",n.getAttribute("data-resource-id")===id);
- });
+}
+function pick(id){
+ // Pulsar el mismo equipo dos veces cancela la selección.
+ selectedId=selectedId===id?null:id;
+ renderSelection();
 }
 function drawDevice(item,x,y,parent=svg){
  const g=el("g",{class:"device "+item.type+" "+item.status},parent);
@@ -466,13 +490,13 @@ function render(data){
   c.extensions+" equipos adicionales verificados; consulta su ficha inferior en el diagrama.":
   "Sin equipos HA/SDN adicionales verificados. Las siguientes fases ampliarán el inventario y la visualización.";
  const t=data.telemetry||{},reliable=t.available===true,state=t.topology||"unknown";
- $("status").className="status "+(reliable&&state==="active"?"active":reliable?"partial":"");
- $("status").textContent=reliable?"Topología "+state.toUpperCase():"Estado UNKNOWN · sin exporter fiable";
+ $("status").className="status "+(reliable?(state==="active"?"active":state==="offline"?"offline":"partial"):"");
+ $("status").textContent=reliable?"Topología "+topologyText(state):"Topología SIN DATOS · fuente no disponible";
  $("updated").textContent=formatVMClock(data);
  const warnings=data.source_warnings||[];
  $("warnings").textContent=warnings.length?
-  "Fuentes: "+warnings.join(" · ")+" · UNKNOWN no implica avería.":
-  "Fuente S04 actualizada. ADMIN UP solo acredita estado administrativo, no ruta elegida ni tráfico.";
+  "Fuentes: "+warnings.join(" · ")+" · «Sin datos» no implica avería.":
+  "Fuente S04 actualizada. Una interfaz habilitada no confirma la ruta elegida ni el tráfico.";
  svg.replaceChildren();
  const bg=el("g"),wan=el("g"),local=el("g");
  ["HQ","S1","S2"].forEach(site=>drawSiteBox(site,data.nodes,bg));
@@ -482,7 +506,7 @@ function render(data){
  txt("INVENTARIO DEL LABORATORIO · LOS ESTADOS NO VERIFICADOS NO SE DAN POR ACTIVOS",
   720,915,"presentation-note");
  drawExtensions(data);
- if(selectedId)pick(selectedId);
+ renderSelection();
 }
 async function update(){
  try{
@@ -490,7 +514,7 @@ async function update(){
   if(!response.ok)throw Error("HTTP "+response.status);
   render(await response.json());
  }catch(error){
-  $("status").textContent="UNKNOWN · API sin respuesta";
+  $("status").textContent="SIN DATOS · API sin respuesta";
   $("status").className="status";
   $("warnings").textContent="No se puede obtener el estado del NOC: "+error.message;
   $("updated").textContent="Hora de la VM: conexión no disponible";
