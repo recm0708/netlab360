@@ -123,6 +123,20 @@ Verificar el código V6 con `python3 -m unittest discover -s tests -p 'test_s05_
 - **Seguridad operacional:** iniciar S04 exporter en modo `--serve` **solo lectura** cuando se quiera demostrar `offline` observado, con autorización sudo temporal en la misma sesión SSH para `sudo -n docker inspect`. No levantar routers/FRR ni tocar `ens33`.
 - **Archivo académico:** [informe de auditoría de 14 PNG](../../docs/sesiones/2026-11-10-s05-auditoria-capturas-y-fuente-s04.md). Los archivos binarios PNG todavía no se han subido al repositorio; incorporar en lote con SHA-256 antes de cerrar issue.
 
+## Primer estado observado en vivo — S04 HTTP → V6 (10/11/2026)
+
+La primera integración en vivo del exporter S04 fue ejecutada por el operador y comprobada por **dos consultas de API**, no por simulación en frontend:
+
+- En una terminal separada se levantó temporalmente el exporter S04 con `--serve --port 9110 --interval 2`, `S04_MODO=SOLO_LECTURA` y credenciales sudo de la sesión.
+- El endpoint `http://127.0.0.1:9110/api/v1/state` devolvió `source_ok=true`, `topology=offline`.
+- El visor en `http://127.0.0.1:9130/api/v1/graph` consumió la observación y devolvió `telemetry.available=true`, `telemetry.topology=offline` y los tres routers R-HQ/R-S1/R-S2 `offline`.
+- El usuario adjuntó `S05_13_Topologia_Offline_Observado`, **captura 15** recibida, válida para acreditar visualmente el cambio de estado a `Topología OFFLINE` y aviso `Fuente S04 actualizada`.
+- `S05_S04_INTEGRACION_OFFLINE=OK` quedó guardado localmente en `~/netlab360-bootstrap/s05/evidencias/observabilidad/02_Integracion_Exporter_S04_V6.txt`.
+
+**Alcance:** evidencia correcta de la transición `UNKNOWN→OFFLINE` por fuente disponible con routers ausentes. No acredita una falla inducida, red desplegada, conectividad OSPF/FIB o tráfico real por enlaces. La fuente depende del proceso y permisos temporales de observación. Mantener `UNKNOWN` cuando falte muestra fresca.
+
+El [informe de auditoría y su anexo](../../docs/sesiones/2026-11-10-s05-auditoria-capturas-y-fuente-s04.md) incluye la transcripción esencial y la revisión de 15 PNG. **Pendiente** copia de originales con hashes al repositorio, precheck operativo S02 y validación de router/enlaces activos.
+
 ## Actualización por fases
 
 El inventario S02 fija el núcleo. En `inventario/topologia-extensiones-s05.json` pueden añadirse **solo equipos que se hayan desplegado y verificado**; exige `schema_version=1` y listas `nodes` y `links`. Un elemento nuevo requiere ID único, sede, tipo, evidencia y `realized=true` para registrarse en el modelo; el estado se marca UNKNOWN hasta que se instrumente telemetría específica.
