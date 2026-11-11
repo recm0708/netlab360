@@ -1,5 +1,15 @@
 # NETLAB360 — Punto de reanudación
 
+## Incidente recuperable de supervisión — diagnóstico 84R-D (11/11/2026)
+
+- [x] **Auditoría de solo lectura ejecutada:** NOC 9130 PID `449431` ligado a terminal antigua `pts/2`, exporter 9110 PID `546643` en `pts/4`. Ambos escuchan en 127.0.0.1. FRR `nl360-s02-r-hq`, `-r-s1`, `-r-s2` **Up 12 hours**; S04 `source_ok=True`, `topology=active`, `errors=[]`.
+- [x] **Causa precisa de pantalla sin FIB:** NOC en PID antiguo devuelve `routing.available=False`, `routes={}`, aviso `FIB: Docker no consultable sin privilegios interactivos`. Su fuente S04 sí funciona. El código del NOC invoca `sudo -n docker inspect` y `sudo -n nsenter`; la autorización `sudo -v` del proceso antiguo ya no está disponible.
+- [x] **Confusión de nombre tmux identificada:** sesión `nl360-noc` creada 07:15, **attached**, panel ejecuta `python3 s04_exporter_multisede.py`, no NOC. Necesita renombrarse a `nl360-exporter` SIN detener el proceso.
+- [x] **Infraestructura preservada:** `ens33 UP 192.168.47.40/24`, gateway `192.168.47.2`, Git limpio. No inferir que FRR o los 12 namespaces cayeron; no volver a desplegar S02.
+- [ ] **Recuperación pendiente:** desprender sesión tmux exporter sin Ctrl+C; renombrar a `nl360-exporter`; finalizar únicamente viejo proceso NOC PID 449431 tras verificar CMD; levantar NOC dentro de tmux `nl360-noc` con autorización sudo renovada dentro de la sesión. Comprobar ambas APIs/FIB. Después fusionar túnel y SSH de control en UNA PowerShell, sin duplicar listener.
+- [ ] **Limitación de largo plazo:** sudo timestamp de cada TTY puede expirar. No conceder membresía en grupo Docker ni `NOPASSWD` genérico para Docker/nsenter; diseñar un observador privilegiado mínimo y acotado con lectura estructurada si se requiere FIB indefinidamente, manteniendo APIs no privilegiadas solo en localhost.
+- [ ] **Lotes 84–86 del despliegue HA NO ejecutados.** El código GitHub puede estar listo, pero no se ha creado red HA. Mantener snapshot VMware manual sin tocar.
+
 ## Corte de recuperación 11/11/2026 — todas las SSH cortadas, Lote 84 NO iniciado
 
 **Confirmación explícita del operador:** las seis terminales SSH/PowerShell de la VM `netlab360-lab` se desconectaron con `client_loop: send disconnect: Connection reset` por inactividad/posible suspensión de VMware. El visor NOC en 9130 y exporter S04 en 9110 se lanzaban en primer plano dentro de terminales SSH, de modo que **sus procesos pueden haberse detenido**. **No hay prueba aún del estado actual** de esos puertos ni de las tres FRR; no atribuir el corte a daño de la infraestructura. **No se ejecutaron lotes 84, 85 ni 86**, no existe despliegue HA nuevo confirmado, no reclamar capturas S05_34–36.
