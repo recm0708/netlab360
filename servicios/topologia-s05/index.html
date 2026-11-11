@@ -166,6 +166,19 @@ header{padding-top:15px;padding-bottom:15px}
 .site-state-badge.offline{fill:#392936;stroke:#ff7783}
 .wan-line.offline{stroke:#ff7783}
 .device.offline.selected circle,.device.offline.selected rect{stroke:#ff7783;filter:drop-shadow(0 0 5px rgba(183,255,105,.82))}
+.device.server rect{fill:#1d3851;stroke:#8fb6df}
+.device.server.running rect{stroke:#51d8a8;stroke-width:3.1}
+.device.server.offline rect{stroke:#ff7783;fill:#392936}
+.ha-overview{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:12px 17px;margin-bottom:14px;background:#13283e;border:1px solid #335570;border-radius:12px;font-size:.84rem}
+.ha-overview strong{color:#e8f5ff}.ha-overview .ha-source{color:#9eb8cf;font-size:.74rem}
+.ha-active{color:#51d8a8}.ha-standby{color:#8ebfe8}.ha-unknown{color:#f7c971}
+.ha-application-link{fill:none;stroke-width:3.5;stroke-linecap:round}
+.ha-application-link.selected{stroke:#51d8a8}
+.ha-application-link.standby{stroke:#62bafa;stroke-dasharray:7 8}
+.ha-application-link.offline{stroke:#f97680;stroke-dasharray:5 7}
+.ha-application-link.unknown{stroke:#879bb0;stroke-dasharray:4 7}
+.ha-application-label{fill:#bcd4eb;font-size:12px;text-anchor:middle}
+body.presentation .ha-overview{margin:6px 0;padding:8px 14px}
 </style></head>
 <body>
 <header>
@@ -192,6 +205,12 @@ header{padding-top:15px;padding-bottom:15px}
 <div class="clockchip" id="updated" title="Hora proveniente del reloj del sistema de la VM, zona America/Panama">Consultando reloj de la VM…</div>
 </div>
 <div class="warn" id="warnings">Supervisión de infraestructura · Estado operativo sujeto a fuentes verificables</div>
+<section class="ha-overview" aria-label="Alta disponibilidad HTTP multisede">
+<strong>Aplicación HTTP · HQ / S1</strong>
+<span id="ha-active" class="ha-unknown" aria-live="polite">Estado del frontal: SIN DATOS</span>
+<span id="ha-backends" class="ha-source">Servicios verificados desde S2: sin muestra</span>
+<span id="ha-source" class="ha-source">Healthcheck HTTP de aplicación, independiente de la FIB</span>
+</section>
 <div class="layout">
 <section class="canvas" aria-label="Diagrama de red multisede">
 <div class="canvas-head"><strong>Mapa corporativo · Sede central y sucursales</strong><span>Infraestructura multisede · Estado observado de equipos y enlaces</span></div>
@@ -242,7 +261,9 @@ const displayStates={
  "unknown":"Sin datos verificables",
  "namespace-present":"Espacio de nombres registrado",
  "admin-up":"Interfaz administrativamente habilitada",
- "admin-down":"Interfaz administrativamente deshabilitada"
+ "admin-down":"Interfaz administrativamente deshabilitada",
+ "standby":"En espera",
+ "selected":"Seleccionado por aplicación"
 };
 const topologyLabels={
  "active":"ACTIVA",
@@ -253,7 +274,7 @@ const topologyLabels={
 };
 function topologyText(value){return topologyLabels[value]||"SIN DATOS";}
 function typeText(value){
- return ({wan:"Enlace WAN",router:"Enrutador",switch:"Conmutador",host:"Equipo final"})[value]||String(value||"No especificado");
+ return ({wan:"Enlace WAN",router:"Enrutador",switch:"Conmutador",host:"Equipo final",server:"Servidor HTTP",redundancy:"Ruta de aplicación",access:"Acceso VLAN"})[value]||String(value||"No especificado");
 }
 function formatVMClock(data){
  // No usa new Date() sin argumento: la hora viene del backend en la VM.
@@ -278,6 +299,11 @@ function routeText(value){
 }
 function statusText(value){
  return displayStates[value]||String(value||"No observado");
+}
+function appText(value){
+ return ({selected:"Backend elegido por healthcheck HTTP",
+  standby:"Backend disponible en espera",
+  unknown:"Selección HTTP sin datos verificables"})[value]||"Sin datos";
 }
 // Reservamos bandas exclusivas para encabezados, WAN y equipos. Ninguna posición
 // de dispositivos puede cruzar la banda de texto de su sede.
@@ -338,7 +364,10 @@ function renderSelection(){
  const attrs=[["Identificador",item.id],["Sede",item.site||"Entre sedes"],
   ["Tipo",typeText(item.type)],["Estado observado",statusText(item.status)],
   ["Función",item.role==="primary"?"Principal":item.role==="backup"?"Respaldo":item.role],
-  ["VLAN",item.vlan],["Puerta de enlace",item.gateway],["Fuente",item.origin],
+  ["VLAN",item.vlan],["Puerta de enlace",item.gateway],["IP observada",item.ip],
+  ["Fuente",item.origin],["Observado desde",item.observed_from],
+  ["Selección HTTP",item.application_selection?
+    appText(item.application_selection):undefined],
   ["Extremo A",item.a],["Extremo B",item.b],
   ["Selección FIB R-HQ",item.type==="wan"?routeText(item.route_selection):undefined],
   ["Próximo salto FIB",item.route_gateway],["Origen ruta",item.route_source]];
@@ -493,6 +522,17 @@ function render(data){
  $("expansions").textContent=c.extensions?
   "Activos adicionales integrados al inventario: "+c.extensions+".":
   "Activos adicionales integrados al inventario: 0.";
+ const ha=data.ha_service||{},known=ha.available===true,active=known?ha.active_backend:null;
+ const label=active==="BACKEND_HQ"?"HQ · PRINCIPAL":
+   active==="BACKEND_S1"?"S1 · RESPALDO":
+   known&&ha.status==="offline"?"FUERA DE LÍNEA":"SIN DATOS";
+ $("ha-active").textContent="Backend HTTP seleccionado: "+label;
+ $("ha-active").className=active==="BACKEND_HQ"?"ha-active":
+   active==="BACKEND_S1"?"ha-standby":"ha-unknown";
+ const httpNodes=data.nodes.filter(n=>["BACKEND_HQ","BACKEND_S1","FRONTAL_HQ"].includes(n.id));
+ $("ha-backends").textContent=httpNodes.map(n=>n.label+": "+statusText(n.status)).join(" · ");
+ $("ha-source").textContent=known?"Observado desde S2 · "+(ha.observed_at_utc||"sin hora"):
+   "Sin muestra HTTP reciente desde S2; no se presume disponibilidad";
  const t=data.telemetry||{},reliable=t.available===true,state=t.topology||"unknown";
  $("status").className="status "+(reliable?(state==="active"?"active":state==="offline"?"offline":"partial"):"");
  $("status").textContent=reliable?"Topología "+topologyText(state):"Topología SIN DATOS · fuente no disponible";
