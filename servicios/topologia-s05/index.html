@@ -501,7 +501,7 @@ function render(data){
  $("warnings").textContent=warnings.length?
   "Supervisión parcial · "+warnings.join(" · ")+".":
   (reliable?"Supervisión operativa · Telemetría de equipos e interfaces actualizada · "+
-   (data.routing?.available===true?"Rutas de encaminamiento verificadas por FIB.":"Rutas de encaminamiento pendientes de validación de la fuente."):
+   (data.routing?.available===true?"Rutas de encaminamiento verificadas por FIB.":"Rutas de encaminamiento: sin datos verificables."):
    "Supervisión no disponible · No se dispone de una muestra confiable.");
  svg.replaceChildren();
  const bg=el("g"),wan=el("g"),local=el("g");
