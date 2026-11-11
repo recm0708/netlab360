@@ -1,0 +1,32 @@
+[Unit]
+Description=NETLAB360 S05 observador HTTP desde cliente VLAN320 S2 (solo lectura)
+After=network-online.target
+ConditionPathExists=/run/netns/nl360-s02-h-s2-320
+
+[Service]
+Type=simple
+User=rc-aa-ec
+Group=rc-aa-ec
+WorkingDirectory=/home/rc-aa-ec/proyectos/netlab360
+Environment=HOME=/home/rc-aa-ec
+Environment=PYTHONUNBUFFERED=1
+NetworkNamespacePath=/run/netns/nl360-s02-h-s2-320
+ExecStart=/usr/bin/python3 /home/rc-aa-ec/proyectos/netlab360/servicios/ha-s05/monitor_http_s2.py --serve --interval 1
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=8
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/rc-aa-ec/netlab360-bootstrap/s05/ha
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target
