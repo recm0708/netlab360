@@ -11,6 +11,11 @@ spec = importlib.util.spec_from_file_location("s05_ha_http", CODE)
 m = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(m)
 
+FAILOVER = ROOT / "scripts/laboratorio/s05-ha-http-failover.py"
+fspec = importlib.util.spec_from_file_location("s05_ha_http_failover", FAILOVER)
+fm = importlib.util.module_from_spec(fspec)
+fspec.loader.exec_module(fm)
+
 
 class HAHTTPTests(unittest.TestCase):
     def test_fixed_roles_and_addresses(self):
@@ -100,6 +105,56 @@ class HAHTTPTests(unittest.TestCase):
             self.assertIn("Restart=on-failure", config)
             self.assertNotIn("ExecStart=/usr/bin/sudo", config)
             self.assertNotIn("User=root", config)
+
+
+class HAHTTPFailoverTests(unittest.TestCase):
+    def test_failure_script_only_touches_backend_hq_service(self):
+        source = FAILOVER.read_text(encoding="utf-8")
+        self.assertIn('ROOT = "netlab360-s05-ha-backend-hq.service"', source)
+        self.assertIn('sudo("systemctl", "stop", ROOT)', source)
+        self.assertIn('sudo("systemctl", "start", ROOT)', source)
+        self.assertIn("finally:", source)
+        for danger in ('"docker", "stop"', '"ip", "link", "set"',
+                       '"route", "replace"', '"shutdown"', "shell=True"):
+            self.assertNotIn(danger, source)
+
+    def test_restarts_backend_even_if_fallback_not_observed(self):
+        calls = []
+        def sudo(*args):
+            calls.append(args)
+            return ""
+        with patch.object(fm, "check"), \
+             patch.object(fm, "fib_check"), \
+             patch.object(fm, "sudo", side_effect=sudo), \
+             patch.object(fm, "cmd", return_value="inactive"), \
+             patch.object(fm, "wait", side_effect=[
+                 RuntimeError("respaldo no responde"),
+                 {"active_backend": "BACKEND_HQ"}
+             ]):
+            with self.assertRaisesRegex(RuntimeError, "respaldo no responde"):
+                fm.experiment(5)
+        self.assertIn(("systemctl", "stop", fm.ROOT), calls)
+        self.assertIn(("systemctl", "start", fm.ROOT), calls)
+
+    def test_successful_cycle_uses_same_endpoint_and_restores(self):
+        calls = []
+        def sudo(*args):
+            calls.append(args)
+            return ""
+        with patch.object(fm, "check"), \
+             patch.object(fm, "fib_check"), \
+             patch.object(fm, "sudo", side_effect=sudo), \
+             patch.object(fm, "cmd", return_value="inactive"), \
+             patch.object(fm, "wait", side_effect=[
+                 {"active_backend": "BACKEND_S1"},
+                 {"active_backend": "BACKEND_HQ"}
+             ]), \
+             patch.object(fm.time, "monotonic", side_effect=[0.0, 6.0]):
+            fm.experiment(5)
+        self.assertEqual(calls, [
+            ("systemctl", "stop", fm.ROOT),
+            ("systemctl", "start", fm.ROOT)
+        ])
 
 
 if __name__ == "__main__":
