@@ -1,5 +1,15 @@
 # NETLAB360 — Punto de reanudación
 
+## Corte actual · 14/11/2026 · Recuperación VM y precheck de integración LACP
+
+- [x] **Lote 105:** tras suspensión VMware, Ubuntu 26.04.1 con kernel 7.0.0-43, uptime preservado, `ens33=192.168.47.40/24`, gateway `.2` (métrica observada 100), Git limpio a `cdf0bee`. Seis servicios systemd `active`, tres Docker FRR `running/network_mode:none`, NOC HTTP HA `BACKEND_HQ` principal, telemetría 1,57 s, FIB S1 `s1p`/S2 `s2p`, `LOTE105_RECUPERACION=OK`. Ubuntu muestra aviso de reinicio por actualizaciones; **NO reiniciar durante laboratorio**, perdería namespaces temporales.
+- [x] **Lote 106:** `s02-lan-vlan.py status` = `S02_LAN_ESTADO=OK`; `s05-ha-red-servicios.py status` = `S05_HA_RED_STATUS=OK`; tres switches bridge/VLAN válidos, 15 namespaces, HA intacta y todas las rutas OSPF principales. `LOTE106_INVENTARIO=OK`.
+- [x] **Diseño candidato** [LACP multisede](disenos/s05-lacp-integracion-multisede-candidata.md): bond 802.3ad exclusivamente local a cada switch S02, en VLAN servicios HQ120/S1-220/S2-320 y nuevos namespaces S05, **sin** combinar las WAN enrutadas. Candidatos `10.70.20.40`, `10.71.20.40` y `10.72.20.40`: aún **NO asignados ni suficientemente liberados**.
+- [x] **Herramienta nueva en GitHub** `scripts/validacion/s05-lacp-integracion-precheck.py` con `plan`/`precheck` (sin `up/down`) y prueba de regresión `tests/test_s05_lacp_integracion_precheck.py`; PR #98 CI OK. **No desplegada ni ejecutada todavía en VM**.
+- [ ] **Inmediato:** sincronizar `main` en VM, ejecutar plan/test y el precheck real, validar ausencia de conflicto de IP y recursos, revisar salida antes de proponer `up`. Reservar captura `S05_45` hasta validación. No cambiar `br0`, `tr-sw`, WAN ni puertos HA. Mantener S05 abierta y no repetir ensayos LACP P1/P1B ya completados.
+
+---
+
 ## Corte vigente · 11/11/2026 · Lote 102R y capturas 41–44; evitar repetir P1B
 
 - [x] **Lote 101:** `main` sincronizado al commit `03439d5` después de comprobar identidad binaria del parche local; **82/82 tests S05 OK**, seis servicios operativos, árbol limpio; `LOTE101_GIT=OK`.
