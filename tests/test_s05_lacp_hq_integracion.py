@@ -90,6 +90,25 @@ class TestS05LacpHQ(unittest.TestCase):
                 lab.cleanup(record)
             netcmd.assert_not_called()
 
+    def test_cleanup_allows_only_bridge_mac_drift(self):
+        expected = {"ports": {
+            "br0": {"ifindex": 1, "mac": "06:01", "master": None},
+            "tr-sw": {"ifindex": 2, "mac": "08:02", "master": 1},
+        }, "vlans": {"br0": ["1 PVID Egress Untagged"],
+                     "tr-sw": ["120"]}}
+        bridge_mac_only = {"ports": {
+            "br0": {"ifindex": 1, "mac": "fe:10", "master": None},
+            "tr-sw": {"ifindex": 2, "mac": "08:02", "master": 1},
+        }, "vlans": expected["vlans"]}
+        with mock.patch.object(lab, "protected_snapshot", return_value=bridge_mac_only):
+            lab.assert_protected(expected, before_cleanup=True)
+            with self.assertRaises(RuntimeError):
+                lab.assert_protected(expected)
+        bridge_mac_only["vlans"] = {"br0": ["1"], "tr-sw": ["120"]}
+        with mock.patch.object(lab, "protected_snapshot", return_value=bridge_mac_only):
+            with self.assertRaises(RuntimeError):
+                lab.assert_protected(expected, before_cleanup=True)
+
     def test_protected_port_set_includes_existing_bridge_and_ha(self):
         self.assertEqual(set(lab.PROTECTED), {
             "br0", "tr-sw", "a110", "a120", "a130", "ha-hq21", "ha-hq23"
