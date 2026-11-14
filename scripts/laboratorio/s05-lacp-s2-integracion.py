@@ -103,7 +103,7 @@ def protected_snapshot() -> dict:
             current = values[0]
             rows.setdefault(current, []).append(" ".join(values[1:]))
     if not set(PROTECTED).issubset(rows):
-        raise RuntimeError("Inventario VLAN incompleto en HQ")
+        raise RuntimeError("Inventario VLAN incompleto en S2")
     return {
         "ports": {name: {
             "ifindex": devices[name]["ifindex"],
@@ -279,7 +279,7 @@ def status(data: dict, ping: bool = True) -> None:
     if data.get("status") != "active":
         raise RuntimeError("Estado S05 no está activo")
     if CLIENT not in netns():
-        raise RuntimeError("Cliente LACP S05 HQ no existe")
+        raise RuntimeError("Cliente LACP S05 S2 no existe")
     for ns, names in ((SW, (SW_BOND, *SW_SLAVES)),
                       (CLIENT, (CLIENT_BOND, *CLIENT_SLAVES))):
         for name in names:
@@ -333,9 +333,9 @@ def cleanup(data: dict) -> None:
     if CLIENT in names:
         cmd("ip", "netns", "delete", CLIENT, root=True)
     if any(dev in links(SW) for dev in (SW_BOND, *SW_SLAVES, *CLIENT_SLAVES)):
-        raise RuntimeError("Hay interfaces S05 HQ residuales")
+        raise RuntimeError("Hay interfaces S05 S2 residuales")
     if CLIENT in netns():
-        raise RuntimeError("Namespace cliente S05 HQ residual")
+        raise RuntimeError("Namespace cliente S05 S2 residual")
     assert_protected(data["before"]["switch"])
     if management() != data["before"]["mgmt"]:
         raise RuntimeError("Host perdió baseline de gestión")
