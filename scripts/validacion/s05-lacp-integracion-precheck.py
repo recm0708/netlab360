@@ -67,7 +67,10 @@ def privileged(*argv: str, **kwargs) -> subprocess.CompletedProcess:
     return run("sudo", "-n", *argv, **kwargs)
 
 
-def inventory() -> None:
+def inventory(selected: list[str] | None = None) -> None:
+    selected = selected or list(SITES)
+    if len(set(selected)) != len(selected) or any(site not in SITES for site in selected):
+        raise ValueError("Selección de sedes repetida o desconocida")
     data = yaml.safe_load(IPAM.read_text(encoding="utf-8"))
     if data.get("schema_version") != "0.2" or set(data["sites"]) != set(SITES):
         raise ValueError("Topología S02 distinta de la esperada")
@@ -77,7 +80,8 @@ def inventory() -> None:
             or mgmt["interface"] != "ens33" or mgmt["locked"] is not True):
         raise ValueError("IPAM de gestión inesperado")
     seen = set()
-    for site, row in SITES.items():
+    for site in selected:
+        row = SITES[site]
         vlans = [v for v in data["sites"][site]["vlans"] if v["id"] == row["vlan"]]
         if len(vlans) != 1:
             raise ValueError(f"VLAN de servicios sin identidad única: {site}")
@@ -90,7 +94,11 @@ def inventory() -> None:
             raise ValueError(f"IP repetida: {proposed}")
         seen.add(proposed)
         print(f"S05_LACP_PLAN_{site}=VLAN{row['vlan']} IP_CANDIDATA={proposed} SIN_ASIGNAR")
-    print("S05_LACP_PLAN=3_SEDES_3_BONDS_CANDIDATOS_NO_DESPLEGADOS")
+    if set(selected) == set(SITES):
+        print("S05_LACP_PLAN=3_SEDES_3_BONDS_CANDIDATOS_NO_DESPLEGADOS")
+    else:
+        print("S05_LACP_PLAN_SEDES_SOLICITADAS=" + ",".join(selected))
+        print("S05_LACP_PLAN=ALCANCE_SELECTIVO_SIN_VERIFICAR_OTRAS_SEDES")
 
 
 def parse_vlan_map(source: str) -> dict[str, set[int]]:
@@ -125,8 +133,14 @@ def ip_set(source: str) -> set[str]:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=("plan", "precheck"))
+    parser.add_argument("--sites", nargs="+", choices=tuple(SITES),
+                        default=list(SITES),
+                        help="Solo revisar estas sedes (por ejemplo, --sites S1 S2)")
     args = parser.parse_args()
-    inventory()
+    selected = list(args.sites)
+    if len(set(selected)) != len(selected):
+        parser.error("--sites no admite sedes duplicadas")
+    inventory(selected)
     if args.action == "plan":
         print("S05_LACP_PLAN_SOLO_LECTURA=OK")
         return
@@ -147,8 +161,8 @@ def main() -> None:
     print("S05_LACP_GESTION_PROTEGIDA=SI")
 
     names = {line.split()[0] for line in privileged("ip", "netns", "list").stdout.splitlines() if line.strip()}
-    candidates = {x["ip"] for x in SITES.values()}
-    if any(row["new_ns"] in names for row in SITES.values()):
+    candidates = {SITES[site]["ip"] for site in selected}
+    if any(SITES[site]["new_ns"] in names for site in selected):
         raise RuntimeError("Namespace nuevo ya ocupado; no reutilizar recursos")
     all_ips = ip_set(run("ip", "-j", "-4", "address", "show").stdout)
     for ns in sorted(names):
@@ -171,7 +185,8 @@ def main() -> None:
         raise RuntimeError("IP candidata ya observada en inventario: " + ",".join(sorted(collisions)))
     print(f"S05_LACP_IPS_INVENTARIO_AUDITADO={len(all_ips)}_DIRECCIONES_DISTINTAS")
 
-    for site, row in SITES.items():
+    for site in selected:
+        row = SITES[site]
         sw = row["sw"]
         if sw not in names or row["host"] not in names:
             raise RuntimeError(f"Switch o host de VLAN ausente: {site}")
@@ -217,6 +232,7 @@ def main() -> None:
         raise RuntimeError("NOC API no disponible") from error
     print("S05_LACP_NOC_HTTP_HA=OK")
     print("S05_LACP_ADVERTENCIA=PING_SIN_RESPUESTA_NO_DEMUESTRA_IP_LIBRE_EN_TODA_LA_RED")
+    print("S05_LACP_PRECHECK_SEDES=" + ",".join(selected))
     print("S05_LACP_PRECHECK=OK_SIN_CAMBIOS_DE_CONFIGURACION")
 
 
