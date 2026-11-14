@@ -156,10 +156,14 @@ def main() -> None:
                                    "ip", "-j", "-4", "address", "show").stdout)
     for r in ("nl360-s02-r-hq", "nl360-s02-r-s1", "nl360-s02-r-s2"):
         identity = privileged("docker", "inspect", "--format",
-                              "{{.State.Running}} {{.HostConfig.NetworkMode}}", r).stdout.strip()
-        if identity != "true none":
+                              "{{.State.Running}} {{.HostConfig.NetworkMode}} {{.State.Pid}}",
+                              r).stdout.strip().split()
+        if len(identity) != 3 or identity[:2] != ["true", "none"]:
             raise RuntimeError(f"Router FRR inesperado: {r}={identity}")
-        all_ips |= ip_set(privileged("docker", "exec", r,
+        pid = identity[2]
+        if not pid.isdecimal() or int(pid) <= 1:
+            raise RuntimeError(f"PID del router inválido: {r}")
+        all_ips |= ip_set(privileged("nsenter", "-t", pid, "-n",
                                      "ip", "-j", "-4", "address", "show").stdout)
         print(f"S05_LACP_FRR_{r}=RUNNING_NONE")
     collisions = candidates & all_ips
