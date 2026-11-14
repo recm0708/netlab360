@@ -243,6 +243,38 @@ def bond_ports(ns: str, dev: str, expected: int, attempts: int = 22) -> None:
     raise RuntimeError(f"Agregador {ns}/{dev} no alcanzó {expected}: " + output[-400:])
 
 
+def ping_verified(ns: str, target: str, *,
+                  prefix: str = "S05_LACP_HQ_PING",
+                  attempts: int = 3) -> None:
+    """Comprueba conectividad estabilizada: reintentos acotados, sin falsear OK.
+
+    Timeout del proceso (VM) y error de ICMP son distintos y ambos se
+    registran. Nunca declaramos conectividad si todas las pruebas fallaron.
+    """
+    if attempts < 1 or attempts > 3:
+        raise ValueError("Número de intentos fuera del contrato 1..3")
+    last: Exception | None = None
+    for attempt in range(1, attempts + 1):
+        try:
+            ns_exec(ns, "ping", "-n", "-c", "2", "-W", "2",
+                    target, timeout=15)
+            print(f"{prefix}_{target}=OK",
+                  f"INTENTO={attempt}", flush=True)
+            return
+        except (RuntimeError, subprocess.TimeoutExpired) as exc:
+            last = exc
+            reason = ("TIMEOUT_PROCESO" if isinstance(
+                exc, subprocess.TimeoutExpired) else "ICMP_O_COMANDO_ERROR")
+            print(f"{prefix}_{target}_INTENTO_{attempt}={reason}",
+                  flush=True)
+            if attempt < attempts:
+                time.sleep(1)
+    raise RuntimeError(
+        f"{prefix}_{target}=NO_VALIDADO tras {attempts} intentos; "
+        f"último error: {last}"
+    ) from last
+
+
 def status(data: dict, ping: bool = True) -> None:
     if data.get("status") != "active":
         raise RuntimeError("Estado S05 no está activo")
@@ -266,8 +298,7 @@ def status(data: dict, ping: bool = True) -> None:
     bond_ports(CLIENT, CLIENT_BOND, 2, attempts=12)
     if ping:
         for target in (GW, "10.70.20.23", "10.71.20.21", "10.72.20.20"):
-            ns_exec(CLIENT, "ping", "-n", "-c", "2", "-W", "2", target, timeout=10)
-            print(f"S05_LACP_HQ_PING_{target}=OK")
+            ping_verified(CLIENT, target)
     if management() != data["before"]["mgmt"]:
         raise RuntimeError("Red de gestión cambió respecto del precheck")
     assert_protected(data["before"]["switch"])
