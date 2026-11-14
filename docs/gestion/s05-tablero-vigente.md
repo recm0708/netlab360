@@ -1,5 +1,7 @@
 # NETLAB360 · Tablero vigente de la fase S05
 
+> **Corte 14/11/2026 — lote 114A-R aprobado y 114A-S aún sin ejecutar.** Tras sincronizar `da6e7b5`, las suites `test_s05_lacp_hq_integracion` (10/10), `test_s05_lacp_hq_falla_retorno` (7/7) y `test_s05_lacp_integracion_precheck` (8/8) suman **25/25 aprobadas**. Estado HQ 2/2, ping 4/4 en intento 1, HTTP BACKEND_HQ y FIB/puertos conservados; S1/S2 precheck selectivo OK, IP candidatas aún sin asignar, gestión y Git correctos. Marcador exacto en log `29_Precheck_Failover_HQ_y_S1S2_Corregido.txt`: `========== LOTE114A_R_PRECHECK=OK ==========`. Dos intentos posteriores de 114A-S se detuvieron **antes del paso 573** porque `grep -Fxq` buscaba solo `LOTE114A_R_PRECHECK=OK` sin los signos `==========`. No se bajó ningún enlace, 114B sin ejecutar. **Reanudar directamente con 114A-S corregido**, sin repetir 114A-R; seguir 114B únicamente con dos marcadores correctos. [Runbook actualizado](https://github.com/recm0708/netlab360/blob/main/docs/operacion/s05-lotes-siguientes-lacp-hq-20261114.md).
+
 **Corte de evidencia:** 14 de noviembre de 2026, 15:18, hora de Panamá. **Alcance:** solo resultados observados en VM y salidas aportadas por el operador; los cambios de código y pruebas CI se identifican por separado. **La fase S05 no está cerrada.**
 
 ## Incidencia 114A y próximo gate (14/11)

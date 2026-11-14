@@ -1,5 +1,7 @@
 # NETLAB360 S05 — Próximos cuatro lotes agrupados (14/11/2026)
 
+> **Gate corregido 14/11/2026:** los marcadores impresos con `echo "========== ... =========="` deben buscarse con el **texto exacto completo** usando `grep -Fxq '========== MARCADOR=OK =========='`. El resultado del lote 114A-R ya fue verificado: **25/25 tests OK**, bond SW/cliente 2/2, 4/4 ping por intento 1, HTTP real BACKEND_HQ, precheck S1/S2, gestión y Git intactos. El 114A-S aún no se ejecutó; el gate equivocado terminaba antes de imprimir paso 573. No repetir 114A-R si el archivo `29_Precheck_Failover_HQ_y_S1S2_Corregido.txt` contiene su marcador completo.
+
 **Corte probado:** HQ LACP 802.3ad y VLAN120/HTTP HA operativos; diagnóstico 111D-R/S OK. S1/S2 sin bonds, OVS/Faucet no implementado. **No volver a ejecutar UP de HQ ni reiniciar la VM.**
 
 **Acceso:** una sesión SSH PowerShell con túnel 127.0.0.1:9130 a rc-aa-ec@192.168.47.40. Código en ~/proyectos/netlab360. No usar clear.
@@ -58,7 +60,7 @@ set -Eeuo pipefail
 cd ~/proyectos/netlab360
 DIR="$HOME/netlab360-bootstrap/s05/evidencias/lacp-integracion"
 sudo -v
-grep -Fxq 'LOTE114A_R_PRECHECK=OK' \
+grep -Fxq '========== LOTE114A_R_PRECHECK=OK ==========' \
   "$DIR/29_Precheck_Failover_HQ_y_S1S2_Corregido.txt"
 {
 echo "========== 564 ESTABILIDAD DOS VUELTAS =========="
@@ -97,8 +99,8 @@ cd ~/proyectos/netlab360
 DIR="$HOME/netlab360-bootstrap/s05/evidencias/lacp-integracion"
 sudo -v
 test -f "$DIR/29_Precheck_Failover_HQ_y_S1S2_Corregido.txt"
-grep -Fxq 'LOTE114A_R_PRECHECK=OK' "$DIR/29_Precheck_Failover_HQ_y_S1S2_Corregido.txt"
-grep -Fxq 'LOTE114A_S_ESTABILIDAD=OK' "$DIR/30_Estabilidad_PreFailover_HQ.txt"
+grep -Fxq '========== LOTE114A_R_PRECHECK=OK ==========' "$DIR/29_Precheck_Failover_HQ_y_S1S2_Corregido.txt"
+grep -Fxq '========== LOTE114A_S_ESTABILIDAD=OK ==========' "$DIR/30_Estabilidad_PreFailover_HQ.txt"
 {
 echo "========== 557 FAILOVER HQ 2_1_2 =========="
 python3 scripts/laboratorio/s05-lacp-hq-falla-retorno.py run --confirm-failover
@@ -127,7 +129,7 @@ bash <<'BASH'
 set -Eeuo pipefail
 DIR="$HOME/netlab360-bootstrap/s05/evidencias/lacp-integracion"
 LOG="$DIR/25_Falla_Retorno_HQ_2_1_2.txt"
-grep -Fxq 'LOTE114B_FALLA_RETORNO=OK' "$LOG"
+grep -Fxq '========== LOTE114B_FALLA_RETORNO=OK ==========' "$LOG"
 grep -Fxq 'S05_LACP_HQ_PRUEBA=OK_2_1_2' "$LOG"
 {
 for N in 48 49; do
