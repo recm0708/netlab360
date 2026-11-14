@@ -274,20 +274,20 @@ def cleanup(data: dict) -> None:
         if pids:
             raise RuntimeError(f"Cliente S05 contiene procesos no terminados: {pids}")
     # Validar TODAS las identidades antes de borrar cualquier recurso.
-    for ns, devs in ((SW, (SW_BOND, *SW_SLAVES)),
+    for ns, devs in ((SW, (SW_BOND, *SW_SLAVES, *CLIENT_SLAVES)),
                      (CLIENT, (CLIENT_BOND, *CLIENT_SLAVES))):
         if ns not in names:
             continue
         for dev in devs:
             assert_owned(dev, ns, data)
-    for dev in SW_SLAVES:
+    for dev in (*SW_SLAVES, *CLIENT_SLAVES):
         if dev in links(SW):
             ip_ns(SW, "link", "delete", "dev", dev)
     if SW_BOND in links(SW):
         ip_ns(SW, "link", "delete", "dev", SW_BOND)
     if CLIENT in names:
         cmd("ip", "netns", "delete", CLIENT, root=True)
-    if any(dev in links(SW) for dev in (SW_BOND, *SW_SLAVES)):
+    if any(dev in links(SW) for dev in (SW_BOND, *SW_SLAVES, *CLIENT_SLAVES)):
         raise RuntimeError("Hay interfaces S05 HQ residuales")
     if CLIENT in netns():
         raise RuntimeError("Namespace cliente S05 HQ residual")
@@ -311,17 +311,22 @@ def up() -> None:
     try:
         cmd("ip", "netns", "add", CLIENT, root=True)
         ip_ns(CLIENT, "link", "set", "lo", "up")
-        for ns, bond in ((SW, SW_BOND), (CLIENT, CLIENT_BOND)):
+        for ns, bond, mac in (
+                (SW, SW_BOND, "fe:10:05:70:01:20"),
+                (CLIENT, CLIENT_BOND, "fe:20:05:70:01:20")):
             ip_ns(ns, "link", "add", bond, "type", "bond",
                   "mode", "802.3ad", "miimon", "100", "lacp_rate", "fast")
             set_alias(ns, bond, data)
+            # MAC locales y altas: no competir con MAC autoseleccionada de br0.
+            ip_ns(ns, "link", "set", "dev", bond, "address", mac)
             ip_ns(ns, "link", "set", bond, "type", "bond",
                   "xmit_hash_policy", "layer3+4")
         for sw_dev, client_dev in zip(SW_SLAVES, CLIENT_SLAVES):
             ip_ns(SW, "link", "add", sw_dev, "type", "veth",
                   "peer", "name", client_dev)
-            ip_ns(SW, "link", "set", client_dev, "netns", CLIENT)
             set_alias(SW, sw_dev, data)
+            set_alias(SW, client_dev, data)
+            ip_ns(SW, "link", "set", client_dev, "netns", CLIENT)
             set_alias(CLIENT, client_dev, data)
             ip_ns(SW, "link", "set", sw_dev, "master", SW_BOND)
             ip_ns(CLIENT, "link", "set", client_dev, "master", CLIENT_BOND)
@@ -332,12 +337,12 @@ def up() -> None:
         ns_exec(SW, "bridge", "vlan", "add", "dev", SW_BOND, "vid",
                 str(VID), "pvid", "untagged")
         ip_ns(CLIENT, "address", "add", IP, "dev", CLIENT_BOND)
-        ip_ns(CLIENT, "route", "add", "default", "via", GW, "dev", CLIENT_BOND)
         ip_ns(CLIENT, "link", "set", CLIENT_BOND, "up")
         ip_ns(SW, "link", "set", SW_BOND, "up")
         for sw_dev, client_dev in zip(SW_SLAVES, CLIENT_SLAVES):
             ip_ns(SW, "link", "set", sw_dev, "up")
             ip_ns(CLIENT, "link", "set", client_dev, "up")
+        ip_ns(CLIENT, "route", "add", "default", "via", GW, "dev", CLIENT_BOND)
         # Marcar activo provisionalmente para ejecutar contrato completo de
         # status. Si falla, se hace rollback de estos recursos S05.
         data["status"] = "active"
