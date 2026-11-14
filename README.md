@@ -10,7 +10,7 @@ Desarrollamos NETLAB360 como proyecto semestral de **Tópicos Especiales II** en
 - **Automatización:** Python, Ansible, OpenTofu y GitHub Actions.
 - **Observabilidad:** Prometheus, exportadores propios, NOC web y SQLite.
 
-## Avance verificado — 01/11/2026
+## Avance verificado — 14/11/2026
 
 | Fase | Alcance | Estado |
 |---|---|---|
@@ -18,7 +18,8 @@ Desarrollamos NETLAB360 como proyecto semestral de **Tópicos Especiales II** en
 | S02 | Topología HQ/S1/S2, cuatro WAN y nueve VLAN | **Cerrada** |
 | S03 | SoT candidata, Ansible FRR, 17 metadatos OpenTofu y GitOps | **Cerrada según su alcance real** |
 | S04 | NOC multisede, incidente WAN, persistencia y medición SLI | **Cerrada técnicamente** |
-| S05–S08 | SDN, redundancia avanzada, diagnóstico, integración y entrega | Pendientes |
+| S05 | NOC interactivo, redundancia WAN/HTTP HA, piloto LACP y bond integrado HQ VLAN120 | **En curso: OVS/Faucet y LACP S1/S2 pendientes** |
+| S06–S08 | Diagnóstico IA, integración AIOps y entrega | Pendientes |
 
 No atribuimos al proyecto capacidades aún no implementadas: OpenTofu S03 administra **metadatos locales**, no infraestructura externa. Utilizamos el **99 % como referencia experimental interna** para evaluar el SLI de recolección; la ventana de 60 minutos registró **97,586 %**, por lo que **no cumplió** dicho umbral. No acreditamos notificaciones externas ni un modelo ML entrenado.
 
@@ -26,9 +27,9 @@ La **presentación académica del 30/10/2026 se realizó**. Según la comunicaci
 
 ## Documentación y evidencias
 
-- [Reanudación](docs/REANUDAR-AQUI.md) y [control de fases](docs/control/06-tablero-porcentajes-cierre-fases-2026-10-25.md).
+- **[Tablero S05 vigente](docs/gestion/s05-tablero-vigente.md)**, [reanudación histórica](docs/REANUDAR-AQUI.md), [auditoría de 50 issues](docs/gestion/auditoria-issues-20261114.md) y [control de fases](docs/control/06-tablero-porcentajes-cierre-fases-2026-10-25.md).
 - [Topología multisede](topologias/s02-frr/README.md), [Ansible](ansible/s03/README.md) y [OpenTofu](iac/s03/README.md).
 - [Observabilidad](servicios/observabilidad/README.md), [NOC](servicios/noc-s04/README.md) y [capturas](evidencias/capturas/README.md).
 - [Issues y próximos entregables](https://github.com/recm0708/netlab360/issues).
 
-Conservamos **122 PNG oficiales** (S01=83, S02=9, S03=8 y S04=22) bajo manifiestos de integridad. El informe unificado de corte es el borrador 4.6, con 113 páginas, 20 figuras y 13 tablas. Continuaremos con S05 sin repetir las fases ya comprobadas.
+Conservamos **122 PNG oficiales** (S01=83, S02=9, S03=8 y S04=22) bajo manifiestos de integridad. El informe unificado de corte es el borrador 4.6, con 113 páginas, 20 figuras y 13 tablas. Para S05, la evidencia de terminal no equivale a PNG original importado: auditoría y SHA-256 binarios están pendientes. Continuaremos sin repetir las fases ya comprobadas.

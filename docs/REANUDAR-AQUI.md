@@ -1,5 +1,11 @@
 # NETLAB360 — Punto de reanudación
 
+> **PUNTO DE REANUDACIÓN REAL Y ACTUALIZADO (14/11/2026, 15:18 Panamá):** antes de interpretar las notas históricas de este archivo, abrir **[Tablero S05 vigente](gestion/s05-tablero-vigente.md)** y **[Auditoría de issues](gestion/auditoria-issues-20261114.md)**. Las listas `- [ ]` que aparecen más abajo son historia de sesiones y algunas tareas ya se ejecutaron. **No repetir `up` de LACP HQ ni de HA, ni reiniciar Ubuntu**.
+>
+> **Último dato del operador:** lote 111D-R completó con ping 4/4 desde LACP HQ, 3/3 desde clientes S02, FRR HQ→S1 `s1p`, HQ→S2 `s2p`, S1→HQ `s1p`; gestión y Git conservados. Lote 111D-S: SSH socket/service activos, ~13 GiB RAM disponibles, disco 12%, registros recientes sin error kernel filtrado. **No se ha ejecutado la falla HQ 2→1→2**; script preparado, pruebas CI correctas, precheck anterior afectado por timeout transitorio. S1/S2 todavía sin bonds. Captura 45 tomada; 46/47 salidas válidas, PNG no confirmados como guardados; 48/49 pendientes.
+>
+> **Siguiente orden:** sincronizar `main`, comprobar `s05-lacp-hq-integracion.py status`, `s05-lacp-hq-falla-retorno.py precheck` y 6 tests; solo si todo OK ejecutar `run --confirm-failover` con temporizador de rescate; luego S1/S2, redundancia de instancia, OVS/Faucet, NOC, binarios SHA256, cierre real S05, actualizar informe maestro. **Un solo SSH desde PowerShell con túnel 9130; no usar `clear`.**
+
 ## Corte vigente · 14/11/2026 · LACP HQ integrado (lotes 109 y 110) — Falla controlada siguiente
 
 - [x] **Lote 107:** precheck multisede versionado; 5/5 tests OK, plan tres sedes. **Lote 108:** auditoría 35 direcciones distintas, VLAN 120/220/320 conservadas, candidatos .40 sin asignación en tres sedes al comenzar, servicios NOC/HA activos; `LOTE108_PRECHECK=OK`; operador confirmó captura **S05_45 tomada**.
