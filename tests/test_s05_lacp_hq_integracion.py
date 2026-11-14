@@ -109,6 +109,29 @@ class TestS05LacpHQ(unittest.TestCase):
             with self.assertRaises(RuntimeError):
                 lab.assert_protected(expected, before_cleanup=True)
 
+    def test_ping_verificado_recupera_timeout_y_registra_intento(self):
+        timed_out = subprocess.TimeoutExpired(
+            cmd=["sudo", "ip", "netns", "exec", lab.CLIENT, "ping"], timeout=15
+        )
+        with mock.patch.object(lab, "ns_exec", side_effect=[timed_out, ""]) as cmd, \
+             mock.patch.object(lab.time, "sleep") as sleep, \
+             redirect_stdout(io.StringIO()) as output:
+            lab.ping_verified(lab.CLIENT, "10.72.20.20", attempts=2)
+        self.assertEqual(cmd.call_count, 2)
+        sleep.assert_called_once_with(1)
+        self.assertIn("TIMEOUT_PROCESO", output.getvalue())
+        self.assertIn("S05_LACP_HQ_PING_10.72.20.20=OK", output.getvalue())
+
+    def test_ping_verificado_no_declarar_ok_si_todo_falla(self):
+        timed_out = subprocess.TimeoutExpired(cmd=["ping"], timeout=15)
+        with mock.patch.object(lab, "ns_exec", side_effect=timed_out) as cmd, \
+             mock.patch.object(lab.time, "sleep"), \
+             redirect_stdout(io.StringIO()) as output:
+            with self.assertRaisesRegex(RuntimeError, "NO_VALIDADO"):
+                lab.ping_verified(lab.CLIENT, "10.72.20.20", attempts=3)
+        self.assertEqual(cmd.call_count, 3)
+        self.assertNotIn("=OK", output.getvalue())
+
     def test_protected_port_set_includes_existing_bridge_and_ha(self):
         self.assertEqual(set(lab.PROTECTED), {
             "br0", "tr-sw", "a110", "a120", "a130", "ha-hq21", "ha-hq23"

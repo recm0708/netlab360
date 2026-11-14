@@ -58,11 +58,9 @@ def check_http() -> None:
 
 def availability() -> None:
     for target in (lab.GW, "10.70.20.23", "10.71.20.21", "10.72.20.20"):
-        lab.ns_exec(
-            lab.CLIENT, "ping", "-n", "-c", "2", "-W", "2",
-            target, timeout=9
+        lab.ping_verified(
+            lab.CLIENT, target, prefix="S05_LACP_HQ_FALLBACK_PING"
         )
-        print(f"S05_LACP_HQ_FALLBACK_PING_{target}=OK", flush=True)
     check_http()
 
 

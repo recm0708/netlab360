@@ -91,6 +91,21 @@ class TestS05LACPHQFailover(unittest.TestCase):
     def test_failure_still_restores_member_and_cancels_timer_if_healthy(self):
         self._simulate(fail_during_availability=True)
 
+    def test_availability_usa_ping_verificado_y_http(self):
+        with mock.patch.object(module.lab, "ping_verified") as ping, \
+             mock.patch.object(module, "check_http") as http:
+            module.availability()
+        self.assertEqual(ping.call_count, 4)
+        self.assertEqual(
+            [call.args[1] for call in ping.call_args_list],
+            [module.lab.GW, "10.70.20.23", "10.71.20.21", "10.72.20.20"]
+        )
+        self.assertTrue(all(
+            call.kwargs["prefix"] == "S05_LACP_HQ_FALLBACK_PING"
+            for call in ping.call_args_list
+        ))
+        http.assert_called_once()
+
     def test_identity_checks_ownership(self):
         with mock.patch.object(module.lab, "identity"), \
              mock.patch.object(module.lab, "read_state", return_value={
