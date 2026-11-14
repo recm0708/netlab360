@@ -114,8 +114,13 @@ def protected_snapshot() -> dict:
     }
 
 
-def assert_protected(before: dict) -> None:
+def assert_protected(before: dict, *, before_cleanup: bool = False) -> None:
     current = protected_snapshot()
+    if before_cleanup:
+        # El MAC automático de br0 puede elegirse de un puerto nuevo; permitir
+        # retirar SOLO dispositivos S05 sin relajar IFINDEX/VLAN ni otros MAC.
+        # Tras la limpieza se exige nuevamente el MAC original del bridge.
+        current["ports"]["br0"]["mac"] = before["ports"]["br0"]["mac"]
     if current != before:
         raise RuntimeError("Cambio en puertos protegidos o sus VLAN")
 
@@ -267,7 +272,7 @@ def cleanup(data: dict) -> None:
         raise RuntimeError("Estado de LACP HQ no autoriza limpieza")
     if management() != data["before"]["mgmt"]:
         raise RuntimeError("Gestión cambió: bloquear limpieza")
-    assert_protected(data["before"]["switch"])
+    assert_protected(data["before"]["switch"], before_cleanup=True)
     names = netns()
     if CLIENT in names:
         pids = cmd("ip", "netns", "pids", CLIENT, root=True).split()
