@@ -26,6 +26,15 @@ class TestS05LACPS1Failover(unittest.TestCase):
         self.assertEqual(module.lab.SW_BOND, "s5bond0")
         self.assertTrue(module.MAX_FALLBACK_SECONDS >= 60)
 
+    def test_capturas_tienen_identidad_de_sede(self):
+        src = PATH.read_text(encoding="utf-8")
+        self.assertIn("INICIO_CAPTURA_S05_53_LACP_S1_UN_ENLACE", src)
+        self.assertIn("FIN_CAPTURA_S05_53_LACP_S1_UN_ENLACE", src)
+        self.assertIn("INICIO_CAPTURA_S05_54_LACP_S1_RETORNO", src)
+        self.assertIn("FIN_CAPTURA_S05_54_LACP_S1_RETORNO", src)
+        self.assertNotIn("_LACP_HQ_UN_ENLACE", src)
+        self.assertNotIn("_LACP_HQ_RETORNO", src)
+
     def test_confirmation_required_for_run(self):
         p = subprocess.run(
             [sys.executable, str(PATH), "run"],
