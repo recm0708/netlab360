@@ -27,6 +27,32 @@ class TestS05LACPIntegrationPrecheck(unittest.TestCase):
             module.inventory()
         self.assertIn("S05_LACP_PLAN=3_SEDES", out.getvalue())
 
+    def test_plan_selectivo_s1_s2_no_marca_hq_libre(self):
+        with contextlib.redirect_stdout(io.StringIO()) as out:
+            module.inventory(["S1", "S2"])
+        value = out.getvalue()
+        self.assertNotIn("S05_LACP_PLAN_HQ=", value)
+        self.assertIn("S05_LACP_PLAN_S1=", value)
+        self.assertIn("S05_LACP_PLAN_S2=", value)
+        self.assertIn("S05_LACP_PLAN_SEDES_SOLICITADAS=S1,S2", value)
+        self.assertIn("ALCANCE_SELECTIVO", value)
+
+    def test_rechaza_sedes_duplicadas_y_desconocidas(self):
+        for selected in (["HQ", "HQ"], ["S3"]):
+            with self.assertRaises(ValueError):
+                module.inventory(selected)
+
+    def test_cli_accepts_selected_sites(self):
+        import subprocess
+        import sys
+        process = subprocess.run(
+            [sys.executable, str(PATH), "plan", "--sites", "S1", "S2"],
+            cwd=ROOT, capture_output=True, text=True, timeout=10,
+        )
+        self.assertEqual(process.returncode, 0, process.stderr)
+        self.assertIn("S05_LACP_PLAN_SEDES_SOLICITADAS=S1,S2", process.stdout)
+        self.assertNotIn("S05_LACP_PLAN_HQ=", process.stdout)
+
     def test_bridge_vlan_multiline_parser(self):
         text = (
             "port              vlan-id\n"
