@@ -48,6 +48,46 @@ BASH
 
 Si no aparece LOTE114A_R_PRECHECK=OK, no ejecutar 114B. Los tests de error simulado son intencionales y deben terminar en OK.
 
+## Lote 114A-S — estabilidad antes de ensayar una falla (SOLO CONSULTA)
+
+Ejecutar únicamente después de **LOTE114A_R_PRECHECK=OK**. Dos vueltas independientes de ping a cuatro destinos, con tiempo máximo por ejecución y log. Si cualquiera falla, conservar diagnóstico y **NO ejecutar 114B**.
+
+~~~bash
+bash <<'BASH'
+set -Eeuo pipefail
+cd ~/proyectos/netlab360
+DIR="$HOME/netlab360-bootstrap/s05/evidencias/lacp-integracion"
+sudo -v
+grep -Fxq 'LOTE114A_R_PRECHECK=OK' \
+  "$DIR/29_Precheck_Failover_HQ_y_S1S2_Corregido.txt"
+{
+echo "========== 564 ESTABILIDAD DOS VUELTAS =========="
+for vuelta in 1 2; do
+    for destino in 10.70.20.1 10.70.20.23 10.71.20.21 10.72.20.20; do
+        echo "========== VUELTA $vuelta DESTINO $destino =========="
+        timeout -k 2s 12s sudo -n ip netns exec nl360-s05-lacp-hq \
+          ping -n -c 2 -W 2 "$destino"
+        printf 'ESTABILIDAD_VUELTA_%s_DESTINO_%s=OK\n' "$vuelta" "$destino"
+    done
+done
+echo "========== 565 BONDS DOS MIEMBROS =========="
+for especificacion in "nl360-s02-sw-hq s5bond0" "nl360-s05-lacp-hq bond0"; do
+  read -r ns bond <<< "$especificacion"
+  sudo -n ip netns exec "$ns" cat "/proc/net/bonding/$bond" |
+    grep -E 'Bonding Mode:|Number of ports:|Slave Interface:|MII Status:'
+done
+echo "========== 566 GESTION Y REPO =========="
+ip -4 -br address show ens33
+ip -4 route show default
+test -z "$(git status --porcelain)"
+git status --short --branch
+echo "========== LOTE114A_S_ESTABILIDAD=OK =========="
+} 2>&1 | tee "$DIR/30_Estabilidad_PreFailover_HQ.txt"
+BASH
+~~~
+
+Antes de ejecutar el lote mutante 114B, enviar los logs de 114A-R y 114A-S para revisión si hubo desconexiones o fallos previos.
+
 ## Lote 114B — Falla real solo del miembro s5c1 y restauración 2→1→2
 
 ~~~bash
@@ -58,6 +98,7 @@ DIR="$HOME/netlab360-bootstrap/s05/evidencias/lacp-integracion"
 sudo -v
 test -f "$DIR/29_Precheck_Failover_HQ_y_S1S2_Corregido.txt"
 grep -Fxq 'LOTE114A_R_PRECHECK=OK' "$DIR/29_Precheck_Failover_HQ_y_S1S2_Corregido.txt"
+grep -Fxq 'LOTE114A_S_ESTABILIDAD=OK' "$DIR/30_Estabilidad_PreFailover_HQ.txt"
 {
 echo "========== 557 FAILOVER HQ 2_1_2 =========="
 python3 scripts/laboratorio/s05-lacp-hq-falla-retorno.py run --confirm-failover
