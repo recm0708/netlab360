@@ -14,6 +14,7 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+import time
 from urllib.request import urlopen
 
 import yaml
@@ -65,6 +66,25 @@ def run(*argv: str, timeout: int = 15, check: bool = True) -> subprocess.Complet
 
 def privileged(*argv: str, **kwargs) -> subprocess.CompletedProcess:
     return run("sudo", "-n", *argv, **kwargs)
+
+
+def read_bridge_vlans(ns: str, *, attempts: int = 2, timeout: int = 30) -> str:
+    """Consulta read-only con espera acotada; nunca omite validación VLAN."""
+    if attempts < 1 or attempts > 3 or timeout < 16 or timeout > 60:
+        raise ValueError("Parámetros de diagnóstico fuera de rango")
+    last = None
+    for i in range(1, attempts + 1):
+        try:
+            result = privileged("ip", "netns", "exec", ns,
+                                "bridge", "vlan", "show", timeout=timeout)
+            print(f"S05_LACP_VLAN_LECTURA_{ns}=OK_INTENTO_{i}")
+            return result.stdout
+        except subprocess.TimeoutExpired as exc:
+            last = exc
+            print(f"S05_LACP_VLAN_LECTURA_{ns}=TIMEOUT_INTENTO_{i}", flush=True)
+            if i < attempts:
+                time.sleep(1)
+    raise RuntimeError(f"Consulta VLAN no validada para {ns} tras {attempts} intentos") from last
 
 
 def inventory(selected: list[str] | None = None) -> None:
@@ -201,7 +221,7 @@ def main() -> None:
         bridge = next(d for d in devs if d["ifname"] == "br0")
         if bridge.get("linkinfo", {}).get("info_kind") != "bridge":
             raise RuntimeError(f"br0 no es bridge Linux en {site}")
-        vlan_text = privileged("ip", "netns", "exec", sw, "bridge", "vlan", "show").stdout
+        vlan_text = read_bridge_vlans(sw)
         vlans = parse_vlan_map(vlan_text)
         if row["vlan"] not in vlans.get("tr-sw", set()):
             raise RuntimeError(f"Troncal no incluye VLAN {site}")
