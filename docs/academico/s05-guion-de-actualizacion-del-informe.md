@@ -1,5 +1,7 @@
 # NETLAB360 · Guion de incorporación académica de la fase S05
 
+> **Aviso de revisión 14/11/2026:** este guion contiene una línea base del **11/11/2026** y varias afirmaciones ya obsoletas (por ejemplo, "HA no desplegada", "independencia SSH pendiente" y "LACP solo piloto"). **NO copiar a Word sin revalidar.** Se demostró HTTP HA real HQ→S1→HQ, NOC persistente y LACP integrado HQ VLAN120 con ping intersede 4/4; falla 2→1→2 HQ todavía pendiente, S1/S2 sin bonds y OVS/Faucet sin implementar. Consultar [tablero S05 vigente](../gestion/s05-tablero-vigente.md) y el informe maestro real antes de editar el borrador.
+
 **Corte técnico verificable:** 11 de noviembre de 2026. **Estado editorial:** contenido de apoyo **todavía NO incorporado al archivo Word maestro** del equipo. El objetivo es actualizar **el mismo informe académico único**, no redactar un segundo informe. Se respeta la organización documentada en `docs/entregables/00-politica-editorial-y-entrega-acumulativa.md`: capítulos 5 Implementación, 6 Pruebas y validación, 7 Análisis de resultados y 8 Conclusiones y recomendaciones; sin capítulo de anexos. La numeración final de figuras/tablas se decidirá comparando el último Word/PDF, no inventando correlativos.
 
 ## Resumen del estado S05 para redacción
