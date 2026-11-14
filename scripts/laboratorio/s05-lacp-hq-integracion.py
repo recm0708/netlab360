@@ -120,8 +120,16 @@ def assert_protected(before: dict, *, before_cleanup: bool = False) -> None:
         # El MAC automático de br0 puede elegirse de un puerto nuevo; permitir
         # retirar SOLO dispositivos S05 sin relajar IFINDEX/VLAN ni otros MAC.
         # Tras la limpieza se exige nuevamente el MAC original del bridge.
-        current["ports"]["br0"] = dict(current["ports"]["br0"])
-        current["ports"]["br0"]["mac"] = before["ports"]["br0"]["mac"]
+        current = {
+            **current,
+            "ports": {
+                **current["ports"],
+                "br0": {
+                    **current["ports"]["br0"],
+                    "mac": before["ports"]["br0"]["mac"],
+                },
+            },
+        }
     if current != before:
         raise RuntimeError("Cambio en puertos protegidos o sus VLAN")
 
