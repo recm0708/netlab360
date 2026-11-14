@@ -138,15 +138,34 @@ def assert_services() -> None:
     for unit in UNITS:
         if cmd("systemctl", "is-active", unit, check=False).strip() != "active":
             raise RuntimeError(f"Servicio no activo: {unit}")
-    with urlopen("http://127.0.0.1:9130/api/v1/graph", timeout=8) as resp:
-        graph = json.load(resp)
-    ha = graph.get("ha_service", {})
-    if ha.get("available") is not True or ha.get("active_backend") != "BACKEND_HQ":
-        raise RuntimeError("HTTP HA principal no observado")
-    routes = graph["routing"]["routes"]
-    if routes["S1"]["dev"] != "s1p" or routes["S2"]["dev"] != "s2p":
-        raise RuntimeError("FIB WAN no coincide con las rutas principales")
-    print("S05_LACP_HQ_SERVICIOS_HA_FIB=OK")
+    # La API del NOC puede entregar transitoriamente una vista sin rutas.
+    # Nunca registrar OK por un JSON parcial: comprobar hasta tres vistas.
+    last_error = None
+    for attempt in range(1, 4):
+        try:
+            with urlopen("http://127.0.0.1:9130/api/v1/graph", timeout=8) as resp:
+                graph = json.load(resp)
+            ha = graph.get("ha_service") if isinstance(graph, dict) else None
+            routing = graph.get("routing") if isinstance(graph, dict) else None
+            routes = routing.get("routes") if isinstance(routing, dict) else None
+            ha = ha if isinstance(ha, dict) else {}
+            routes = routes if isinstance(routes, dict) else {}
+            s1 = routes.get("S1") if isinstance(routes.get("S1"), dict) else {}
+            s2 = routes.get("S2") if isinstance(routes.get("S2"), dict) else {}
+            if (ha.get("available") is True
+                    and ha.get("active_backend") == "BACKEND_HQ"
+                    and s1.get("dev") == "s1p"
+                    and s2.get("dev") == "s2p"):
+                print("S05_LACP_HQ_SERVICIOS_HA_FIB=OK")
+                return
+            last_error = "observación NOC sin HA principal y rutas S1/S2 completas"
+        except Exception as exc:
+            last_error = f"{type(exc).__name__}: {exc}"
+        print(f"S05_LACP_HQ_NOC_FIB_NO_VALIDADO_INTENTO_{attempt}=SI",
+              flush=True)
+        if attempt < 3:
+            time.sleep(1)
+    raise RuntimeError(f"NOC no confirmó HA/FIB tras 3 observaciones: {last_error}")
 
 
 def identity() -> None:
