@@ -1,0 +1,26 @@
+version: 2
+vlans:
+  s05_experimento:
+    vid: 410
+    description: "NETLAB360 S05 - clientes aislados de S02"
+  s05_restringida:
+    vid: 420
+    description: "NETLAB360 S05 - segmento aislado sin router"
+
+dps:
+  br-s05-sdn:
+    dp_id: 0x505
+    hardware: "Open vSwitch"
+    interfaces:
+      1:
+        name: sdna0
+        native_vlan: s05_experimento
+        description: "Host aislado A"
+      2:
+        name: sdnb0
+        native_vlan: s05_experimento
+        description: "Host aislado B"
+      3:
+        name: sdnc0
+        native_vlan: s05_restringida
+        description: "Host aislado C"
