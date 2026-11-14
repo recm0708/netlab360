@@ -1,5 +1,16 @@
 # NETLAB360 — Punto de reanudación
 
+## Corte vigente · 14/11/2026 · LACP HQ integrado (lotes 109 y 110) — Falla controlada siguiente
+
+- [x] **Lote 107:** precheck multisede versionado; 5/5 tests OK, plan tres sedes. **Lote 108:** auditoría 35 direcciones distintas, VLAN 120/220/320 conservadas, candidatos .40 sin asignación en tres sedes al comenzar, servicios NOC/HA activos; `LOTE108_PRECHECK=OK`; operador confirmó captura **S05_45 tomada**.
+- [x] **Lote 109:** Git `a44f630` sincronizado, 8/8 tests de LACP HQ, `plan` y `S05_LACP_HQ_PRECHECK=OK_SIN_CAMBIOS` tras dos desconexiones SSH previas; `LOTE109_HQ_PRECHECK=OK`.
+- [x] **Lote 110 REAL:** primer bond integrado en **SW HQ `nl360-s02-sw-hq`**, `s5bond0` 802.3ad con miembros `s5p1/s5p2`; segundo bond `bond0` en nuevo NS `nl360-s05-lacp-hq`, miembros `s5c1/s5c2`; **ambos 2/2 puertos activos**, `layer3+4`, MAC de bond S05 independiente y un solo puerto lógico en `br0` VLAN 120 PVID Egress Untagged. Cliente S05 **`10.70.20.40/24` actualmente asignado**. Ping gateway `.1`, frontal `10.70.20.23`, backend S1 `10.71.20.21` y S2 `10.72.20.20` OK. Servicios HA/FIB, VLAN/puertos previos, gestión `ens33=192.168.47.40/24` GW `.2`, Git intactos. `S05_LACP_HQ_DESPLIEGUE=OK`, `LOTE110_HQ_UP=OK`. **No ejecutar `up` HQ de nuevo**.
+- [x] **Evidencias S05_46/S05_47:** salida terminal delimitada validada como correcta; **operador aún no confirmó explícitamente haber guardado las imágenes PNG**. No declararlas importadas a GitHub.
+- [x] **Falla y recuperación HQ preparada, NO ejecutada:** `scripts/laboratorio/s05-lacp-hq-falla-retorno.py` PR #102 CI OK. Modo `precheck` sin mutar, modo `run --confirm-failover` con `finally` de restauración y failsafe transitorio `systemd-run` (120s), baja únicamente el esclavo cliente S05 `s5c1`; asegura 2→1→2, HTTP real, FIB y servicios; recopilar evidencia S05_48 y S05_49 solo después de validación.
+- [ ] **Inmediato:** Git sync + test unitario nuevo + precheck de falla HQ. Si OK, ensayo controlado HQ 2→1→2 y postcheck, enviar log sin borrar o reiniciar NS. Posterior diseñar réplica S1/S2, luego OVS/Faucet. **No reiniciar Ubuntu**, aviso de actualizaciones pendiente; reinicio eliminaría namespaces LACP/HA/S02 sin orquestador de arranque completo.
+
+---
+
 ## Corte actual · 14/11/2026 · Recuperación VM y precheck de integración LACP
 
 - [x] **Lote 105:** tras suspensión VMware, Ubuntu 26.04.1 con kernel 7.0.0-43, uptime preservado, `ens33=192.168.47.40/24`, gateway `.2` (métrica observada 100), Git limpio a `cdf0bee`. Seis servicios systemd `active`, tres Docker FRR `running/network_mode:none`, NOC HTTP HA `BACKEND_HQ` principal, telemetría 1,57 s, FIB S1 `s1p`/S2 `s2p`, `LOTE105_RECUPERACION=OK`. Ubuntu muestra aviso de reinicio por actualizaciones; **NO reiniciar durante laboratorio**, perdería namespaces temporales.
