@@ -67,7 +67,7 @@ for vuelta in 1 2; do
         echo "========== VUELTA $vuelta DESTINO $destino =========="
         timeout -k 2s 12s sudo -n ip netns exec nl360-s05-lacp-hq \
           ping -n -c 2 -W 2 "$destino"
-        echo "ESTABILIDAD_VUELTA_$vuelta_DESTINO_$destino=OK"
+        printf 'ESTABILIDAD_VUELTA_%s_DESTINO_%s=OK\n' "$vuelta" "$destino"
     done
 done
 echo "========== 565 BONDS DOS MIEMBROS =========="
