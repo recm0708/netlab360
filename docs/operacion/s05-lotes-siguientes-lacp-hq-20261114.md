@@ -4,6 +4,12 @@
 
 **Acceso:** una sesión SSH PowerShell con túnel 127.0.0.1:9130 a rc-aa-ec@192.168.47.40. Código en ~/proyectos/netlab360. No usar clear.
 
+## Corrección de ejecución para LOTE114A-R
+
+**Corte operativo posterior (14/11/2026):** lote 114A falló **en el paso 553**, `status` por `TimeoutExpired` de ping `-c 2 -W 2` con timeout externo 10s; dos ejecuciones: primero destino S2 `10.72.20.20` y luego frontal HQ `10.70.20.23`. **14/14 tests offline OK**, switch/cliente HQ 2/2 puertos, sin evidencia de fallo LACP. Lote 114B no pasó su gate (no había `LOTE114A_PRECHECK=OK`), **NO ocurrió failover real**. Ya existe [PR #109](https://github.com/recm0708/netlab360/pull/109), CI OK y merge en `1e2d12a9184c83caf71306bede14d76e88787fff`: reintentos ICMP auditados hasta 3 veces, timeout 15s, fallo cerrado si persiste y aplicado a status/ensayo. Rehacer **solo** 114A como validación de lectura sobre el código nuevo; 114B está prohibido hasta marcador final `OK`. No ejecutar UP HQ ni reiniciar.
+
+**Nueva versión mínima exigida:** `1e2d12a9184c83caf71306bede14d76e88787fff`. El código listado más abajo continúa aplicando, pero se debe cambiar la prueba de ancestro a este SHA y el marcador final `LOTE114A_R_PRECHECK=OK` para distinguirlo del intento fallido anterior. La compuerta del lote B debe comprobar el archivo nuevo `29_Precheck_Failover_HQ_y_S1S2_Corregido.txt` y el marcador nuevo; **no usar** el archivo anterior que carece de OK.
+
 ## Lote 114A — Sincronización, tests, verificación HQ y precheck S1/S2 (SOLO CONSULTA)
 
 ~~~bash
