@@ -2,9 +2,10 @@
 
 Corte validado 14/11/2026: se ejecutaron los lotes 117R-A, 117R-B y 118-R, los 3 bonds IEEE 802.3ad tienen dos puertos por lado, las VLAN 120/220/320 operan, HQ y S1/S2 responden y OSPF mantiene s1p/s2p. Los seis servicios HA/NOC activos, ens33 192.168.47.40/24. Primera ejecución de 118-R abortó por KeyError S1 en respuesta NOC incompleta, segunda completó con OK. El operador confirma capturas tomadas; PNG originales no se han importado ni comprobado por SHA256 en el repositorio.
 
-Cambios preparados y aprobados por CI:
+Cambios preparados, aprobados por CI e integrados a main:
 - PR #117: scripts independientes de falla 2→1→2 en S1 y S2; solo s5c1, rescate systemd de 120s, restore en finally, pruebas de identidad y validación HTTP/OSPF.
 - PR #118: vistas de NOC parciales manejadas mediante hasta tres observaciones, con rechazo estricto si nunca se ven HA principal y rutas s1p/s2p.
+- PR #120: corrige los marcadores INICIO/FIN de S05_53/54 para LACP_S1 y S05_55/56 para LACP_S2, sin cambiar la red.
 
 Seguridad: no reiniciar ni reconstruir HQ/S1/S2. Si SSH cae DURANTE un run, no repetir run; reconectar y comprobar estado, interfaces y temporizador. Las pruebas siguientes cambian temporalmente un miembro por sede, NO son solo lectura. Si falta marcador OK de un lote, no ejecutar el siguiente.
 
@@ -21,7 +22,7 @@ sudo -v
 echo "========== 620 SINCRONIZACION =========="
 test -z "$(git status --porcelain)"
 GIT_TERMINAL_PROMPT=0 git pull --ff-only origin main
-git merge-base --is-ancestor d45b374407a6b38829dfc140b4523b33ce6ccb9b HEAD
+git merge-base --is-ancestor ed8985dc7db4e9200f9a986c351957dd59921e52 HEAD
 git log -1 --oneline
 grep -Fxq '========== LOTE118_R_TRES_BONDS=OK ==========' "$DIR/39_Tres_Sedes_LACP_Validadas.txt"
 
