@@ -6,6 +6,8 @@ import io
 import contextlib
 from pathlib import Path
 import unittest
+from unittest import mock
+import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
 PATH = ROOT / "scripts/validacion/s05-lacp-integracion-precheck.py"
@@ -71,6 +73,30 @@ class TestS05LACPIntegrationPrecheck(unittest.TestCase):
     def test_address_reader_only_ipv4_locals(self):
         data = '[{"ifname":"eth0","addr_info":[{"family":"inet","local":"10.70.20.21"},{"family":"inet6","local":"fe80::1"}]}]'
         self.assertEqual(module.ip_set(data), {"10.70.20.21"})
+
+    def test_bridge_vlan_timeout_transitorio_se_recupera(self):
+        timed = subprocess.TimeoutExpired(cmd=("ip", "netns", "exec"), timeout=30)
+        with mock.patch.object(module, "privileged",
+                               side_effect=[timed, mock.Mock(stdout="tr-sw 320\\n")]) as call, \\
+             mock.patch.object(module.time, "sleep") as sleep, \\
+             contextlib.redirect_stdout(io.StringIO()) as output:
+            value = module.read_bridge_vlans("nl360-s02-sw-s2")
+        self.assertEqual(value, "tr-sw 320\\n")
+        self.assertEqual(call.call_count, 2)
+        self.assertEqual(call.call_args.kwargs["timeout"], 30)
+        sleep.assert_called_once_with(1)
+        self.assertIn("TIMEOUT_INTENTO_1", output.getvalue())
+        self.assertIn("OK_INTENTO_2", output.getvalue())
+
+    def test_bridge_vlan_falla_si_ambas_lecturas_expiran(self):
+        timed = subprocess.TimeoutExpired(cmd=("ip", "netns", "exec"), timeout=30)
+        with mock.patch.object(module, "privileged", side_effect=timed) as call, \\
+             mock.patch.object(module.time, "sleep"), \\
+             contextlib.redirect_stdout(io.StringIO()) as output:
+            with self.assertRaisesRegex(RuntimeError, "Consulta VLAN no validada"):
+                module.read_bridge_vlans("nl360-s02-sw-s2")
+        self.assertEqual(call.call_count, 2)
+        self.assertNotIn("OK_INTENTO", output.getvalue())
 
     def test_no_mutating_actions_offered(self):
         src = PATH.read_text(encoding="utf-8")
