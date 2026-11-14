@@ -4,6 +4,12 @@
 
 **Acceso:** una sesión SSH PowerShell con túnel 127.0.0.1:9130 a rc-aa-ec@192.168.47.40. Código en ~/proyectos/netlab360. No usar clear.
 
+## Corrección de ejecución para LOTE114A-R
+
+**Corte operativo posterior (14/11/2026):** lote 114A falló **en el paso 553**, `status` por `TimeoutExpired` de ping `-c 2 -W 2` con timeout externo 10s; dos ejecuciones: primero destino S2 `10.72.20.20` y luego frontal HQ `10.70.20.23`. **14/14 tests offline OK**, switch/cliente HQ 2/2 puertos, sin evidencia de fallo LACP. Lote 114B no pasó su gate (no había `LOTE114A_R_PRECHECK=OK`), **NO ocurrió failover real**. Ya existe [PR #109](https://github.com/recm0708/netlab360/pull/109), CI OK y merge en `1e2d12a9184c83caf71306bede14d76e88787fff`: reintentos ICMP auditados hasta 3 veces, timeout 15s, fallo cerrado si persiste y aplicado a status/ensayo. Rehacer **solo** 114A como validación de lectura sobre el código nuevo; 114B está prohibido hasta marcador final `OK`. No ejecutar UP HQ ni reiniciar.
+
+**Nueva versión mínima exigida:** `1e2d12a9184c83caf71306bede14d76e88787fff`. Los bloques de esta guía **ya incluyen** este SHA y el nuevo marcador `LOTE114A_R_PRECHECK=OK` en el archivo `29_Precheck_Failover_HQ_y_S1S2_Corregido.txt`. No reutilizar el archivo anterior sin marcador. 
+
 ## Lote 114A — Sincronización, tests, verificación HQ y precheck S1/S2 (SOLO CONSULTA)
 
 ~~~bash
@@ -17,7 +23,7 @@ sudo -v
 echo "========== 551 SYNC MAIN =========="
 test -z "$(git status --porcelain)"
 GIT_TERMINAL_PROMPT=0 git pull --ff-only origin main
-git merge-base --is-ancestor 89429b9763234911e2313687c033692cf025b424 HEAD
+git merge-base --is-ancestor 1e2d12a9184c83caf71306bede14d76e88787fff HEAD
 git log -1 --oneline
 echo "========== 552 TESTS LACP =========="
 python3 -m unittest discover -s tests -p 'test_s05_lacp_hq_falla_retorno.py' -v 2>&1 | tee "$DIR/22_Tests_Failover_HQ.txt"
@@ -35,12 +41,12 @@ ip -4 -br address show ens33
 ip -4 route show default
 test -z "$(git status --porcelain)"
 git status --short --branch
-echo "========== LOTE114A_PRECHECK=OK =========="
-} 2>&1 | tee "$DIR/24_Precheck_Failover_HQ_y_S1S2.txt"
+echo "========== LOTE114A_R_PRECHECK=OK =========="
+} 2>&1 | tee "$DIR/29_Precheck_Failover_HQ_y_S1S2_Corregido.txt"
 BASH
 ~~~
 
-Si no aparece LOTE114A_PRECHECK=OK, no ejecutar 114B. Los tests de error simulado son intencionales y deben terminar en OK.
+Si no aparece LOTE114A_R_PRECHECK=OK, no ejecutar 114B. Los tests de error simulado son intencionales y deben terminar en OK.
 
 ## Lote 114B — Falla real solo del miembro s5c1 y restauración 2→1→2
 
@@ -50,8 +56,8 @@ set -Eeuo pipefail
 cd ~/proyectos/netlab360
 DIR="$HOME/netlab360-bootstrap/s05/evidencias/lacp-integracion"
 sudo -v
-test -f "$DIR/24_Precheck_Failover_HQ_y_S1S2.txt"
-grep -Fxq 'LOTE114A_PRECHECK=OK' "$DIR/24_Precheck_Failover_HQ_y_S1S2.txt"
+test -f "$DIR/29_Precheck_Failover_HQ_y_S1S2_Corregido.txt"
+grep -Fxq 'LOTE114A_R_PRECHECK=OK' "$DIR/29_Precheck_Failover_HQ_y_S1S2_Corregido.txt"
 {
 echo "========== 557 FAILOVER HQ 2_1_2 =========="
 python3 scripts/laboratorio/s05-lacp-hq-falla-retorno.py run --confirm-failover
