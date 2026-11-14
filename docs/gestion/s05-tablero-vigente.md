@@ -2,6 +2,10 @@
 
 **Corte de evidencia:** 14 de noviembre de 2026, 15:18, hora de Panamá. **Alcance:** solo resultados observados en VM y salidas aportadas por el operador; los cambios de código y pruebas CI se identifican por separado. **La fase S05 no está cerrada.**
 
+## Incidencia 114A y próximo gate (14/11)
+
+**Corte operativo posterior (14/11/2026):** lote 114A falló **en el paso 553**, `status` por `TimeoutExpired` de ping `-c 2 -W 2` con timeout externo 10s; dos ejecuciones: primero destino S2 `10.72.20.20` y luego frontal HQ `10.70.20.23`. **14/14 tests offline OK**, switch/cliente HQ 2/2 puertos, sin evidencia de fallo LACP. Lote 114B no pasó su gate (no había `LOTE114A_PRECHECK=OK`), **NO ocurrió failover real**. Ya existe [PR #109](https://github.com/recm0708/netlab360/pull/109), CI OK y merge en `1e2d12a9184c83caf71306bede14d76e88787fff`: reintentos ICMP auditados hasta 3 veces, timeout 15s, fallo cerrado si persiste y aplicado a status/ensayo. Rehacer **solo** 114A como validación de lectura sobre el código nuevo; 114B está prohibido hasta marcador final `OK`. No ejecutar UP HQ ni reiniciar.
+
 ## Resumen verificable
 
 | Subsistema | Completado y evidenciado | Pendiente |
