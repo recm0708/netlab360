@@ -77,8 +77,8 @@ class TestS05LACPIntegrationPrecheck(unittest.TestCase):
     def test_bridge_vlan_timeout_transitorio_se_recupera(self):
         timed = subprocess.TimeoutExpired(cmd=("ip", "netns", "exec"), timeout=30)
         with mock.patch.object(module, "privileged",
-                               side_effect=[timed, mock.Mock(stdout="tr-sw 320\\n")]) as call, \\
-             mock.patch.object(module.time, "sleep") as sleep, \\
+                               side_effect=[timed, mock.Mock(stdout="tr-sw 320\\n")]) as call, \
+             mock.patch.object(module.time, "sleep") as sleep, \
              contextlib.redirect_stdout(io.StringIO()) as output:
             value = module.read_bridge_vlans("nl360-s02-sw-s2")
         self.assertEqual(value, "tr-sw 320\\n")
@@ -90,8 +90,8 @@ class TestS05LACPIntegrationPrecheck(unittest.TestCase):
 
     def test_bridge_vlan_falla_si_ambas_lecturas_expiran(self):
         timed = subprocess.TimeoutExpired(cmd=("ip", "netns", "exec"), timeout=30)
-        with mock.patch.object(module, "privileged", side_effect=timed) as call, \\
-             mock.patch.object(module.time, "sleep"), \\
+        with mock.patch.object(module, "privileged", side_effect=timed) as call, \
+             mock.patch.object(module.time, "sleep"), \
              contextlib.redirect_stdout(io.StringIO()) as output:
             with self.assertRaisesRegex(RuntimeError, "Consulta VLAN no validada"):
                 module.read_bridge_vlans("nl360-s02-sw-s2")
