@@ -66,8 +66,7 @@ class TestS05SucursalesLACP(unittest.TestCase):
                 m = load(site)
                 baseline = {"mgmt": {"x": 1}, "switch": {"ports": {}, "vlans": {}}}
                 with mock.patch.object(m, "identity"), \
-                     mock.patch.object(m.STATE, "exists", return_value=False), \
-                     mock.patch.object(m.STATE, "is_symlink", return_value=False), \
+                     mock.patch.object(m, "STATE", mock.Mock(exists=lambda: False, is_symlink=lambda: False)), \
                      mock.patch.object(m, "cmd", return_value="S05_LACP_PRECHECK=OK_SIN_CAMBIOS_DE_CONFIGURACION\n") as cmd, \
                      mock.patch.object(m, "netns", return_value={m.SW}), \
                      mock.patch.object(m, "links", return_value={}), \
@@ -86,8 +85,7 @@ class TestS05SucursalesLACP(unittest.TestCase):
             with self.subTest(site=site):
                 m = load(site)
                 with mock.patch.object(m, "identity"), \
-                     mock.patch.object(m.STATE, "exists", return_value=True), \
-                     mock.patch.object(m.STATE, "is_symlink", return_value=False):
+                     mock.patch.object(m, "STATE", mock.Mock(exists=lambda: True, is_symlink=lambda: False)):
                     with self.assertRaisesRegex(RuntimeError, "ya existe"):
                         m.precheck()
                 with mock.patch.object(m, "precheck", side_effect=RuntimeError("guard")), \
