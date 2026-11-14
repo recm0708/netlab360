@@ -19,7 +19,7 @@
 ## Próximo trabajo agrupado en 7 bloques (no en micro-pasos)
 
 1. **LACP HQ 2→1→2:** ejecutar suite y precheck actualizados; iniciar prueba `s05-lacp-hq-falla-retorno.py run --confirm-failover` SOLO si el precheck alcanza `OK`. El script implementa rescate systemd transitorio de 120 segundos y restauración en `finally`. Verificar ambos agregadores con dos miembros al final y HTTP/FIB/gestión; capturas S05_48–49 tras éxito.
-2. **LACP S1/S2:** versionar por PR implementaciones idempotentes, namespaces exclusivos y propiedad verificable; primero precheck, luego despliegues por sede y pruebas 2→1→2, ICMP/HTTP intersede, rollback de recursos S05; no tocar WAN OSPF ni trunks.
+2. **LACP S1/S2:** ejecutar en código nuevo el validador selectivo `scripts/validacion/s05-lacp-integracion-precheck.py precheck --sites S1 S2` (PR #107 CI OK) para evitar marcar como conflicto a `10.70.20.40` ya usada por HQ. Después versionar por PR implementaciones idempotentes, namespaces exclusivos y propiedad verificable; primero precheck, luego despliegues por sede y pruebas 2→1→2, ICMP/HTTP intersede, rollback de recursos S05; no tocar WAN OSPF ni trunks.
 3. **HA equipos/servicios:** ensayar explícitamente indisponibilidad de instancia/servidor independiente de enlace, distinguir de HA física; preservar HTTP HQ/S1 validado.
 4. **SDN OVS/Faucet:** integración acotada sin puentes sobre enlaces de producción; reglas VLAN/ACL, controlador, failover y limpieza selectiva comprobados.
 5. **NOC final:** enlazar LACP/SDN/HA a observaciones frescas; `SIN DATOS` ante ausencia, revisar gráfica y formato horario de Panamá con el operador.
@@ -33,7 +33,15 @@
 - [#32](https://github.com/recm0708/netlab360/issues/32): redundancia de servicio/instancia/equipo sin prometer HA física.
 - [#23](https://github.com/recm0708/netlab360/issues/23): OVS/Faucet aislado.
 - [#64](https://github.com/recm0708/netlab360/issues/64): NOC integrado y evidencias visuales.
+- [#105](https://github.com/recm0708/netlab360/issues/105): nueva issue S05 de **importación de evidencias auténticas, SHA-256 y aceptación final**; abierta.
 - [#24](https://github.com/recm0708/netlab360/issues/24): **cerrada (not planned)**; cuarta sede/WireGuard no requerida, no implementada.
+- [#106](https://github.com/recm0708/netlab360/issues/106): nueva issue S08 para **reconstrucción reproducible de namespaces al reiniciar**; no se debe confundir con S05 completada.
+
+## Punto de relevo para otra conversación
+
+**Lotes próximos versionados:** [guía operativa](../operacion/s05-lotes-siguientes-lacp-hq-20261114.md). **HEAD mínimo del validador selectivo:** `89429b9763234911e2313687c033692cf025b424` (PR #107). Esta guía sustituye comandos anteriores que repetían el precheck de los tres candidatos después de desplegar HQ.
+
+**Última auditoría de issues:** 50 issues al corte **antes de crear** #105 y #106 (por tanto ahora al menos 52). S05: seis abiertas (#5, #23, #31, #32, #64, #105), una cerrada (#24). S01–S04 milestones cerradas; S05–S08 abiertas.
 
 ## Seguridad operativa
 
