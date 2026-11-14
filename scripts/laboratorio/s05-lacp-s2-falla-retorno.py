@@ -127,7 +127,7 @@ def exercise() -> None:
         check_baseline(data)
         print("S05_LACP_S2_ESTADO_INICIAL=2_2", flush=True)
 
-        marker("INICIO_CAPTURA_S05_55_LACP_HQ_UN_ENLACE")
+        marker("INICIO_CAPTURA_S05_55_LACP_S2_UN_ENLACE")
         # Solo una interfaz que ya existe y pertenece al cliente S05.
         if lab.alias_of(lab.CLIENT, MEMBER) != data["alias"]:
             raise RuntimeError("La identidad del miembro cambió antes de la falla")
@@ -139,7 +139,7 @@ def exercise() -> None:
         availability()
         check_baseline(data)
         print("S05_LACP_S2_SERVICIOS_DURANTE_FALLA=OK", flush=True)
-        marker("FIN_CAPTURA_S05_55_LACP_HQ_UN_ENLACE")
+        marker("FIN_CAPTURA_S05_55_LACP_S2_UN_ENLACE")
     except BaseException as exc:
         error = exc
         print(f"S05_LACP_S2_PRUEBA_ERROR={type(exc).__name__}: {exc}",
@@ -164,7 +164,7 @@ def exercise() -> None:
         # No cancelar rescate si no se acredita restauración del agregador.
         if not changed:
             try:
-                marker("INICIO_CAPTURA_S05_56_LACP_HQ_RETORNO")
+                marker("INICIO_CAPTURA_S05_56_LACP_S2_RETORNO")
                 lab.bond_ports(lab.CLIENT, lab.CLIENT_BOND, 2, attempts=15)
                 lab.bond_ports(lab.SW, lab.SW_BOND, 2, attempts=15)
                 lab.status(data, ping=True)
@@ -173,7 +173,7 @@ def exercise() -> None:
                 print("S05_LACP_S2_ESTADOS_2_1_2=OK" if error is None
                       else "S05_LACP_S2_ESTADO_FINAL_2=RECUPERADO_TRAS_ERROR",
                       flush=True)
-                marker("FIN_CAPTURA_S05_56_LACP_HQ_RETORNO")
+                marker("FIN_CAPTURA_S05_56_LACP_S2_RETORNO")
                 if rescue:
                     failsafe_cancel(rescue)
             except BaseException as exc:
