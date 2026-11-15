@@ -268,9 +268,10 @@ def ping(site: str, target: str, *, expect_success: bool) -> None:
     raise RuntimeError(f"Conectividad no validada de {site} hacia {target}: RC={last}")
 
 
-def status() -> None:
+def status(*, allow_recovery: bool = False) -> None:
     state = state_read()
-    if state.get("status") not in ("active", "provisioning"):
+    permitted = ("active", "provisioning", "needs_inspection") if allow_recovery else ("active", "provisioning")
+    if state.get("status") not in permitted:
         raise RuntimeError("Estado SDN parcial, requiere inspeccion antes de validar")
     if not owned_bridge() or not owned_controller():
         raise RuntimeError("OVS o controlador esperado no estan presentes")
