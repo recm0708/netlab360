@@ -1,5 +1,9 @@
 # NETLAB360 · Tablero vigente de la fase S05
 
+> **ESTADO VIGENTE 147A — 15/11/2026:** TAR P1 histórico verificado 4/4 SHA sin extracción, P1B 5/5; CSV 70 PNG inventariado y captura 63 cotejada con Windows. Cuatro descripciones milestones GitHub ya actualizadas con estado abierto. Código de recuperación P1, watchdog para una prueba HA y cotejo ZIP/CSV PNG fusionados con CI; **pendiente ejecutar en VM**, importar originales y documentar aceptación. [Corte maestro 147A](CORTE-MAESTRO-NETLAB360-S05-147A-20261115.md). Avisos inferiores históricos.
+
+
+
 > **CORTE OPERATIVO 146A — 15/11/2026:** 4/4 tests HA y 6/6 servicios activos, 21 namespaces, 4 contenedores, FIB y HTTP healthy, SDN inspect correcto. **BLOQUEO:** tres JSON P1 no coinciden con su manifiesto; 146A abortó, sin marcador final. S05 sigue abierta, apagado invitado bloqueado por recursos efímeros y prueba HA #32 pendiente. PNG63 original Windows SHA confirmado. [Procedencia P1](../evidencias/s05-reconciliacion-p1-146a-20261115.md).
 
 > **ÚNICO ESTADO VIGENTE — S05 145C (15/11/2026):** captura 63 ya **recibida y aceptada visualmente**, 1917×712, SHA del adjunto calculado; aún falta comparar hash del original Windows e incorporar archivo al repo (#105). NOC LACP HQ/S1/S2 y Faucet operativo; 26 reglas observadas en la imagen. P1/P1B caracterización descriptiva asentada, originales pendientes. **Siguiente: 146A de solo lectura, luego prueba independiente de backend #32 con recuperación garantizada, documentación #23, integridad #105 y cierre #5.** [Corte 145C](CORTE-MAESTRO-NETLAB360-S05-145C-20261115.md). **Todo lo que aparece debajo son cortes históricos, aunque indiquen «vigente».**
