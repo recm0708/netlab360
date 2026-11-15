@@ -1,5 +1,7 @@
 # NETLAB360 — Corte maestro de reanudación al 15/11/2026 (S05 NOC · 142B)
 
+> **DOCUMENTO HISTÓRICO:** 142B fue solucionado en PR #139 y **143A/143B/143C ya aprobaron**. Para reanudar, consultar [corte maestro 143C](CORTE-MAESTRO-NETLAB360-S05-143C-20261115.md) y [144A/B/C](../operacion/s05-lotes-144a-144c-diagnostico-http-ha-pre-noc-20261115.md); no repetir este documento antiguo.
+
 **LEER PRIMERO EN CUALQUIER CHAT NUEVO.** Esta nota es el estado operativo más reciente. El histórico en REANUDAR-AQUI.md y en las issues es cronológico, y puede contener tareas antiguas cuyos resultados ya se cerraron en lotes posteriores.
 
 ## Contexto y ambiente
