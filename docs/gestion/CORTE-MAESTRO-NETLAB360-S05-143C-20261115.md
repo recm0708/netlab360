@@ -1,5 +1,7 @@
 # CORTE MAESTRO NETLAB360 — S05, 143A/B/C aprobados; HTTP HA en diagnóstico
 
+> **ARCHIVO HISTÓRICO.** La anomalía HA se resolvió en las muestras 144A y los GET HTTP 200 de 144B; 144C conservó FIB/observador legacy. Reanudar desde [corte maestro 144C](CORTE-MAESTRO-NETLAB360-S05-144C-20261115.md) y ejecutar 145A/B con rollback; NO volver a ejecutar 144.
+
 Fecha 15/11/2026. **Documento primario para reanudar un chat futuro.** Actualizar aquí tras lotes nuevos. No confundir código GitHub versionado con despliegue efectivo en VM.
 
 ## Entorno y reglas
