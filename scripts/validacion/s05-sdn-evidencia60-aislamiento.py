@@ -18,7 +18,10 @@ assert spec and spec.loader
 lab = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(lab)
 
-SUMMARY = re.compile(\n    r"(?m)^\s*(\d+)\s+packets transmitted,\s*(\d+)\s+received,"\n    r"(?:\s*\+\d+\s+errors,)?\s*([\d.]+)%\s+packet loss"\n)
+SUMMARY = re.compile(
+    r"(?m)^\s*(\d+)\s+packets transmitted,\s*(\d+)\s+received,"
+    r"(?:\s*\+\d+\s+errors,)?\s*([\d.]+)%\s+packet loss"
+)
 
 
 def measure(site: str, target: str, allowed: bool) -> None:
