@@ -1,5 +1,9 @@
 # NETLAB360
 
+> **CORTE VIGENTE S05 147A (15/11/2026):** TAR P1 original 10/11 localizado y SHA 4/4 conforme; P1B SHA 5/5; CSV Windows 70 PNG, 5 588 763 bytes y 70 hashes distintos; la captura 63 coincide con el original. Milestones #5–#8: descripciones realmente actualizadas mediante gh CLI y conservadas abiertas. PR #147 recuperación P1/HA protegida y PR #148 importación PNG fusionadas, **scripts aún no ejecutados en VM**. [Nuevo corte de reanudación](docs/gestion/CORTE-MAESTRO-NETLAB360-S05-147A-20261115.md). Los avisos siguientes son históricos.
+
+
+
 > **ALERTA S05 146A (15/11/2026):** el original PNG63 en Windows coincide por SHA; el preflight HA/NOC/SDN fue correcto, **pero los tres JSON P1 actuales difieren del manifiesto original** y no se emitió marcador final 146A. No declarar integridad P1 ni cerrar S05, no repetir iperf3 ni apagar el invitado. [Auditoría de procedencia](docs/evidencias/s05-reconciliacion-p1-146a-20261115.md).
 
 > **ÚNICO CORTE OPERATIVO VIGENTE — S05 145C (15/11/2026):** captura 63 del NOC **recibida, revisada y SHA-256 calculado**; LACP HQ/S1/S2 2/2, Faucet conectado (26 flujos observados en imagen), HTTP HQ principal. 145A y 145B no se repiten. P1/P1B ya tienen interpretación técnica descriptiva. Pendientes: HA de instancia #32, integración y hashes de PNG originales #105, documentación SDN #23, aceptación #5. [Leer corte maestro 145C](docs/gestion/CORTE-MAESTRO-NETLAB360-S05-145C-20261115.md). **Los cortes siguientes en este archivo son antecedentes históricos, no órdenes de ejecución.**
