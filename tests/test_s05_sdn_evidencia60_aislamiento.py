@@ -32,6 +32,36 @@ class TestS05SDNEvidencia60(unittest.TestCase):
         self.assertEqual(run.call_args.kwargs["timeout"], 20)
         self.assertNotIn("timeout", run.call_args.args[0])
 
+    def test_iputils_reporta_diez_intentos_y_diez_errores_arp(self):
+        real = subprocess.CompletedProcess(
+            ["ping"], 1,
+            "--- 198.18.41.13 ping statistics ---\\n"
+            "10 packets transmitted, 0 received, +10 errors, 100% packet loss, time 3088ms\\n"
+            "pipe 10\\n", "")
+        with mock.patch.object(module.subprocess, "run", return_value=real), \
+             redirect_stdout(io.StringIO()) as out:
+            module.measure("a", "198.18.41.13", allowed=False)
+        self.assertIn("RESUMEN=10 transmitidos, 0 recibidos, 100% pérdida; RC=1", out.getvalue())
+        self.assertIn("DENEGADO_RC_1", out.getvalue())
+
+    def test_iputils_errores_arp_no_permiten_aceptar_rc124(self):
+        bad = subprocess.CompletedProcess(
+            ["ping"], 124,
+            "10 packets transmitted, 0 received, +10 errors, 100% packet loss, time 3000ms\\n", "")
+        with mock.patch.object(module.subprocess, "run", return_value=bad), \
+             redirect_stdout(io.StringIO()):
+            with self.assertRaisesRegex(RuntimeError, "Aislamiento NO acreditado"):
+                module.measure("a", "198.18.41.13", allowed=False)
+
+    def test_dos_intentos_minimos_requeridos_en_denegacion(self):
+        bad = subprocess.CompletedProcess(
+            ["ping"], 1,
+            "1 packets transmitted, 0 received, 100% packet loss, time 100ms\\n", "")
+        with mock.patch.object(module.subprocess, "run", return_value=bad), \
+             redirect_stdout(io.StringIO()):
+            with self.assertRaisesRegex(RuntimeError, "fuera de rango"):
+                module.measure("a", "198.18.41.13", allowed=False)
+
     def test_rc124_no_es_evidencia_de_denegacion(self):
         with mock.patch.object(module.subprocess, "run", return_value=fake(124, 0)), \
              redirect_stdout(io.StringIO()):
