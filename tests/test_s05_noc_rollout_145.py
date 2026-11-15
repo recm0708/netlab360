@@ -25,7 +25,7 @@ class NocRolloutBashTests(unittest.TestCase):
             "sha256sum", "sudo -n mv -f -T",
             "ROOT_HELPER=OK_FIB_LACP_SDN",
             "LOTE145A_HELPER_ROOT_NOC=OK",
-            '"BACKUP" "$BIN"'
+            '"$BACKUP" "$BIN"'
         ):
             self.assertIn(key, text)
         self.assertNotIn("systemctl restart", text)
