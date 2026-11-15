@@ -1,5 +1,7 @@
 # NETLAB360 S05/P1 — LACP multistream piloto, medición real y retorno
 
+> **NOTA DE INTEGRIDAD POSTERIOR, 15/11/2026:** esta bitácora conserva los valores e SHA de la ejecución histórica de P1 del 10/11. En 146A, el TXT log aún verificó SHA correcto, **pero los tres JSON actualmente presentes en la VM no coincidieron**. Por tanto, los números históricos de esta página **no se deben reutilizar como lectura de los JSON actuales** hasta localizar las copias originales (TAR histórico) y verificar su procedencia. [Investigación y hashes](../evidencias/s05-reconciliacion-p1-146a-20261115.md).
+
 **Ejecución:** 10/11/2026, Panamá UTC−05. **Ubicación del ensayo:** `netlab360-lab`, Ubuntu 26.04.1, kernel `7.0.0-43-generic`. **Estado:** prueba piloto realizada y validada contra transcripción operativa del usuario. No se ha demostrado aún la capacidad máxima ni la integración multisede.
 
 ## Topología y método
