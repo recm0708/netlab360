@@ -1,5 +1,7 @@
 # NETLAB360
 
+> **ESTADO VIGENTE 15/11/2026 · S05:** [Corte maestro 143A/B/C completados](docs/gestion/CORTE-MAESTRO-NETLAB360-S05-143C-20261115.md). 143A=55/55 pruebas, 143B=6/6 bonds 2/2 + Faucet conectado/25 flujos, 143C=4 tarjetas UI y JS correctos. La API NOC indicó HTTP HA status=offline desde S2 en una muestra válida: diagnosticar con [144A/B/C](docs/operacion/s05-lotes-144a-144c-diagnostico-http-ha-pre-noc-20261115.md). **La extensión NOC LACP/SDN sigue sin instalarse; no reiniciar NOC ni Ubuntu hasta revisar HA.**
+
 > **REANUDAR PROYECTO · 15/11/2026:** [Corte maestro S05, lote 142B detenido](docs/gestion/CORTE-MAESTRO-NETLAB360-S05-142B-20261115.md) · [Procedimiento corregido 143A–143C](docs/operacion/s05-lotes-143a-143c-reparacion-parser-y-continuidad-20261115.md). 142A aprobó 49 pruebas; 142B falló dos veces porque ad_num_ports no aparece en ip JSON (None), 142C no se ejecutó. La ampliación LACP/SDN del NOC existe en GitHub pero **NO se ha desplegado** en la VM. No repetir pruebas LACP/SDN acreditadas ni reiniciar Ubuntu.
 
 **Plataforma virtualizada para la automatización, observabilidad y diagnóstico de redes empresariales multisede.**
