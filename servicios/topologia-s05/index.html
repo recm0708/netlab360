@@ -181,6 +181,19 @@ header{padding-top:15px;padding-bottom:15px}
 .ha-overview{row-gap:7px;line-height:1.55}
 .ha-overview #ha-source{white-space:normal}
 body.presentation .ha-overview{margin:6px 0;padding:8px 14px}
+
+/* Panel de observabilidad: independiente de la topología SVG y rutas FIB. */
+.ob-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.ob-panel{border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:12px 16px;margin-bottom:14px}
+.ob-panel h2{font-size:1rem;margin:0 0 12px}
+.ob-item{border:1px solid #33536b;background:#11253a;border-radius:10px;padding:12px}
+.ob-item strong{display:block;font-size:.77rem;color:#cde9fc}
+.ob-state{display:block;font-size:1rem;font-weight:750;color:#a5b4c8;margin:5px 0}
+.ob-state.up{color:var(--good)}.ob-state.degraded{color:var(--warn)}.ob-state.down{color:var(--bad)}
+.ob-detail,.ob-sources{color:var(--muted);font-size:.77rem;line-height:1.5}
+.ob-sources{margin-top:10px}
+@media(max-width:1060px){.ob-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.ob-grid{grid-template-columns:1fr}}
 </style></head>
 <body>
 <header>
@@ -212,6 +225,16 @@ body.presentation .ha-overview{margin:6px 0;padding:8px 14px}
 <span id="ha-active" class="ha-unknown" aria-live="polite">Estado del frontal: SIN DATOS</span>
 <span id="ha-backends" class="ha-source">Servicios verificados desde S2: sin muestra</span>
 <span id="ha-source" class="ha-source">Healthcheck HTTP de aplicación, independiente de la FIB</span>
+</section>
+<section class="ob-panel" aria-label="Estado LACP y OpenFlow observado">
+<h2>Agregación de enlaces y controlador SDN</h2>
+<div class="ob-grid">
+<div class="ob-item"><strong>LACP HQ</strong><span id="obs-hq-state" class="ob-state">SIN DATOS</span><span id="obs-hq-detail" class="ob-detail">Sin lectura del agregador</span></div>
+<div class="ob-item"><strong>LACP S1</strong><span id="obs-s1-state" class="ob-state">SIN DATOS</span><span id="obs-s1-detail" class="ob-detail">Sin lectura del agregador</span></div>
+<div class="ob-item"><strong>LACP S2</strong><span id="obs-s2-state" class="ob-state">SIN DATOS</span><span id="obs-s2-detail" class="ob-detail">Sin lectura del agregador</span></div>
+<div class="ob-item"><strong>FAUCET · OPENFLOW</strong><span id="obs-sdn-state" class="ob-state">SIN DATOS</span><span id="obs-sdn-detail" class="ob-detail">Sin lectura del controlador</span></div>
+</div>
+<div id="obs-sources" class="ob-sources">Muestras verificadas y caducidad pendiente</div>
 </section>
 <div class="layout">
 <section class="canvas" aria-label="Diagrama de red multisede">
@@ -555,8 +578,35 @@ function drawExtensions(data){
    });
  });
 }
+function renderObservedSources(data){
+ const lacp=data.lacp||{},sites=lacp.sites||{};
+ for(const site of ["HQ","S1","S2"]){
+  const x=sites[site]||{},name=site.toLowerCase();
+  const status=["up","degraded","down"].includes(x.status)?x.status:"unknown";
+  const statusLabel={up:"OPERATIVO",degraded:"DEGRADADO",down:"SIN ENLACE",unknown:"SIN DATOS"};
+  const label=$("obs-"+name+"-state");
+  label.textContent=statusLabel[status];
+  label.className="ob-state "+(status==="unknown"?"":status);
+  $("obs-"+name+"-detail").textContent=status!=="unknown"?
+   "Switch: "+x.switch_members+"/2 · Cliente: "+x.client_members+"/2 · 802.3ad":
+   "No hay lectura suficiente; no se presume activo";
+ }
+ const s=data.sdn||{},status=s.available===true?
+   (s.connected===true?"up":s.connected===false?"down":"unknown"):"unknown";
+ const label=$("obs-sdn-state");
+ label.textContent=status==="up"?"CONECTADO":status==="down"?"DESCONECTADO":"SIN DATOS";
+ label.className="ob-state "+(status==="unknown"?"":status);
+ $("obs-sdn-detail").textContent=status==="up"&&Number.isInteger(s.flow_count)?
+   "OVS/OF1.3 · "+s.flow_count+" reglas observadas":
+   status==="down"?"Faucet sin conexión OpenFlow":"No hay muestra confiable";
+ const a=formatPanamaStamp(lacp.observed_at_utc),b=formatPanamaStamp(s.observed_at_utc);
+ $("obs-sources").textContent="Lectura LACP: "+(a||"SIN DATOS")+
+  " · Lectura SDN: "+(b||"SIN DATOS")+
+  " · Estado observado, sin inferir disponibilidad desde JSON persistido";
+}
 function render(data){
  latest=data;
+ renderObservedSources(data);
  const c=data.counts||{};
  $("c-sites").textContent=c.sites??"—";
  $("c-routers").textContent=c.routers??"—";
