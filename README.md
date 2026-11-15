@@ -1,5 +1,7 @@
 # NETLAB360
 
+> **ALERTA S05 146A (15/11/2026):** el original PNG63 en Windows coincide por SHA; el preflight HA/NOC/SDN fue correcto, **pero los tres JSON P1 actuales difieren del manifiesto original** y no se emitió marcador final 146A. No declarar integridad P1 ni cerrar S05, no repetir iperf3 ni apagar el invitado. [Auditoría de procedencia](docs/evidencias/s05-reconciliacion-p1-146a-20261115.md).
+
 > **ÚNICO CORTE OPERATIVO VIGENTE — S05 145C (15/11/2026):** captura 63 del NOC **recibida, revisada y SHA-256 calculado**; LACP HQ/S1/S2 2/2, Faucet conectado (26 flujos observados en imagen), HTTP HQ principal. 145A y 145B no se repiten. P1/P1B ya tienen interpretación técnica descriptiva. Pendientes: HA de instancia #32, integración y hashes de PNG originales #105, documentación SDN #23, aceptación #5. [Leer corte maestro 145C](docs/gestion/CORTE-MAESTRO-NETLAB360-S05-145C-20261115.md). **Los cortes siguientes en este archivo son antecedentes históricos, no órdenes de ejecución.**
 
 
