@@ -1,5 +1,9 @@
 # NETLAB360 · Tablero vigente de la fase S05
 
+> **CORTE VIGENTE 151 — 15/11/2026:** ZIP/CSV con 70 PNG transferidos desde Windows y auditados en Ubuntu: SHA 70/70, firma/tamaño, 3/3 tests. Pruebas watchdog 2/2, seis servicios HA/NOC/exporter activos, backend HQ principal, ens33 y Git sin cambios. **No hay prueba de falla de instancia ejecutada ni importación Git de PNG aún.** [Corte 151](CORTE-MAESTRO-NETLAB360-S05-151-20261115.md). Avisos inferiores históricos.
+
+
+
 > **ESTADO VIGENTE 147A — 15/11/2026:** TAR P1 histórico verificado 4/4 SHA sin extracción, P1B 5/5; CSV 70 PNG inventariado y captura 63 cotejada con Windows. Cuatro descripciones milestones GitHub ya actualizadas con estado abierto. Código de recuperación P1, watchdog para una prueba HA y cotejo ZIP/CSV PNG fusionados con CI; **pendiente ejecutar en VM**, importar originales y documentar aceptación. [Corte maestro 147A](CORTE-MAESTRO-NETLAB360-S05-147A-20261115.md). Avisos inferiores históricos.
 
 
