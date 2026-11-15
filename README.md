@@ -1,5 +1,7 @@
 # NETLAB360
 
+> **REANUDAR PROYECTO · 15/11/2026:** [Corte maestro S05, lote 142B detenido](docs/gestion/CORTE-MAESTRO-NETLAB360-S05-142B-20261115.md) · [Procedimiento corregido 143A–143C](docs/operacion/s05-lotes-143a-143c-reparacion-parser-y-continuidad-20261115.md). 142A aprobó 49 pruebas; 142B falló dos veces porque ad_num_ports no aparece en ip JSON (None), 142C no se ejecutó. La ampliación LACP/SDN del NOC existe en GitHub pero **NO se ha desplegado** en la VM. No repetir pruebas LACP/SDN acreditadas ni reiniciar Ubuntu.
+
 **Plataforma virtualizada para la automatización, observabilidad y diagnóstico de redes empresariales multisede.**
 
 Desarrollamos NETLAB360 como proyecto semestral de **Tópicos Especiales II** en la Universidad Tecnológica de Panamá. Integramos tres sedes virtuales (HQ, S1 y S2) para diseñar, validar y documentar conectividad, automatización, supervisión y recuperación de fallos.
@@ -10,7 +12,7 @@ Desarrollamos NETLAB360 como proyecto semestral de **Tópicos Especiales II** en
 - **Automatización:** Python, Ansible, OpenTofu y GitHub Actions.
 - **Observabilidad:** Prometheus, exportadores propios, NOC web y SQLite.
 
-## Avance verificado — 14/11/2026
+## Avance verificado — 15/11/2026
 
 | Fase | Alcance | Estado |
 |---|---|---|
@@ -18,7 +20,7 @@ Desarrollamos NETLAB360 como proyecto semestral de **Tópicos Especiales II** en
 | S02 | Topología HQ/S1/S2, cuatro WAN y nueve VLAN | **Cerrada** |
 | S03 | SoT candidata, Ansible FRR, 17 metadatos OpenTofu y GitOps | **Cerrada según su alcance real** |
 | S04 | NOC multisede, incidente WAN, persistencia y medición SLI | **Cerrada técnicamente** |
-| S05 | NOC interactivo, redundancia WAN/HTTP HA, piloto LACP y bond integrado HQ VLAN120 | **En curso: OVS/Faucet y LACP S1/S2 pendientes** |
+| S05 | WAN/HTTP HA y LACP HQ/S1/S2 con fallos 2→1→2 probados; OVS/Faucet aislado y VLAN 410/420 validados, fallo/retorno sdna0 acreditado | **En curso: integrar LACP/SDN al NOC, HA de instancia, evidencias y aceptación** |
 | S06–S08 | Diagnóstico IA, integración AIOps y entrega | Pendientes |
 
 No atribuimos al proyecto capacidades aún no implementadas: OpenTofu S03 administra **metadatos locales**, no infraestructura externa. Utilizamos el **99 % como referencia experimental interna** para evaluar el SLI de recolección; la ventana de 60 minutos registró **97,586 %**, por lo que **no cumplió** dicho umbral. No acreditamos notificaciones externas ni un modelo ML entrenado.

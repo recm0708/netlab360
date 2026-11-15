@@ -63,6 +63,13 @@ def safe_json(path: Path, owner: str) -> dict:
 
 
 def observed_bond(namespace: str, device: str, alias: str) -> dict:
+    # Lista cerrada: la fuente privilegiada nunca admite un namespace o
+    # nombre de dispositivo elegido por la API ni por usuarios externos.
+    allowed = {(switch, "s5bond0") for switch, _ in LACP_SITES.values()}
+    allowed |= {(client, "bond0") for _, client in LACP_SITES.values()}
+    if (namespace, device) not in allowed:
+        raise RuntimeError("Namespace o bond ajeno al inventario S05")
+
     raw = json.loads(optional_read(
         "/usr/sbin/ip", "-n", namespace, "-j", "-d",
         "link", "show", "dev", device))
@@ -71,14 +78,29 @@ def observed_bond(namespace: str, device: str, alias: str) -> dict:
     row = raw[0]
     info = row.get("linkinfo") or {}
     data = info.get("info_data") or {}
-    ports = data.get("ad_num_ports")
     if (str(row.get("ifname", "")).split("@", 1)[0] != device
             or row.get("ifalias") != alias
             or info.get("info_kind") != "bond"
-            or str(data.get("mode")) != "802.3ad"
-            or isinstance(ports, bool) or not isinstance(ports, int)
-            or not 0 <= ports <= 2):
+            or str(data.get("mode")) != "802.3ad"):
         raise RuntimeError("Bond o datos 802.3ad no acreditados")
+
+    ports = data.get("ad_num_ports")
+    if ports is None:
+        # Algunas versiones de iproute2 omiten ad_num_ports en -j -d aunque
+        # lo muestran en ip -d y en /proc/net/bonding. La comprobación
+        # histórica de LACP en S05 ya usa Number of ports del mismo /proc.
+        proc = optional_read(
+            "/usr/sbin/ip", "netns", "exec", namespace,
+            "/usr/bin/cat", "/proc/net/bonding/" + device,
+            timeout=4.0)
+        if re.search(r"(?m)^Bonding Mode:\s*IEEE 802\.3ad\b", proc) is None:
+            raise RuntimeError("Bonding /proc no acredita IEEE 802.3ad")
+        matches = re.findall(r"(?m)^\s*Number of ports:\s*(\d+)\s*$", proc)
+        if len(matches) != 1:
+            raise RuntimeError("Bonding /proc sin número de puertos único")
+        ports = int(matches[0])
+    if type(ports) is not int or not 0 <= ports <= 2:
+        raise RuntimeError("Cantidad de miembros LACP no acreditada")
     return {
         "active_members": ports,
         "link_up": "UP" in row.get("flags", [])
@@ -92,7 +114,7 @@ def lacp_observation() -> dict:
     sites = {}
     for site, (switch, client) in LACP_SITES.items():
         unknown = {"status": "unknown", "switch_members": None,
-                   "client_members": None, "source": "iproute2 -j -d Linux bond"}
+                   "client_members": None, "source": "iproute2 JSON + /proc/net/bonding (si falta ad_num_ports)"}
         try:
             state = safe_json(LACP_STATES / ("state-" + site.lower() + ".json"),
                               "NETLAB360_S05_LACP_" + site + "_V1")
