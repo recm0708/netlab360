@@ -9,6 +9,7 @@ on:
       - 'inventario/topologia-extensiones-s05.json'
       - 'inventario/ipam/topologia-s02.yaml'
       - 'tests/test_s05_topologia.py'
+      - 'tests/test_s05_noc_lacp_sdn_telemetria.py'
       - 'tests/test_s05_layout.py'
       - 'tests/test_s05_observador_failover.py'
       - 'tests/test_s05_ha_precheck.py'
@@ -35,6 +36,7 @@ on:
       - 'inventario/topologia-extensiones-s05.json'
       - 'inventario/ipam/topologia-s02.yaml'
       - 'tests/test_s05_topologia.py'
+      - 'tests/test_s05_noc_lacp_sdn_telemetria.py'
       - 'tests/test_s05_layout.py'
       - 'tests/test_s05_observador_failover.py'
       - 'tests/test_s05_ha_precheck.py'
@@ -74,6 +76,7 @@ jobs:
         run: |
           python -m py_compile servicios/topologia-s05/app.py tests/test_s05_topologia.py
           python -m unittest discover -s tests -p 'test_s05_topologia.py' -v
+          python -m unittest discover -s tests -p 'test_s05_noc_lacp_sdn_telemetria.py' -v
           python -m unittest discover -s tests -p 'test_s05_layout.py' -v
           python -m unittest discover -s tests -p 'test_s05_observador_failover.py' -v
           python -m unittest discover -s tests -p 'test_s05_ha_precheck.py' -v
