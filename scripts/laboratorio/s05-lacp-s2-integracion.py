@@ -77,6 +77,45 @@ def management() -> dict[str, str]:
     return {"ens33": a, "routes": r}
 
 
+def assert_management_preserved(previous: dict[str, str]) -> None:
+    """Proteger ens33 y su ruta, sin congelar rutas de redes no relacionadas.
+
+    Durante el ciclo de vida SDN/Docker pueden aparecer rutas de bridges
+    nuevos en la tabla main. Son ajenas a la gestion del host; no justifican
+    declarar una perdida de ens33 ni modificar el estado persistido de LACP.
+    """
+    current = management()
+    if current == previous:
+        return
+    if not all(isinstance(item, dict) and
+               {"ens33", "routes"}.issubset(item)
+               for item in (previous, current)):
+        raise RuntimeError("Baseline de gestion mal formado")
+
+    def ens33_ips(snapshot: dict[str, str]) -> set[str]:
+        return set(re.findall(
+            r"\binet\s+(\d+\.\d+\.\d+\.\d+/\d+)\b",
+            snapshot["ens33"]
+        ))
+
+    def protected_routes(snapshot: dict[str, str]) -> set[str]:
+        return {
+            " ".join(line.split())
+            for line in snapshot["routes"].splitlines()
+            if line.startswith("default ") or
+            re.search(r"\bdev\s+ens33\b", line)
+        }
+
+    if ens33_ips(current) != ens33_ips(previous):
+        raise RuntimeError("Direcciones IPv4 de ens33 cambiaron respecto del precheck")
+    if protected_routes(current) != protected_routes(previous):
+        raise RuntimeError("Rutas de ens33 o rutas predeterminadas cambiaron")
+    print(f"S05_LACP_{SITE}_GESTION_CRITICA=CONSERVADA_RUTAS_AJENAS_PERMITIDAS",
+          flush=True)
+
+
+
+
 def links(ns: str) -> dict[str, dict]:
     items = json.loads(ns_exec(ns, "ip", "-j", "-d", "link", "show"))
     return {item["ifname"]: item for item in items}
@@ -318,8 +357,7 @@ def status(data: dict, ping: bool = True) -> None:
     if ping:
         for target in (GW, "10.70.20.23", "10.71.20.21", "10.70.20.40"):
             ping_verified(CLIENT, target)
-    if management() != data["before"]["mgmt"]:
-        raise RuntimeError("Red de gestión cambió respecto del precheck")
+    assert_management_preserved(data["before"]["mgmt"])
     assert_protected(data["before"]["switch"])
     assert_services()
     print("S05_LACP_S2_S02_PUERTOS_VLAN=CONSERVADOS")
@@ -329,8 +367,7 @@ def status(data: dict, ping: bool = True) -> None:
 def cleanup(data: dict) -> None:
     if data.get("status") not in ("creating", "active", "cleanup_pending"):
         raise RuntimeError("Estado de LACP S2 no autoriza limpieza")
-    if management() != data["before"]["mgmt"]:
-        raise RuntimeError("Gestión cambió: bloquear limpieza")
+    assert_management_preserved(data["before"]["mgmt"])
     assert_protected(data["before"]["switch"], before_cleanup=True)
     names = netns()
     if CLIENT in names:
@@ -356,8 +393,7 @@ def cleanup(data: dict) -> None:
     if CLIENT in netns():
         raise RuntimeError("Namespace cliente S05 S2 residual")
     assert_protected(data["before"]["switch"])
-    if management() != data["before"]["mgmt"]:
-        raise RuntimeError("Host perdió baseline de gestión")
+    assert_management_preserved(data["before"]["mgmt"])
     STATE.unlink()
     print("S05_LACP_S2_LIMPIEZA=OK")
     print("S05_LACP_S2_S02_CONSERVADO=SI")
