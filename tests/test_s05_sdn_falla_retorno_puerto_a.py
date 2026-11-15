@@ -84,8 +84,6 @@ class TestS05SDNLinkFault(unittest.TestCase):
         command = root.call_args.args
         self.assertEqual(command[:2], ("systemd-run", "--unit"))
         self.assertIn("--on-active=120s", command)
-        self.assertEqual(command[-5:], ("/usr/sbin/ip", "link", "set", "dev", mod.PORT, "up")[-5:]) if False else None
-        self.assertEqual(command[-6:], ("link", "set", "dev", "sdna0", "up")[-6:]) if False else None
         self.assertEqual(command[-6:], ("/usr/sbin/ip", "link", "set", "dev", "sdna0", "up"))
 
     def test_no_muta_si_precheck_falla(self):
