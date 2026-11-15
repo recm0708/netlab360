@@ -1,5 +1,7 @@
 # NETLAB360 — Corte maestro S05: captura 145C y cierre restante
 
+> **ACTUALIZACION 146A (15/11/2026):** el lote 146A detectó discrepancia SHA-256 en los tres JSON P1: el log original coincide, pero JSON actuales y manifiesto histórico no. **Los valores P1 de este corte son provisionales; no copiarlos al informe hasta reconciliar** los originales del TAR, sin sobrescribir archivos ni recalcular manifiestos. Las verificaciones HA/NOC/SDN hasta 146A-12 sí fueron correctas, pero 146A abortó en 146A-13. Leer [auditoría de procedencia P1](../evidencias/s05-reconciliacion-p1-146a-20261115.md).
+
 **Fecha:** 15 de noviembre de 2026. **Alcance:** S05 exclusivamente. Continúa el [corte maestro 145B](CORTE-MAESTRO-NETLAB360-S05-145B-20261115.md) y sustituye sus instrucciones operativas de «captura 63 no tomada». Los datos históricos 145A/145B permanecen válidos.
 
 ## 145C: evidencia visual verificada
