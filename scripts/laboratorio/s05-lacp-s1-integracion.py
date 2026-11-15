@@ -94,7 +94,7 @@ def assert_management_preserved(previous: dict[str, str]) -> None:
 
     def ens33_ips(snapshot: dict[str, str]) -> set[str]:
         return set(re.findall(
-            r"\\binet\\s+(\\d+\\.\\d+\\.\\d+\\.\\d+/\\d+)\\b",
+            r"\binet\s+(\d+\.\d+\.\d+\.\d+/\d+)\b",
             snapshot["ens33"]
         ))
 
@@ -103,7 +103,7 @@ def assert_management_preserved(previous: dict[str, str]) -> None:
             " ".join(line.split())
             for line in snapshot["routes"].splitlines()
             if line.startswith("default ") or
-            re.search(r"\\bdev\\s+ens33\\b", line)
+            re.search(r"\bdev\s+ens33\b", line)
         }
 
     if ens33_ips(current) != ens33_ips(previous):
