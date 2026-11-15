@@ -1,5 +1,9 @@
 # NETLAB360
 
+> **S05 CORTE VIGENTE 151 (15/11/2026):** originales P1 recuperados (4/4) y P1B 5/5 SHA; 70 PNG originales pasaron SHA en Windows y ZIP/CSV en Ubuntu (70/70, 5 588 763 bytes), pero NO se han importado a Git; HA HQ precheck 6/6 y 2/2 tests watchdog, falla real pendiente. **Siguiente: único ciclo HQ→S1→HQ protegido y después importación PNG con revisión de datos sensibles.** [Leer corte S05 151](docs/gestion/CORTE-MAESTRO-NETLAB360-S05-151-20261115.md). Avisos inferiores: historial.
+
+
+
 > **CORTE VIGENTE S05 147A (15/11/2026):** TAR P1 original 10/11 localizado y SHA 4/4 conforme; P1B SHA 5/5; CSV Windows 70 PNG, 5 588 763 bytes y 70 hashes distintos; la captura 63 coincide con el original. Milestones #5–#8: descripciones realmente actualizadas mediante gh CLI y conservadas abiertas. PR #147 recuperación P1/HA protegida y PR #148 importación PNG fusionadas, **scripts aún no ejecutados en VM**. [Nuevo corte de reanudación](docs/gestion/CORTE-MAESTRO-NETLAB360-S05-147A-20261115.md). Los avisos siguientes son históricos.
 
 
