@@ -18,7 +18,10 @@ assert spec and spec.loader
 lab = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(lab)
 
-SUMMARY = re.compile(r"(?m)^\s*(\d+)\s+packets transmitted,\s*(\d+)\s+received,\s*([\d.]+)%\s+packet loss")
+SUMMARY = re.compile(
+    r"(?m)^\s*(\d+)\s+packets transmitted,\s*(\d+)\s+received,"
+    r"(?:\s*\+\d+\s+errors,)?\s*([\d.]+)%\s+packet loss"
+)
 
 
 def measure(site: str, target: str, allowed: bool) -> None:
@@ -42,10 +45,13 @@ def measure(site: str, target: str, allowed: bool) -> None:
     loss = float(found[3])
     print(f"RESUMEN={sent} transmitidos, {received} recibidos, {loss:g}% pérdida; RC={result.returncode}",
           flush=True)
-    if sent != 2:
-        raise RuntimeError(f"Cantidad de paquetes incorrecta {site}->{target}")
+    # iputils puede volver a transmitir ARP/ICMP hasta el deadline de -w
+    # si el kernel genera Destination Host Unreachable. No falsear fallo:
+    # comprobar RC de ping, 0 respuestas y 100% perdida, no sent == 2.
+    if sent < 2 or sent > 32:
+        raise RuntimeError(f"Cantidad de intentos fuera de rango {site}->{target}: {sent}")
     if allowed:
-        if result.returncode != 0 or received != 2 or loss != 0:
+        if result.returncode != 0 or sent != 2 or received != 2 or loss != 0:
             raise RuntimeError(f"El tráfico autorizado {site}->{target} no fue entregado")
         print(f"S05_SDN_PRUEBA_{site.upper()}_{target}=PERMITIDO_RC_0", flush=True)
     else:
