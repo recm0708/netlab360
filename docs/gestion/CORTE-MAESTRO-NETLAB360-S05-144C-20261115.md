@@ -1,5 +1,7 @@
 # CORTE MAESTRO NETLAB360 — 15/11/2026: 144A/B/C OK, siguiente 145A/B
 
+> **HISTÓRICO SUPERADO:** 145A y 145B YA FUERON EJECUTADOS Y APROBADOS EN VM. No volver a correr sus scripts. Para continuar: [CORTE MAESTRO 145B](CORTE-MAESTRO-NETLAB360-S05-145B-20261115.md), que sitúa el siguiente paso en captura 63, y [Auditoría S05–S08](AUDITORIA-ISSUES-MILESTONES-S05-S08-145B-20261115.md).
+
 **PUNTO VIGENTE DE REANUDACIÓN; leer primero.** Los cortes 142B y 143C quedan históricos.
 
 ## Entorno
