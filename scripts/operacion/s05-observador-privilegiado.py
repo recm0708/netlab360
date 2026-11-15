@@ -266,8 +266,19 @@ def snapshot() -> dict:
             if route is not None:
                 result["routes"][site] = route
     # Las observaciones opcionales nunca pueden invalidar el contrato FRR/FIB.
-    result["lacp"] = lacp_observation()
-    result["sdn"] = sdn_observation()
+    try:
+        result["lacp"] = lacp_observation()
+    except Exception:
+        result["lacp"] = {"owner": "NETLAB360_S05_LACP_OBSERVATION_V1",
+                          "observed_at_utc": None, "available": False,
+                          "sites": {}}
+    try:
+        result["sdn"] = sdn_observation()
+    except Exception:
+        result["sdn"] = {"owner": "NETLAB360_S05_SDN_OBSERVATION_V1",
+                         "observed_at_utc": None, "available": False,
+                         "status": "unknown", "connected": None,
+                         "flow_count": None}
     return result
 
 
