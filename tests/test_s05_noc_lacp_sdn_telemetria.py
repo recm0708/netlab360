@@ -72,7 +72,78 @@ class TestNocExtendedSources(unittest.TestCase):
         with mock.patch.object(helper, "optional_read",
                                return_value=bond_json()):
             with self.assertRaisesRegex(RuntimeError, "no acreditados"):
-                helper.observed_bond("x", "bond0", "S05_HQ_ffffffffffffffff")
+                helper.observed_bond("nl360-s05-lacp-hq", "bond0", "S05_HQ_ffffffffffffffff")
+
+    def test_root_observed_bond_json_sin_ad_num_ports_con_proc_real(self):
+        alias = "S05_HQ_0000000000000000"
+        proc = (
+            "Ethernet Channel Bonding Driver: v6.16\\n"
+            "Bonding Mode: IEEE 802.3ad Dynamic link aggregation\\n"
+            "MII Status: up\\n"
+            "Active Aggregator Info:\\n"
+            "        Aggregator ID: 1\\n"
+            "        Number of ports: 2\\n"
+        ).replace("\\n", "\n")
+        with mock.patch.object(
+            helper, "optional_read",
+            side_effect=[bond_json(alias=alias, ports=None), proc]
+        ) as reader:
+            result = helper.observed_bond("nl360-s05-lacp-hq", "bond0", alias)
+        self.assertTrue(result["link_up"])
+        self.assertEqual(result["active_members"], 2)
+        self.assertEqual(reader.call_count, 2)
+        self.assertEqual(reader.call_args_list[1].args, (
+            "/usr/sbin/ip", "netns", "exec", "nl360-s05-lacp-hq",
+            "/usr/bin/cat", "/proc/net/bonding/bond0",
+        ))
+        self.assertEqual(reader.call_args_list[1].kwargs["timeout"], 4.0)
+
+    def test_root_observed_bond_proc_degradado_un_puerto(self):
+        alias = "S05_HQ_0000000000000000"
+        proc = "Bonding Mode: IEEE 802.3ad Dynamic link aggregation\\nNumber of ports: 1\\n".replace("\\n", "\n")
+        with mock.patch.object(helper, "optional_read",
+                               side_effect=[bond_json(alias=alias, ports=None), proc]):
+            result = helper.observed_bond("nl360-s05-lacp-hq", "bond0", alias)
+        self.assertEqual(result["active_members"], 1)
+
+    def test_root_observed_bond_proc_no_acredita_modo_o_numero(self):
+        alias = "S05_HQ_0000000000000000"
+        invalids = (
+            "Bonding Mode: fault tolerance (active-backup)\\nNumber of ports: 2\\n",
+            "Bonding Mode: IEEE 802.3ad Dynamic link aggregation\\n",
+            "Bonding Mode: IEEE 802.3ad Dynamic link aggregation\\nNumber of ports: 9\\n",
+            "Bonding Mode: IEEE 802.3ad Dynamic link aggregation\\nNumber of ports: 2\\nNumber of ports: 1\\n",
+        )
+        for raw in invalids:
+            with self.subTest(raw=raw), mock.patch.object(
+                helper, "optional_read", side_effect=[
+                    bond_json(alias=alias, ports=None), raw.replace("\\n", "\n")
+                ]
+            ):
+                with self.assertRaises(RuntimeError):
+                    helper.observed_bond("nl360-s05-lacp-hq", "bond0", alias)
+
+    def test_root_observed_bond_proc_no_disponible_se_rechaza(self):
+        alias = "S05_HQ_0000000000000000"
+        with mock.patch.object(helper, "optional_read", side_effect=[
+                bond_json(alias=alias, ports=None), RuntimeError("proceso no observado")
+        ]):
+            with self.assertRaisesRegex(RuntimeError, "no observado"):
+                helper.observed_bond("nl360-s05-lacp-hq", "bond0", alias)
+
+    def test_root_observed_bond_namespace_ajeno_no_se_consulta(self):
+        with mock.patch.object(helper, "optional_read") as reader:
+            with self.assertRaisesRegex(RuntimeError, "ajeno al inventario"):
+                helper.observed_bond("nl360-s02-h-hq-120", "bond0", "alias")
+        reader.assert_not_called()
+
+    def test_root_observed_bond_json_ya_completo_sin_proc(self):
+        alias = "S05_HQ_0000000000000000"
+        with mock.patch.object(helper, "optional_read",
+                               return_value=bond_json(alias=alias, ports=2)) as reader:
+            result = helper.observed_bond("nl360-s05-lacp-hq", "bond0", alias)
+        self.assertEqual(result["active_members"], 2)
+        reader.assert_called_once()
 
     def test_root_observed_bond_rejects_unexpected_type(self):
         payload = json.loads(bond_json())
