@@ -160,8 +160,7 @@ def observed_lacp(source: dict | None) -> tuple[dict, str]:
               or not isinstance(a, int) or not isinstance(b, int)
               or not 0 <= a <= 2 or not 0 <= b <= 2
               or (status == "up" and (a != 2 or b != 2))
-              or (status == "degraded" and min(a, b) != 1)
-              or (status == "down" and min(a, b) != 0 and a == 2 and b == 2)):
+              or (status == "degraded" and min(a, b) != 1)):
             return unknown, "LACP: datos de agregador inconsistentes"
         sites[site] = {"status": status, "switch_members": a,
                        "client_members": b}
