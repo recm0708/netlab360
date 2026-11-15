@@ -1,5 +1,9 @@
 # NETLAB360 · Tablero vigente de la fase S05
 
+> **CORTE OPERATIVO 152/153 (15/11/2026):** HA de instancia probada realmente HQ→S1→HQ (17 muestras, watchdog armado/cancelado, 6/6 servicios); originales 70 PNG copiados a **rama local** y verificados 70/70 SHA. Lote 153 abortó **después** de la importación por un límite arbitrario de dimensiones (100px), no por fallo de hash. Captura 64 tomada, aún fuera de Git; JSONL igualmente fuera de Git. No repetir ensayos ni `--import`; identificar tamaño recortado, incorporar PNG64 y registrar evidencias antes del merge. [Corte 153 parcial](CORTE-MAESTRO-NETLAB360-S05-153-PARCIAL-20261115.md). Avisos inferiores: históricos.
+
+
+
 > **CORTE VIGENTE 151 — 15/11/2026:** ZIP/CSV con 70 PNG transferidos desde Windows y auditados en Ubuntu: SHA 70/70, firma/tamaño, 3/3 tests. Pruebas watchdog 2/2, seis servicios HA/NOC/exporter activos, backend HQ principal, ens33 y Git sin cambios. **No hay prueba de falla de instancia ejecutada ni importación Git de PNG aún.** [Corte 151](CORTE-MAESTRO-NETLAB360-S05-151-20261115.md). Avisos inferiores históricos.
 
 
