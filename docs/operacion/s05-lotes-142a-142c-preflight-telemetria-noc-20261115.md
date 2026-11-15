@@ -1,5 +1,7 @@
 # NETLAB360 S05 — Lotes 142A–142C: precheck para observaciones LACP/SDN en NOC
 
+> **ADVERTENCIA DE CONTINUIDAD (15/11/2026):** 142A aprobó 49/49 pruebas, 142B falló DOS veces en paso 826 (iproute2 omite ad_num_ports en JSON; aparece None) y 142C no se ejecutó. **NO ejecutar de nuevo el 142B de este documento ni el 142C sin la nueva validación.** Conservar el TXT 06 original fallido. Seguir [lotes 143A–143C corregidos](s05-lotes-143a-143c-reparacion-parser-y-continuidad-20261115.md), que verifican seis bonds con /proc/net/bonding antes de instalar cualquier observador. [Corte maestro](../gestion/CORTE-MAESTRO-NETLAB360-S05-142B-20261115.md).
+
 Corte real (15/11/2026): 139A NOC 9130 y exporter 9110 activos y dos muestras actualizadas, FIB S1=s1p S2=s2p, backend HTTP HQ principal, sin warnings. 139B helper privilegiado raíz root:root 0755, SHA igual al repositorio, snapshot FRR/FIB RC0. Lote 140 LACP HQ/S1/S2 2/2 en ambos extremos y Faucet/OVS OpenFlow conectado, estado S05 propio. Lote 141 14+4 tests OK, grafo 18 nodos/21 enlaces, sin campos LACP ni SDN.
 
 PR de implementación: observador autorizado amplía su única acción snapshot con lectura de seis bonds Linux 802.3ad y OVS/Faucet; el API NOC exige propietario y marca UTC fresca y representa UNKNOWN si faltan datos. UI tiene cuatro tarjetas fuera del SVG, manteniendo el mismo formato de hora Panama. Esta PR no ejecuta cambios en la VM: primero verificar JSON real y el helper antes de instalar root.
