@@ -224,9 +224,24 @@ def up() -> None:
             time.sleep(1)
         else:
             raise RuntimeError("Faucet/OVS no establecieron canal OpenFlow")
+        # El canal TCP puede estar conectado ANTES de instalarse el pipeline.
+        # Reintentar la aceptacion sin volver a crear ningun recurso.
+        last = None
+        for attempt in range(1, 4):
+            try:
+                status()
+                print(f"S05_SDN_ACEPTACION_INTENTO_{attempt}=OK", flush=True)
+                break
+            except (RuntimeError, subprocess.TimeoutExpired) as exc:
+                last = exc
+                print(f"S05_SDN_ACEPTACION_INTENTO_{attempt}=PENDIENTE",
+                      flush=True)
+                if attempt < 3:
+                    time.sleep(3)
+        else:
+            raise RuntimeError(f"No se confirmo el flujo SDN: {last}")
         state["status"] = "active"
         state_write(state)
-        status()
         print("S05_SDN_DESPLIEGUE=OK", flush=True)
     except BaseException as exc:
         state["status"] = "needs_inspection"
@@ -305,7 +320,7 @@ def down() -> None:
             raise RuntimeError("Hay puertos ajenos en bridge; no eliminar")
     if owned_controller() and owned_bridge():
         pass
-    print("S05_SDN_DOWN=SOLO_RECURSOS_PROPEDAD_S05", flush=True)
+    print("S05_SDN_DOWN=SOLO_RECURSOS_PROPIEDAD_S05", flush=True)
     if owned_bridge():
         ovs("del-br", BRIDGE)
     for ns in NS.values():
