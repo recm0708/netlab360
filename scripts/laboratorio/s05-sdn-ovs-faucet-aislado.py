@@ -336,6 +336,30 @@ def down() -> None:
     print("S05_SDN_DOWN=OK_RECURSOS_AISLADOS", flush=True)
 
 
+def inspect() -> None:
+    """Diagnostico read-only incluso si UP quedo parcial tras perder SSH."""
+    print("========== S05 SDN INSPECCION SOLO LECTURA ==========")
+    print(f"S05_SDN_STATE_EXISTE={STATE.exists() or STATE.is_symlink()}")
+    if STATE.is_file() and not STATE.is_symlink():
+        data = state_read()
+        print(f"S05_SDN_STATE_STATUS={data.get('status', 'UNKNOWN')}")
+        if data.get("error"):
+            print(f"S05_SDN_STATE_ERROR={data['error']}")
+    print(f"S05_SDN_OVS_BRIDGES={ovs('list-br').replace(chr(10), ',')}")
+    if BRIDGE in ovs("list-br").splitlines():
+        print(f"S05_SDN_BRIDGE_PROPIETARIO_OK={owned_bridge()}")
+        print(f"S05_SDN_PORTS={ovs('list-ports', BRIDGE).replace(chr(10), ',')}")
+    print("S05_SDN_NAMESPACES=" +
+          ",".join(sorted(set(NS.values()) & namespaces())))
+    print("S05_SDN_HOST_LINKS=" +
+          ",".join(sorted({v[0] for v in HOSTS.values()} & link_names())))
+    print(f"S05_SDN_CONTENEDOR_EXISTE={owned_controller()}")
+    before = management()
+    print("S05_SDN_GESTION=" + before["ens33"])
+    print("S05_SDN_GATEWAY=" + before["route"])
+    print("S05_SDN_INSPECCION=OK_SIN_CAMBIOS", flush=True)
+
+
 def plan() -> None:
     print("S05_SDN_PLAN=DPID_0x505_VLAN_410_420_NO_S02", flush=True)
     for site, (host, _, port, address) in HOSTS.items():
@@ -345,14 +369,14 @@ def plan() -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("plan", "precheck", "up", "status", "down"))
+    parser.add_argument("action", choices=("plan", "precheck", "up", "status", "inspect", "down"))
     parser.add_argument("--confirm-isolated", action="store_true")
     args = parser.parse_args()
     if args.action in ("up", "down") and not args.confirm_isolated:
         parser.error("up/down exigen --confirm-isolated")
     try:
         {"plan": plan, "precheck": precheck, "up": up,
-         "status": status, "down": down}[args.action]()
+         "status": status, "inspect": inspect, "down": down}[args.action]()
     except Exception as exc:
         print(f"S05_SDN_ERROR={type(exc).__name__}: {exc}", file=sys.stderr)
         raise SystemExit(1)
