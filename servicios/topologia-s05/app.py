@@ -95,6 +95,109 @@ def telemetry() -> tuple[dict | None, str]:
         return None, "Exporter S04 127.0.0.1:9110 sin muestra confiable"
 
 
+
+LACP_SITES = ("HQ", "S1", "S2")
+LACP_OBS_OWNER = "NETLAB360_S05_LACP_OBSERVATION_V1"
+SDN_OBS_OWNER = "NETLAB360_S05_SDN_OBSERVATION_V1"
+
+
+def optional_privileged_snapshot() -> tuple[dict | None, str]:
+    """Única lectura sudoers acotada. No se ejecutan comandos root nuevos."""
+    if os.environ.get("NETLAB360_PRIV_OBSERVER") != PRIV_HELPER:
+        return None, "Observaciones LACP/SDN: helper privilegiado no configurado"
+    try:
+        output = command("sudo", "-n", PRIV_HELPER, "snapshot", timeout=10)
+        if output.returncode:
+            return None, "Observaciones LACP/SDN: helper sin respuesta"
+        data = json.loads(output.stdout)
+        if (data.get("project") != "NETLAB360"
+                or data.get("owner") != "NETLAB360_S02_WAN_LINKS_V1"):
+            return None, "Observaciones LACP/SDN: propietario de fuente inválido"
+        return data, ""
+    except (OSError, ValueError, TypeError, subprocess.TimeoutExpired):
+        return None, "Observaciones LACP/SDN: fuente no consultable"
+
+
+def source_age_ok(value: object) -> bool:
+    if not isinstance(value, str):
+        return False
+    try:
+        stamp = datetime.fromisoformat(value)
+        if stamp.tzinfo is None:
+            return False
+        age = (datetime.now(timezone.utc) - stamp).total_seconds()
+        return -2 <= age <= 15
+    except (ValueError, TypeError, OverflowError):
+        return False
+
+
+def observed_lacp(source: dict | None) -> tuple[dict, str]:
+    unknown = {"available": False, "status": "unknown",
+               "observed_at_utc": None,
+               "sites": {site: {"status": "unknown",
+                                "switch_members": None, "client_members": None}
+                         for site in LACP_SITES}}
+    data = (source or {}).get("lacp")
+    if (not isinstance(data, dict)
+            or data.get("owner") != LACP_OBS_OWNER
+            or not source_age_ok(data.get("observed_at_utc"))
+            or not isinstance(data.get("sites"), dict)
+            or set(data["sites"]) != set(LACP_SITES)):
+        return unknown, "LACP: muestra ausente, obsoleta o no confiable"
+    sites = {}
+    for site in LACP_SITES:
+        row = data["sites"][site]
+        if not isinstance(row, dict):
+            return unknown, "LACP: respuesta no válida"
+        status = row.get("status")
+        a = row.get("switch_members")
+        b = row.get("client_members")
+        if status == "unknown":
+            if a is not None or b is not None:
+                return unknown, "LACP: respuesta UNKNOWN inconsistente"
+        elif (status not in ("up", "degraded", "down")
+              or isinstance(a, bool) or isinstance(b, bool)
+              or not isinstance(a, int) or not isinstance(b, int)
+              or not 0 <= a <= 2 or not 0 <= b <= 2
+              or (status == "up" and (a != 2 or b != 2))
+              or (status == "degraded" and min(a, b) != 1)):
+            return unknown, "LACP: datos de agregador inconsistentes"
+        sites[site] = {"status": status, "switch_members": a,
+                       "client_members": b}
+    return {"available": all(r["status"] != "unknown" for r in sites.values()),
+            "status": "observed" if all(r["status"] != "unknown"
+                                        for r in sites.values()) else "partial",
+            "observed_at_utc": data["observed_at_utc"],
+            "sites": sites,
+            "source": "Linux bonding 802.3ad, observación root read-only"}, ""
+
+
+def observed_sdn(source: dict | None) -> tuple[dict, str]:
+    unknown = {"available": False, "status": "unknown",
+               "connected": None, "flow_count": None, "observed_at_utc": None}
+    data = (source or {}).get("sdn")
+    if (not isinstance(data, dict) or data.get("owner") != SDN_OBS_OWNER
+            or not source_age_ok(data.get("observed_at_utc"))):
+        return unknown, "SDN: muestra ausente, obsoleta o no confiable"
+    if data.get("available") is False:
+        return unknown, "SDN: no se pudo comprobar propietario o controlador"
+    status = data.get("status")
+    connected = data.get("connected")
+    flows = data.get("flow_count")
+    if (data.get("available") is not True
+            or status not in ("connected", "disconnected")
+            or not isinstance(connected, bool)
+            or (status == "connected") != connected
+            or (connected and (type(flows) is not int or flows <= 0))
+            or (not connected and flows is not None)):
+        return unknown, "SDN: estado del controlador ambiguo"
+    return {"available": True, "status": status, "connected": connected,
+            "flow_count": flows, "observed_at_utc": data["observed_at_utc"],
+            "source": "OVS OpenFlow13 + Faucet; sin prueba de tráfico"}, ""
+
+
+
+
 def namespaces() -> tuple[set[str] | None, str]:
     # Listar netns suele ser legible sin privilegios. Intentarlo primero
     # evita depender de la caché sudo y no modifica namespaces.
@@ -181,7 +284,7 @@ def wan_state(w: dict, snap: dict | None) -> str:
     return "unknown"
 
 
-def fib_routes() -> tuple[dict | None, str]:
+def fib_routes(*, trusted_snapshot: dict | None = None) -> tuple[dict | None, str]:
     """Lee la FIB de R-HQ; nunca escribe en Docker, FRR, rutas o interfaces.
 
     La identidad del contenedor debe coincidir con el state WAN creado por S02.
@@ -197,10 +300,13 @@ def fib_routes() -> tuple[dict | None, str]:
         if not isinstance(expected_id, str) or len(expected_id) < 12:
             return None, "FIB: ID de router no valido"
         if os.environ.get("NETLAB360_PRIV_OBSERVER") == PRIV_HELPER:
-            output = command("sudo", "-n", PRIV_HELPER, "snapshot", timeout=6.0)
-            if output.returncode:
-                return None, "FIB: observador autorizado sin respuesta confiable"
-            trusted = json.loads(output.stdout)
+            if trusted_snapshot is None:
+                output = command("sudo", "-n", PRIV_HELPER, "snapshot", timeout=10.0)
+                if output.returncode:
+                    return None, "FIB: observador autorizado sin respuesta confiable"
+                trusted = json.loads(output.stdout)
+            else:
+                trusted = trusted_snapshot
             hq = (trusted.get("routers") or {}).get("R-HQ") or {}
             if (trusted.get("project") != "NETLAB360" or
                     trusted.get("owner") != "NETLAB360_S02_WAN_LINKS_V1" or
@@ -278,7 +384,8 @@ def fib_link_selection(w: dict, wan_status: str, fib: dict | None) -> str:
 
 
 def graph(inv: dict, snap: dict | None, ns: set[str] | None, ext: dict,
-          fib: dict | None = None, ha: dict | None = None) -> dict:
+          fib: dict | None = None, ha: dict | None = None,
+          lacp: dict | None = None, sdn: dict | None = None) -> dict:
     # El instante se toma del reloj de la VM; UTC se conserva para trazabilidad
     # y America/Panama se ofrece explícitamente para su presentación.
     now_utc = datetime.now(timezone.utc)
@@ -412,6 +519,8 @@ def graph(inv: dict, snap: dict | None, ns: set[str] | None, ext: dict,
                       "last_sample_utc": snap["observed_at_utc"] if snap else None},
         "routing": {"available": fib is not None, "source": "FIB Linux ip route get en R-HQ",
                     "routes": fib or {}, "traffic_measured": False},
+        "lacp": lacp if lacp is not None else observed_lacp(None)[0],
+        "sdn": sdn if sdn is not None else observed_sdn(None)[0],
         "ha_service": {
             "available": ha is not None,
             "source": "HTTP real desde S2 VLAN320; distinto de Linux FIB",
@@ -440,10 +549,18 @@ def current() -> dict:
     ext = extensions()
     snap, s_error = telemetry()
     ns, ns_error = namespaces()
-    fib, fib_error = fib_routes() if snap is not None and snap.get("topology") == "active" else (None, "")
+    privileged, privileged_error = optional_privileged_snapshot()
+    fib, fib_error = (fib_routes(trusted_snapshot=privileged)
+                      if snap is not None and snap.get("topology") == "active"
+                      else (None, ""))
     ha, ha_error = ha_observation() if ext["nodes"] else (None, "")
-    result = graph(inv, snap, ns, ext, fib=fib, ha=ha)
-    result["source_warnings"] = [x for x in (s_error, ns_error, fib_error, ha_error) if x]
+    lacp, lacp_error = observed_lacp(privileged)
+    sdn, sdn_error = observed_sdn(privileged)
+    result = graph(inv, snap, ns, ext, fib=fib, ha=ha, lacp=lacp, sdn=sdn)
+    result["source_warnings"] = [
+        x for x in (s_error, ns_error, fib_error, ha_error,
+                    privileged_error, lacp_error, sdn_error) if x
+    ]
     result["namespaces_observable"] = ns is not None
     return result
 
