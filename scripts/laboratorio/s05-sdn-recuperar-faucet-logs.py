@@ -12,6 +12,7 @@ import json
 import os
 from pathlib import Path
 import stat
+import subprocess
 import sys
 import time
 
@@ -141,7 +142,7 @@ def recover() -> None:
             lab.status(allow_recovery=True)
             print(f"S05_SDN_RECOVERY_ACEPTACION=OK_INTENTO_{attempt}", flush=True)
             break
-        except (RuntimeError, TimeoutError) as exc:
+        except (RuntimeError, subprocess.TimeoutExpired, TimeoutError) as exc:
             last = exc
             print(f"S05_SDN_RECOVERY_ACEPTACION=PENDIENTE_INTENTO_{attempt}",
                   flush=True)
