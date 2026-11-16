@@ -41,4 +41,4 @@ El exportador S04, los registros Prometheus/SQLite y el NOC de S05 permiten cons
 
 La arquitectura está implementada en una sola VM. Las conmutaciones probadas acreditan recuperación lógica de enlaces o backends, **no** tolerancia a la pérdida del host, del hypervisor ni del almacenamiento. La reconstrucción automatizada tras reiniciar Ubuntu sigue sin validarse.
 
-[Diseño HA](../diseno/s05-ha-servicios-multisede.md) · [LACP](../disenos/s05-lacp-integracion-multisede-candidata.md) · [SDN](../diseno/s05-ovs-faucet-vs-bridge-frr-y-limpieza-segura.md) · [Acta S05](../gestion/ACTA-ACEPTACION-TECNICA-S05-20261115.md).
+[Diseño HA](../diseno/s05-ha-servicios-multisede.md) · [LACP](../diseno/s05-lacp-8023ad-multisede.md) · [SDN](../diseno/s05-ovs-faucet-vs-bridge-frr-y-limpieza-segura.md) · [Acta S05](../gestion/ACTA-ACEPTACION-TECNICA-S05-20261115.md).
