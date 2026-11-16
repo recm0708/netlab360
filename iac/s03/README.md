@@ -16,4 +16,4 @@ Completamos `tofu init`, `validate`, `plan` y `apply` (**17 recursos añadidos, 
 
 **Límite del componente:** nuestros `terraform_data` representan metadatos; no crean routers FRRouting, enlaces WAN, interfaces ni VLAN. La configuración FRR en ejecución corresponde a [Ansible](../../ansible/s03/README.md). La integración de `data sources` y propiedad de recursos externos **no se implementó** en S03 y se registró como ampliación futura en [#17](https://github.com/recm0708/netlab360/issues/17).
 
-No utilizamos `tofu apply` ni `tofu destroy` para tareas documentales. [Registro técnico de S03](../../docs/sesiones/2026-10-25-s03-opentofu-metadata-ci.md).
+No utilizamos `tofu apply` ni `tofu destroy` para tareas documentales. Registro técnico de S03.
