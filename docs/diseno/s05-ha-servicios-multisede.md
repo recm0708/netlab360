@@ -1,54 +1,28 @@
-# NETLAB360 S05 · Diseño controlado de HA de servicios multisede
+# Arquitectura y validación de alta disponibilidad HTTP — S05
 
-**Estado operativo validado:** red HA S05 activa y HTTP HQ/S1/frontal implementado y probado mediante failover lógico, lotes 84–90, issue #32. **Actualizado:** 2026-11-11. El monitor de estado desde S2 y su integración visual NOC están versionados y **pendientes de desplegar en VM**.
+Implementamos una solución de **alta disponibilidad lógica de servicio HTTP** basada en dos backends ubicados en las sedes HQ y S1. Un frontal en HQ selecciona la instancia principal y conmuta a la secundaria cuando la primera deja de estar disponible. La observación desde S2 permite comprobar la selección del servicio sin confundirla con el estado de la WAN.
 
-## Alcance y propósito
+## Componentes implementados
 
-Demostrar **alta disponibilidad lógica de un servicio HTTP** con dos instancias independientes y mecanismo de comprobación de salud y conmutación. Este trabajo es distinto del failover de WAN S1/S2 ya aprobado (conmutación OSPF por FIB). Se busca comprobar acceso HTTP desde otra sede antes, durante y después de detener una instancia, conservando el servicio mediante otra instancia. Una sola VM **no** prueba tolerancia a la pérdida física de la máquina VMware.
+| Función | Sede y VLAN | Namespace | IPv4 |
+|---|---|---|---|
+| Backend principal HTTP | HQ, VLAN120 | `nl360-s05-ha-hq` | `10.70.20.21/24` |
+| Backend secundario HTTP | S1, VLAN220 | `nl360-s05-ha-s1` | `10.71.20.21/24` |
+| Frontal de acceso | HQ, VLAN120 | `nl360-s05-ha-fe` | `10.70.20.23/24` |
+| Cliente de observación | S2, VLAN320 | `nl360-s02-h-s2-320` | `10.72.20.20/24` |
 
-## Topología de servicios HA (implementada y validada en la VM)
+Los backends comparten la infraestructura multisede previamente creada; no modificamos la red administrativa `ens33`. Su selección y los estados de servicio se observan en el NOC de S05 por medio de fuentes de telemetría reales.
 
-El inventario S02 y el precheck del 11/11 documentan tres sedes, tres FRR, tres switches por netns y nueve VLAN. Los siguientes tres nodos **se desplegaron y comprobaron con HTTP real**, tras reservar y validar las direcciones candidatas. La extensión de inventario NOC está versionada; el estado visual dinámico requiere aún activar el monitor S2:
+## Verificación del servicio
 
-| Función | Namespace propuesto | Sede/VLAN | IP candidata | Estado |
-| --- | --- | --- | --- | --- |
-| Backend HTTP A (preferido) | `nl360-s05-ha-hq` | HQ / 120 | `10.70.20.21/24` | Activo y validado HTTP 200 |
-| Backend HTTP B (reserva) | `nl360-s05-ha-s1` | S1 / 220 | `10.71.20.21/24` | Activo; seleccionado en failover |
-| Proxy de supervisión/frontal | `nl360-s05-ha-fe` | HQ / 120 | `10.70.20.23/24` | Activo; principal HQ → S1 → HQ verificado |
-| Cliente test intersede **existente** | `nl360-s02-h-s2-320` | S2 / 320 | `10.72.20.20/24` | Observado |
+Comprobamos respuestas HTTP correctas de ambos backends y del frontal. Posteriormente efectuamos **una única interrupción controlada del backend HQ**, después de programar un rescate autónomo mediante `systemd` para restablecer exclusivamente esa unidad. El NOC registró **17 observaciones** con la secuencia `BACKEND_HQ → BACKEND_S1 → BACKEND_HQ`. El temporizador se canceló tras comprobar la restauración; el frontal, el monitor S2 y los servicios de observabilidad quedaron activos.
 
-Los gateways S02 existentes son `10.70.20.1`, `10.71.20.1` y `10.72.20.1`. El backend alterno situado en **S1** exige comunicación real sobre los enlaces WAN OSPF ya observados; separar lo que prueba redundancia de servicio de lo que prueba HA física de infraestructura.
+La regresión posterior acreditó FIB S1=`s1p`, S2=`s2p`, seis servicios activos y gestión `192.168.47.40/24` intacta. La evidencia original se conserva en JSONL, TXT y PNG64 con manifiestos SHA-256.
 
-**Las tres IP ya fueron asignadas por el despliegue HA S05 tras el precheck**, observadas en los namespaces y alcanzadas por ICMP desde S2; los servicios HTTP fueron validados después. La comprobación original de IPAM antecedió a la asignación, y la falta de ICMP por sí sola nunca se consideró prueba de disponibilidad.
+## Límites y recuperabilidad
 
-## Diseño de implementación (etapas completadas y siguientes)
+Esta prueba verifica tolerancia al fallo lógico de **una instancia backend** dentro de una única VM, no HA del frontal, del propio host Ubuntu, del hipervisor, del almacenamiento ni del equipo físico. Tampoco equivale a failover de miembro LACP ni a conmutación de enlace WAN; estos mecanismos se validaron en escenarios separados.
 
-1. Comprobar ownership `NETLAB360_S02_WAN_LINKS_V1`, `NETLAB360_S02_LAN_8021Q_V1`, IDs de routers, y `ens33=192.168.47.40/24` sin nuevas rutas host.
-2. Crear exclusivamente tres namespaces de propiedad S05 y sus extremos `veth` con nombres únicos (sin borrar ni renombrar `tr-sw`, `trunk0`, `br0`, `ens33`). Integrarlos bajo una operación transaccional, con rollback propio, como puertos nuevos etiquetados en switches existentes **solo si la revisión técnica de VLAN filtering lo permite**.
-3. Mantener backends independientes con comprobación HTTP de identidad, respuesta y salud. Frontal con política preferencia A y respaldo B por healthcheck; evitar respuestas cacheadas; registrar destino efectivo en cabecera o cuerpo JSON.
-4. Desde S2 y/o HQ verificar: A responde → A detenido temporalmente → B responde por el mismo endpoint → A restaurado → política de retorno verificada. Recoger tasa de éxito, indisponibilidad observable y límites de frecuencia de sondeo. **No afirmar cero interrupción si no se midió**.
-5. Limpiar procesos de prueba de modo explícito, o conservar servicios con `systemd` controlado y documentado solo después de éxito. Los artefactos de S05 se mantienen fuera de S02 y fuera de datos S04.
-6. Actualizar `inventario/topologia-extensiones-s05.json` **después**, no antes, de desplegar y verificar, con origen de datos y estados verificables.
+El rescate de `systemd` depende de que Ubuntu continúe ejecutándose. Un apagado normal de la VM destruiría los namespaces efímeros si no se ha completado su reconstrucción reproducible. Para pausas temporales preservamos el estado mediante suspensión VMware.
 
-## Riesgos y límites arquitectónicos
-
-- Frontal en HQ puede ser un **punto único de falla**. Una prueba de redundancia de backends no demuestra HA del frontal ni tolerancia a pérdida completa de HQ. La redundancia de router/switch/host físico se tratará como una demostración separada o una limitación explícita.
-- El tráfico de backends comparte recursos CPU, NIC y almacenamiento de una única VM; la medición no se extrapola a una infraestructura física.
-- No tocar `ens33`, VMnet8, default gateway, Docker `network_mode:none` de FRR, bases S04, puertos NOC `9130` y exporter `9110`, ni el snapshot manual `NETLAB360_S05_PreLAN_20261110`.
-- **No desplegar por el mero resultado de precheck**: primero validar addresses, puertos, rutas OSPF de VLAN de servicios y plan de rollback; luego implementar por lotes con capturas precisas.
-
-## Módulo de red HA versionado y ejecutado en la VM
-
-**Implementación desplegada en la VM:** [`scripts/laboratorio/s05-ha-red-servicios.py`](../../scripts/laboratorio/s05-ha-red-servicios.py) ofrece acciones `plan`, `precheck`, `up --confirm-isolated`, `status` y `down --confirm-isolated`. La CI [run 42974399828](https://github.com/recm0708/netlab360/actions/runs/42974399828) aprobó tests de contrato de recursos y sintaxis; **CI offline no certifica despliegue real**.
-
-Al ejecutarse `up`, el módulo comprueba el precheck S05 HA, ownership S02, Git limpio, dirección `ens33` y puertos sin ocupar. Reserva estado local en `~/netlab360-bootstrap/s05/ha/state.json` con owner `NETLAB360_S05_HA_RED_V1`; crea **tres namespaces exclusivos S05** y puertos `ha-hq21`, `ha-s121`, `ha-hq23` en switches S02, cada uno con VLAN de acceso 120/220 y ruta por defecto **dentro de su propio namespace**. Comprueba gateway local y conectividad desde S2 a cada IP. No crea ni modifica router FRR, `ens33`, rutas host, puertos `tr-sw/trunk0` ni servicios HTTP. Solo pasa a `status=active` después de validar; ante fallo intenta revertir únicamente interfaces y namespaces nuevos.
-
-La retirada `down` exige reconocer el estado HA y **rechaza borrar namespaces con procesos vivos**. Una vez implementados servidores HTTP, habrá que detener solo sus procesos antes de cualquier `down`. En caso de error de limpieza, conservar estado y revisar antes de reintentar; no usar `ip netns del` manualmente.
-
-**Ejecución validada:** lotes **84–86**: 51 pruebas S05, precheck, tres namespaces y tres puertos propios S05, comunicación S2→tres IPs, `S05_HA_RED_UP=OK`, `S05_HA_RED_STATUS=OK`, FIB principal intacta, manifiesto SHA256 6/6 y capturas S05_34–36. Lotes **87–90**: 62 pruebas S05, tres units `systemd` HTTP ejecutándose, frontal eligió HQ, conmutó a S1 tras detener exclusivamente backend HQ, **15 observaciones HTTP correctas** durante el respaldo y retorno automático a HQ, sin alterar la FIB WAN; capturas S05_37–38 y SHA256 6/6. Las units HTTP no se habilitaron para el boot ya que falta ordenar la recreación de namespaces después de reiniciar Ubuntu.
-
-## Validación de integración NOC siguiente
-
-Activar **solo si la red HA y los tres HTTP siguen activos** el monitor `netlab360-s05-ha-monitor-s2.service` bajo `NetworkNamespacePath=/run/netns/nl360-s02-h-s2-320`. El código `servicios/ha-s05/monitor_http_s2.py` realiza healthchecks HTTP fijos con proxy desactivado y publica `~/netlab360-bootstrap/s05/ha/observacion-http-s2.json`, sin Docker/sudo ni modificación de redes. `servicios/topologia-s05/app.py` valida identidad, origen S2 y ventana de frescura de 6 segundos antes de mostrar nodos o selección de aplicación como activos. En ausencia de lectura, muestra **SIN DATOS**. El inventario `topologia-extensiones-s05.json` incluye tres servidores materializados y cinco vínculos, sin atribuir disponibilidad por su mera existencia. `scripts/validacion/s05-ha-noc-ciclo.py` verificará desde la API NOC el ciclo HQ→S1→HQ, produciendo JSONL y restaurando el backend principal con un bloque `finally`. **Todavía no se ejecutó el monitor ni el ciclo NOC en la VM**.
-
-**Lotes completados:** 79 (JSONL 119 muestras, principal 55 / respaldo 64, SHA-256 y TAR técnico) y 80 (tres routers FRR activos, 12 namespaces S02, recursos 8 vCPU / 15 GiB RAM total / 132 GiB disco libre, gestión intacta). La captura S05_32 requiere confirmación de guardado por el operador.
+[Registro del ensayo](../../docs/gestion/s05-tablero-vigente.md) · [Evidencias](../../evidencias/capturas/README.md) · [Continuidad VMware](../05-plan-operativo-y-pausas.md).

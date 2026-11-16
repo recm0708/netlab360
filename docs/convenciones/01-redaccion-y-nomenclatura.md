@@ -1,26 +1,26 @@
-# NETLAB360 — Convenciones de redacción del repositorio
+# Convenciones editoriales de NETLAB360
 
-**Aplicación:** todos los archivos Markdown actuales y futuros del proyecto, incluidos README, bitácoras, decisiones de arquitectura, criterios académicos, informes técnicos y notas de evidencias.
+Estas convenciones se aplican a README, arquitectura, decisiones, operación, evidencias, bitácoras e informes técnicos del proyecto.
 
-## Voz documental
+## Voz del equipo
 
-Se utiliza una voz **técnica y natural**, como documentación del propio proyecto: `Se configuró…`, `Comprobé…` cuando se describe una operación personal, `Se verificó…`, `La prueba confirmó…`, `Quedó pendiente…`. Para decisiones del equipo, `Definimos…` o `Se acordó…`. No se introducen interlocutores externos como narradores de la bitácora.
+Escribimos de forma profesional, precisa y cohesionada desde el trabajo del grupo: «configuramos», «comprobamos», «registramos», «se verificó» o «la prueba confirmó». Evitamos narraciones externas como «el usuario solicitó», «el asistente verificó» o «el estudiante indicó» para describir nuestras propias actividades. No atribuimos aprobaciones a la docente sin respaldo específico.
 
-En los documentos del proyecto **no** se escriben expresiones del tipo `el estudiante informó`, `el usuario confirmó`, `el asistente verificó`, `una herramienta externa gestionó`, `se le pidió al estudiante` ni fórmulas equivalentes para narrar nuestro propio trabajo. Estas se sustituyen por descripciones comprobables del hecho, de su resultado, de la fuente técnica o de la decisión. **No atribuir a la docente afirmaciones no confirmadas:** distinguir `criterio indicado en clase`, `decisión de entrega comunicada` y `aprobación documentada` según el respaldo disponible.
+Usamos pasado para ensayos completados y futuro para actividades planificadas. Distinguimos explícitamente **diseñado**, **implementado**, **comprobado**, **documentado** y **pendiente**; no convertimos un código fusionado, un precheck o un plan en resultado operativo sin evidencia.
 
-**Excepciones:** `usuarios` como población de una VLAN, el `usuario final` de una interfaz, denominaciones de productos cuando sean objeto de estudio, nombres exactos de archivos, terminales, comandos, mensajes de error, resultados literales y citas bibliográficas. Nunca cambiar esos datos por razones de estilo.
+## Estructura documental
 
-## Organización y nomenclatura
+Cada archivo cumple una responsabilidad definida. El README raíz presenta la plataforma; los README de componentes describen sus funciones y referencias; el tablero mantiene el estado actual; el informe académico integra los resultados; y las bitácoras fechadas registran el desarrollo histórico. No añadimos una alerta «vigente» en archivos históricos ni replicamos el tablero entero en cada README.
 
-- En la narración académica usar `fase 1`, `fase 2`, etc.; conservar `S01`–`S08` exclusivamente como códigos de laboratorio, capturas, scripts, rutas y referencias cruzadas técnicas.
-- Capturas: `evidencias/capturas/faseN/SNN_XX_Descripcion_Tecnica.png`. Mantener mayúsculas en siglas FRR, OSPF, VLAN, WAN, LAN, HTTP, ACL, IaC y SoT; palabras descriptivas sin acentos y separadas por guiones bajos. Nombres previamente versionados se conservan cuando cambiarlos rompe trazabilidad; usar mapas de renombrado para excepciones históricas.
-- Toda prueba se documenta con condiciones de inicio, comando o procedimiento, resultado observado, limitación y evidencia. No asumir éxito donde no consta registro.
-- El Word/PDF oficial **no contiene un capítulo de anexos**. La entrega técnica final se realizará mediante un archivo `.tar` independiente autorizado para este proyecto, excluyendo secretos y estados locales de OpenTofu.
-- Preservar cifras, fechas, issues, commits, hashes, URLs y salidas reales; nunca borrar historia técnica al normalizar la redacción.
+[Índice de responsabilidades](../gestion/INDICE-DOCUMENTAL.md).
 
-## Revisión antes de confirmar cambios
+## Nomenclatura y trazabilidad
 
-1. Revisar si el texto narra una **decisión propia** o describe a un **usuario funcional**; solo cambiar el primer caso.
-2. Corregir gramática después de sustituir frases y mantener tiempos verbales coherentes.
-3. Comprobar los enlaces internos, rutas y nombres de archivos sin modificar código ni evidencias binarias.
-4. Ejecutar la regresión Markdown/CI pertinente y documentar las decisiones de edición sin alterar el historial de Git.
+- Utilizamos «fase 1», «fase 2» y sucesivas en la narración académica, y los identificadores técnicos S01–S08 en archivos, scripts, capturas y referencias.
+- Conservamos denominaciones exactas como FRRouting/FRR, OSPF, VLAN, WAN, LACP, Open vSwitch, Faucet, HA, IaC, SoT, NOC y SHA-256.
+- Respetamos nombres y hashes originales de la evidencia; una corrección editorial no autoriza modificar bytes de registros o imágenes.
+- Cada afirmación experimental incluye condiciones, resultado, limitación y fuente verificable. No confundimos reglas OpenFlow con tráfico exitoso, `terraform_data` con aprovisionamiento externo ni HA lógica con redundancia física.
+- Nunca incorporamos cédulas, contraseñas, llaves privadas, tokens o estados de infraestructura con secretos.
+- En el informe institucional aplicamos citas/referencias APA 7 y numeración consistente con la versión editable del documento.
+
+Antes de fusionar modificaciones comprobamos enlaces internos, nombres de archivos y referencias a documentación vigente, preservando el valor probatorio de los registros históricos.
