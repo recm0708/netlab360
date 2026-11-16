@@ -1,10 +1,12 @@
 <!doctype html>
 <html lang="es">
 <head>
+<!-- NETLAB360 | Interfaz web del centro de operaciones multisede. -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NETLAB360 · Topología multisede</title>
 <style>
+/* Presentación del grafo y de las vistas de estado; no administra redes. */
 :root{color-scheme:dark;--bg:#091323;--panel:#132238;--panel2:#182940;--line:#2e4260;--text:#ebf4ff;--muted:#9aafc8;--cyan:#52c7e6;--good:#51d8a8;--warn:#f7c971;--bad:#f97680;--quiet:#899cb3}
 *{box-sizing:border-box}body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);margin:0}
 header{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:24px max(18px,calc((100vw - 1500px)/2));border-bottom:1px solid #243a56;background:linear-gradient(125deg,#152c4b,#0e1e32)}
@@ -277,6 +279,8 @@ body.presentation .ha-overview{margin:6px 0;padding:8px 14px}
 <footer>NETLAB360 · Centro de operaciones de red · Vista lógica de tres sedes. Las condiciones operativas se presentan según fuentes verificables; el inventario no sustituye la telemetría. Acceso de supervisión sin cambios de configuración.</footer>
 </main>
 <script>
+// Observación del NOC: consultas a la API y actualización de la interfaz.
+// Las acciones del visor no reconfiguran interfaces ni servicios.
 "use strict";
 const NS="http://www.w3.org/2000/svg", svg=document.querySelector("#network");
 const $=id=>document.getElementById(id);
