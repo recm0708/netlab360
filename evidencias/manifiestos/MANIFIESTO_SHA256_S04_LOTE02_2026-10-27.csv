@@ -1,9 +1,0 @@
-ruta_relativa,sha256,bytes,ancho_px,alto_px,clasificacion,observacion
-evidencias/capturas/fase4/S04_07_Exporter_Estado_Activo_Tres_Sedes_WAN_VLAN.png,dd9102f7dbfd5bc03ca56cf53258a904ef77f5e8f3422d4101df9193e6f6e1f3,25740,433,194,obligatoria,Exporter HTTP en topologia activa; 3/3 routers y 25 series
-evidencias/capturas/fase4/S04_08_Prometheus_Metricas_Activas_Scrape.png,61ea52f87db9d96b9d04d01c8ebe1bfac9d6d155335792e8214580e325cf1b5f,19015,440,155,obligatoria,Prometheus target UP; 8 WAN y 9 VLAN; 0 alertas basales
-evidencias/capturas/fase4/S04_09_NOC_Tres_Sedes_Enlaces_Activos-1.png,838acedf8b00df12eb047a6fe4439d687ae4473e49f5a58e7f57cd6e544414dd,78178,953,968,obligatoria,"NOC: evidencia visual de topologia activa, parte 1/4"
-evidencias/capturas/fase4/S04_09_NOC_Tres_Sedes_Enlaces_Activos-2.png,3168f52402c48c6491615f6c3a9d612b1e8ecae84bd50e500d93432537a4c811,68223,955,944,complementaria,"NOC: evidencia visual de topologia activa, parte 2/4"
-evidencias/capturas/fase4/S04_09_NOC_Tres_Sedes_Enlaces_Activos-3.png,b90a4eadd239b9cf58a020a6619fe60d0ff7b88c0c2c1bf19c018e204a778149,66726,954,906,complementaria,"NOC: evidencia visual de topologia activa, parte 3/4"
-evidencias/capturas/fase4/S04_09_NOC_Tres_Sedes_Enlaces_Activos-4.png,bdd63db8c2d75b6bd47e85061dd4af480acd8d50cd12817104b5ea960520eb7d,66776,952,906,complementaria,"NOC: evidencia visual de topologia activa, parte 4/4"
-evidencias/capturas/fase4/S04_10_Incidente_WAN_Principal_Alerta_Firing.png,b66c7bbcbb65e0704c5c26bc59f8aa725874ddbb8e5a452becb9c8bfdef49460,84800,953,986,obligatoria,NOC HQ/s1p DOWN; alerta WANAdminDown en firing con hora UTC
-evidencias/capturas/fase4/S04_11_Recuperacion_WAN_Alerta_Resuelta.png,ccfc89a5fe399caa5e45e0f3f648043f793b56a815660255e26b5f611dead64e,76078,954,968,obligatoria,NOC recuperado: HQ/s1p UP y cero alertas activas tras incidente

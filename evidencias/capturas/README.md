@@ -1,17 +1,22 @@
-# Catálogo de capturas técnicas de NETLAB360
+# Evidencias gráficas de NETLAB360
 
-Conservamos las imágenes originales de los ensayos y sus manifiestos para garantizar trazabilidad. Los números de capturas indican identificadores operativos, no necesariamente números consecutivos de figuras del informe.
+## Descripción
 
-| Fase | PNG verificados | Estado de publicación |
-|---|---:|---|
-| S01 | 83 | Versionados en `main` |
-| S02 | 9 | Versionados en `main` |
-| S03 | 8 | Versionados en `main` |
-| S04 | 22 | Versionados en `main` |
-| S05 | 71 | Versionados en `main` (PR #152) |
-| **Total técnico validado** | **193** | **193 publicados** |
+Este catálogo reúne las capturas obtenidas durante el desarrollo y las pruebas del laboratorio de redes empresariales multisede. Cada fase tiene su propia carpeta y un único documento `README.md` que enumera las imágenes disponibles.
 
-Para S01–S04 consultamos los manifiestos de `evidencias/manifiestos/`. Para S05 disponemos de 70 PNG importados desde inventario ZIP/CSV y una captura 64 independiente: manifiestos de 70+1, inventario y registros HA en `evidencias/capturas/fase5/` y `evidencias/registros/s05/` del repositorio. Los 77 archivos fueron comprobados mediante SHA-256 y revisión visual e incorporados a `main` en el PR #152.
+## Inventario por fase
 
-La selección académica utilizará solo las figuras pertinentes. Se preservan las variantes de varias pantallas (17/18/58) cuando aportan partes distintas de una misma validación, sin inventar capturas ausentes ni modificar las originales.
+| Fase | Descripción | Capturas |
+|---|---|---:|
+| [01](fase1/README.md) | Plataforma y laboratorio de referencia | 83 |
+| [02](fase2/README.md) | Infraestructura de tres sedes y conectividad | 9 |
+| [03](fase3/README.md) | Automatización, cumplimiento y GitOps | 8 |
+| [04](fase4/README.md) | Observabilidad e incidentes | 22 |
+| [05](fase5/README.md) | WAN, LACP, HTTP, SDN y NOC integrados | 71 |
+| **Total** | **Fases ejecutadas** | **193** |
 
+## Criterios de presentación
+
+Las imágenes conservan su denominación técnica y se organizan por fase. En el informe académico utilizaremos únicamente aquellas que respalden directamente los resultados relevantes; la selección y la numeración de figuras dependerán de la estructura de la versión final del documento.
+
+[Volver a NETLAB360](../../README.md).

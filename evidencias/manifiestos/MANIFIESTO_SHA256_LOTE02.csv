@@ -1,6 +1,0 @@
-numero,original,canonico,sha256,bytes,resultado
-01,B3_01_Linea_Base_Observabilidad_ICMP.png,B3_01_Linea_Base_Observabilidad_ICMP.png,f116b30acbaa90f48ede64a2ae86c8ddd606b21eae413d1757138b5a2b7093f5,35815,VALIDADA — linea base historica
-02,B3_02_API_y_Metricas_Historicas.png,B3_02_API_y_Metricas_Historicas.png,d1be1e1bbcc66c624b196cc5b7ee51189f7eef5dd79a1fcd4cb7ee60595c2ed8,74274,VALIDADA — API y metricas historicas
-03,B3_03_Panel_NOC_Historico-1.png,B3_03_Panel_NOC_Historico-1.png,70070e4b0888b45f9151f013c417a605906bf424f691db31e3368480a1398115,55539,VALIDADA — Panel NOC parte superior
-04,B3_03_Panel_NOC_Historico-2.png,B3_03_Panel_NOC_Historico-2.png,7fa431cc366bbef73471f833cbfcceda5c7212401a58d05c2990a4e9eb81efbd,37139,VALIDADA — Panel NOC parte inferior
-05,B3_04_Postcheck_Servicio_NOC.png,B3_04_Postcheck_Servicio_NOC.png,6b2c70cc802c0cebbef1f889463204155945293f7dd5570b3b5b6bdfc22e3d1c,41945,DIAGNOSTICO — puerto ocupado a 15:52; posterior libre a 16:09 segun texto

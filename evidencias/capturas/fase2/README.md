@@ -1,7 +1,25 @@
-# Capturas S02 — Infraestructura multisede
+# Evidencias gráficas — Fase 02
 
-Reunimos **9 PNG**, de S02_01 a S02_09, para mostrar la configuración y validación de HQ/S1/S2: cuatro WAN, nueve VLAN, OSPF **4/2/2 Full**, selección de rutas, failover y restauración, pruebas HTTP y política ACL.
+## Descripción
 
-Registramos los resultados de los estados de prueba sin presentar una red virtual como redundancia física ni extrapolar su continuidad a intervalos no medidos.
+La segunda fase muestra la integración de las tres sedes, el enrutamiento OSPF, las VLAN, la conectividad HTTP y la recuperación WAN.
 
-[Manifiesto de integridad](../../manifiestos/MANIFIESTO_SHA256_CAPTURAS_2026-10-25.csv) · [Cierre S02](../../../docs/control/05-s02-aceptacion-y-documentacion-2026-10-24.md).
+## Capturas disponibles
+
+**Total: 9 imágenes PNG.** Los archivos se enumeran con su nombre de registro para facilitar su consulta y la selección de figuras del informe.
+
+- `S02_01_Precheck_Inicial_Integracion_Multisede.png`
+- `S02_02_Validacion_IPAM_Tres_Sedes_Cuatro_WAN.png`
+- `S02_03_Configuraciones_FRR_Tres_Sedes_Candidatas.png`
+- `S02_04_Precheck_Seguridad_y_FRR_Multisede.png`
+- `S02_05_FRR_Tres_Routers_Aislados_Validados.png`
+- `S02_06_WAN_OSPF_HQ_S1_S2_Cuatro_Enlaces.png`
+- `S02_07_Conmutacion_WAN_S1_S2_Restauracion.png`
+- `S02_08_Tres_Switches_Nueve_VLAN_Trunk_8021Q.png`
+- `S02_09_HTTP_Real_y_ACL_Entre_Sedes.png`
+
+## Uso académico
+
+Las capturas representan resultados del laboratorio. Para el informe final seleccionaremos las imágenes pertinentes, con numeración y explicación acordes con el documento académico. El catálogo no presupone que todas deban incluirse como figuras.
+
+[Volver al catálogo general](../README.md).
