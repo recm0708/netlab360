@@ -1,17 +1,25 @@
-# Topología FRRouting HQ/S1/S2 — S02
+# Infraestructura FRRouting multisede — Fase 02
 
-Implementamos y comprobamos una infraestructura virtual de tres sedes mediante [`docker-compose.yml`](docker-compose.yml) y configuraciones renderizadas desde [la SoT candidata](../../inventario/ipam/topologia-s02.yaml).
+## Descripción
+
+Implementamos una topología virtual de tres sedes, HQ, S1 y S2, mediante contenedores FRRouting y enlaces aislados en Ubuntu.
 
 ## Componentes
 
-Los contenedores `nl360-s02-r-hq`, `nl360-s02-r-s1` y `nl360-s02-r-s2` emplean FRRouting 10.7.1 con `network_mode: none`; los scripts de laboratorio crean los enlaces aislados en la VM. El workspace de configuración generado se conserva fuera de Git, en `~/netlab360-bootstrap/s02/rendered/`.
+- [Declaración Docker](docker-compose.yml) con tres routers FRRouting.
+- [Inventario IPAM](../../inventario/ipam/topologia-s02.yaml).
+- Cuatro enlaces WAN: `s1p`, `s1b`, `s2p`, `s2b`.
+- Nueve VLAN de servicio repartidas entre las sedes.
+- [Scripts del laboratorio](../../scripts/laboratorio/) para la creación y validación de enlaces.
 
-Trabajamos con **cuatro WAN** (s1p/s1b/s2p/s2b), costos OSPF 10/100 y **nueve VLAN** distribuidas entre las tres sedes. Validamos OSPF Full **4/2/2**, rutas preferidas **6/6**, pruebas de loopback **6/6**, gateways de VLAN **9/9**, conectividad LAN **6/6**, failover y restricciones HTTP/ACL.
+## Resultados
 
-## Operación
+Comprobamos adyacencias OSPF FULL **4/2/2**, seis rutas principales, seis pruebas entre loopbacks, nueve gateways de VLAN, conectividad LAN y restricciones HTTP/ACL. La conmutación WAN seleccionó los enlaces alternativos y posteriormente regresó a las rutas preferidas.
 
-Desplegamos con scripts controlados de [`scripts/laboratorio/`](../../scripts/laboratorio/) y retiramos los componentes en orden LAN → WAN → FRR al finalizar S04. Nunca conectamos redes experimentales a `ens33` ni modificamos la ruta administrativa VMware para simular fallos.
+## Limitaciones
 
-El mismo escenario sirvió de base para el [cumplimiento Ansible S03](../../ansible/s03/README.md) y la [observabilidad S04](../../servicios/observabilidad/README.md). Las validaciones originales no requieren repetir el despliegue para documentarse.
+El entorno utiliza `network_mode: none` para los routers, de manera que los enlaces experimentales son creados explícitamente por el laboratorio. La interfaz de administración VMware no forma parte de las WAN.
 
-[Resultados y aceptación S02](../../docs/validacion/s01-s04-resultados.md).
+## Documentación relacionada
+
+[Validación S01–S04](../../docs/validacion/s01-s04-resultados.md) · [Ansible S03](../../ansible/s03/README.md) · [NOC S04](../../servicios/noc-s04/README.md).

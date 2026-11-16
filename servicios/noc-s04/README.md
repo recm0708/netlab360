@@ -1,19 +1,23 @@
-# NOC centralizado multisede — S04
+# Centro de operaciones multisede — Fase 04
 
-Implementamos un panel web y API local de consulta para **HQ, S1 y S2**, junto con un historial persistente de incidentes.
+## Descripción
 
-## Componentes y fuentes
+Implementamos un NOC web local para observar las sedes HQ, S1 y S2, consultar su estado y conservar el historial de incidentes de laboratorio.
 
-- [`app.py`](app.py): vistas centralizadas y por sucursal en `127.0.0.1:9120`.
-- [`historial_s04.py`](historial_s04.py): almacenamiento y consulta del historial SQLite, con exportación CSV.
-- [Exportador y Prometheus S04](../observabilidad/README.md): métricas en `127.0.0.1:9110` y `127.0.0.1:9091`, respectivamente.
+## Componentes
 
-Distinguimos `active` (topología operativa), `offline` (escenario desmontado) y `UNKNOWN` (fuente de observación no fiable). La ausencia de un exportador no se traduce automáticamente en una caída WAN ficticia.
+- [Aplicación NOC](app.py), disponible en `127.0.0.1:9120`.
+- [Historial de incidentes](historial_s04.py) mediante SQLite.
+- [Exportador y métricas](../observabilidad/README.md) en el entorno S04.
 
 ## Resultados
 
-Durante el incidente controlado HQ/s1p observamos la transición `pending → firing → resolved`, con conmutación al respaldo y recuperación. Conservamos **3/3 eventos** en SQLite tras reiniciar el NOC. El sistema solo ofrece avisos visuales y registros locales; no envía correos, SMS, Telegram ni webhooks, y tampoco ejecuta acciones autónomas sobre FRR.
+Durante el ensayo WAN observamos la transición **pending → firing → resolved**, con selección del enlace alternativo y posterior recuperación. Comprobamos la conservación de tres eventos en SQLite después de reiniciar el servicio NOC.
 
-Los datos operativos de SQLite permanecen en `~/netlab360-bootstrap/s04/historial/incidentes.sqlite3`, fuera de Git.
+## Limitaciones
 
-[Validaciones G4](../../docs/validacion/s01-s04-resultados.md) · [Evidencias S04](../../evidencias/capturas/fase4/README.md).
+El sistema distingue entre fuente disponible, entorno desmontado y estado `UNKNOWN`. No interpreta automáticamente una muestra ausente como falla WAN. La implementación registra alertas locales, pero no envía notificaciones externas ni corrige rutas sin intervención autorizada.
+
+## Documentación relacionada
+
+[Resultados S01–S04](../../docs/validacion/s01-s04-resultados.md) · [Capturas S04](../../evidencias/capturas/fase4/README.md).

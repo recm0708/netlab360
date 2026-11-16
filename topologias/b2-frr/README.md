@@ -1,12 +1,26 @@
-# Topología FRRouting dual-WAN — S01
+# Topología de referencia FRRouting — Fase 01
 
-Construimos un escenario inicial de **dos routers HQ/S1** con configuraciones FRRouting 10.7.1 versionadas en [`configs/`](configs/). Evaluamos preferencia OSPF, caída de WAN principal, conmutación y restauración de enlace.
+## Descripción
 
-| Enlace | Prefijo | Costo OSPF |
+Construimos un escenario inicial de dos routers virtuales HQ y S1 con enlaces WAN principal y alternativo para evaluar la preferencia de rutas OSPF y su recuperación.
+
+## Componentes
+
+| Enlace | Red | Costo OSPF |
 |---|---|---:|
-| HQ–S1 principal | `10.78.0.0/30` | 10 |
-| HQ–S1 respaldo | `10.78.0.4/30` | 100 |
+| Principal HQ–S1 | `10.78.0.0/30` | 10 |
+| Alternativo HQ–S1 | `10.78.0.4/30` | 100 |
 
-Las loopbacks fueron `10.79.0.1/32` (HQ) y `10.79.0.2/32` (S1). Registramos adyacencias Full, rutas preferidas y comunicación HTTP en estados estables. No extrapolamos esa prueba a disponibilidad continua.
+Las interfaces de loopback se configuraron como `10.79.0.1/32` y `10.79.0.2/32`. Las configuraciones de los routers están disponibles en [configs](configs/).
 
-Este prototipo es distinto del [despliegue integrado S02](../s02-frr/README.md). Mantuvimos separado `ens33` y la red de gestión VMware durante las pruebas.
+## Resultados
+
+Comprobamos el establecimiento de adyacencias OSPF FULL, el uso preferido del enlace principal y la transición al respaldo durante un ensayo controlado, seguido de recuperación.
+
+## Limitaciones
+
+El escenario es un prototipo de dos sedes. No representa la integración HQ/S1/S2 desarrollada en S02 ni garantiza disponibilidad continua de enlaces físicos.
+
+## Documentación relacionada
+
+[Topología multisede S02](../s02-frr/README.md) · [Resultados S01–S04](../../docs/validacion/s01-s04-resultados.md).

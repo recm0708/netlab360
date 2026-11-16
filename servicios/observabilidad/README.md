@@ -1,19 +1,29 @@
-# Observabilidad y exportadores — S01 y S04
+# Observabilidad de red — Fases 01 y 04
 
-En este directorio conservamos dos implementaciones diferenciadas: el primer prototipo FRR de S01 y el colector de estado multisede desarrollado en S04. **No mezclamos muestras históricas con estados actuales.**
+## Descripción
 
-## S01 — Exportador inicial
+Desarrollamos un exportador inicial para el laboratorio S01 y posteriormente un colector multisede que publica métricas y permite observar el estado de WAN, VLAN y routers FRRouting.
 
-[`live_exporter.py`](live_exporter.py) consulta en solo lectura eventos y estado de rutas en escenarios HQ/S1, mediante `127.0.0.1:9108`. Durante S01 validamos alertas y recuperación WAN, sin inferir continuidad de paquetes entre sondeos.
+## Componentes
 
-## S04 — Colector multisede y Prometheus
+| Servicio | Función |
+|---|---|
+| [Exportador S01](live_exporter.py) | Consultas iniciales de rutas y eventos |
+| [Exportador S04](s04_exporter_multisede.py) | Estado y métricas de HQ, S1 y S2 |
+| [Prometheus](prometheus/s04-prometheus.yml) | Almacenamiento y consulta de series temporales |
+| [Reglas de alerta](prometheus/rules/s04-alerts.yml) | Detección del escenario WAN observado |
+| [NOC S04](../noc-s04/README.md) | Visualización e historial de incidentes |
 
-[`s04_exporter_multisede.py`](s04_exporter_multisede.py) consulta en solo lectura la SoT candidata, Docker y los routers FRRouting autorizados. Publica `/api/v1/state`, `/metrics` y salud local desde `127.0.0.1:9110`. Registramos 25 series de métricas relacionadas con tres sedes, ocho extremos WAN y nueve interfaces VLAN.
+## Resultados
 
-Prometheus 3.7.0 se ejecutó en `127.0.0.1:9091`, con [configuración S04](prometheus/s04-prometheus.yml) y [reglas de alerta](prometheus/rules/s04-alerts.yml). Verificamos persistencia **68/68** muestras de WAN y **28/28** de alerta después de reiniciar Prometheus; el NOC mostró `UNKNOWN` durante la interrupción del colector sin inventar fallas WAN.
+El colector S04 registró 25 series de métricas asociadas a tres sedes, ocho extremos WAN y nueve interfaces VLAN. Se comprobó la conservación de los registros temporales tras reiniciar Prometheus y la presentación de `UNKNOWN` cuando la fuente no estaba disponible.
 
-**SLI medido:** 450/450 scrapes (100 %) en 15 minutos y 1698/1740 (97,586 %) en 60 minutos. El 99 % se adoptó como **referencia experimental interna de evaluación**, incumplida en la ventana de 60 minutos; no equivale a un SLA ni a aprobación individual docente del indicador. Ninguna de estas medidas representa por sí sola un SLA de aplicaciones.
+La recolección alcanzó **100 % en 15 minutos** y **97,586 % en 60 minutos**. La segunda ventana quedó por debajo de la referencia experimental del 99 %.
 
-No ejecutamos `s04_exporter_multisede.py` para cambiar interfaces o routers; el componente es de observación. Su visualización e historial corresponden al [NOC S04](../noc-s04/README.md). Conservamos los datos TSDB y SQLite fuera de Git.
+## Limitaciones
 
-[Pruebas G5](../../docs/validacion/s01-s04-resultados.md) · [Evidencias S04](../../evidencias/capturas/fase4/README.md).
+Los componentes son de observación: no modifican la configuración de routers ni ejecutan recuperación autónoma. Los resultados del laboratorio no constituyen un acuerdo de disponibilidad de servicios de producción.
+
+## Documentación relacionada
+
+[Validación S01–S04](../../docs/validacion/s01-s04-resultados.md) · [Capturas S04](../../evidencias/capturas/fase4/README.md).

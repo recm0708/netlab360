@@ -1,19 +1,27 @@
-# Infraestructura declarativa OpenTofu — S03
+# Infraestructura declarativa con OpenTofu — Fase 03
 
-Utilizamos **OpenTofu 1.13.1** para registrar y verificar metadatos derivados del [inventario candidato multisede](../../inventario/ipam/topologia-s02.yaml).
+## Descripción
 
-## Recursos implementados
+Utilizamos OpenTofu 1.13.1 para representar metadatos de las sedes, enlaces y VLAN definidos en el inventario de NETLAB360.
 
-| Categoría | `terraform_data` |
+## Componentes
+
+| Categoría | Objetos locales |
 |---|---:|
-| Resguardo de gestión administrativa | 1 |
+| Protección de administración | 1 |
 | Sedes HQ, S1 y S2 | 3 |
 | Enlaces WAN | 4 |
 | VLAN | 9 |
 | **Total** | **17** |
 
-Completamos `tofu init`, `validate`, `plan` y `apply` (**17 recursos añadidos, 0 modificados y 0 destruidos**). Un segundo plan no detectó cambios. Conservamos el `state` y los archivos de trabajo operativos fuera de Git, en `~/netlab360-bootstrap/s03/`.
+## Resultados
 
-**Límite del componente:** nuestros `terraform_data` representan metadatos; no crean routers FRRouting, enlaces WAN, interfaces ni VLAN. La configuración FRR en ejecución corresponde a [Ansible](../../ansible/s03/README.md). La integración de `data sources` y propiedad de recursos externos **no se implementó** en S03 y se registró como ampliación futura en [#17](https://github.com/recm0708/netlab360/issues/17).
+Comprobamos la inicialización, validación, planificación y aplicación de los **17 recursos locales**, sin modificaciones ni destrucciones posteriores. La siguiente planificación confirmó que no existían cambios declarativos pendientes.
 
-No utilizamos `tofu apply` ni `tofu destroy` para tareas documentales. Registro técnico de S03.
+## Limitaciones
+
+Los objetos `terraform_data` representan metadatos; **no crean routers, interfaces ni VLAN externas**. La configuración activa de FRRouting se gestiona mediante Ansible. El estado de ejecución de OpenTofu se conserva fuera del repositorio.
+
+## Documentación relacionada
+
+[Inventario multisede](../../inventario/ipam/topologia-s02.yaml) · [Ansible S03](../../ansible/s03/README.md) · [Validación S01–S04](../../docs/validacion/s01-s04-resultados.md).

@@ -1,23 +1,25 @@
-# NOC de topología multisede — S05
+# NOC de topología multisede — Fase 05
 
-Implementamos este componente para consultar y visualizar el estado de las tres sedes **HQ, S1 y S2**, con rutas WAN, interfaces, agregación LACP, disponibilidad HTTP y segmento SDN. La interfaz web y API se ejecutan localmente en `127.0.0.1:9130`.
+## Descripción
 
-## Funciones implementadas
+Implementamos una interfaz web y API para consultar la topología integrada de HQ, S1 y S2, con indicadores WAN, FRRouting, LACP, disponibilidad HTTP y controlador SDN.
 
-- Representación de la topología de **18 nodos y 21 enlaces**; vistas de sede y detalle de enlaces.
-- Datos reales de rutas FIB S1/S2, con diferenciación entre enlace preferido, respaldo disponible, respaldo seleccionado y estado no observado.
-- Tarjetas del NOC para LACP 802.3ad en HQ/S1/S2, servidor HTTP seleccionado y controlador Faucet/OpenFlow.
-- Observaciones de salud y fuente de telemetría; no se transforma una muestra ausente en una caída ficticia.
-- Hora de consulta presentada en `America/Panama` y selección reversible de elementos de la topología.
+## Componentes
 
-El acceso a operaciones de diagnóstico privilegiadas está limitado a un observador de solo lectura. Este servicio no administra directamente rutas, bridges, bonds o interfaces de gestión.
+- [Aplicación de topología](app.py) e [interfaz web](index.html) en `127.0.0.1:9130`.
+- Representación de **18 nodos y 21 enlaces**, con detalles por sede.
+- Rutas FIB principales y alternativas de S1 y S2.
+- Estado de los agregadores LACP y conexión OpenFlow/Faucet.
+- Selección del backend HTTP y visualización de la hora de Panamá.
 
-## Validación técnica
+## Resultados
 
-Se comprobaron estados LACP de dos miembros por sede, Faucet conectado con reglas OpenFlow, rutas preferidas S1=`s1p` y S2=`s2p`, y disponibilidad HTTP en HQ. En la fase S05 se observó también la conmutación de backend `HQ → S1 → HQ` en 17 muestras, tras una parada controlada únicamente del servicio backend HQ. La API regresó al estado principal y los seis servicios supervisados quedaron activos.
+Comprobamos rutas principales S1=`s1p` y S2=`s2p`, agregación de dos enlaces por sede y controlador Faucet conectado. El NOC registró la conmutación HTTP **HQ → S1 → HQ** a lo largo de 17 muestras. Los seis servicios supervisados permanecieron activos tras la recuperación.
 
-La cifra de flujos OpenFlow representa reglas observadas, no una medición de throughput ni una garantía de entrega de tráfico. Esta implementación constituye HA lógica entre servicios dentro de una VM, no una solución HA de hardware.
+## Limitaciones
 
-## Referencias
+La consola consulta fuentes reales, pero no administra directamente rutas ni switches. La existencia de reglas OpenFlow no equivale a una prueba de tráfico exitoso; los resultados de HA corresponden a servicios lógicos dentro de una VM.
 
-[Acta S05](../../docs/gestion/ACTA-ACEPTACION-TECNICA-S05-20261115.md) · [Diseño HA](../../docs/diseno/s05-ha-servicios-multisede.md) · [Evidencias](../../evidencias/capturas/README.md).
+## Documentación relacionada
+
+[Validación S05](../../docs/validacion/s05-integracion-y-aceptacion.md) · [Diseño HTTP](../../docs/diseno/s05-ha-servicios-multisede.md) · [Capturas S05](../../evidencias/capturas/fase5/README.md).

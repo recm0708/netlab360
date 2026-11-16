@@ -1,17 +1,24 @@
-# Automatización y cumplimiento FRRouting — S03
+# Automatización FRRouting — Fase 03
 
-Implementamos el flujo de auditoría y reconciliación con Ansible sobre los routers FRRouting de HQ, S1 y S2. Consumimos el inventario candidato [`topologia-s02.yaml`](../../inventario/ipam/topologia-s02.yaml) y el inventario de ejecución generado fuera del repositorio en `~/netlab360-bootstrap/s03/rendered/inventory-s03.yml`.
+## Descripción
+
+Implementamos auditoría y reconciliación con Ansible sobre los routers FRRouting de HQ, S1 y S2 a partir del inventario candidato multisede.
 
 ## Componentes
 
-- [`compliance-frr.yml`](compliance-frr.yml): evaluación de los parámetros de FRR en funcionamiento.
-- Roles y tareas de este directorio: reconciliación selectiva de la configuración autorizada.
-- [Validador de cumplimiento](../../scripts/validacion/s03-frr-compliance.py) y [pruebas offline](../../tests/test_s03_frr_compliance.py).
+- [Playbook de cumplimiento](compliance-frr.yml).
+- [Verificación del estado FRR](../../scripts/validacion/s03-frr-compliance.py).
+- [Pruebas automatizadas](../../tests/test_s03_frr_compliance.py).
+- [Topología declarativa](../../inventario/ipam/topologia-s02.yaml).
 
 ## Resultados
 
-Comprobamos **8/8 costos OSPF**, con costos principales de 10 y de respaldo de 100. Introdujimos una desviación controlada en R-S1/s1b (**100→150**), obtuvimos `NON_COMPLIANT`, restablecimos **150→100** y verificamos idempotencia (`changed=0`). Las vecindades OSPF registradas fueron **4/2/2 Full**.
+Comprobamos ocho costos OSPF configurados, con valores de 10 para enlaces principales y 100 para respaldos. Introdujimos una desviación controlada de costo **100 → 150** en S1 y confirmamos su detección. La reconciliación restauró el costo **150 → 100** y una ejecución posterior no requirió cambios.
 
-**Alcance:** Ansible administra configuración FRR activa; OpenTofu S03 mantiene exclusivamente metadatos locales. El estado de la SoT sigue siendo `candidate`, válido para el laboratorio y no equivalente a aprobación de producción. No ejecutamos una nueva reconciliación sin un precheck y una necesidad técnica concreta.
+## Limitaciones
 
-[Contrato SoT](../../docs/validacion/s01-s04-resultados.md) · [OpenTofu](../../iac/s03/README.md).
+Ansible administra la configuración FRRouting del laboratorio. La fuente de información tiene carácter de configuración candidata y no representa aprobación para un entorno productivo.
+
+## Documentación relacionada
+
+[Validación S01–S04](../../docs/validacion/s01-s04-resultados.md) · [OpenTofu](../../iac/s03/README.md).
