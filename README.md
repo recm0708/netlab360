@@ -1,41 +1,52 @@
 # NETLAB360
 
-**Plataforma virtualizada para automatización, observabilidad y diagnóstico de redes empresariales multisede**
+**Plataforma virtualizada para la automatización, observabilidad y diagnóstico de redes empresariales multisede**
 
-NETLAB360 integra infraestructura virtual de tres sedes (HQ, S1 y S2) para analizar el comportamiento de protocolos de encaminamiento, agregación de enlaces, automatización, telemetría y segmentación definida por software. Desarrollamos el laboratorio en Ubuntu Desktop sobre VMware y utilizamos Docker, FRRouting, Ansible, OpenTofu, Prometheus, Open vSwitch y Faucet.
+## Descripción
 
-## Arquitectura
+NETLAB360 es una plataforma de laboratorio desarrollada para diseñar, implementar y evaluar una red empresarial de tres sedes: HQ, S1 y S2. Integramos enrutamiento dinámico, segmentación, automatización de configuraciones, observabilidad y escenarios controlados de recuperación de servicios.
 
-La red experimental combina cuatro enlaces WAN, nueve VLAN y tres routers FRRouting con OSPF. La administración permanece separada mediante `ens33 192.168.47.40/24` y puerta de enlace `192.168.47.2`.
+## Arquitectura y tecnologías
 
-- **Infraestructura y encaminamiento:** [topología multisede](topologias/s02-frr/README.md) e [inventario IPAM](inventario/ipam/topologia-s02.yaml).
-- **Automatización:** [Ansible/FRR](ansible/s03/README.md), [OpenTofu](iac/s03/README.md) y pruebas de GitOps.
-- **Observabilidad:** [métricas y Prometheus](servicios/observabilidad/README.md), [NOC S04](servicios/noc-s04/README.md) y [NOC de topología S05](servicios/topologia-s05/README.md).
-- **Alta disponibilidad y LACP:** [diseño y resultados HTTP](docs/diseno/s05-ha-servicios-multisede.md) y [agregación multisede](docs/diseno/s05-lacp-8023ad-multisede.md).
-- **Segmentación SDN:** [Open vSwitch/Faucet](docs/diseno/s05-ovs-faucet-vs-bridge-frr-y-limpieza-segura.md).
+El laboratorio funciona sobre Ubuntu Desktop en VMware Workstation. La red administrativa está separada de los segmentos experimentales. Las WAN y VLAN virtuales utilizan FRRouting, OSPF, namespaces Linux y contenedores Docker; la plataforma incorpora OpenTofu, Ansible, Prometheus, Open vSwitch y Faucet.
 
-## Resultados verificados
-
-| Fase | Resultado técnico |
+| Componente | Función |
 |---|---|
-| S01 | Línea base FRRouting/OSPF, VLAN, servicios y automatización inicial |
-| S02 | Tres sedes, cuatro enlaces WAN, nueve VLAN y conmutación de rutas |
-| S03 | Auditoría y reconciliación Ansible sobre FRR; 17 recursos locales de metadatos OpenTofu |
-| S04 | Prometheus, observabilidad WAN, eventos y persistencia de historial SQLite/TSDB |
-| S05 | HTTP HA lógico HQ→S1→HQ, LACP 2→1→2 en las tres sedes, segmentación Faucet y NOC integrado |
-| S06–S08 | Funcionalidades adicionales, integración académica y entrega final sujetas a validación |
+| FRRouting / OSPF | Encaminamiento dinámico y recuperación WAN multisede |
+| VLAN / switching | Segmentación de tráfico por sede y servicio |
+| OpenTofu / Ansible | Declaración de metadatos, configuración y reconciliación de FRR |
+| Prometheus / NOC | Métricas, incidentes y representación del estado de la red |
+| LACP 802.3ad | Agregación y recuperación de enlaces en las tres sedes |
+| Open vSwitch / Faucet | Segmentación y control SDN de un dominio aislado |
+| HTTP HA | Selección de backend principal y alternativo |
 
-La aceptación técnica S05 comprobó 21 namespaces, cuatro contenedores, seis servicios activos, NOC saludable y gestión intacta. El ciclo de conmutación HTTP cuenta con 17 muestras originales. Estas pruebas acreditan alta disponibilidad **lógica**, no redundancia física de host o hipervisor.
+## Resultados de las fases
 
-## Evidencias y documentación técnica
+| Fase | Alcance realizado |
+|---|---|
+| S01 | Preparación del entorno, conectividad inicial y pruebas de referencia |
+| S02 | Infraestructura multisede con cuatro enlaces WAN y nueve VLAN |
+| S03 | Automatización de FRR, reconciliación y recursos locales OpenTofu |
+| S04 | Métricas, incidentes y observabilidad de la red multisede |
+| S05 | HTTP HA, LACP, SDN con Faucet y NOC integrado |
+| S06–S08 | Funciones avanzadas y entrega final, sujetas a sus propias validaciones |
 
-Conservamos [193 capturas PNG](evidencias/capturas/README.md) distribuidas entre S01 y S05, acompañadas por inventarios y manifiestos SHA-256. Los ensayos de HA incorporan además registros JSONL y TXT originales.
+La validación final de S05 comprobó 21 namespaces, cuatro contenedores y seis servicios activos, así como la conmutación lógica HTTP **HQ → S1 → HQ**. Estas pruebas se realizaron dentro de una máquina virtual; no se atribuye a ellas redundancia física de servidores.
 
-- [Acta de aceptación técnica S05](docs/gestion/ACTA-ACEPTACION-TECNICA-S05-20261115.md)
-- [Arquitectura](docs/arquitectura/arquitectura-multisede-implementada.md) y [decisiones de diseño](docs/decisiones/)
-- [Configuración e inventario del entorno](docs/infraestructura/)
-- [Pruebas automatizadas](tests/) y [scripts de laboratorio](scripts/)
-- [Capturas y registros de evidencia](evidencias/)
+## Estructura del proyecto
 
-Las mediciones se obtuvieron en infraestructura virtualizada; no se atribuyen a equipos de producción. El código y las pruebas se mantienen separados de los registros y credenciales locales. Las actividades pendientes de S06–S08 no se presentan como implementadas.
+- [Arquitectura implementada](docs/arquitectura/arquitectura-multisede-implementada.md)
+- [Diseño de disponibilidad HTTP](docs/diseno/s05-ha-servicios-multisede.md)
+- [Diseño de agregación LACP](docs/diseno/s05-lacp-8023ad-multisede.md)
+- [Diseño SDN](docs/diseno/s05-ovs-faucet-vs-bridge-frr-y-limpieza-segura.md)
+- [Validación S01–S04](docs/validacion/s01-s04-resultados.md)
+- [Validación S05](docs/validacion/s05-integracion-y-aceptacion.md)
+- [Evidencias gráficas](evidencias/capturas/README.md)
+- [Topología FRRouting](topologias/s02-frr/README.md)
+- [Automatización Ansible](ansible/s03/README.md)
+- [Infraestructura declarativa OpenTofu](iac/s03/README.md)
+- [NOC multisede](servicios/topologia-s05/README.md)
 
+## Alcance
+
+El repositorio contiene el código y los documentos técnicos que describen el sistema desarrollado y sus resultados. Los registros privados y los recursos de ejecución propios de la VM se mantienen fuera del código fuente. Las ampliaciones no implementadas no se presentan como funcionalidades terminadas.

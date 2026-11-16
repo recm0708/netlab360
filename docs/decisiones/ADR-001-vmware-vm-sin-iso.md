@@ -1,51 +1,23 @@
-# ADR-001 — Máquina virtual base VMware sin ISO
+# ADR-001 — Entorno de virtualización
 
-- **Fecha:** 2026-10-09 (Panamá)
-- **Estado:** Ubuntu Desktop 26.04.1 instalado, 8 vCPU comprobadas, servidor SSH activo. Conexión remota aún pendiente por huella antigua de IP reutilizada.
-- **Issues relacionadas:** #1, #10 ([002]), #34 ([026]) y #29 ([021]).
-- **Decisión:** Crear desde cero una única máquina virtual Ubuntu Desktop en VMware Workstation Pro mediante asistente **Custom (Advanced)** y **I will install the operating system later**; no conectar imagen ISO ni iniciar la VM durante la preparación del hardware.
+## Contexto
 
-## Candidatos y recursos
+El proyecto requiere una infraestructura que permita ejecutar routers, switches virtuales y servicios de observabilidad en un entorno controlado. Para ello seleccionamos una máquina virtual Ubuntu Desktop en VMware Workstation, evitando introducir equipos físicos adicionales.
 
-| Parámetro | Selección propuesta |
-|---|---|
-| Nombre de VM | NETLAB360-Ubuntu-Desktop |
-| Invitado | Linux → Ubuntu 64-bit |
-| Distribución | **Ubuntu Desktop 26.04.1 LTS**, versión real comprobada en el sistema |
-| Hipervisor | **Verificado:** VMware Workstation Pro 26H1u1 (26.0.1, build 25688693) |
-| Firmware | UEFI; Secure Boot según compatibilidad comprobada (preferente activado) |
-| vCPU | **8 vCPU comprobadas** tanto en VMware como con `nproc=8` |
-| RAM | **VM observada:** 16 GB; **host:** 63.70 GB; mantener configuración actual |
-| Disco virtual | **VM observada:** 160 GB SCSI; aprovisionamiento y división de archivo no comprobados |
-| Controladora | **Observada:** SCSI. Mantener salvo necesidad justificada |
-| NIC inicial | **Observada:** una NIC NAT |
-| ISO | **Cambio de etapa:** el usuario encendió la VM para instalar Ubuntu; CD/DVD muestra una ruta de archivo. Desconectar ISO tras concluir instalación |
-| Aceleración anidada | No habilitar VT-x/EPT/AMD-V/RVI dentro del invitado salvo evidencia de necesidad; Docker/FRR/OVS no la requieren por sí mismos |
-| Servicios invitados | Docker, redes por contenedores/namespaces, OpenTofu, Ansible, observabilidad, dashboard |
+## Decisión
 
-## Fundamento técnico
+Utilizamos una única VM Ubuntu Desktop 26.04.1 LTS con ocho vCPU, 16 GiB de RAM y disco SCSI virtual de 160 GB. La interfaz de gestión opera mediante NAT VMnet8, separada de los dominios de laboratorio.
 
-- Separar el sistema operativo anfitrión, NAT de administración y los segmentos internos creados por Docker/OVS.
-- No exponer accidentalmente los segmentos de laboratorio a la LAN real.
-- Facilitar portabilidad y exportación OVA, verificar reimportación.
-- No activar arranque sin instalador: ausencia de sistema de arranque es esperada.
-- No asignar conectividad puente (Bridged) ni interfaces extra de la VM hasta disponer de una necesidad validada.
-- Revisar hardware y características antes de finalizar. Documentar configuración final con capturas.
+La configuración inicial del hardware virtual se realizó con el asistente avanzado de VMware. Posteriormente instalamos el sistema operativo y las dependencias necesarias de los componentes del proyecto.
 
-## Pendientes de aprobación operacional
+## Justificación
 
-- [x] Confirmar versión exacta y compilación VMware instalada (Help → About): 26H1u1, 26.0.1 build 25688693.
-- [ ] Verificar CPU, RAM, almacenamiento disponible, VT-x/AMD-V, firmware y compatibilidad de host. **CPU/RAM/discos/firmware de virtualización verificados; falta UEFI del invitado y compatibilidad final.**
-- [x] Confirmar ubicación general de almacenamiento (C:, carpeta Documents\\Virtual Machines), con 425.57 GB libres en C: según PowerShell.
-- [ ] Capturar valores elegidos en el asistente, antes de pulsar Finish.
-- [x] Crear VM y comprobar que está apagada; el usuario indica que fue creada sin ISO. Aún falta comprobar conexión CD/DVD.
-- [x] Instalar Ubuntu Desktop 26.04.1 LTS, aplicar mantenimiento y comprobar servicios básicos. Falta cotejar hash de ISO y acceso remoto SSH.
-- [x] Registrar inventario en `docs/infraestructura/01-inventario-host-y-vmware.md` y enlazar a #10 y #34.
+La solución permite experimentar con FRRouting, OSPF, namespaces Linux, Docker, Open vSwitch, Ansible y herramientas de monitoreo sin intervenir la red física. También facilita la conservación del entorno entre sesiones.
 
-## Referencias oficiales consultadas
+## Limitaciones
 
-- Broadcom KB 332659: asistente Workstation, opción *I will install the Operating System later*: https://knowledge.broadcom.com/external/article/332659/creating-a-workstation-virtual-machine-u.html
-- Broadcom KB 315434: creación y configuración de VM en Workstation: https://knowledge.broadcom.com/external/article/315434/create-virtual-machines-in-vmware-workst.html
-- Aviso de seguridad Broadcom, versión corregida 26H1u1: https://support.broadcom.com/web/ecx/support-content-notification/-/external/content/security-advisories/0/38288
+La infraestructura se ejecuta sobre un único host y una única VM. Los escenarios de recuperación de enlaces y backends HTTP no constituyen redundancia del hipervisor ni tolerancia a la pérdida del equipo anfitrión.
 
-**Inspección 2026-10-09:** VM VMware 26H1u1 con Ubuntu 26.04.1 LTS instalado; `nproc=8`, 16 GB RAM asignada, SCSI 160 GB, NAT `192.168.47.130/24` y SSH activo. Pendientes: comparar huella SSH por IP reutilizada, validar acceso desde Windows, verificar ISO descargada y funcionamiento final. Inventario detallado en `docs/infraestructura/01-inventario-host-y-vmware.md` y procedimiento en `docs/infraestructura/02-ubuntu-desktop-instalacion-ssh.md`.
+## Documentación relacionada
+
+[Infraestructura virtual](../infraestructura/01-inventario-host-y-vmware.md) · [Preparación de Ubuntu](../infraestructura/02-ubuntu-desktop-instalacion-ssh.md).

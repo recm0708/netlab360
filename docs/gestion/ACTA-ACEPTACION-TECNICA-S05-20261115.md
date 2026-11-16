@@ -1,33 +1,31 @@
-# Acta de aceptación técnica — fase 5
+# Acta de aceptación técnica — Fase 05
 
-**Proyecto:** NETLAB360  
-**Validación operativa:** 15 de noviembre de 2026  
-**Integridad y publicación de evidencias:** 16 de noviembre de 2026
+## Descripción
 
-## Objeto
-
-Comprobamos la integración de una red multisede virtual en HQ, S1 y S2, incorporando alta disponibilidad lógica HTTP, agregación LACP 802.3ad, segmentación OVS/Faucet y un centro de operaciones de red que observa fuentes reales.
+La fase 05 integró alta disponibilidad lógica HTTP, agregación LACP, segmentación SDN y observabilidad sobre la red empresarial multisede desarrollada en NETLAB360.
 
 ## Resultados verificados
 
-| Dominio | Comprobación |
+| Componente | Resultado |
 |---|---|
-| WAN/OSPF y VLAN | Cuatro WAN, nueve VLAN; conmutación y retorno de rutas observados |
-| LACP | Dos miembros por sede, prueba de falla y recuperación 2→1→2 |
-| OVS/Faucet | VLAN410 A/B comunicada, VLAN420 C aislada y puerto restaurado |
-| HTTP HA | Backend HQ→S1→HQ observado en 17 muestras, timer de rescate cancelado |
-| NOC | API saludable, 18 nodos/21 enlaces, FIB, LACP, HA y controlador SDN |
-| Estado de VM | 21 namespaces, cuatro contenedores y seis servicios activos |
-| Gestión | `ens33 192.168.47.40/24`, gateway `192.168.47.2`, intactos |
-| Integridad P1/P1B | 4/4 archivos históricos P1 y 5/5 P1B con SHA comprobado |
-| Evidencias S05 | 71 PNG, inventario, tres manifiestos y dos registros HA, 77 archivos en total |
+| WAN/OSPF | Cuatro enlaces WAN y nueve VLAN, con recuperación de rutas |
+| HTTP HA | Conmutación HQ → S1 → HQ observada en 17 muestras |
+| LACP | Dos enlaces por sede, pérdida de un miembro y recuperación 2 → 1 → 2 |
+| SDN | Comunicación entre A/B en VLAN 410 y aislamiento de C en VLAN 420 |
+| NOC | 18 nodos, 21 enlaces y visualización de FIB, HA, LACP y Faucet |
+| Entorno de ejecución | 21 namespaces, cuatro contenedores y seis servicios activos |
+| Administración | `192.168.47.40/24`, gateway `192.168.47.2`, sin alteraciones |
 
-## Trazabilidad documental
+## Evidencias
 
-El lote 158 acreditó los resultados operativos sin provocar nuevas fallas. El conjunto de 77 archivos se publicó sin modificar los originales mediante el [PR #152](https://github.com/recm0708/netlab360/pull/152), fusionado en `main`. Los 71 PNG y sus registros se conservan en [evidencias S05](../../evidencias/capturas/fase5/README.md) y [registros HA](../../evidencias/registros/s05/).
+Conservamos **71 capturas PNG** de la fase, junto con los registros originales de la prueba de conmutación HTTP. Las imágenes representan configuraciones, estados y pruebas realmente realizados en el laboratorio.
 
-## Alcance de aceptación
+## Alcance y limitaciones
 
-**La implementación y la aceptación técnica de S05 quedan comprobadas.** El informe académico único, las ampliaciones S06–S07 y el paquete final S08 son actividades independientes que siguen pendientes de sus propios criterios.
+Los componentes descritos se comprobaron en un entorno virtualizado. El resultado acredita recuperación lógica de servicios, enlaces y rutas; no demuestra redundancia física del servidor ni reconstrucción automática del escenario después de apagar Ubuntu.
 
-Las conmutaciones son lógicas dentro de una única VM; no demuestran redundancia física, disponibilidad contractual ni recuperación tras reiniciar Ubuntu. Los namespaces efímeros deben conservarse mediante suspensión controlada hasta validar una reconstrucción segura.
+## Resultado
+
+Consideramos **completada la validación técnica de la fase 05**. La integración de estos resultados al informe académico único y las fases S06–S08 constituyen actividades posteriores del proyecto.
+
+[Validación técnica](../validacion/s05-integracion-y-aceptacion.md) · [Catálogo gráfico](../../evidencias/capturas/fase5/README.md).
