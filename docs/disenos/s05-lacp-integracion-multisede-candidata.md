@@ -24,4 +24,4 @@ El rendimiento de un único flujo TCP no se duplica necesariamente al habilitar 
 
 El desmontaje selectivo solo debe afectar los recursos S05 expresamente identificados, sin borrar `br0`, las troncales o namespaces S02. No repetimos el despliegue ni los ensayos de caída para completar tareas editoriales. En caso de suspensión de VMware, comprobamos su línea base tras reanudar antes de iniciar otros experimentos.
 
-[Resultados S05](../gestion/s05-tablero-vigente.md) · [Análisis académico](../academico/s05-guion-de-actualizacion-del-informe.md).
+Resultados S05 · Análisis académico.

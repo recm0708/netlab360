@@ -41,24 +41,24 @@
 - La issue #3 de S03 conserva el contrato SoT `candidate` y alcance de recursos externos OpenTofu; el trabajo S04 puede usar el SoT como referencia sin declararlo aceptado globalmente.
 - **El informe no contiene anexos**. Código y capturas completas se preparan para TAR técnico independiente de fase 8; redactar el avance S04 en secciones 5/6/7/8 solo con pruebas y figuras finales.
 
-**Continuidad:** revisar [REANUDAR-AQUI](../REANUDAR-AQUI.md), [issue S04 #4](https://github.com/recm0708/netlab360/issues/4), [NOC #15](https://github.com/recm0708/netlab360/issues/15), [telemetría #20](https://github.com/recm0708/netlab360/issues/20), [alertas/SLI #21](https://github.com/recm0708/netlab360/issues/21), [catálogo de incidentes #22](https://github.com/recm0708/netlab360/issues/22).
+**Continuidad:** revisar REANUDAR-AQUI, [issue S04 #4](https://github.com/recm0708/netlab360/issues/4), [NOC #15](https://github.com/recm0708/netlab360/issues/15), [telemetría #20](https://github.com/recm0708/netlab360/issues/20), [alertas/SLI #21](https://github.com/recm0708/netlab360/issues/21), [catálogo de incidentes #22](https://github.com/recm0708/netlab360/issues/22).
 
 
 ## Corte de ejecución real — 26/10/2026, 23:58:53 (hora Panamá)
 
-G1 completa con evidencia de terminal real; G2 con muestra `--once` confiable pero sin arranque aún de Prometheus/NOC en la topología activa. [Bitácora](../sesiones/2026-10-26-s04-g1-lan-y-muestra-activa.md). Mantener FRR, WAN y LAN funcionando. Los controles G3–G6 siguen pendientes.
+G1 completa con evidencia de terminal real; G2 con muestra `--once` confiable pero sin arranque aún de Prometheus/NOC en la topología activa. Bitácora. Mantener FRR, WAN y LAN funcionando. Los controles G3–G6 siguen pendientes.
 
 **Política de fases:** S01 y S03 pueden permanecer abiertas mientras se avanza S04–S08; los hitos compartidos solo modifican el estado de la fase a la que pertenezca su criterio. Ninguna dependencia posterior se dará por probada anticipadamente.
 
 
 ## Actualización del 27/10/2026 — G2 funcional validada en red activa
 
-Los tres procesos exporter 9110, Prometheus 9091 y NOC 9120 quedaron iniciados y con APIs comprobadas sobre G1 operativa; [bitácora de resultados](../sesiones/2026-10-27-s04-g2-servicios-activos.md). Pendiente la visualización en Windows y los PNG S04_07–S04_09, que no se presumen capturados. Consolidar Terminal 1 en sesión interactiva SSH con reenvío 9120, y reservar Terminales 2–4 para los tres procesos persistentes. No interrumpir G1/G2 mientras se organiza G3.
+Los tres procesos exporter 9110, Prometheus 9091 y NOC 9120 quedaron iniciados y con APIs comprobadas sobre G1 operativa; bitácora de resultados. Pendiente la visualización en Windows y los PNG S04_07–S04_09, que no se presumen capturados. Consolidar Terminal 1 en sesión interactiva SSH con reenvío 9120, y reservar Terminales 2–4 para los tres procesos persistentes. No interrumpir G1/G2 mientras se organiza G3.
 
 
 ## 27/10/2026 — G3 ejecutada y fotografiada
 
-- [Bitácora real G3](../sesiones/2026-10-27-s04-g3-incidente-real-y-recuperacion.md): 60 segundos de corte controlado HQ/s1p, alerta `pending→firing` en Prometheus/NOC, rutas S1 por respaldo s1b, S2 primaria estable, conectividad ICMP y restitución de s1p y alarma. La recuperación se acredita por fuente fresca, métrica `admin_up=1` y ausencia de alerta entre activas, no como notificación externa.
+- Bitácora real G3: 60 segundos de corte controlado HQ/s1p, alerta `pending→firing` en Prometheus/NOC, rutas S1 por respaldo s1b, S2 primaria estable, conectividad ICMP y restitución de s1p y alarma. La recuperación se acredita por fuente fresca, métrica `admin_up=1` y ausencia de alerta entre activas, no como notificación externa.
 - El operador aportó y se auditó un lote de ocho PNG originales S04_07–11, con S04_09 dividida en cuatro vistas; **ZIP/CSV SHA-256 listos fuera de Git**. Falta transferir al repositorio, validar y publicar; contador de GitHub sin cambios (114 PNG).
 - Historial durable básico de incidentes, TSDB, fuente `UNKNOWN` y SLI/SLO constituyen trabajo G4/G5; [topología gráfica animada/semántica avanzada corresponde a S05](https://github.com/recm0708/netlab360/issues/64). La fase S04 **continúa abierta**.
 

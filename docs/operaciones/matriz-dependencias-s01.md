@@ -1,4 +1,4 @@
-> **NORMA DOCENTE POSTERIOR, 16/10/2026:** esta matriz se conserva como **inventario histórico de dependencias S01**. Toda referencia a «dos documentos maestros» ya fue sustituida: la profesora exige **UN informe final >=40 páginas** y PPT+demostración; Manual 02 pospuesto. Fuente normativa actual: [guía 1457](../academico/00-criterios-docentes-y-hitos.md). Las versiones de herramientas mostradas son las observadas al corte técnico y requieren nueva verificación cuando se reinicie la VM.
+> **NORMA DOCENTE POSTERIOR, 16/10/2026:** esta matriz se conserva como **inventario histórico de dependencias S01**. Toda referencia a «dos documentos maestros» ya fue sustituida: la profesora exige **UN informe final >=40 páginas** y PPT+demostración; Manual 02 pospuesto. Fuente normativa actual: guía 1457. Las versiones de herramientas mostradas son las observadas al corte técnico y requieren nueva verificación cuando se reinicie la VM.
 
 # NETLAB360 — Matriz vigente de dependencias S01
 
@@ -24,4 +24,4 @@
 5. Cerrar con down/rollback específico; no limpiar recursos ajenos.
 6. Comprobar red administrativa, servicios, evidencias y Git al terminar.
 
-**Estado actual:** no se requieren paquetes nuevos ni pruebas de red para elaborar los documentos académicos S01. No afirmar que faltaba Prometheus: fue validado en la sesión del 13/10 18:29–18:36. [Bitácora](../sesiones/2026-10-13-b3-prometheus-alertas-firing-y-resolucion-verificadas.md).
+**Estado actual:** no se requieren paquetes nuevos ni pruebas de red para elaborar los documentos académicos S01. No afirmar que faltaba Prometheus: fue validado en la sesión del 13/10 18:29–18:36. Bitácora.

@@ -26,4 +26,4 @@ La interfaz `ens33` y el gateway VMware se mantuvieron aislados durante los ensa
 
 Nuestro borrador **4.6 (113 páginas)** integra implementación S04, pruebas 6.9, análisis 7.10 y conclusiones. Incluye 20 figuras, 13 tablas y 10 referencias. La revisión de avance del 30/10 quedó consignada, sin adelantar los contenidos aún pendientes de S05–S08.
 
-[Medición G5](s04-g5-decision-medida-notificaciones-locales.md) · [Continuidad](../REANUDAR-AQUI.md) · [Seguimiento S04](https://github.com/recm0708/netlab360/issues/4).
+[Medición G5](s04-g5-decision-medida-notificaciones-locales.md) · Continuidad · [Seguimiento S04](https://github.com/recm0708/netlab360/issues/4).

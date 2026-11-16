@@ -34,4 +34,4 @@ Las pruebas de WAN, LACP y HA se realizaron en una VM con recursos virtuales; no
 
 No interpretamos esta acta como certificación de servicios de producción o como entrega final del proyecto.
 
-[Tablero S05](s05-tablero-vigente.md) · [Informe académico](../entregables/01-proyecto-investigacion-maestro.md) · [Catálogo de capturas](../../evidencias/capturas/README.md).
+Tablero S05 · Informe académico · [Catálogo de capturas](../../evidencias/capturas/README.md).
