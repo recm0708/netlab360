@@ -16,4 +16,4 @@ Prometheus 3.7.0 se ejecutó en `127.0.0.1:9091`, con [configuración S04](prome
 
 No ejecutamos `s04_exporter_multisede.py` para cambiar interfaces o routers; el componente es de observación. Su visualización e historial corresponden al [NOC S04](../noc-s04/README.md). Conservamos los datos TSDB y SQLite fuera de Git.
 
-[Pruebas G5](../../docs/operaciones/s04-g5-decision-medida-notificaciones-locales.md) · [Evidencias S04](../../evidencias/capturas/fase4/README.md).
+[Pruebas G5](../../docs/validacion/s01-s04-resultados.md) · [Evidencias S04](../../evidencias/capturas/fase4/README.md).

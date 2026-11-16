@@ -14,4 +14,4 @@ Desplegamos con scripts controlados de [`scripts/laboratorio/`](../../scripts/la
 
 El mismo escenario sirvió de base para el [cumplimiento Ansible S03](../../ansible/s03/README.md) y la [observabilidad S04](../../servicios/observabilidad/README.md). Las validaciones originales no requieren repetir el despliegue para documentarse.
 
-[Resultados y aceptación S02](../../docs/control/05-s02-aceptacion-y-documentacion-2026-10-24.md).
+[Resultados y aceptación S02](../../docs/validacion/s01-s04-resultados.md).

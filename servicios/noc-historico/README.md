@@ -1,5 +1,17 @@
-# NOC histórico — Prototipo S01
+# NOC histórico — Prototipo inicial
 
-Desarrollamos este componente como visualizador de datos de un ensayo inicial de **76 sondeos ICMP**. Su [aplicación](app.py) permite consultar el historial local y rutas observadas mediante `127.0.0.1:8765`.
+## Descripción
 
-Los datos son **históricos**: no representan el estado actual de HQ, S1 o S2, ni generan cambios sobre FRRouting, Docker o las interfaces. Conservamos el prototipo para reproducibilidad de S01 y lo distinguimos del [NOC multisede S04](../noc-s04/README.md), que utiliza observación real y SQLite.
+Este componente corresponde al prototipo de observabilidad empleado durante la primera fase de NETLAB360. Permitió estudiar la presentación básica de estados y eventos de un laboratorio de red virtualizado.
+
+## Implementación
+
+El prototipo utiliza una aplicación local y consultas a las fuentes de laboratorio disponibles durante S01. Sus resultados sirvieron de referencia para la evolución del centro de operaciones de red.
+
+## Evolución
+
+La observabilidad multisede se desarrolló posteriormente en [S04](../noc-s04/README.md), mientras que el panel de topología integrado corresponde a [S05](../topologia-s05/README.md). El prototipo se conserva por su valor técnico como versión inicial, sin presentarlo como la consola principal del sistema.
+
+## Limitaciones
+
+El módulo histórico no representa por sí mismo la supervisión completa de las tres sedes.

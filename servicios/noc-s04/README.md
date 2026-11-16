@@ -16,4 +16,4 @@ Durante el incidente controlado HQ/s1p observamos la transición `pending → fi
 
 Los datos operativos de SQLite permanecen en `~/netlab360-bootstrap/s04/historial/incidentes.sqlite3`, fuera de Git.
 
-[Validaciones G4](../../docs/operaciones/s04-g4-historial-persistente-noc.md) · [Evidencias S04](../../evidencias/capturas/fase4/README.md).
+[Validaciones G4](../../docs/validacion/s01-s04-resultados.md) · [Evidencias S04](../../evidencias/capturas/fase4/README.md).

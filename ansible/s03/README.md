@@ -14,4 +14,4 @@ Comprobamos **8/8 costos OSPF**, con costos principales de 10 y de respaldo de 1
 
 **Alcance:** Ansible administra configuración FRR activa; OpenTofu S03 mantiene exclusivamente metadatos locales. El estado de la SoT sigue siendo `candidate`, válido para el laboratorio y no equivalente a aprobación de producción. No ejecutamos una nueva reconciliación sin un precheck y una necesidad técnica concreta.
 
-[Contrato SoT](../../docs/control/07-puertas-cierre-fases1-a-3-2026-10-25.md) · [OpenTofu](../../iac/s03/README.md).
+[Contrato SoT](../../docs/validacion/s01-s04-resultados.md) · [OpenTofu](../../iac/s03/README.md).
