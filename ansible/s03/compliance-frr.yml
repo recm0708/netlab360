@@ -1,3 +1,5 @@
+# NETLAB360 | Configuración de FRRouting mediante Ansible
+# Configuración del componente correspondiente; conservar los recursos ajenos.
 ---
 # NETLAB360 S03 — Primera automatización ANSIBLE sobre routers FRR VIVOS.
 # SOLO AUDITORÍA: no aplica configuración ni cambia interfaces/Docker.

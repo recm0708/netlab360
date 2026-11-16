@@ -1,3 +1,5 @@
+# NETLAB360 | Gestión de servicios del laboratorio
+# Configuración del componente correspondiente; conservar los recursos ajenos.
 [Unit]
 Description=NETLAB360 S05 HTTP HA backend-s1 (10.71.20.21:8088)
 After=network-online.target

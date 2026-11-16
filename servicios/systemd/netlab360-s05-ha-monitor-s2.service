@@ -1,3 +1,5 @@
+# NETLAB360 | Gestión de servicios del laboratorio
+# Configuración del componente correspondiente; conservar los recursos ajenos.
 [Unit]
 Description=NETLAB360 S05 observador HTTP desde cliente VLAN320 S2 (solo lectura)
 After=network-online.target

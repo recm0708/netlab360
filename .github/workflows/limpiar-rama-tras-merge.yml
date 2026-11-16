@@ -1,3 +1,5 @@
+# NETLAB360 | Automatización de pruebas y tareas del repositorio
+# Configuración del componente correspondiente; conservar los recursos ajenos.
 name: NETLAB360 - Eliminar rama fusionada
 
 on:

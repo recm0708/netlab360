@@ -1,3 +1,5 @@
+# NETLAB360 | Gestión de servicios del laboratorio
+# Configuración del componente correspondiente; conservar los recursos ajenos.
 [Unit]
 Description=NETLAB360 S04 exporter de observabilidad multisede (solo lectura)
 Wants=network-online.target docker.service

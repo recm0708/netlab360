@@ -1,3 +1,5 @@
+# NETLAB360 | Métricas y reglas de observabilidad
+# Configuración del componente correspondiente; conservar los recursos ajenos.
 # Prometheus S04: pruebas unitarias sintéticas de reglas, no prueban una topologia viva.
 rule_files:
   - ../rules/s04-alerts.yml

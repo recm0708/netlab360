@@ -1,3 +1,5 @@
+# NETLAB360 | Gestión de servicios del laboratorio
+# Configuración del componente correspondiente; conservar los recursos ajenos.
 [Unit]
 Description=NETLAB360 S05 NOC topologia e inspeccion FIB (solo lectura)
 Wants=network-online.target netlab360-s04-exporter.service

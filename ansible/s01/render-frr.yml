@@ -1,3 +1,5 @@
+# NETLAB360 | Configuración de FRRouting mediante Ansible
+# Configuración del componente correspondiente; conservar los recursos ajenos.
 ---
 # NETLAB360 — renderiza configuraciones FRRouting desde OpenTofu, sin aplicarlas.
 - name: NETLAB360 SoT a FRRouting para HQ y S1

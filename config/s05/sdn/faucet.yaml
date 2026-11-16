@@ -1,3 +1,5 @@
+# NETLAB360 | Segmentación SDN del laboratorio
+# Configuración del componente correspondiente; conservar los recursos ajenos.
 version: 2
 vlans:
   s05_experimento:
