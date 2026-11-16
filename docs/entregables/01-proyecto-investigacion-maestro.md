@@ -1,40 +1,25 @@
-# NETLAB360 — Control del documento académico único
+# Control del informe académico único de NETLAB360
 
-**Versión interna revisada:** `1457-Proyecto Semestral_borrador4.6.pdf` (**113 páginas**), corte 01/11/2026. Editamos el Word original como documento maestro; el repositorio conserva el seguimiento y las evidencias, no reemplaza su contenido por un segundo informe.
+El documento académico se desarrolla como **un único informe institucional** que integra las ocho fases del proyecto. El repositorio conserva diseños, scripts, evidencias y decisiones, pero no sustituye el archivo Word/PDF del informe.
 
-## Estructura y estado de los capítulos
+## Versión revisada y alcance
 
-| Apartado | Estado del borrador 4.6 |
-|---|---|
-| Portada e índices | Verificados editorialmente, sujetos a título final comunicado a la docente |
-| Introducción y objetivos | Presentados en revisión del 30/10 sin observaciones comunicadas |
-| Planteamiento del problema | Incluido en la revisión académica del 30/10 |
-| Fundamento técnico | Desarrollado para la revisión del 13/11 |
-| Diseño y topología | HQ/S1/S2, redes, servicios y componentes documentados; revisión del 13/11 pendiente |
-| Implementación (cap. 5) | S01–S04 integradas |
-| Pruebas y validación (cap. 6) | S01–S04 con resultados reales |
-| Análisis (cap. 7) | S04 incluida en 7.10 |
-| Conclusiones y recomendaciones (cap. 8) | Actualizadas a S04 |
-| Referencias | 10 referencias revisadas internamente |
+La última versión del manuscrito que tenemos documentada es `1457-Proyecto Semestral_borrador4.6.pdf` (113 páginas, corte 1/11/2026). Esa versión abarca la implementación, pruebas y análisis de S01–S04. **No afirmamos que los resultados S05 estén incorporados en ese borrador** hasta revisar el archivo maestro actualizado.
 
-**Numeración del corte:** 20 figuras consecutivas, 13 tablas consecutivas y **122 capturas oficiales** con integridad SHA-256 (83/9/8/22). No agregar capturas de administración rutinaria solo para aumentar el volumen del repositorio.
+## Estructura académica
 
-## Alcance documentado y límites
+El informe mantiene portada e índices, introducción, objetivos, planteamiento del problema, fundamento técnico, diseño de la solución, implementación, pruebas y validación, análisis de resultados, conclusiones y recomendaciones, y referencias. Las citas y fuentes bibliográficas se gestionan conforme a APA 7 y la plantilla institucional. El paquete técnico se entregará por separado; no añadimos un capítulo de anexos al informe cuando el acuerdo de entrega contempla un TAR externo.
 
-En S03 demostramos Ansible operando FRR y OpenTofu manteniendo 17 recursos declarativos de **metadatos**, no aprovisionamiento externo. En S04 medimos 15m 100 % y 60m 97,586 % de éxito de recolección; la referencia interna del 99 % **no se alcanzó en 60m**. Registramos avisos locales y no atribuimos notificaciones externas, IA entrenada o disponibilidad contractual de servicios.
+## Incorporación pendiente de la fase 5
 
-## Seguimiento editorial S05 — corte 11/11/2026
+Actualizaremos los capítulos de implementación, pruebas, análisis y conclusiones con los resultados ya acreditados de WAN/OSPF, HA HTTP, LACP, OVS/Faucet y NOC. Conservaremos la distinción entre la infraestructura heredada de S02 y los módulos introducidos en S05.
 
-La fase S05 se encuentra **en desarrollo técnico**. Se validaron el piloto LACP P1 y la comparación P1B, el NOC interactivo multisede, la observación de la conmutación HQ–S1 por FIB (119 muestras) y la instalación de servicios S04/S05 mediante `systemd` con lector privilegiado de solo lectura. El registro más reciente confirma **50 pruebas S05 exitosas**, `S05_OBSERVADOR_PRIVILEGIADO=OK` y `S05_SERVICIOS_SYSTEMD=OK`, aunque el lote 84R-H se interrumpió por un `grep` antiguo de 46 pruebas y queda por confirmar la persistencia tras desconectarse y reconectarse por SSH. HA HTTP, integración LACP multisede y OVS/Faucet **no** están implementados todavía.
+Como evidencia primaria utilizaremos el piloto LACP P1 del 10/11 (original recuperado con SHA 4/4), su segunda sesión 11/11 como observación complementaria, P1B 5/5, el ciclo HTTP HQ→S1→HQ de 17 muestras y las capturas seleccionadas del catálogo S05. Presentaremos las mediciones como resultados virtualizados y precisaremos que no existe redundancia física del host.
 
-**Ya se inició el guion de incorporación de S05 al mismo informe académico**: [`s05-guion-de-actualizacion-del-informe.md`](../academico/s05-guion-de-actualizacion-del-informe.md). Contiene párrafos base para capítulos 5, 6 y 7 y sugerencias de tablas/figuras; **todavía no están pegados en el Word/PDF maestro**. El último documento inspeccionado sigue siendo el borrador 4.6 de 113 páginas (01/11). Cuando se revise la versión actual del Word se ajustará la numeración correlativa de figuras y tablas, citas y referencias según APA 7. No duplicar como informe independiente ni abrir capítulo de anexos.
+La incorporación de figuras y tablas al Word deberá conservar la numeración real de su última revisión. No agregaremos las 71 capturas al cuerpo por defecto: seleccionaremos únicamente las pertinentes y legibles.
 
-## Próximas incorporaciones
+## Trabajo posterior
 
-- Resultados **reales** de S05–S08, con nuevas pruebas, análisis, figuras y referencias solo cuando correspondan.
-- Revisión de fundamento y diseño por Teams del **13/11/2026** y correcciones que la profesora solicite realmente.
-- Versión final en Word/PDF y preparación del **TAR técnico independiente**, PowerPoint y demostración al cierre del semestral.
+S06 y S07 permanecen sujetos a sus propios criterios de implementación y validación; no presentamos un modelo de aprendizaje automático ni remediación AIOps como ejecutados antes de su evidencia. Durante S08 completaremos el TAR técnico, presentación y demostración de acuerdo con los criterios docentes confirmados.
 
-La reunión del 30/10 se celebró y, según informó el equipo, la profesora indicó que el trabajo presentado estaba bien y que continuaran con el siguiente entregable. Esta conformidad no constituye calificación final del proyecto completo.
-
-[Guion editorial](../academico/s04-guion-de-actualizacion-del-informe.md) · [Control académico](https://github.com/recm0708/netlab360/issues/36) · [TAR S08](https://github.com/recm0708/netlab360/issues/45).
+[Criterios de entrega](00-politica-editorial-y-entrega-acumulativa.md) · [Guion S05](../academico/s05-guion-de-actualizacion-del-informe.md) · [Catálogo de evidencias](../../evidencias/capturas/README.md).

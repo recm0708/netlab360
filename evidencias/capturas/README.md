@@ -1,15 +1,18 @@
-# Evidencias fotográficas del proyecto
+# Catálogo de capturas técnicas de NETLAB360
 
-Conservamos en este directorio únicamente las capturas **versionadas y verificadas** de los ensayos de NETLAB360. Se seleccionan para sustentar el informe y la demostración; no incorporamos capturas rutinarias de administración SSH, firmware ni salidas duplicadas.
+Conservamos las imágenes originales de los ensayos y sus manifiestos para garantizar trazabilidad. Los números de capturas indican identificadores operativos, no necesariamente números consecutivos de figuras del informe.
 
-| Fase | Imágenes PNG | Índice |
+| Fase | PNG verificados | Estado de publicación |
 |---|---:|---|
-| S01 | 83 | [Laboratorio inicial](fase1/README.md) |
-| S02 | 9 | [Red multisede](fase2/README.md) |
-| S03 | 8 | [Automatización](fase3/README.md) |
-| S04 | 22 | [Observabilidad](fase4/README.md) |
-| **Total verificado** | **122** | |
+| S01 | 83 | Versionados en `main` |
+| S02 | 9 | Versionados en `main` |
+| S03 | 8 | Versionados en `main` |
+| S04 | 22 | Versionados en `main` |
+| S05 | 71 | Consolidados y auditados en rama local; merge a `main` pendiente |
+| **Total técnico validado** | **193** | **122 publicados, 71 pendientes** |
 
-Cada imagen cuenta con una entrada de procedencia en [`evidencias/manifiestos/`](../manifiestos/). Verificamos ruta, tamaño y SHA-256 mediante [`validar-capturas-unificadas.py`](../../scripts/validacion/validar-capturas-unificadas.py). **No renombramos ni eliminamos imágenes respaldadas por manifiestos sin actualizar y probar el control de integridad.**
+Para S01–S04 consultamos los manifiestos de `evidencias/manifiestos/`. Para S05 disponemos de 70 PNG importados desde inventario ZIP/CSV y una captura 64 independiente: manifiestos de 70+1, inventario y registros HA en `evidencias/capturas/fase5/` y `evidencias/registros/s05/` de la rama de publicación. El conjunto fue comprobado por SHA-256 y revisión visual, pero **no se considerará remoto hasta verificar el merge**.
 
-Para S05–S08 reservamos directorios de evidencia vacíos hasta contar con ejecuciones reales. El ciclo GitOps S03 se documenta en [un registro Markdown](../../docs/evidencias/S03_09_GitOps_CI_Regresion_PullRequest.md), no como una novena PNG.
+La selección académica utilizará solo las figuras pertinentes. Se preservan las variantes de varias pantallas (17/18/58) cuando aportan partes distintas de una misma validación, sin inventar capturas ausentes ni modificar las originales.
+
+[Selección de S05](../../docs/evidencias/s05-seleccion-para-informe.md) · [Estado técnico](../../docs/gestion/s05-tablero-vigente.md).
