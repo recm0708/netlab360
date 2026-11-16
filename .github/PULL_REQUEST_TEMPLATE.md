@@ -1,6 +1,6 @@
 ## Revisión técnica y editorial
 
-- [ ] Los cambios se redactaron como documentación propia del proyecto, de acuerdo con [convenciones](../docs/convenciones/01-redaccion-y-nomenclatura.md).
+- [ ] Los cambios se redactaron como documentación propia del proyecto, de acuerdo con convenciones.
 - [ ] No se atribuyeron acciones al «estudiante», «usuario» o a un asistente externo cuando se documentan operaciones propias de NETLAB360.
 - [ ] Las menciones a usuarios de la red o de una aplicación, comandos, errores literales y nombres técnicos se conservaron cuando corresponden a su significado real.
 - [ ] Se mantuvieron resultados, fechas, IP, nombres de archivos, SHA-256, citas y evidencias sin alteraciones.

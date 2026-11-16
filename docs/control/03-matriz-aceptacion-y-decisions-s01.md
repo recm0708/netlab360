@@ -1,6 +1,6 @@
 # NETLAB360 — Matriz de objetivos internos históricos y criterios DOCENTES
 
-**Revisión 16/10/2026.** [Norma docente recibida](../academico/00-criterios-docentes-y-hitos.md): un informe de **mínimo 40 páginas**, 12 secciones; PowerPoint y demostración técnica. **Los C01–C11 de abajo fueron inventario INTERNO de validaciones transversales anteriores, NO 11 criterios oficiales entregados por la profesora.** Su trazabilidad se conserva para no omitir funcionalidades; ya no se exige cerrar todo en S01 para autorizar S02.
+**Revisión 16/10/2026.** Norma docente recibida: un informe de **mínimo 40 páginas**, 12 secciones; PowerPoint y demostración técnica. **Los C01–C11 de abajo fueron inventario INTERNO de validaciones transversales anteriores, NO 11 criterios oficiales entregados por la profesora.** Su trazabilidad se conserva para no omitir funcionalidades; ya no se exige cerrar todo en S01 para autorizar S02.
 
 | Código | Objetivo o comprobación interna | Estado técnico de evidencia al corte S01 | Pendiente/fase principal |
 |---|---|---|---|
@@ -18,11 +18,11 @@
 
 ## Confirmaciones y decisiones
 
-- Guía docente ahora conocida: **un solo documento escrito de al menos 40 páginas**, PowerPoint y demostración. Requisitos narrativos y de pruebas documentados con precisión en [guía transcrita](../academico/00-criterios-docentes-y-hitos.md).
+- Guía docente ahora conocida: **un solo documento escrito de al menos 40 páginas**, PowerPoint y demostración. Requisitos narrativos y de pruebas documentados con precisión en guía transcrita.
 - **Ya se confirmaron** revisiones parciales del proyecto el **30/10/2026** y **13/11/2026**, ZIP separado de anexos permitido junto al informe y demostración final **EN VIVO**. **Todavía se desconocen** fecha y duración finales, límites de diapositivas, cómputo de las 40 páginas, tamaño máximo del ZIP y obligación de OVA; Parcial 1 se atiende en otro chat.
 - S01 continúa ABIERTA en issue #1 con resultados reales parciales; **retirada la prohibición anterior de S02 por falta de dos manuscritos**. Avanzar S02 y mantener trazabilidad de los 11 objetivos a su fase técnica lógica.
 - Reducir opcionales sólo con aprobación según exigencias confirmadas; no fingir que topología única o ML ya funcionan.
 - El manual técnico independiente #28 se mantiene como **posentrega, no parte de C05/C09 ni de la evaluación**.
-- Portada Word confeccionada por el usuario; referencias APA7 y figuras/tablas contextualizadas. [Mapa de los 65p](../academico/01-migracion-borrador-a-formato-docente.md).
+- Portada Word confeccionada por el usuario; referencias APA7 y figuras/tablas contextualizadas. Mapa de los 65p.
 
 **Criterio de aceptación académica:** cumplimiento del informe y su estructura, defensa de diseño, evidencias reproducibles y demostración explicada. La ponderación 72/100 NO ES calificación docente.

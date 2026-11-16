@@ -25,4 +25,4 @@ Esta prueba verifica tolerancia al fallo lógico de **una instancia backend** de
 
 El rescate de `systemd` depende de que Ubuntu continúe ejecutándose. Un apagado normal de la VM destruiría los namespaces efímeros si no se ha completado su reconstrucción reproducible. Para pausas temporales preservamos el estado mediante suspensión VMware.
 
-[Registro del ensayo](../../docs/gestion/s05-tablero-vigente.md) · [Evidencias](../../evidencias/capturas/README.md) · [Continuidad VMware](../05-plan-operativo-y-pausas.md).
+Registro del ensayo · [Evidencias](../../evidencias/capturas/README.md) · Continuidad VMware.

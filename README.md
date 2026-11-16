@@ -1,41 +1,42 @@
 # NETLAB360
 
-**Plataforma virtualizada para automatización, observabilidad y diagnóstico de redes empresariales multisede.**
+**Plataforma virtualizada para automatización, observabilidad y diagnóstico de redes empresariales multisede**
 
-Desarrollamos NETLAB360 como un laboratorio reproducible para estudiar la operación de redes de tres sedes (HQ, S1 y S2). Integramos FRRouting/OSPF, segmentación VLAN, automatización Ansible/OpenTofu, telemetría, un centro de operaciones de red (NOC), agregación LACP, Open vSwitch/Faucet y alta disponibilidad lógica de servicios HTTP.
+NETLAB360 integra infraestructura virtual de tres sedes (HQ, S1 y S2) para analizar el comportamiento de protocolos de encaminamiento, agregación de enlaces, automatización, telemetría y segmentación definida por software. Desarrollamos el laboratorio en Ubuntu Desktop sobre VMware y utilizamos Docker, FRRouting, Ansible, OpenTofu, Prometheus, Open vSwitch y Faucet.
 
-## Arquitectura y alcance
+## Arquitectura
 
-El entorno se ejecuta en una máquina virtual Ubuntu Desktop con redes experimentales aisladas. La interfaz de administración `ens33` utiliza `192.168.47.40/24` y puerta de enlace `192.168.47.2`; los ensayos no deben modificarla. Los routers virtuales, switches, hosts y servicios se distribuyen entre contenedores y espacios de nombres de red. La plataforma no representa redundancia física del servidor anfitrión.
+La red experimental combina cuatro enlaces WAN, nueve VLAN y tres routers FRRouting con OSPF. La administración permanece separada mediante `ens33 192.168.47.40/24` y puerta de enlace `192.168.47.2`.
 
-| Fase | Resultado acreditado | Alcance |
-|---|---|---|
-| S01 | Línea base FRR/OSPF, VLAN, pruebas de conectividad, automatización inicial | Laboratorio de referencia |
-| S02 | Tres sedes, cuatro enlaces WAN, nueve VLAN y conmutación de rutas | Infraestructura multisede |
-| S03 | Ansible sobre FRR, reconciliación de desviaciones y GitOps | OpenTofu administra 17 registros locales de metadatos, no routers externos |
-| S04 | Métricas, alertas, incidentes y persistencia SQLite/Prometheus | Observabilidad y diagnóstico por reglas |
-| S05 | WAN/HTTP HA, LACP HQ/S1/S2, OVS/Faucet, NOC y ensayos de recuperación | Implementación y aceptación técnica comprobadas; publicación de evidencias en preparación |
-| S06–S08 | Actividades pendientes según sus criterios específicos | No se declara entrenamiento ML, AIOps ni entrega final sin verificaciones |
+- **Infraestructura y encaminamiento:** [topología multisede](topologias/s02-frr/README.md) e [inventario IPAM](inventario/ipam/topologia-s02.yaml).
+- **Automatización:** [Ansible/FRR](ansible/s03/README.md), [OpenTofu](iac/s03/README.md) y pruebas de GitOps.
+- **Observabilidad:** [métricas y Prometheus](servicios/observabilidad/README.md), [NOC S04](servicios/noc-s04/README.md) y [NOC de topología S05](servicios/topologia-s05/README.md).
+- **Alta disponibilidad y LACP:** [diseño y resultados HTTP](docs/diseno/s05-ha-servicios-multisede.md) y [agregación multisede](docs/disenos/s05-lacp-integracion-multisede-candidata.md).
+- **Segmentación SDN:** [Open vSwitch/Faucet](docs/diseno/s05-ovs-faucet-vs-bridge-frr-y-limpieza-segura.md).
 
-## Evidencias y validación
+## Resultados verificados
 
-La fase S05 registra **71 capturas PNG originales** y un ciclo de conmutación real del backend HTTP `BACKEND_HQ → BACKEND_S1 → BACKEND_HQ` observado en 17 muestras. El último precheck no destructivo confirmó 21 namespaces, cuatro contenedores, seis servicios, integridad SHA-256 y gestión intacta. Estos archivos se encuentran consolidados en una rama local de evidencias; **su publicación en `main` debe verificarse antes de declarar el catálogo remoto completo**.
+| Fase | Resultado técnico |
+|---|---|
+| S01 | Línea base FRRouting/OSPF, VLAN, servicios y automatización inicial |
+| S02 | Tres sedes, cuatro enlaces WAN, nueve VLAN y conmutación de rutas |
+| S03 | Auditoría y reconciliación Ansible sobre FRR; 17 recursos locales de metadatos OpenTofu |
+| S04 | Prometheus, observabilidad WAN, eventos y persistencia de historial SQLite/TSDB |
+| S05 | HTTP HA lógico HQ→S1→HQ, LACP 2→1→2 en las tres sedes, segmentación Faucet y NOC integrado |
+| S06–S08 | Funcionalidades adicionales, integración académica y entrega final sujetas a validación |
 
-Las pruebas de rendimiento se interpretan dentro de las limitaciones de una VM y no se extrapolan a enlaces o equipos físicos de producción.
+La aceptación técnica S05 comprobó 21 namespaces, cuatro contenedores, seis servicios activos, NOC saludable y gestión intacta. El ciclo de conmutación HTTP cuenta con 17 muestras originales. Estas pruebas acreditan alta disponibilidad **lógica**, no redundancia física de host o hipervisor.
 
-## Organización del repositorio
+## Evidencias y documentación técnica
 
-- [Estado técnico y continuidad](docs/00-estado-y-continuidad.md)
-- [Punto de reanudación](docs/REANUDAR-AQUI.md)
-- [Arquitectura, decisiones y diseño](docs/arquitectura/)
-- [Plan de operación y conservación de la VM](docs/05-plan-operativo-y-pausas.md)
-- [Tablero y aceptación de S05](docs/gestion/s05-tablero-vigente.md)
-- [Catálogo de evidencias](evidencias/capturas/README.md)
-- [Control del informe académico único](docs/entregables/01-proyecto-investigacion-maestro.md)
-- [Criterios editoriales](docs/convenciones/01-redaccion-y-nomenclatura.md)
+Conservamos [193 capturas PNG](evidencias/capturas/README.md) distribuidas entre S01 y S05, acompañadas por inventarios y manifiestos SHA-256. Los ensayos de HA incorporan además registros JSONL y TXT originales.
 
-Los archivos de `docs/sesiones/` y los cortes anteriores de `docs/gestion/` constituyen registros históricos; no deben interpretarse como instrucciones operativas vigentes.
+- [Acta de aceptación técnica S05](docs/gestion/ACTA-ACEPTACION-TECNICA-S05-20261115.md)
+- [Arquitectura](docs/arquitectura/) y [decisiones de diseño](docs/decisiones/)
+- [Configuración e inventario del entorno](docs/infraestructura/)
+- [Pruebas automatizadas](tests/) y [scripts de laboratorio](scripts/)
+- [Capturas y registros de evidencia](evidencias/)
 
-## Continuidad y seguridad
+Las mediciones se obtuvieron en infraestructura virtualizada; no se atribuyen a equipos de producción. El código y las pruebas se mantienen separados de los registros y credenciales locales. Las actividades pendientes de S06–S08 no se presentan como implementadas.
 
-Preservamos los registros originales, manifiestos de integridad y configuraciones de cada fase. Los datos sensibles, estados de OpenTofu y credenciales permanecen fuera del repositorio. Mientras los 21 namespaces efímeros sigan activos, no corresponde apagar ni reiniciar el sistema invitado sin un procedimiento de reconstrucción comprobado. Para una pausa temporal utilizamos suspensión de la VM en VMware, sin confundirla con apagado o recuperación tras reinicio.
+La carpeta `docs/_temporal_continuidad/` contiene exclusivamente material de seguimiento interno y no corresponde a los entregables técnicos finales.

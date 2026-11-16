@@ -14,4 +14,4 @@ El firmware y disco de la VM se comprobaron en S01. El origen de ISO de instalac
 
 **Total oficial al cierre S04:** 122 PNG (83/9/8/22) con controles de integridad. S04 sigue pendiente de ratificar el SLO académico y de registrar el dictamen docente.
 
-[Continuidad](../REANUDAR-AQUI.md) · [Tablero de fases](06-tablero-porcentajes-cierre-fases-2026-10-25.md).
+Continuidad · Tablero de fases.

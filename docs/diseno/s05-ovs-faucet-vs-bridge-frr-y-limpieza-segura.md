@@ -17,7 +17,7 @@
 - Código: [implementación aislada](../../scripts/laboratorio/s05-sdn-ovs-faucet-aislado.py) y [configuración de Faucet](../../config/s05/sdn/faucet.yaml).
 - Recursos propios: bridge br-s05-sdn; propietario NETLAB360_S05_SDN_V1; DPID 0x505; contenedor nl360-s05-faucet, publicado solo en localhost 16653→6653; namespaces nl360-s05-sdn-a, -b y -c.
 - Puertos OpenFlow 1/2/3: sdna0, sdnb0, sdnc0; hosts 198.18.41.11/24, .12/24 y .13/24. VLAN 410 para A/B y VLAN 420 para C. La prueba ICMP A↔B fue positiva; A↔C y C↔A rechazadas, sin afirmar ACL L3 adicionales que no se midieron.
-- Lotes 136–138 documentan pertenencia del dominio, controlador conectado, reglas OpenFlow presentes, caída y recuperación del **único puerto sdna0**, regresión de FRR/LACP/HTTP/NOC/gestión y no reutilización de ens33. [Evidencia de ejecución](../operacion/s05-lotes-136-138-aceptacion-y-falla-sdn-20261115.md).
+- Lotes 136–138 documentan pertenencia del dominio, controlador conectado, reglas OpenFlow presentes, caída y recuperación del **único puerto sdna0**, regresión de FRR/LACP/HTTP/NOC/gestión y no reutilización de ens33. Evidencia de ejecución.
 - La captura 63 validada muestra Faucet CONECTADO y **26 reglas observadas**. Los recuentos anteriores de 25 y 31 corresponden a otras muestras; no constituyen medidas de rendimiento ni sustituyen comprobaciones de conectividad.
 
 ## Contrato de consulta y retirada selectiva

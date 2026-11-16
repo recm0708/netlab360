@@ -46,4 +46,4 @@ Windows PowerShell verificó físicamente **9/9 PNG válidos** `S02_01`–`S02_0
 
 Un **único documento institucional** >=40 páginas al final, sin informes separados por S01, S02, S03. Orden: Portada; Introducción; Objetivos; Planteamiento; Fundamento; Diseño; Implementación; Pruebas; Análisis; Conclusiones/recomendaciones; Referencias; Anexos. Preservar contenido útil del borrador inicial, pero cambiar afirmaciones desactualizadas (p. ej. S2 como futuro cuando ya fue implementado). Figuras y tablas con preámbulo, numeración/nota APA7. Código completo y registros extensos al ZIP autorizado, sin contraseñas ni claves privadas.
 
-**Enlaces:** [Issue S02](https://github.com/recm0708/netlab360/issues/2) · [Criterios docente](../academico/00-criterios-docentes-y-hitos.md) · [Informe único](../entregables/01-proyecto-investigacion-maestro.md) · [Bitácora](../sesiones/2026-10-23-s02-integracion-wan-lan.md).
+**Enlaces:** [Issue S02](https://github.com/recm0708/netlab360/issues/2) · Criterios docente · Informe único · Bitácora.

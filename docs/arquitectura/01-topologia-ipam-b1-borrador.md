@@ -1,7 +1,7 @@
 # B1 — Arquitectura e IPAM preliminar de NETLAB360
 
 **Estado:** BORRADOR v0.1 (12/10/2026). Sujeto a validación contra las rutas y redes Docker reales de la VM; **no está desplegado**.  
-**Issues:** #11, #16 y #1. **Plan:** [bloques y pausas](../05-plan-operativo-y-pausas.md).
+**Issues:** #11, #16 y #1. **Plan:** bloques y pausas.
 
 ## 1. Capas separadas
 
