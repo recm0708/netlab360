@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# NETLAB360 | Herramientas del proyecto: precheck frr b2
+# Alcance: ejecutar únicamente los recursos del componente correspondiente.
+# Seguridad: mantener separada la red de administración del laboratorio.
+
 # NETLAB360 B2-L3: solo lectura; verifica host, IPAM, Docker y la etiqueta FRR.
 # No descarga imagen, no crea bridges, routers ni contenedores.
 set -Eeuo pipefail

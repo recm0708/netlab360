@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# NETLAB360 | Operación: s05 lote ha instancia con watchdog
+# Alcance: recursos propios del módulo, sin alterar la red administrativa.
+
 # S05: UNA prueba HA de backend con rescate systemd independiente de SSH.
 # No interviene WAN, LACP, Faucet, ens33 ni namespaces.
 set -Eeuo pipefail

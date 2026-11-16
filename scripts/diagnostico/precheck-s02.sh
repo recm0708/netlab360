@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# NETLAB360 | Diagnóstico: precheck s02
+# Alcance: recursos propios del módulo, sin alterar la red administrativa.
+
 # NETLAB360 S02 - comprobacion previa SIN MODIFICAR LA RED.
 # Para validar nueva conexion SSH es imprescindible una prueba externa (Windows).
 set -Eeuo pipefail

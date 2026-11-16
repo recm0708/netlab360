@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# NETLAB360 | Observabilidad: preparar prometheus local
+# Alcance: recursos propios del módulo, sin alterar la red administrativa.
+
 # NETLAB360 B3 — obtener binarios Prometheus/promtool desde imagen oficial pinned.
 # No instala paquetes apt; NO arranca servicios, NO altera redes del host.
 set -Eeuo pipefail

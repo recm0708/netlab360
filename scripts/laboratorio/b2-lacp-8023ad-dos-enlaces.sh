@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# NETLAB360 | Laboratorio: b2 lacp 8023ad dos enlaces
+# Alcance: recursos propios del módulo, sin alterar la red administrativa.
+
 # NETLAB360 — laboratorio LACP 802.3ad 2 enlaces con fallo y restauracion.
 # Solo opera 2 namespaces de propiedad nl360-lacpa / nl360-lacpb.
 # Nunca configura ens33, VMnet8, Docker ni rutas/nftables del host.

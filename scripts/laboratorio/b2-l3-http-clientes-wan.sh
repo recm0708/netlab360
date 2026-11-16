@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# NETLAB360 | Laboratorio: b2 l3 http clientes wan
+# Alcance: recursos propios del módulo, sin alterar la red administrativa.
+
 # NETLAB360: HTTP real HQ->S1 sobre WAN-P, WAN-B y WAN-P.
 # Namespace de cliente/servidor + transportes veth P2P; no altera host.
 set -Eeuo pipefail

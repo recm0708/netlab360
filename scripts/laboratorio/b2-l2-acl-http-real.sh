@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# NETLAB360 | Laboratorio: b2 l2 acl http real
+# Alcance: recursos propios del módulo, sin alterar la red administrativa.
+
 # NETLAB360 B2-L2: HTTP real entre VLAN 110/120 + ACL aislada en router.
 # Solo opera namespaces nl360-acl*, NO toca ens33, gateway ni nftables del host.
 set -Eeuo pipefail

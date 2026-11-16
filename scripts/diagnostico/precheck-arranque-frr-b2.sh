@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# NETLAB360 | Herramientas del proyecto: precheck arranque frr b2
+# Alcance: ejecutar únicamente los recursos del componente correspondiente.
+# Seguridad: mantener separada la red de administración del laboratorio.
+
 # NETLAB360 B2-L3: inspección de arranque/configuración de FRRouting 10.7.1.
 # Solo un contenedor efímero SIN red, sin demonios, cap-drop ALL, rootfs read-only.
 set -Eeuo pipefail

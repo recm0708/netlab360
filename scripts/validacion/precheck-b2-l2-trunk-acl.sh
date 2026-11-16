@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# NETLAB360 | Validación: precheck b2 l2 trunk acl
+# Alcance: recursos propios del módulo, sin alterar la red administrativa.
+
 # NETLAB360 B2-L2: precheck NO destructivo de capacidades trunk/VLAN/ACL.
 set -Eeuo pipefail
 cd "$HOME/proyectos/netlab360"

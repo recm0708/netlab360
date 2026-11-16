@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# NETLAB360 | Laboratorio: b2 frr smoke v5 demonios verificados
+# Alcance: recursos propios del módulo, sin alterar la red administrativa.
+
 # NETLAB360 B2-L3: smoke FRR v5 con verificación explícita de acceso y rollback.
 # Ensayo mínimo en VM aislada: CAP_SYS_ADMIN requerido por daemons FRR 10.7.1.
 # /run/frr y /var/tmp/frr son tmpfs exclusivos del contenedor. NO usa --privileged.

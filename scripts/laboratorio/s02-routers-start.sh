@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# NETLAB360 | Laboratorio: s02 routers start
+# Alcance: recursos propios del módulo, sin alterar la red administrativa.
+
 # Inicio EXCLUSIVO de tres routers FRR aislados por Docker Compose S02.
 # Valida runtime 3/3 ANTES de hacer compose up. NO crea WAN, VLAN o rutas host.
 set -Eeuo pipefail

@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# NETLAB360 | Diagnóstico: precheck l2 b1
+# Alcance: recursos propios del módulo, sin alterar la red administrativa.
+
 # NETLAB360: B1 - Verificación L2/L3 de compatibilidad, únicamente lectura.
 # No ejecuta modprobe, ip link add, docker run, ni modifica ens33, rutas o firewall.
 set -Eeuo pipefail

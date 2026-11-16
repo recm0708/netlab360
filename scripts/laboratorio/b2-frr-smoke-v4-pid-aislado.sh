@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# NETLAB360 | Laboratorio: b2 frr smoke v4 pid aislado
+# Alcance: recursos propios del módulo, sin alterar la red administrativa.
+
 # NETLAB360 B2-L3: smoke FRR v4 con verificación explícita de acceso y rollback.
 # Prueba sin CAP_SYS_ADMIN. /run/frr en tmpfs aislado UID0/GID101 modo 0770.
 # NO crea WAN, no usa network host, no toca ens33.

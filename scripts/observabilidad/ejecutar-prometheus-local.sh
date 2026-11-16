@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# NETLAB360 | Observabilidad: ejecutar prometheus local
+# Alcance: recursos propios del módulo, sin alterar la red administrativa.
+
 # NETLAB360 — Prometheus como usuario normal y exclusivamente localhost.
 set -Eeuo pipefail
 REPO="$HOME/proyectos/netlab360"

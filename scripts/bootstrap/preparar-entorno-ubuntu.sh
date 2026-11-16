@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# NETLAB360 | Herramientas del proyecto: preparar entorno ubuntu
+# Alcance: ejecutar únicamente los recursos del componente correspondiente.
+# Seguridad: mantener separada la red de administración del laboratorio.
+
 # NETLAB360: preparación de herramientas del anfitrión Ubuntu Desktop.
 # NO despliega FRRouting/OVS ni topologías de red.
 set -Eeuo pipefail

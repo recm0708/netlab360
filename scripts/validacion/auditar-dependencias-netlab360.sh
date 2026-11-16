@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# NETLAB360 | Validación: auditar dependencias netlab360
+# Alcance: recursos propios del módulo, sin alterar la red administrativa.
+
 # NETLAB360: auditoria de dependencias de B0/B1/B2/B3 y fases futuras.
 # Solo lectura: NO instala paquetes, NO cambia rutas, NO arranca contenedores.
 set -uo pipefail

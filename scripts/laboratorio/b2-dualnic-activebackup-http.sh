@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# NETLAB360 | Laboratorio: b2 dualnic activebackup http
+# Alcance: recursos propios del módulo, sin alterar la red administrativa.
+
 # NETLAB360 B2 — Servidor dual-NIC virtual: bond active-backup con dos enlaces.
 # Todos los cambios se limitan a nl360-dnica/nl360-dnicb, NO a ens33.
 set -Eeuo pipefail

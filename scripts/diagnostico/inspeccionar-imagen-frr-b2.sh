@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# NETLAB360 | Herramientas del proyecto: inspeccionar imagen frr b2
+# Alcance: ejecutar únicamente los recursos del componente correspondiente.
+# Seguridad: mantener separada la red de administración del laboratorio.
+
 # NETLAB360 B2-L3: inspeccion segura de imagen FRR YA descargada.
 # Crea UN contenedor efimero sin red, sin privilegios, --rm, con rootfs de solo lectura.
 # NO inicia ospfd ni zebra, NO crea veth y NO modifica rutas / ens33 / Docker networks.

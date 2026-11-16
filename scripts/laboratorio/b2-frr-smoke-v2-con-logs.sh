@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# NETLAB360 | Laboratorio: b2 frr smoke v2 con logs
+# Alcance: recursos propios del módulo, sin alterar la red administrativa.
+
 # NETLAB360 B2-L3: smoke FRR v2 con logs, permisos y rollback.
 # Capacidades concretas FRR revisadas; SYS_ADMIN tiene alcance amplio dentro del contenedor.
 # NO crea WAN, no usa network host, no toca ens33.
