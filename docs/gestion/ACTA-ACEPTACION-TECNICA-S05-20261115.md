@@ -1,37 +1,33 @@
 # Acta de aceptación técnica — fase 5
 
 **Proyecto:** NETLAB360  
-**Fecha de verificación:** 15 de noviembre de 2026  
-**Alcance:** implementación, ensayos de alta disponibilidad y comprobación final de la infraestructura S05.
+**Validación operativa:** 15 de noviembre de 2026  
+**Integridad y publicación de evidencias:** 16 de noviembre de 2026
 
 ## Objeto
 
-Verificamos la integración de redes empresariales virtuales para HQ, S1 y S2, incluyendo enrutamiento dinámico, tolerancia a fallas lógicas, agregación de enlaces, segmentación SDN y monitoreo centralizado.
+Comprobamos la integración de una red multisede virtual en HQ, S1 y S2, incorporando alta disponibilidad lógica HTTP, agregación LACP 802.3ad, segmentación OVS/Faucet y un centro de operaciones de red que observa fuentes reales.
 
-## Criterios comprobados
+## Resultados verificados
 
-| Dominio | Resultado |
+| Dominio | Comprobación |
 |---|---|
-| WAN/OSPF y red local | Cuatro WAN, nueve VLAN, conmutación y restauración verificadas |
-| LACP | Tres agregadores con dos miembros; recuperación 2→1→2 por sede |
-| SDN | Faucet/OpenFlow, VLAN410 A↔B permitida, VLAN420 C aislada y puerto restaurado |
-| HTTP HA | Una interrupción real del backend HQ, selección S1 y retorno HQ en 17 muestras |
-| NOC | Salud correcta, 18 nodos/21 enlaces, fuentes FIB/HA/LACP/SDN |
-| Infraestructura del laboratorio | 21 namespaces, cuatro contenedores, seis servicios activos |
-| Administración | `ens33 192.168.47.40/24`, gateway `192.168.47.2`, sin cambios |
-| Integridad | P1 original 4/4, P1B 5/5, 71 PNG y dos registros HA correctos |
+| WAN/OSPF y VLAN | Cuatro WAN, nueve VLAN; conmutación y retorno de rutas observados |
+| LACP | Dos miembros por sede, prueba de falla y recuperación 2→1→2 |
+| OVS/Faucet | VLAN410 A/B comunicada, VLAN420 C aislada y puerto restaurado |
+| HTTP HA | Backend HQ→S1→HQ observado en 17 muestras, timer de rescate cancelado |
+| NOC | API saludable, 18 nodos/21 enlaces, FIB, LACP, HA y controlador SDN |
+| Estado de VM | 21 namespaces, cuatro contenedores y seis servicios activos |
+| Gestión | `ens33 192.168.47.40/24`, gateway `192.168.47.2`, intactos |
+| Integridad P1/P1B | 4/4 archivos históricos P1 y 5/5 P1B con SHA comprobado |
+| Evidencias S05 | 71 PNG, inventario, tres manifiestos y dos registros HA, 77 archivos en total |
 
-El ensayo HTTP se ejecutó con un rescate temporizado independiente de la sesión SSH. La validación comprobó cancelación posterior del timer, recuperación del backend y conservación del resto de los servicios.
+## Trazabilidad documental
 
-## Limitaciones reconocidas
+El lote 158 acreditó los resultados operativos sin provocar nuevas fallas. El conjunto de 77 archivos se publicó sin modificar los originales mediante el [PR #152](https://github.com/recm0708/netlab360/pull/152), fusionado en `main`. Los 71 PNG y sus registros se conservan en [evidencias S05](../../evidencias/capturas/fase5/README.md) y [registros HA](../../evidencias/registros/s05/).
 
-Las pruebas de WAN, LACP y HA se realizaron en una VM con recursos virtuales; no demuestran alta disponibilidad del anfitrión, controlador Faucet redundante ni recuperación tras reiniciar Ubuntu. Los 21 namespaces efímeros requieren suspensión VMware o un procedimiento de reconstrucción todavía pendiente.
+## Alcance de aceptación
 
-## Resultado del acta
+**La implementación y la aceptación técnica de S05 quedan comprobadas.** El informe académico único, las ampliaciones S06–S07 y el paquete final S08 son actividades independientes que siguen pendientes de sus propios criterios.
 
-**Aceptación técnica operativa: conforme** al lote 158 de solo lectura.  
-**Aceptación documental y cierre administrativo: pendientes** hasta comprobar que los 77 archivos nuevos de evidencias estén fusionados en `main`, validar la referencia cruzada con el manuscrito y resolver las issues vinculadas.
-
-No interpretamos esta acta como certificación de servicios de producción o como entrega final del proyecto.
-
-Tablero S05 · Informe académico · [Catálogo de capturas](../../evidencias/capturas/README.md).
+Las conmutaciones son lógicas dentro de una única VM; no demuestran redundancia física, disponibilidad contractual ni recuperación tras reiniciar Ubuntu. Los namespaces efímeros deben conservarse mediante suspensión controlada hasta validar una reconstrucción segura.

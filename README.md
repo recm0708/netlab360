@@ -11,7 +11,7 @@ La red experimental combina cuatro enlaces WAN, nueve VLAN y tres routers FRRout
 - **Infraestructura y encaminamiento:** [topología multisede](topologias/s02-frr/README.md) e [inventario IPAM](inventario/ipam/topologia-s02.yaml).
 - **Automatización:** [Ansible/FRR](ansible/s03/README.md), [OpenTofu](iac/s03/README.md) y pruebas de GitOps.
 - **Observabilidad:** [métricas y Prometheus](servicios/observabilidad/README.md), [NOC S04](servicios/noc-s04/README.md) y [NOC de topología S05](servicios/topologia-s05/README.md).
-- **Alta disponibilidad y LACP:** [diseño y resultados HTTP](docs/diseno/s05-ha-servicios-multisede.md) y [agregación multisede](docs/disenos/s05-lacp-integracion-multisede-candidata.md).
+- **Alta disponibilidad y LACP:** [diseño y resultados HTTP](docs/diseno/s05-ha-servicios-multisede.md) y [agregación multisede](docs/diseno/s05-lacp-8023ad-multisede.md).
 - **Segmentación SDN:** [Open vSwitch/Faucet](docs/diseno/s05-ovs-faucet-vs-bridge-frr-y-limpieza-segura.md).
 
 ## Resultados verificados
@@ -32,11 +32,10 @@ La aceptación técnica S05 comprobó 21 namespaces, cuatro contenedores, seis s
 Conservamos [193 capturas PNG](evidencias/capturas/README.md) distribuidas entre S01 y S05, acompañadas por inventarios y manifiestos SHA-256. Los ensayos de HA incorporan además registros JSONL y TXT originales.
 
 - [Acta de aceptación técnica S05](docs/gestion/ACTA-ACEPTACION-TECNICA-S05-20261115.md)
-- [Arquitectura](docs/arquitectura/) y [decisiones de diseño](docs/decisiones/)
+- [Arquitectura](docs/arquitectura/arquitectura-multisede-implementada.md) y [decisiones de diseño](docs/decisiones/)
 - [Configuración e inventario del entorno](docs/infraestructura/)
 - [Pruebas automatizadas](tests/) y [scripts de laboratorio](scripts/)
 - [Capturas y registros de evidencia](evidencias/)
 
 Las mediciones se obtuvieron en infraestructura virtualizada; no se atribuyen a equipos de producción. El código y las pruebas se mantienen separados de los registros y credenciales locales. Las actividades pendientes de S06–S08 no se presentan como implementadas.
 
-La carpeta `docs/_temporal_continuidad/` contiene exclusivamente material de seguimiento interno y no corresponde a los entregables técnicos finales.

@@ -1,17 +1,14 @@
-# NETLAB360 — Cierre interno de las fases S01 a S03
+# Aceptación técnica de las fases S01–S03
 
-**Corte 01/11/2026:** las tres fases están terminadas según sus pruebas y los límites técnicos declarados. No equivale a aprobación docente final.
+Estas fases constituyen el fundamento funcional de NETLAB360 y cuentan con validaciones registradas en sus componentes y evidencias. El cierre técnico interno no implica calificación docente del proyecto completo.
 
-| Fase | Estado | Alcance demostrado | Evidencias |
-|---|---|---|---:|
-| S01 | Cerrada (#1, #38) | Base VMware/Ubuntu, IPAM, FRR/OSPF, VLAN/ACL, LACP, observabilidad inicial; acceso SSH por clave y recuperación VMware | 83 PNG |
-| S02 | Cerrada (#2) | Tres sedes, cuatro WAN, nueve VLAN, OSPF Full 4/2/2, conmutación, HTTP/ACL | 9 PNG |
-| S03 | Cerrada por alcance real (#3, #16) | SoT candidate validada, Ansible FRR 8/8, drift 100→150→100, OpenTofu de 17 metadatos y GitOps/CI | 8 PNG |
+| Fase | Resultado implementado y comprobado | PNG originales |
+|---|---|---:|
+| S01 | Ubuntu/VMware, FRR/OSPF de referencia, VLAN/ACL, LACP inicial, acceso SSH y primeros componentes de observabilidad | 83 |
+| S02 | HQ/S1/S2, cuatro WAN, nueve VLAN, OSPF FULL 4/2/2, failover/retorno y HTTP/ACL | 9 |
+| S03 | SoT candidata, auditoría Ansible sobre FRR (8/8), reconciliación 100→150→100, 17 `terraform_data` locales y GitOps | 8 |
+| **Total** | **S01–S03 técnicamente aceptadas** | **100** |
 
-**Contrato S03:** la SoT tiene estado `candidate` para pruebas, no está aprobada para producción. Ansible administra FRR activo y OpenTofu mantiene 17 objetos de metadatos, sin gestionar enlaces ni routers externos. La integración de `data sources` y propiedad de recursos externos **no fue implementada**: está reprogramada como ampliación S05+ en la issue #17, abierta.
+**Limitaciones declaradas:** la SoT es candidata para laboratorio, no configuración de producción. Los recursos OpenTofu S03 representan metadatos, no creación de redes o routers externos. Las mediciones de red se realizaron dentro de un entorno virtual.
 
-El firmware y disco de la VM se comprobaron en S01. El origen de ISO de instalación no puede certificarse con los registros disponibles y queda declarado como límite documental, no como defecto operativo.
-
-**Total oficial al cierre S04:** 122 PNG (83/9/8/22) con controles de integridad. S04 sigue pendiente de ratificar el SLO académico y de registrar el dictamen docente.
-
-Continuidad · Tablero de fases.
+[Ansible S03](../../ansible/s03/README.md) · [OpenTofu S03](../../iac/s03/README.md) · [Evidencias](../../evidencias/capturas/README.md).

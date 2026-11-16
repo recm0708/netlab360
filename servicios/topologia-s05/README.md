@@ -20,4 +20,4 @@ La cifra de flujos OpenFlow representa reglas observadas, no una medición de th
 
 ## Referencias
 
-Tablero S05 · [Diseño HA](../../docs/diseno/s05-ha-servicios-multisede.md) · [Evidencias](../../evidencias/capturas/README.md).
+[Acta S05](../../docs/gestion/ACTA-ACEPTACION-TECNICA-S05-20261115.md) · [Diseño HA](../../docs/diseno/s05-ha-servicios-multisede.md) · [Evidencias](../../evidencias/capturas/README.md).

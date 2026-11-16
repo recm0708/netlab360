@@ -8,4 +8,3 @@ Los registros del ensayo HA se conservan por separado en `evidencias/registros/s
 
 No interpretamos el número de capturas como número definitivo de figuras académicas. Seleccionaremos únicamente aquellas que sustenten un resultado relevante y mantendremos las variantes de pantalla cuando aporten partes complementarias.
 
-Selección de figuras · Tablero.
