@@ -35,4 +35,12 @@ Registrar salud `ens33`/gateway, 21 namespaces, cuatro contenedores, controlador
 
 ## CI y fusión (23/11/2026)
 
-PR [#174](https://github.com/recm0708/netlab360/pull/174) fusionado en `main` mediante `8a5baa7`. La CI general ejecutó **764 pruebas (763 aprobadas, una omitida)**, incluidas las 11 pruebas nuevas de auditoría cronológica, conteos, tokens y ausencia de cambios de red. La **ejecución real sobre datasets privados aún está pendiente**; no reportar conclusiones del auditor hasta revisar la bitácora VM. El avance conservador de S06 permanece al 80 % validado.
+PR [#174](https://github.com/recm0708/netlab360/pull/174) fusionado en `main` mediante `8a5baa7`. La CI general ejecutó **764 pruebas (763 aprobadas, una omitida)**, incluidas las 11 pruebas nuevas de auditoría cronológica, conteos, tokens y ausencia de cambios de red. La **ejecución real sobre datasets privados fue aprobada** y se conservaron todos los datos originales. La auditoría no equivale a obtener una prueba prospectiva nueva. El avance conservador de S06 permanece al 80 % validado.
+
+## Resultado real y aceptación en VM — 23/11/2026
+
+El lote terminó con `S06-049_AUDITORIA_VALIDADA=OK`, `RESULTADO_RC=0`; las **11 pruebas específicas** pasaron en la VM y se verificó el informe privado `~/netlab360-bootstrap/s06/auditorias-prospectivas/S06_049_20261123T110156Z_5ef7af/auditoria-readiness.json`. Bitácora de respaldo: `~/netlab360-bootstrap/s06/validacion-s06-049-20261123_060155/S06_049_Validacion_Completa.txt`.
+
+Se confirmaron **60 NORMAL, 16 DEGRADED y 24 RECOVERY por ruta**, cero FAULT verificadas. Los datos TRAIN/TEST tienen IDs de sesiones separados, **pero NO un holdout cronológico global**; el TEST NORMAL fue observado antes de parte del TRAIN DEGRADED. No hay segundo TEST positivo independiente etiquetado ni variable objetivo para pronóstico futuro ni una deriva prospectiva validada. La recopilación de 3 ICMP en tiempo real de S06-046/047 no tiene equivalencia de muestreo ni ground truth para usarla como un segundo TEST supervisado. El dictamen es `S06_049_GATE=PENDING_NEW_PROSPECTIVE_EVIDENCE`.
+
+Los 21 namespaces, cuatro contenedores, `ens33 192.168.47.40/24` y gateway `.2`, guardia `NONE/BASELINE`, qdisc `noqueue`, Prometheus READY, NOC 18/21 y fuentes LACP/SDN permanecen sin alteración. Dataset/modelos originales sin modificaciones y Git limpio. **Esta aceptación cierra S06-049 como auditoría, pero NO los gates prospectivos ni la Fase S06.** No se exige una nueva captura académica por repetir limitaciones ya documentadas.
