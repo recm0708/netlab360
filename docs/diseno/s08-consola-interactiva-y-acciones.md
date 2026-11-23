@@ -21,7 +21,7 @@ Una sola aplicación local, con barra lateral, encabezado de estado general y pa
 | **9. Observabilidad** | Prometheus/S04, SLI/SLO experimental, históricos, latencia P50/P95, pérdida, incidentes, alertas, calidad/edad de fuente | Seleccionar ventana/servicio y exportar gráfica o evidencia |
 | **10. Diagnóstico IA** | Detección, scores, explicación, confianza/UNKNOWN, baseline de reglas, pronóstico y drift **solo cuando S06 se implemente** | Inferencia solo lectura; consulta de evidencia |
 | **11. Incidentes y AIOps** | Correlación de fuente, línea de tiempo, recomendación, riesgo y postcondición **solo cuando S07 se implemente** | Solicitar aprobación, aplicar runbook autorizado, verificar, revertir |
-| **12. Evidencias y sistema** | Historial de trabajos, logs sanitizados, versiones, tests, métricas y catálogo | Descargar resultados JSON/CSV, generar manifiesto y comprobar salud |
+| **12. Evidencias y sistema** | Historial de trabajos, logs sanitizados, versiones, tests, métricas y catálogo | Descargar resultados JSON/CSV, generar inventario técnico y comprobar salud |
 
 **Diseño adaptable:** desktop en VMware/Windows con barra lateral fija; tarjetas en pantallas estrechas; secciones sin implementación muestran `PENDIENTE` explícitamente, nunca resultados ficticios. Mantener el NOC S05 accesible durante la migración.
 
