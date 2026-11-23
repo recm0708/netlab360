@@ -53,6 +53,7 @@ La validación final de S05 comprobó 21 namespaces, cuatro contenedores y seis 
 - [Escenarios S06 y controles de etiquetado verificable](docs/diseno/s06-escenarios-y-etiquetado.md)
 - [S06 watchdog y requisitos de rollback seguro](docs/diseno/s06-watchdog-rollback-gates.md)
 - [S06 simulación de autorización, TTL y rollback](docs/diseno/s06-rollback-simulacion.md)
+- [S06-038A guardia root y temporizador sin cambio de red](docs/diseno/s06-038-guardia-root-y-watchdog-noop.md)
 - [Diseño del programa interactivo S08 y catálogo de acciones](docs/diseno/s08-consola-interactiva-y-acciones.md)
 
 ## Alcance
