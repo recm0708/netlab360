@@ -171,6 +171,18 @@ La evaluación binaria NORMAL/DEGRADED fue **ejecutada y validada** en `netlab36
 
 **Progreso S06: 75 % estimado** (avance técnico, no calificación). Próximo S06-046: ventana de telemetría reciente con origen/ruta/autenticidad y antigüedad controlada, respuesta UNKNOWN para calidad insuficiente y diagnóstico de lectura con futura conexión al NOC S05. Mantener #6, #25, #26 y S06 milestone abiertos; no cerrar S07/S08 por esta API. No realizar nuevas fallas de red ni crear interfaces ficticias.
 
+## 4.17. S06-046 aceptado en VM, F08 aprobada — iniciar S06-047 (23/11/2026)
+
+**Implementación y CI:** PR [#171](https://github.com/recm0708/netlab360/pull/171) fusionado como `50abc66`, **730 pruebas CI (729 OK, una omitida)**. Validadas en VM 21 pruebas específicas del recolector y su lector read-only, adquisición nueva con tres ICMP por destino y respuestas de API 9145 sin activar nuevos servicios permanentes. `S06-046_VALIDACION_COMPLETA=OK`, `RESULTADO_RC=0`.
+
+**Valores reales:** HQ→S1 RTT medio **0.089 ms**, pérdida 0 %, edad 0.59 s; HQ→S2 **0.100 ms**, pérdida 0 %, edad 1.30 s. Tres modelos por ruta retornaron NORMAL. Estas muestras se tomaron en escenario sin perturbación, mantienen `ground_truth_label=UNKNOWN`; no son un test supervisado de fallas nuevas. El TTL 30 s rechazó una muestra artificialmente caducada 40 s; `S06_046_FRESHNESS_GATE=OK`, no inferir disponibilidad de una fuente obsoleta.
+
+**Infraestructura final:** 21 namespaces originales, 4 contenedores, IP `ens33 192.168.47.40/24`, gateway `192.168.47.2`, controlador root `NONE/BASELINE`, qdisc cliente HQ `noqueue`, Prometheus READY y NOC sano; sin cambios a FRR, OVS, servicios, IA ni modelos. Origen privado `~/netlab360-bootstrap/s06/telemetria-hq-live/S06_046_HQ_20261123T090337Z_1c01a6c8.json`; bitácora `~/netlab360-bootstrap/s06/validacion-s06-046-20261123_040333/S06_046_Validacion_Completa.txt`.
+
+**Evidencia F08:** archivo textual `~/netlab360-bootstrap/s06/evidencias/informe/S06_F08_Telemetria_Reciente_Inferencia_HQ.txt`; **captura PNG recibida y aprobada en el chat**. Incluye seis decisiones, RTT, pérdida, TTL y poscondiciones; la imagen del chat no se certifica como subida a Git o copiada a VM.
+
+**S06 estimado 80 % técnico**, no calificación docente. **S06-047 próximo:** adaptación de solo lectura NOC S05 al servicio IA, estado por ruta y modelo, timeout/UNKNOWN cuando API desconectada o muestra obsoleta, pruebas CI y verificación en VM. No duplicar NOC ni alterar su diagrama, FIB, redes ni usuarios; la visualización es experimental, sin atribuir producción ni remediación. Issues #6/#25/#26 y S06 milestone siguen abiertos por pronóstico, evaluación prospectiva, deriva y generalización pendientes.
+
 ## 5. Diseño permanente de la consola
 
 Especificación de menú, arquitectura y mapeo de procedimientos:
