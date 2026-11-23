@@ -229,6 +229,12 @@ Preregistro privado creado y verificado en VM (`--freeze` y `--check`), con **12
 
 Red administrativa, 21 namespaces, cuatro contenedores, controlador `NONE/BASELINE`, qdisc `noqueue` y NOC LACP/SDN intactos. **S06 sigue al 80 % técnico estimado**, ya que el preregistro no demuestra generalización. Próximo S06-051: inventario de paquetes efectivos por sesión/clase/split, sin modificar el acta ni inducir fallas.
 
+## 4.25. S06-051 — auditar paquetes reales por clase y partición (23/11/2026)
+
+El preregistro S06-050 está bloqueado por muestreo de **2 y 3 paquetes**, con 12 pruebas VM OK y 0 cambios de red; no modificar el acta congelada. PR [#176](https://github.com/recm0708/netlab360/pull/176) fusionado como `bc741db`; CI general **789 tests** (788 aprobados, uno omitido). La herramienta `scripts/s06/auditar_muestreo_historico.py` compara los datos originales de 11 sesiones: metadatos, paquetes solicitados y `sent` realmente transmitidos por medición, clase NORMAL/DEGRADED/RECOVERY y split TRAIN/TEST. Permite detectar una confusión entre etiqueta y protocolo sin atribuir causalidad antes de observar resultados reales.
+
+**Pendiente en VM:** auditar distribución efectiva de tamaños por clase y partición, obtener reporte privado y comprobar infraestructura sin mutaciones. El gate sigue `INDEPENDENT_COMPARABILITY_PROTOCOL_BEFORE_NEW_LABELED_TEST`; no ejecutar nuevas fallas, no reentrenar modelos congelados, ni generar una evaluación prospectiva mientras el muestreo continúe sin protocolo comparable. Documento: [S06-051](s06-051-auditoria-muestreo-protocolo-historico.md). **S06 = 80 % técnico estimado; #6/#25/#26 permanecen abiertas.**
+
 ## 5. Diseño permanente de la consola
 
 Especificación de menú, arquitectura y mapeo de procedimientos:
