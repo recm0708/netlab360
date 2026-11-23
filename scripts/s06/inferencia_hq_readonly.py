@@ -24,6 +24,7 @@ from evaluar_deteccion_binaria import (
     FEATURES, PROBES, EVAL_SCHEMA, NORMAL_TEST, SOURCE_MANIFEST,
     read_normal, read_controlled, read_event_batches,
 )
+from telemetria_hq_live import read_latest
 
 EVAL_DIR = (Path.home() / "netlab360-bootstrap/s06/evaluaciones"
             / "S06_044_20261123T081627Z_2ade0e")
@@ -192,6 +193,71 @@ def infer(route: str, scenario: str, window_index: int) -> dict:
     }
 
 
+
+def infer_live(route: str) -> dict:
+    """Inferencia de ventana ICMP RECIENTE, nunca entrenamiento ni ground truth."""
+    mode = "FRESH_READONLY_EXPLORATORY"
+
+    def unknown(reason: str) -> dict:
+        return {**_unknown(reason, route=route), "mode": mode,
+                "fresh_telemetry_verified": False,
+                "ground_truth_label": "UNKNOWN",
+                "model_generalization_demonstrated": False}
+
+    if route not in PROBES:
+        return unknown("UNSUPPORTED_ROUTE")
+    try:
+        fresh = read_latest()   # TTL, identidad, qdisc, salud NOC y calidad.
+    except (ValueError, OSError, TypeError, KeyError, json.JSONDecodeError):
+        return unknown("LIVE_TELEMETRY_MISSING_STALE_OR_INVALID")
+    try:
+        row = _features(fresh["features_by_route"][route])
+        report = verified_report()
+        predictions = _score(row, route, report, _load_models(route))
+    except (ValueError, OSError, RuntimeError, ImportError,
+            KeyError, IndexError, TypeError, json.JSONDecodeError):
+        return unknown("UNVERIFIED_DATA_OR_MODEL")
+
+    unanimous = len(set(predictions.values())) == 1
+    binary = next(iter(predictions.values())) if unanimous else "UNKNOWN"
+    # La qdisc basal no prueba ausencia universal de degradacion. Un resultado
+    # anomalo requiere contrastar otras fuentes, no activar acciones de red.
+    state = "NORMAL" if binary == "NORMAL" else "UNKNOWN"
+    reason = ("BASELINE_AND_UNANIMOUS_NORMAL_SCOPED"
+              if binary == "NORMAL" else
+              "MODEL_DISAGREEMENT" if binary == "UNKNOWN" else
+              "DEGRADATION_INDICATION_UNCONFIRMED")
+    return {
+        "schema": "NETLAB360_S06_046_FRESH_INFERENCE_V1",
+        "mode": mode,
+        "route": route,
+        "observed_at_utc": fresh["collected_at_utc"],
+        "age_seconds": round(fresh["age_seconds"], 3),
+        "features": dict(zip(FEATURES, row)),
+        "predictions": predictions,
+        "binary_consensus": binary,
+        "operational_state": state,
+        "reason": reason,
+        "fresh_telemetry_verified": True,
+        "ground_truth_label": "UNKNOWN",
+        "explanation": {
+            "source": fresh["source"],
+            "target": fresh["target"],
+            "scope": "HQ_CLIENT_EGRESS_NETWORK_STATE",
+            "rtt_avg_ms": row[0],
+            "p95_training_threshold_ms":
+                report["metrics_by_probe"][route]["p95_training_rtt_ms"],
+            "loss_pct": row[3],
+            "model_generalization_demonstrated": False,
+            "confidence_calibrated": False,
+        },
+        "network_mutations_authorized": False,
+        "production_deployment_authorized": False,
+        "new_independent_validation": False,
+        "model_generalization_demonstrated": False,
+    }
+
+
 def audit_errors() -> dict:
     """Reproducir FP/FN a nivel ventana y contrastarlos con S06-044."""
     report = verified_report()
@@ -247,9 +313,9 @@ def make_app():
                 "production_deployment_authorized": False}
 
     @app.get("/api/v1/s06/live")
-    def live():
-        # No presentar replay historico como telemetria vigente.
-        return _unknown("LIVE_TELEMETRY_NOT_INTEGRATED")
+    def live(route: Literal["HQ_A_S1", "HQ_A_S2"] = "HQ_A_S1"):
+        # GET solo lee ultimo snapshot reciente, nunca ejecuta ping ni writes.
+        return infer_live(route)
 
     @app.get("/api/v1/s06/replay")
     def replay(route: Literal["HQ_A_S1", "HQ_A_S2"],
