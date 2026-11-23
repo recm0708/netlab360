@@ -112,7 +112,7 @@ class GuardRootNoopTests(unittest.TestCase):
 
     def test_preflight_rechaza_qdisc_ajena(self):
         def other(*args):
-            ret = readonly_response(args)
+            ret = readonly_response(*args)
             if args[-4:] == ("qdisc", "show", "dev", "eth0"):
                 return json.dumps([{"kind": "netem", "root": True}])
             return ret
