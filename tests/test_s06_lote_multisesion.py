@@ -80,6 +80,27 @@ class MultiSessionTests(unittest.TestCase):
                 with self.subTest(cycles=cycles),self.assertRaises(ValueError):
                     m.orchestrate(cycles,m.APPROVAL)
 
+    def test_protocolo_uniforme_tres_paquetes_sin_alterar_defecto(self):
+        self.assertIn('--packets", str(packets)', FILE.read_text())
+        self.assertIn("def orchestrate(cycles: int, approval: str, packets: int = 2)", FILE.read_text())
+        def fake_cycle(index, folder, report, *, packets=2):
+            self.assertEqual(packets, 3)
+            report["cycles"].append({
+                "number": index, "status": "complete",
+                "degraded": {"windows": 4}, "recovery": {"windows": 6},
+            })
+        with mock.patch.object(m.os, "geteuid", return_value=1000), \
+             mock.patch.object(m, "check_ready"), \
+             mock.patch.object(m, "run_one", side_effect=fake_cycle) as runner:
+            out = m.orchestrate(2, m.APPROVAL, packets=3)
+        self.assertEqual(out["packets_per_degraded_window"], 3)
+        self.assertEqual(runner.call_count, 2)
+
+    def test_protocolo_paquetes_no_autorizado(self):
+        with mock.patch.object(m.os, "geteuid", return_value=1000):
+            with self.assertRaisesRegex(ValueError, "packets"):
+                m.orchestrate(2, m.APPROVAL, packets=4)
+
     def test_aprobacion_explicita_obligatoria(self):
         with mock.patch.object(m.os,"geteuid",return_value=1000):
             with self.assertRaisesRegex(RuntimeError,"approval"):
@@ -134,6 +155,35 @@ class MultiSessionTests(unittest.TestCase):
         log=meta_session(folder,label="RECOVERY",windows=6)
         v=m.validated_session(log,"RECOVERY","0123456789abcdef",6)
         self.assertEqual(v["measurement_count"],12)
+
+    def test_tres_paquetes_validacion_real_de_cada_medicion(self):
+        folder = m.BASE / "datasets/raw" / "S06_WINDOW_DEGRADED_20261123T090000Z_abcdef"
+        log = meta_session(folder)
+        meta_file = folder / "metadata.json"
+        rows_file = folder / "ventanas.jsonl"
+        meta = json.loads(meta_file.read_text())
+        meta["packets"] = 3
+        rows = [json.loads(x) for x in rows_file.read_text().splitlines()]
+        for row in rows:
+            for item in row["measurements"]:
+                item["requested_packets"] = 3
+                item["result"].update(sent=3, received=3)
+        raw = "".join(json.dumps(x) + "\n" for x in rows).encode()
+        rows_file.write_bytes(raw)
+        meta["data_digest_sha256"] = hashlib.sha256(raw).hexdigest()
+        meta_file.write_text(json.dumps(meta))
+        self.assertEqual(m.validated_session(
+            log, "DEGRADED", "0123456789abcdef", 4, expected_packets=3
+        )["windows"], 4)
+        rows[0]["measurements"][0]["result"]["sent"] = 2
+        altered = "".join(json.dumps(x) + "\n" for x in rows).encode()
+        rows_file.write_bytes(altered)
+        meta["data_digest_sha256"] = hashlib.sha256(altered).hexdigest()
+        meta_file.write_text(json.dumps(meta))
+        with self.assertRaisesRegex(RuntimeError, "measurement_protocol"):
+            m.validated_session(
+                log, "DEGRADED", "0123456789abcdef", 4, expected_packets=3
+            )
 
     def test_ventana_unknown_bloquea(self):
         folder=m.BASE/"datasets/raw"/"S06_WINDOW_DEGRADED_20261123T070344Z_abcdef"

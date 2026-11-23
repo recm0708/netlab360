@@ -75,7 +75,7 @@ def check_ready() -> None:
 
 
 def validated_session(log: str, expected: str, token: str,
-                      expected_rounds: int) -> dict:
+                      expected_rounds: int, expected_packets: int | None = None) -> dict:
     ids = re.findall(r"^S06_042_SESION=(.+)$", log, flags=re.MULTILINE)
     dirs = re.findall(r"^S06_042_DIRECTORIO=(.+)$", log,
                       flags=re.MULTILINE)
@@ -109,6 +109,8 @@ def validated_session(log: str, expected: str, token: str,
             if s.strip()]
     if len(rows) != expected_rounds:
         raise RuntimeError("window_count_unexpected")
+    if expected_packets is not None and meta.get("packets") != expected_packets:
+        raise RuntimeError("measurement_protocol_metadata_mismatch")
     seen = set()
     observed_rtt = []
     guard_status = "APPLIED" if expected == "DEGRADED" else "RESTORED"
@@ -139,6 +141,12 @@ def validated_session(log: str, expected: str, token: str,
             raise RuntimeError("unexpected_measurement_count_or_route")
         for m in measurements:
             result = m.get("result", {})
+            if expected_packets is not None and (
+                m.get("requested_packets") != expected_packets
+                or result.get("sent") != expected_packets
+                or result.get("received") != expected_packets
+            ):
+                raise RuntimeError("measurement_protocol_packets_mismatch")
             if result.get("measurement_valid") is not True:
                 raise RuntimeError("invalid_measurement")
             observed_rtt.append(float(result["rtt_avg_ms"]))
@@ -188,7 +196,7 @@ def wait_recovery(token: str, timeout: int = 75) -> dict:
     raise RuntimeError("watchdog_timeout_leave_state_untouched")
 
 
-def run_one(index: int, folder: Path, report: dict) -> dict:
+def run_one(index: int, folder: Path, report: dict, packets: int = 2) -> dict:
     check_ready()
     label = f"{index:02d}"
     cycle = {"number": index, "status": "preparing",
@@ -215,9 +223,10 @@ def run_one(index: int, folder: Path, report: dict) -> dict:
     data_d = run(
         [sys.executable, "-u", str(COLLECTOR),
          "--expected", "DEGRADED", "--rounds",
-         str(ROUND_DEGRADED), "--packets", "2"], timeout=25)
+         str(ROUND_DEGRADED), "--packets", str(packets)], timeout=29)
     (folder / f"ciclo_{label}_degraded.txt").write_text(data_d)
-    degraded = validated_session(data_d, "DEGRADED", token, ROUND_DEGRADED)
+    degraded = validated_session(data_d, "DEGRADED", token, ROUND_DEGRADED,
+                                 expected_packets=packets if packets == 3 else None)
     cycle.update(degraded=degraded, status="waiting_for_timer")
     save_manifest(folder / "manifest.json", report)
 
@@ -234,7 +243,8 @@ def run_one(index: int, folder: Path, report: dict) -> dict:
          "--expected", "RECOVERY", "--rounds",
          str(ROUND_RECOVERY), "--packets", "3"], timeout=40)
     (folder / f"ciclo_{label}_recovery.txt").write_text(data_r)
-    recovery = validated_session(data_r, "RECOVERY", token, ROUND_RECOVERY)
+    recovery = validated_session(data_r, "RECOVERY", token, ROUND_RECOVERY,
+                                 expected_packets=3 if packets == 3 else None)
     if degraded["rtt_avg_ms"] <= recovery["rtt_avg_ms"] + 15:
         raise RuntimeError("measured_degradation_not_separated_from_recovery")
     cycle.update(recovery=recovery, status="ready_to_cleanup")
@@ -256,11 +266,13 @@ def run_one(index: int, folder: Path, report: dict) -> dict:
     return cycle
 
 
-def orchestrate(cycles: int, approval: str) -> dict:
+def orchestrate(cycles: int, approval: str, packets: int = 2) -> dict:
     if os.geteuid() == 0:
         raise RuntimeError("execute_orchestrator_as_unprivileged_user")
     if cycles < 2 or cycles > 3:
         raise ValueError("cycles_must_be_2_or_3")
+    if packets not in (2, 3):
+        raise ValueError("packets_must_be_2_or_3")
     if approval != APPROVAL:
         raise RuntimeError("explicit_approval_required_for_entire_batch")
     if not COLLECTOR.is_file():
@@ -278,6 +290,7 @@ def orchestrate(cycles: int, approval: str) -> dict:
         "management_interface_mutated": False,
         "new_namespaces_created": False, "new_interfaces_created": False,
         "ground_truth_source": "root_controller_and_tc_status_not_rtt",
+        "packets_per_degraded_window": packets,
         "operational_deployment_authorized": False,
         "cycles": [],
     }
@@ -286,7 +299,10 @@ def orchestrate(cycles: int, approval: str) -> dict:
     print("S06_043_DIRECTORIO=" + str(folder), flush=True)
     try:
         for i in range(1, cycles + 1):
-            run_one(i, folder, report)
+            if packets == 2:
+                run_one(i, folder, report)
+            else:
+                run_one(i, folder, report, packets=packets)
         report["status"] = "complete"
         report["finished_utc"] = utc()
         report["complete_cycles"] = cycles
@@ -306,9 +322,11 @@ def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--cycles", required=True, type=int)
     p.add_argument("--approve-batch", required=True)
+    p.add_argument("--packets", type=int, default=2, choices=(2, 3),
+                   help="Cantidad ICMP por ventana DEGRADED (2 histórico; 3 nuevo estudio)")
     args = p.parse_args()
     os.umask(0o077)
-    outcome = orchestrate(args.cycles, args.approve_batch)
+    outcome = orchestrate(args.cycles, args.approve_batch, packets=args.packets)
     deg = sum(c["degraded"]["windows"] for c in outcome["cycles"])
     rec = sum(c["recovery"]["windows"] for c in outcome["cycles"])
     print("S06_043_CICLOS_VALIDOS=" + str(outcome["complete_cycles"]))
