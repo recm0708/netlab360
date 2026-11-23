@@ -350,8 +350,13 @@ def status() -> None:
         print("S06_038B_STATE=" + s["state"])
         print("S06_038B_TOKEN=" + s["token"])
         print("S06_038B_NAMESPACE=" + s["namespace"])
-        print("S06_038B_QDISC=" + qdisc() if NS in namespace_names() else
-              "S06_038B_QDISC=NAMESPACE_MISSING")
+        if NS not in namespace_names():
+            print("S06_038B_QDISC=NAMESPACE_MISSING")
+        else:
+            try:
+                print("S06_038B_QDISC=" + qdisc())
+            except (RuntimeError, ValueError, OSError):
+                print("S06_038B_QDISC=UNAVAILABLE_REVIEW_STATE")
         if s.get("failure"):
             print("S06_038B_FAILURE=" + s["failure"])
 
