@@ -50,8 +50,8 @@ class IsolatedRollbackTests(unittest.TestCase):
         cmd = m.timer_command("abcdef0123456789")
         self.assertEqual(cmd[0], "systemd-run")
         self.assertIn("--on-active=20s", cmd)
-        self.assertEqual(cmd[-4:], [str(m.INSTALL), "expire",
-                                    "--token", "abcdef0123456789"])
+        self.assertEqual(cmd[-4:], (str(m.INSTALL), "expire",
+                                    "--token", "abcdef0123456789"))
         self.assertNotIn("bash", cmd)
         self.assertNotIn("shell", cmd)
 
