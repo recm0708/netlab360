@@ -63,8 +63,8 @@ def confirm_route(value: object, target: str) -> dict:
     if row.get("dev") != DEVICE or row.get("prefsrc", row.get("src")) != CLIENT_IP:
         raise RuntimeError("La ruta no sale del cliente esperado")
     via = row.get("gateway")
-    if via is not None and via != CLIENT_GW:
-        raise RuntimeError("Next-hop distinto al gateway IPAM")
+    if via != CLIENT_GW:
+        raise RuntimeError("Next-hop ausente o distinto al gateway IPAM")
     return {
         "destination": target, "interface": DEVICE,
         "source": CLIENT_IP, "gateway_seen": via,
