@@ -34,4 +34,4 @@ El módulo de entrenamiento no dispone de funciones para ejecutar ping, `sudo`, 
 
 Tras CI, ejecutar tests unitarios específicos y `--freeze` una sola vez; `--check` para verificar integridad. Comprobar NOC 9130, 21 namespaces, cuatro contenedores, guardia `NONE/BASELINE`, qdisc `noqueue`, gestión `.40/24`, gateway `.2` y Git limpio. No tomar nueva captura de pantalla antes de obtener la primera comparación VALIDATION/TEST. Los modelos históricos permanecen independientes.
 
-**Estado:** implementación de código en curso, CI y VM pendientes. Fase S06 todavía al 80 % de avance técnico estimado.
+**Estado:** PR [#178](https://github.com/recm0708/netlab360/pull/178) fusionado en `main` como `9ff338f`. CI **807 tests (806 correctos y uno omitido)**. Los 15 tests del nuevo módulo se ejecutaron sin fallos; **aún falta congelar los modelos reales en VM**. Fase S06 todavía al 80 % técnico estimado hasta VALIDATION/TEST futuros.
