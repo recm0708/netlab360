@@ -208,6 +208,20 @@ class MultiSessionTests(unittest.TestCase):
                 m.orchestrate(3,m.APPROVAL)
         self.assertEqual(seen,[1])
 
+    def test_si_segundo_ciclo_falla_no_intenta_tercero(self):
+        seen=[]
+        def fail_second(index, folder, report):
+            seen.append(index)
+            if index == 2:
+                raise RuntimeError("second_cycle_failed")
+            report["cycles"].append({"number":index,"status":"complete"})
+        with mock.patch.object(m.os,"geteuid",return_value=1000), \
+             mock.patch.object(m,"check_ready"), \
+             mock.patch.object(m,"run_one",side_effect=fail_second):
+            with self.assertRaisesRegex(RuntimeError,"second_cycle_failed"):
+                m.orchestrate(3,m.APPROVAL)
+        self.assertEqual(seen,[1,2])
+
     def test_tres_ciclos_exitosos_en_mock(self):
         def fake(index,folder,report):
             row={"number":index,"status":"complete",
