@@ -52,7 +52,7 @@ El experimento contiene solo un retardo de 40 ms, cuatro ventanas positivas por 
 
 ## Próximos pasos
 
-1. CI y validación local aceptadas; el TXT F07 está preparado. Revisar PNG en el chat antes de declarar aprobada la evidencia gráfica.
+1. CI y validación local aceptadas; el TXT y PNG F07 verificados y aprobados en el chat.
 2. Diseñar lectura de telemetría fresca y conexión no invasiva al NOC existente, con límites por edad, calidad y permisos.
 3. Mantener abiertas las issues #6, #25, #26 y las fases S07–S08 hasta demostrar los requisitos faltantes.
 
@@ -66,6 +66,6 @@ PR [#170](https://github.com/recm0708/netlab360/pull/170) fusionado en `fedd89e`
 
 **API temporal:** `API_HEALTH=OK`, `API_LIVE=UNKNOWN_CORRECTO`, `API_REPLAY_NORMAL=NORMAL`, `API_REPLAY_DEGRADED=DETECTADO_3_MODELOS`, `API_REPLAY_RECOVERY=UNKNOWN_CORRECTO`, `API_AUDITORIA=OK`, ruta no autorizada rechazada (422), POST rechazado (405), `S06_045_API_SMOKE=OK`. Se verificó `API_TEMPORAL=DETENIDA`; ningún servicio permanente instalado. Es inferencia **histórica reproducida**, no clasificación sobre tráfico en vivo ni validación prospectiva.
 
-**Poscondiciones:** 21 namespaces, 4 contenedores, `ens33 192.168.47.40/24` y gateway `192.168.47.2`, controlador HQ `NONE/BASELINE`, `qdisc noqueue`, Prometheus READY, NOC saludable y Git limpio. No hubo intervención de red ni reentrenamiento. TXT `~/netlab360-bootstrap/s06/evidencias/informe/S06_F07_Inferencia_Historica_API_Unknown_HQ.txt` preparado y verificado en la VM; **la captura PNG F07 todavía debe recibirse y revisarse**.
+**Poscondiciones:** 21 namespaces, 4 contenedores, `ens33 192.168.47.40/24` y gateway `192.168.47.2`, controlador HQ `NONE/BASELINE`, `qdisc noqueue`, Prometheus READY, NOC saludable y Git limpio. No hubo intervención de red ni reentrenamiento. TXT `~/netlab360-bootstrap/s06/evidencias/informe/S06_F07_Inferencia_Historica_API_Unknown_HQ.txt` preparado y verificado en la VM; **captura PNG F07 recibida, inspeccionada y aprobada en el chat**.
 
 **Siguiente fase incremental:** S06-046, adaptar telemetría fresca con timestamps, contexto de ruta/ventana, estado de calidad, obsolescencia y UNKNOWN ante fallas, sin alterar S05 ni equiparar un resultado exploratorio con servicio productivo.
