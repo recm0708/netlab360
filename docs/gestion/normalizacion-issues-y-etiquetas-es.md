@@ -41,3 +41,8 @@ Los títulos de PR describen el cambio; no incluyen los distintivos administrati
 ## Estado posterior a las correcciones (23/11/2026)
 
 PR [#183](https://github.com/recm0708/netlab360/pull/183) fusionado como `53d46bb` con 883 pruebas CI (882 OK, una omitida): `accessibility` se interpreta como `tipo:accesibilidad`; `estado:bloqueado` se conserva como definición española con semántica de dependencia. **Aún falta ejecutar `--apply` desde la VM** para efectuar la migración real del catálogo de labels. Tras fusionar el PR del escenario FAULT S06, la consulta directa confirma **131 PR, los 131 fusionados, cero abiertos, cero títulos fuera de `[SNN]`/`[GESTIÓN]`**. La milestone S05 continúa 6 cerradas/0 abiertas, issue #5 correctamente asignada. Nunca repetir el reconciliador antiguo por este motivo.
+
+
+## Auditoría acumulada de PR tras el arreglo de S06
+
+Tras fusionar [#185](https://github.com/recm0708/netlab360/pull/185), la consulta a GitHub confirmó **132 PR fusionados, cero abiertos y 132 títulos ajustados** al patrón `[SNN]` / `[GESTIÓN]`. Las cifras históricas de 129 y 131 registradas arriba corresponden a cortes anteriores, no al inventario actual. Este dato puede aumentar con futuros PR; validar nuevamente con `scripts/operacion/auditar_titulos_prs.py --check`. La migración del catálogo de etiquetas todavía requiere `--apply` real en VM.
