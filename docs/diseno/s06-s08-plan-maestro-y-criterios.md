@@ -82,6 +82,10 @@ PR [#158](https://github.com/recm0708/netlab360/pull/158) fusionado (`317ab99`),
 - **Próxima operación:** ejecutar S06-037 en Ubuntu y revisar las 14 simulaciones, datos privados y topología. Después construir S06-038 con ejecutor root-owned, bloqueo, propiedad de qdisc, timer de restauración real, ensayo de fallo y pre/postchecks. **No ejecutar netem** hasta demostrar los mecanismos de recuperación.
 - **Avance técnico estimado:** 35 % de S06; no es calificación docente. Las sesiones observadas y la normalización están aprobadas, pero no hay etiquetas verificadas por estímulo, dataset representativo, modelos entrenados, pronóstico ni API de inferencia.
 
+## 4.4. S06-037 comprobado en VM (23/11/2026)
+
+`S06-037_SIMULACION_VALIDADA=OK`, RC=0: 21 tests específicos, **478/478** pruebas offline; 14 escenarios de simulación con estados `RESTORED=4`, `ABORTED=1`, `ESCALATED=2`, `NEW=5`, `APPROVED=2`. El reporte privado `~/netlab360-bootstrap/s06/rollback-simulaciones/S06_037_20261123T051618Z_66720c/simulacion_rollback.json` fue verificado contra la huella indicada por el programa. Qdisc real `noqueue` antes/después, `ens33 .40`, gateway `.2`, 21 namespaces, 4 contenedores, NOC 18/21, Prometheus READY, cero unidades fallidas. **No hubo cambios de red, netem real, etiquetas verificadas ni rollback real.** El porcentaje técnico S06 sigue estimado en **35 %**. S06-038 deberá implementar guardas privilegiadas, timer efectivo y restauración demostrable con pruebas adversas; las issues siguen abiertas y no se permiten cierres con casillas sin verificar.
+
 ## 5. Diseño permanente de la consola
 
 Especificación de menú, arquitectura y mapeo de procedimientos:
