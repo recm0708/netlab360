@@ -159,6 +159,18 @@ La evaluación binaria NORMAL/DEGRADED fue **ejecutada y validada** en `netlab36
 
 **Progreso técnico S06 estimado: 70 %** (no calificación docente). **S06-045 siguiente:** diagnóstico comparativo y error de predicción, inferencia y respuestas `UNKNOWN` ante entradas insuficientes, API read-only y futura exposición en NOC, con pruebas offline y aprobación en VM. No volver a inyectar `netem` ni crear interfaces. **Mantener abiertas #6, #25, #26 y milestone S06** hasta que todos los criterios pendientes estén efectivamente cumplidos; S07/S08 no se consideran implementadas por esta evaluación.
 
+## 4.16. S06-045 aprobado en VM — replay IA y API temporal; siguiente S06-046 (23/11/2026)
+
+**Implementación:** PR [#170](https://github.com/recm0708/netlab360/pull/170) fusionado, `fedd89e`. `scripts/s06/inferencia_hq_readonly.py`, pruebas `tests/test_s06_inferencia_readonly.py` y [documentación](s06-045-inferencia-hq-replay-readonly.md). 709 pruebas en CI (708 aprobadas, 1 omitida), 20 específicas locales (19 aprobadas, 1 omitida) y 709 globales locales (708 aprobadas, 1 omitida). **Ejecución real** finalmente `S06-045_VALIDACION_COMPLETA=OK`, `RESULTADO_RC=0`.
+
+**Análisis concreto de fallos de clasificación:** HQ→S1 P95 falsos positivos en ventanas normales 3, 17, 19; IsolationForest en 3; LogisticRegression ninguno. HQ→S2 P95 e IsolationForest fallan en la ventana 16; LogisticRegression ninguno. Todos FN DEGRADED=0 y FP RECOVERY=0. `S06_045_METRICAS_REPRODUCIDAS=OK` y `S06_045_ERROR_AUDIT=OK_REPLAY_ONLY`. **No hubo nuevos datos ni un segundo TEST:** se reprodujeron los resultados originales S06-044 con los cuatro modelos privados; un replay no demuestra generalización ni pronóstico de fallas futuras.
+
+**API temporal FastAPI (loopback 127.0.0.1:9145):** salud OK, replay NORMAL=NORMAL, DEGRADED=DETECTADO_3_MODELOS, RECOVERY=UNKNOWN y LIVE=UNKNOWN por falta de colector fresco. Auditoría de errores OK, ruta fuera de allowlist rechazada y POST denegado. API detenida y puerto liberado al terminar; no servicio persistente, ni ejecución autónoma de acciones mutadoras. Se comprobó conservación de 21 namespaces, 4 contenedores, `ens33 192.168.47.40/24`, gateway `192.168.47.2`, guardia HQ `NONE/BASELINE`, qdisc `noqueue`, NOC y Prometheus operativos, Git limpio.
+
+**Incidencia del wrapper:** primer lote terminó RC 1 por fallo de sintaxis en el delimitador del Python heredoc tras haber guardado el archivo de auditoría; la reanudación validó ese mismo archivo sin repetir los experimentos ni entrenar los modelos. Bitácora final `~/netlab360-bootstrap/s06/validacion-s06-045-20261123_033350/S06_045_Reanudacion_Completa.txt`. Evidencia textual `~/netlab360-bootstrap/s06/evidencias/informe/S06_F07_Inferencia_Historica_API_Unknown_HQ.txt` generada; **PNG F07 pendiente de recepción y revisión en chat**, no declararla aprobada aún.
+
+**Progreso S06: 75 % estimado** (avance técnico, no calificación). Próximo S06-046: ventana de telemetría reciente con origen/ruta/autenticidad y antigüedad controlada, respuesta UNKNOWN para calidad insuficiente y diagnóstico de lectura con futura conexión al NOC S05. Mantener #6, #25, #26 y S06 milestone abiertos; no cerrar S07/S08 por esta API. No realizar nuevas fallas de red ni crear interfaces ficticias.
+
 ## 5. Diseño permanente de la consola
 
 Especificación de menú, arquitectura y mapeo de procedimientos:
