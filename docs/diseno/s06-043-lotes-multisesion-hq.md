@@ -21,13 +21,13 @@ Por cada ciclo:
 5. Captura **seis ventanas RECOVERY** con tres paquetes por sonda, estado RESTORED/qdisc BASELINE y token del mismo ciclo.
 6. Al comprobar las capturas, diferencias observables de RTT y retorno a noqueue, archiva evidencia root y ejecuta `cleanup`; verifica `STATE=NONE` y qdisc BASELINE antes del siguiente ciclo.
 
-El orquestador es un cliente no privilegiado que invoca comandos del controlador root **fijos y permitidos**. No contiene operaciones `tc`, `ip link add/del` o `ip netns add/del`, no necesita cambios sudoers y no altera `ens33`. No se ejecuta en segundo plano. Si falla un ciclo, el watchdog sigue programado de forma independiente, el manifiesto queda con `status=stopped_requires_review` y no se inicia otro experimento. **No repetir el lote ni borrar archivos de estado sin diagnóstico.**
+El orquestador es un cliente no privilegiado que invoca comandos del controlador root **fijos y permitidos**. No contiene operaciones `tc`, `ip link add/del` o `ip netns add/del`, no necesita cambios sudoers y no altera `ens33`. No se ejecuta en segundo plano. Si falla un ciclo, el watchdog sigue programado de forma independiente, el registro JSON queda con `status=stopped_requires_review` y no se inicia otro experimento. **No repetir el lote ni borrar archivos de estado sin diagnóstico.**
 
 ## Archivos de salida y aceptación
 
 Directorio privado `~/netlab360-bootstrap/s06/experimentos/S06_043_<UTC>_<id>/`, con `manifest.json`, inicios del controlador, logs de captura DEGRADED/RECOVERY y estados del watchdog de cada ciclo. Sesiones JSONL/metadata permanecen bajo `~/netlab360-bootstrap/s06/datasets/raw/S06_WINDOW_DEGRADED_*` y `S06_WINDOW_RECOVERY_*`; no se borran ni reetiquetan las sesiones anteriores.
 
-**Objetivo medible si se completan 3 ciclos:** 3×4 = **12 ventanas DEGRADED nuevas**, 3×6 = **18 RECOVERY nuevas**; acumulado con S06-042 inicial: **16 DEGRADED**, **24 RECOVERY**, además de las 60 NORMAL ya verificadas. Cada ventana contiene dos rutas HQ→S1 y HQ→S2. Los totales finales deben verificarse desde el manifiesto, no presumirse.
+**Objetivo medible si se completan 3 ciclos:** 3×4 = **12 ventanas DEGRADED nuevas**, 3×6 = **18 RECOVERY nuevas**; acumulado con S06-042 inicial: **16 DEGRADED**, **24 RECOVERY**, además de las 60 NORMAL ya verificadas. Cada ventana contiene dos rutas HQ→S1 y HQ→S2. Los totales finales deben verificarse desde el registro JSON, no presumirse.
 
 ## Siguiente etapa: evaluación ML honesta
 
@@ -41,4 +41,4 @@ F01–F04 están aprobadas y no deben repetirse. Para nuevas evidencias, cada co
 
 ## Continuidad en otro chat
 
-La fuente canónica de reanudación es [§4.11 del plan maestro](s06-s08-plan-maestro-y-criterios.md). El estado de GitHub/CI solo valida código; las cifras de nuevas sesiones no deben marcarse como realizadas hasta ver la bitácora `S06_043_SESIONES_MULTIPLES=OK` y el manifiesto real de VM. Mantener las issues S06 #6, #25 y #26 abiertas hasta completar sus criterios.
+La fuente canónica de reanudación es [§4.11 del plan maestro](s06-s08-plan-maestro-y-criterios.md). El estado de GitHub/CI solo valida código; las cifras de nuevas sesiones no deben marcarse como realizadas hasta ver la bitácora `S06_043_SESIONES_MULTIPLES=OK` y el registro JSON real de VM. Mantener las issues S06 #6, #25 y #26 abiertas hasta completar sus criterios.
