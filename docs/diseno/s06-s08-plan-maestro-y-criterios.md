@@ -257,6 +257,14 @@ PR [#178](https://github.com/recm0708/netlab360/pull/178), commit `9ff338f`, CI 
 
 PR [#179](https://github.com/recm0708/netlab360/pull/179), commit `aac2dae`, CI **821 tests (820 OK, 1 omitido)**. `scripts/s06/evaluar_v2_congelado.py` puntúa exclusivamente con modelos V2 ya congelados y rechaza IDs/tokens repetidos, TEST anterior a VALIDATION, paquetes incompatibles, watchdog sin RESTORED y huellas de modelos alteradas. Entrega métricas FP/FN/F1, falsas alarmas en RECOVERY, detección por evento y distribución NORMAL para análisis de drift descriptivo. **Pendiente validación real del scoring en VM; TEST aún no adquirido**. No ajustar umbrales ni reentrenar tras observar VALIDATION. Mantener S06 80 % técnico estimado hasta TEST, análisis de errores y aceptación del alcance FAULT/pronóstico.
 
+## 4.32. V2 TEST prospectivo aprobado y auditoría científica preparada (23/11/2026)
+
+**TEST V2 real validado:** `S06_V2_TEST_CRONOLOGICO_COMPLETO=OK`, RC 0; 14 pruebas locales de evaluador aprobadas, TRAIN/VALIDATION/TEST con 3 ICMP y nuevo TEST posterior al congelamiento. Por ruta: TRAIN (40 NORMAL, 8 DEGRADED, 12 RECOVERY), VALIDATION (20/8/12), TEST (20/8/12), dos eventos distintos por split; ambas rutas comparten los eventos. En TEST, **0 falsos negativos para P95, IsolationForest y LogisticRegression**: HQ→S1 F1 **0.941/0.941/1.000**, HQ→S2 **1.000/0.941/1.000**; FP NORMAL S1 1/1/0, S2 0/1/0. **Cero FP RECOVERY en TEST**. LogisticRegression obtiene F1=1.000 en ambos enlaces, pero esto solo cubre retardo artificial fijo de 40 ms. No equivale a pronóstico ni a detección general de FAULT/WAN/OSPF/HA/LACP/SDN.
+
+RTT NORMAL medio (ms) S1 TRAIN 0.0780, VALIDATION 0.0798, TEST 0.0799; S2 0.0796, 0.0849, 0.0752. Dos ciclos TEST protegidos con RTT DEGRADED/RECOVERY 40.476/0.075 ms y 40.469/0.073 ms; watchdog RESTORED, controlador NONE/BASELINE, qdisc noqueue, 21 namespaces/4 Docker, NOC saludable. Informes privados `~/netlab360-bootstrap/s06/estudio-uniforme-v2/evaluaciones-v2/validation.json` y `test.json`, bitácora `~/netlab360-bootstrap/s06/estudio-uniforme-v2/validacion-test-20261123_103455/S06_V2_Evaluacion_Test_Completa.txt`. No repetir sesiones, no reentrenar ni optimizar umbrales con el TEST.
+
+PR [#180](https://github.com/recm0708/netlab360/pull/180), commit `64e61e4`, CI **837 tests (836 aprobadas, una omitida)**. Auditor read-only de deriva normal descriptiva en cuatro features y latencia retrospectiva de primera ventana positiva, sin confundirla con alerta en vivo/anticipación, y con declaraciones explícitas `NO_EVALUABLE` de concept drift robusto, horizonte/MAE de pronóstico y FAULT independiente. **Pendiente ejecución real en VM y decisión posterior del escenario FAULT**. No cerrar la fase ni issues hasta resolver requisitos pendientes, evidencias y texto del informe.
+
 ## 5. Diseño permanente de la consola
 
 Especificación de menú, arquitectura y mapeo de procedimientos:
