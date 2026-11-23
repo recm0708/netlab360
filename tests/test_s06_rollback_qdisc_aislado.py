@@ -119,6 +119,9 @@ class IsolatedRollbackTests(unittest.TestCase):
                        "dummy0", "type", "dummy"), calls)
         self.assertFalse(any("ens33" in str(q) for q in calls))
         self.assertFalse(any("netem" in str(q) for q in calls))
+        i_ipv6 = next(i for i, a in enumerate(calls) if a[0:4] == ("ip", "netns", "exec", m.NS) and "sysctl" in a)
+        i_up = next(i for i, a in enumerate(calls) if a[-3:] == ("set", "dummy0", "up"))
+        self.assertLess(i_ipv6, i_up)
 
     def test_start_rechaza_sin_prepare(self):
         with self.assertRaisesRegex(RuntimeError, "not_prepared"):
@@ -214,6 +217,17 @@ class IsolatedRollbackTests(unittest.TestCase):
         self.seed()
         with self.assertRaisesRegex(RuntimeError, "foreign_timer"):
             m.expire("0123456789abcdef")
+
+    def test_watchdog_espera_lock_sin_perder_oportunidad(self):
+        self.seed("APPLIED")
+        original = m.exclusive
+        with mock.patch.object(m, "exclusive", wraps=original) as lock, \
+             mock.patch.object(m, "management"), \
+             mock.patch.object(m, "verify_owned_namespace"), \
+             mock.patch.object(m, "qdisc", return_value="BASELINE"):
+            state = m.expire("abcdef0123456789")
+        self.assertEqual(state["state"], "RESTORED_NO_CHANGE")
+        lock.assert_called_once_with(wait=True)
 
     def test_cleanup_prohibido_en_estado_activo(self):
         self.seed()
