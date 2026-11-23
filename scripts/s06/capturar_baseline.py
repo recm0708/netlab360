@@ -267,6 +267,7 @@ def main() -> None:
     }
     write_json(metadata_path, metadata)
     count_ok = 0
+    count_recorded = 0
     first = time.monotonic()
     try:
         with observations_path.open("x", encoding="utf-8") as stream:
@@ -288,16 +289,17 @@ def main() -> None:
                 sample["sample_index"] = i + 1
                 stream.write(json.dumps(sample, ensure_ascii=False) + "\n")
                 stream.flush()
+                count_recorded += 1
                 count_ok += int(sample["observed_healthy"])
                 print(f"S06_MUESTRA={i+1}/{args.samples} "
                       f"CALIDAD={'OK' if sample['observed_healthy'] else 'UNKNOWN'}",
                       flush=True)
     finally:
         metadata["finished_at_utc"] = utc()
-        metadata["samples_complete"] = args.samples
+        metadata["samples_complete"] = count_recorded
         metadata["samples_healthy"] = count_ok
-        metadata["status"] = ("complete" if count_ok == args.samples
-                               else "partial_quality")
+        metadata["status"] = ("complete" if count_recorded == args.samples
+                               and count_ok == args.samples else "partial_quality")
         if observations_path.is_file():
             metadata["observations_sha256"] = hashlib.sha256(
                 observations_path.read_bytes()
