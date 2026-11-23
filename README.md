@@ -69,7 +69,7 @@ La validación final de S05 comprobó 21 namespaces, cuatro contenedores y seis 
 - [S06-047 panel IA exploratorio en NOC S05 (validado en VM; F09 principal aprobada)](docs/diseno/s06-047-panel-ia-noc-readonly.md)
 - [S06-048 estados IA explícitos y auditoría LACP/SDN (validado en VM)](docs/diseno/s06-048-estados-ia-y-observacion-lacp-sdn.md)
 - [S06-049 auditoría de cronología y suficiencia prospectiva (validada en VM; gate pendiente de nuevos datos)](docs/diseno/s06-049-auditoria-readiness-prospectiva.md)
-- [S06-050 preregistro de TEST futuro y modelos congelados (CI/VM pendientes)](docs/diseno/s06-050-preregistro-futuro-modelos-congelados.md)
+- [S06-050 preregistro de TEST futuro y modelos congelados (CI aprobada; VM pendiente)](docs/diseno/s06-050-preregistro-futuro-modelos-congelados.md)
 - [Diseño del programa interactivo S08 y catálogo de acciones](docs/diseno/s08-consola-interactiva-y-acciones.md)
 
 ## Alcance
