@@ -58,6 +58,8 @@ Se recibieron capítulos **I–XII**, materiales complementarios, actividades in
 
 **Orden de implementación:** terminar regresión S06-025/026 y corregir `status` WAN → diseñar/adquirir datos S06 → modelos y métricas → AIOps S07 → consola S08 e integración progresiva → pruebas finales/entrega. Se puede crear el esqueleto del frontend en paralelo, pero no marcar pantallas de IA como operativas antes de su implementación.
 
+**Inicio de adquisición S06, sin validar aún en VM:** el PR #155 incorporó `scripts/s06/capturar_baseline.py` y pruebas offline (388 tests CI aprobadas). Realiza consultas de solo lectura a exporter S04, NOC S05, Prometheus y SQLite; guarda sesiones privadas con `ground_truth_label=UNKNOWN`. La primera captura real y sus controles de calidad están pendientes; no se cuenta como modelo entrenado ni fase S06 completada. Protocolo: `docs/diseno/s06-adquisicion-observacional.md`.
+
 ## 5. Diseño permanente de la consola
 
 Especificación de menú, arquitectura y mapeo de procedimientos:
