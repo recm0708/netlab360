@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import json
 import subprocess
+import time
 import sys
 
 REPO = "recm0708/netlab360"
@@ -169,7 +170,17 @@ def refresh_s05_once(inv: dict) -> None:
     verify = gh(f"{ENDPOINT}/issues/5")
     if verify.get("state") != "closed" or (verify.get("milestone") or {}).get("number") != 5:
         raise RuntimeError("s05_anchor_not_recovered")
-    inv2 = s05_inventory()
+    # La lista de issues por milestone puede tardar en sincronizarse tras PATCH.
+    # Releer en vez de mover/reabrir una segunda vez la issue cerrada.
+    inv2 = None
+    for intento in range(5):
+        try:
+            inv2 = s05_inventory()
+            break
+        except RuntimeError as exc:
+            if "s05_issue_inventory_changed" not in str(exc) or intento == 4:
+                raise
+            time.sleep(1)
     after = milestone(5)
     print(f"S05_CONTADOR_API_POST_RECUENTO={after.get('closed_issues')}/{after.get('open_issues', 0)+after.get('closed_issues',0)}")
     print("S05_RECUENTO="+("100_POR_CIENTO" if counts_ok(after, inv2)
