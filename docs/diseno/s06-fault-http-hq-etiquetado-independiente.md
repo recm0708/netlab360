@@ -23,3 +23,7 @@ El modo `--check` verifica posteriormente el JSON guardado frente a las fuentes 
 Se considera validado el segundo escenario si `S06_FAULT_HTTP_VERIFICADO=OK`, el informe presenta muestras normal/falla/recuperación con procedencia fiable, el watchdog recuperó HQ y se conservan NOC, Prometheus, LACP/SDN, qdisc noqueue, la ruta administrativa y los cuatro modelos V2 congelados. La cobertura real quedaría delimitada a **falla HA del backend HTTP HQ y latencia controlada del cliente HQ**. Otros fallos físicos y fallas de OSPF/WAN/SDN quedan no evaluados, así como pronóstico de horizonte futuro, MAE y concept drift inferencial.
 
 Solo después se deben tomar las capturas finales necesarias y revisar el documento académico sin redundancia entre descripción metodológica, resultados y conclusiones; no cerrar issues S06 o milestone sin validar el evento real y el informe.
+
+## Integración de código — pendiente ejecución real en VM
+
+PR [#184](https://github.com/recm0708/netlab360/pull/184) fusionado como `215fa64`; **896 pruebas CI, 895 OK y una omitida**. El validador S06 registra estados de servicio NORMAL/FAULT/RECOVERY con procedencia `systemctl stop` + NOC + temporizador systemd de 120 s, pero **todavía no se ha autorizado ni ejecutado un nuevo FAULT HTTP de S06**. No modificar el valor de avance ni cerrar ninguna issue antes de observar la salida real y la recuperación.
