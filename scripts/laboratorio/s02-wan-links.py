@@ -122,6 +122,44 @@ def host_before() -> dict:
     }
 
 
+
+def management_snapshot_equal(actual: dict, recorded: dict) -> bool:
+    """Acepta solo el flag transitorio linkdown en rutas kernel de docker0.
+
+    La dirección ens33 y todas las rutas (destino, gateway, dev, src,
+    metrica y atributos restantes) deben permanecer equivalentes.
+    """
+    if (not isinstance(actual, dict) or not isinstance(recorded, dict)
+            or set(actual) != {"ens33", "routes"}
+            or set(recorded) != {"ens33", "routes"}
+            or actual["ens33"] != recorded["ens33"]):
+        return False
+    if not isinstance(actual["routes"], str) or not isinstance(recorded["routes"], str):
+        return False
+
+    def normalize(line: str) -> str:
+        words = line.split()
+        if (words and words[-1] == "linkdown" and words[0] != "default"
+                and "via" not in words and "dev" in words
+                and words.index("dev") + 1 < len(words)
+                and words[words.index("dev") + 1] == "docker0"
+                and "proto" in words
+                and words.index("proto") + 1 < len(words)
+                and words[words.index("proto") + 1] == "kernel"
+                and "scope" in words
+                and words.index("scope") + 1 < len(words)
+                and words[words.index("scope") + 1] == "link"
+                and "src" in words
+                and words.index("src") + 1 < len(words)):
+            words.pop()
+        return " ".join(words)
+
+    before = sorted(normalize(x) for x in recorded["routes"].splitlines() if x.strip())
+    after = sorted(normalize(x) for x in actual["routes"].splitlines() if x.strip())
+    return before == after
+
+
+
 def precheck(records: list[dict], current: dict) -> dict:
     host = host_before()
     if STATE.exists() or STATE.is_symlink():
@@ -183,8 +221,7 @@ def cleanup(records: list[dict], current: dict) -> None:
         ns(current, logical, "sysctl", "-qw", f"net.ipv4.ip_forward={previous}")
         print(f"S02_IP_FORWARD_RESTAURADO={logical}:{previous}")
     after = host_before()
-    if (after["ens33"] != state["host"]["ens33"]
-            or after["routes"] != state["host"]["routes"]):
+    if (not management_snapshot_equal(after, state["host"])):
         raise RuntimeError("Red del host distinta de la registrada; conservar state")
     STATE.unlink()
     print("S02_HOST_POSTCHECK=OK")
@@ -235,7 +272,7 @@ def up(records: list[dict], current: dict) -> None:
                 raise RuntimeError(f"FRR rechazo configuracion en {logical}: {output}")
             print(f"S02_FRR_REAPLICADA={logical}")
         print("S02_WAN_LINKS_UP=4")
-        if host_before() != host:
+        if not management_snapshot_equal(host_before(), host):
             raise RuntimeError("El host cambio durante el despliegue WAN")
         print("S02_HOST_GESTION_INTACTO=SI")
         print("S02_WAN_UP=OK")
@@ -258,7 +295,7 @@ def status(records: list[dict], current: dict) -> None:
         print(ns(current, logical, "ip", "-4", "-br", "addr").strip())
         print(privilege("docker", "exec", current[logical]["name"],
                         "vtysh", "-c", "show ip ospf neighbor").strip())
-    if host_before() != state["host"]:
+    if not management_snapshot_equal(host_before(), state["host"]):
         raise RuntimeError("Host red cambiado")
     print("S02_HOST_GESTION_INTACTO=SI")
 

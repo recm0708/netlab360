@@ -111,6 +111,44 @@ def host_state() -> dict:
     return {"ens33": a, "routes": r}
 
 
+
+def management_snapshot_equal(actual: dict, recorded: dict) -> bool:
+    """Acepta solo el flag transitorio linkdown en rutas kernel de docker0.
+
+    La dirección ens33 y todas las rutas (destino, gateway, dev, src,
+    metrica y atributos restantes) deben permanecer equivalentes.
+    """
+    if (not isinstance(actual, dict) or not isinstance(recorded, dict)
+            or set(actual) != {"ens33", "routes"}
+            or set(recorded) != {"ens33", "routes"}
+            or actual["ens33"] != recorded["ens33"]):
+        return False
+    if not isinstance(actual["routes"], str) or not isinstance(recorded["routes"], str):
+        return False
+
+    def normalize(line: str) -> str:
+        words = line.split()
+        if (words and words[-1] == "linkdown" and words[0] != "default"
+                and "via" not in words and "dev" in words
+                and words.index("dev") + 1 < len(words)
+                and words[words.index("dev") + 1] == "docker0"
+                and "proto" in words
+                and words.index("proto") + 1 < len(words)
+                and words[words.index("proto") + 1] == "kernel"
+                and "scope" in words
+                and words.index("scope") + 1 < len(words)
+                and words[words.index("scope") + 1] == "link"
+                and "src" in words
+                and words.index("src") + 1 < len(words)):
+            words.pop()
+        return " ".join(words)
+
+    before = sorted(normalize(x) for x in recorded["routes"].splitlines() if x.strip())
+    after = sorted(normalize(x) for x in actual["routes"].splitlines() if x.strip())
+    return before == after
+
+
+
 def check(plan_data: dict, routers: dict) -> dict:
     before = host_state()
     if STATE.exists() or STATE.is_symlink():
@@ -169,7 +207,7 @@ def cleanup(d: dict, routers: dict) -> None:
                     sudo("kill", "-TERM", pid, allow=True)
             sudo("ip", "netns", "delete", name)
             print(f"S02_LAN_NETNS_RETIRADO={name}")
-    if host_state() != data["host"]:
+    if not management_snapshot_equal(host_state(), data["host"]):
         raise RuntimeError("Ruta/IP host cambió, conservar state")
     STATE.unlink()
     print("S02_LAN_DOWN=OK")
@@ -234,7 +272,7 @@ def up(d: dict, routers: dict) -> None:
             if any(x in output.lower() for x in ("processing failure", "invalid input", "unknown command")):
                 raise RuntimeError(f"Error al aplicar FRR {site}: {output}")
             print(f"S02_ROUTER_LAN_REAPLICADA={site}")
-        if host_state() != before:
+        if not management_snapshot_equal(host_state(), before):
             raise RuntimeError("Host cambio durante construccion LAN")
         print("S02_SWITCHES=3 VLAN=9 HOSTS=9")
         print("S02_HOST_GESTION_INTACTO=SI")
@@ -261,7 +299,7 @@ def status(d: dict, routers: dict) -> None:
         for v in entry["vlans"]:
             print(ip_ns(v["host"], "-4", "-br", "addr").strip())
         print(router_ns(routers, site, "ip", "-4", "-br", "addr").strip())
-    if host_state() != state["host"]:
+    if not management_snapshot_equal(host_state(), state["host"]):
         raise RuntimeError("Gestion host alterada")
     print("S02_LAN_ESTADO=OK")
     print("S02_HOST_GESTION_INTACTO=SI")
