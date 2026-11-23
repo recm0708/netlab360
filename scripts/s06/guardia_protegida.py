@@ -125,7 +125,7 @@ def ensure_dir() -> None:
     if not RUN_DIR.exists():
         RUN_DIR.mkdir(mode=0o700)
     info = RUN_DIR.lstat()
-    if (not stat.S_ISDIR(info.st_mode) or info.st_uid != 0
+    if (not stat.S_ISDIR(info.st_mode) or info.st_uid != os.geteuid()
             or stat.S_IMODE(info.st_mode) != 0o700):
         raise RuntimeError("run_directory_not_root_private")
 
@@ -136,7 +136,7 @@ def read_state() -> dict | None:
     if not STATE.exists():
         return None
     info = STATE.lstat()
-    if (not stat.S_ISREG(info.st_mode) or info.st_uid != 0
+    if (not stat.S_ISREG(info.st_mode) or info.st_uid != os.geteuid()
             or stat.S_IMODE(info.st_mode) != 0o600):
         raise RuntimeError("state_not_root_private")
     data = json.loads(STATE.read_text(encoding="utf-8"))
@@ -169,7 +169,7 @@ def exclusive():
     fd = os.open(LOCK, os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW, 0o600)
     try:
         info = os.fstat(fd)
-        if (info.st_uid != 0 or not stat.S_ISREG(info.st_mode)
+        if (info.st_uid != os.geteuid() or not stat.S_ISREG(info.st_mode)
                 or stat.S_IMODE(info.st_mode) != 0o600):
             raise RuntimeError("lock_not_root_private")
         try:
