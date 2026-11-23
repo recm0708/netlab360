@@ -233,5 +233,23 @@ class BridgeTests(unittest.TestCase):
         self.assertIn('state.textContent=', html)
 
 
+    def test_s06_ui_desacuerdo_separado_de_sin_datos(self):
+        html = UI.read_text(encoding="utf-8")
+        self.assertIn('disagreement=available&&data.consensus==="UNKNOWN"', html)
+        self.assertIn('unconfirmed=available&&data.consensus==="DEGRADED"', html)
+        self.assertIn('disagreement?"DESACUERDO IA / UNKNOWN"', html)
+        self.assertIn('unconfirmed?"INDICIO DE DEGRADACIÓN / UNKNOWN"', html)
+        self.assertIn(':"SIN DATOS / UNKNOWN"', html)
+        self.assertIn('.ai-state.uncertain{color:var(--warn)}', html)
+
+    def test_s06_ui_no_confunde_estado_producido_con_ground_truth(self):
+        html = UI.read_text(encoding="utf-8")
+        self.assertIn('Verdad de terreno UNKNOWN', html)
+        self.assertIn('Clasificación no confirmada como estado global', html)
+        self.assertIn('state.textContent=classified?"NORMAL · EGRESO HQ"', html)
+        self.assertIn('if(!available){', html)
+
+
+
 if __name__ == "__main__":
     unittest.main()

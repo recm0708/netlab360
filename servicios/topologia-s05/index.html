@@ -205,6 +205,7 @@ body.presentation .ha-overview{margin:6px 0;padding:8px 14px}
 .ai-item strong{font-size:.85rem;color:#d4ebff}
 .ai-state{display:inline-block;margin-left:10px;font-weight:750;color:#f7c971}
 .ai-state.normal{color:#51d8a8}
+.ai-state.uncertain{color:var(--warn)}
 .ai-meta,.ai-methods{display:block;color:#a9bfd6;font-size:.79rem;line-height:1.5;margin-top:6px;overflow-wrap:anywhere}
 .ai-note{font-size:.76rem;color:#b5c9dd;line-height:1.5;margin:0}
 @media(max-width:660px){.ai-grid{grid-template-columns:1fr}}
@@ -685,8 +686,14 @@ function aiRenderRoute(route, data){
  const methods=$("ai-"+suffix+"-methods");
  const available=data&&data.available===true&&data.route===route;
  const classified=available&&data.state==="NORMAL"&&data.consensus==="NORMAL";
- state.className="ai-state"+(classified?" normal":"");
- state.textContent=classified?"NORMAL · EGRESO HQ":"SIN DATOS / UNKNOWN";
+ // UNKNOWN con una muestra válida no equivale a fuente ausente.
+ // El desacuerdo IA y la indicación no corroborada se diferencian del TTL vencido.
+ const disagreement=available&&data.consensus==="UNKNOWN";
+ const unconfirmed=available&&data.consensus==="DEGRADED";
+ state.className="ai-state"+(classified?" normal":(disagreement||unconfirmed)?" uncertain":"");
+ state.textContent=classified?"NORMAL · EGRESO HQ":
+  disagreement?"DESACUERDO IA / UNKNOWN":
+  unconfirmed?"INDICIO DE DEGRADACIÓN / UNKNOWN":"SIN DATOS / UNKNOWN";
  if(!available){
   meta.textContent="Fuente IA ausente, caducada o no verificable";
   methods.textContent="P95 · IsolationForest · LogisticRegression: sin datos";
