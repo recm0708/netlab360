@@ -25,4 +25,4 @@ Tras aprobar CI, ejecutar las pruebas específicas y el auditor con `--save`. Co
 
 Al terminar, verificar 21 namespaces, cuatro contenedores, ens33 .40/24 con gateway .2, guardia `NONE/BASELINE`, qdisc `noqueue`, NOC 18/21, LACP/SDN y Prometheus. Ninguna nueva captura académica hasta conocer resultados. F01–F09B siguen válidas como evidencia de lo que se ejecutó, con limitaciones metodológicas claramente declaradas.
 
-**Estado:** CI y ejecución VM pendientes. S06 permanece en 80 % técnico validado mientras no exista evidencia prospectiva independiente.
+**Estado:** PR [#176](https://github.com/recm0708/netlab360/pull/176) fusionado a `main` con `bc741db`. CI general **789 pruebas (788 aprobadas y una omitida)**, incluyendo 13 tests nuevos. **La auditoría real en la VM está pendiente**: aún no afirmamos cuál de las clases utilizó dos o tres paquetes. S06 permanece en 80 % técnico validado mientras no exista evidencia prospectiva independiente.
