@@ -217,6 +217,12 @@ PR [#174](https://github.com/recm0708/netlab360/pull/174) integrado como `8a5baa
 
 **S06-050 próximo:** preregistro reproducible de evaluación futura con modelos congelados y gate de adquisición comparable; evitar contaminar el TEST y no inducir otra degradación antes de permisos/watchdog. Luego capturar normalidad posterior y eventos genuinamente nuevos con validación independente, evaluar deriva y horizonte solo si hay datos. [Informe S06-049](s06-049-auditoria-readiness-prospectiva.md).
 
+## 4.23. S06-050 — preregistro de modelos, CI aprobada, VM pendiente (23/11/2026)
+
+PR [#175](https://github.com/recm0708/netlab360/pull/175) fusionado como `32b108a` con **776 pruebas CI** (775 aprobadas, una omitida). `scripts/s06/prerregistrar_estudio_futuro.py` fija antes de futuras capturas los cuatro modelos existentes, métodos, variables, sesiones ya conocidas y criterios mínimos de TEST prospectivo (nuevas sesiones cronológicas, dos eventos positivos independientes y ventanas recovery). El acta privada se crea **una sola vez**, se puede auditar con `--check` y no modifica red ni reentrena. **Ningún nuevo TEST fue ejecutado**.
+
+Antes de aceptar el protocolo se comprobará muestreo por paquetes de las sesiones normales/degradadas; si no coincide se declara `BLOCKED_INCOMPATIBLE_SAMPLING` en vez de calificar resultados incompatibles. Para nuevos estímulos de red se exigirán autorización humana independiente, guardas y watchdog. Concept drift requiere etiquetas futuras, forecast requiere objetivo/horizonte y la deriva de datos exige ventanas comparables; reportar NO_EVALUABLE donde corresponda. VM pendiente, [protocolo](s06-050-preregistro-futuro-modelos-congelados.md). **S06 aún al 80 % técnico validado; #6/#25/#26 y milestone abiertos.**
+
 ## 5. Diseño permanente de la consola
 
 Especificación de menú, arquitectura y mapeo de procedimientos:
