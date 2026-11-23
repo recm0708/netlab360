@@ -78,7 +78,7 @@ def private_dir() -> None:
 
 
 @contextmanager
-def exclusive():
+def exclusive(*, wait: bool = False):
     private_dir()
     fd = os.open(LOCK, os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW, 0o600)
     try:
@@ -87,7 +87,7 @@ def exclusive():
                 or stat.S_IMODE(s.st_mode) != 0o600):
             raise RuntimeError("untrusted_lock")
         try:
-            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            fcntl.flock(fd, fcntl.LOCK_EX if wait else fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError as exc:
             raise RuntimeError("concurrent_test_forbidden") from exc
         yield
@@ -288,7 +288,9 @@ def start() -> dict:
 
 def expire(token: str) -> dict:
     timer_command(token)  # Valida estrictamente el token, sin ejecutar systemd.
-    with exclusive():
+    # El timer espera la liberacion del lock; si el proceso principal cae,
+    # el kernel libera flock y el watchdog conserva su oportunidad de actuar.
+    with exclusive(wait=True):
         state = read_state()
         if state is None or state["token"] != token:
             raise RuntimeError("foreign_timer_or_state")
