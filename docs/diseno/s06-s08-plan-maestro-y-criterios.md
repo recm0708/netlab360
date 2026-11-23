@@ -253,6 +253,10 @@ Se obtuvieron **40 NORMAL, 8 DEGRADED, 12 RECOVERY por ruta** con muestreo unifo
 
 PR [#178](https://github.com/recm0708/netlab360/pull/178), commit `9ff338f`, CI 807 tests (806 OK, 1 omitida): scripts y controles para **entrenar/congelar** cuatro modelos nuevos exclusivamente con el TRAIN V2, sin tocar modelos legacy y sin exponer datos futuros. **Aún no se ejecutó el entrenamiento real ni hay resultados VALIDATION/TEST**. Próximo paso `--freeze` y `--check` en VM, después adquisición cronológica validada. S06 en 80 % técnico estimado.
 
+## 4.31. Evaluador V2 de VALIDATION/TEST preparado (23/11/2026)
+
+PR [#179](https://github.com/recm0708/netlab360/pull/179), commit `aac2dae`, CI **821 tests (820 OK, 1 omitido)**. `scripts/s06/evaluar_v2_congelado.py` puntúa exclusivamente con modelos V2 ya congelados y rechaza IDs/tokens repetidos, TEST anterior a VALIDATION, paquetes incompatibles, watchdog sin RESTORED y huellas de modelos alteradas. Entrega métricas FP/FN/F1, falsas alarmas en RECOVERY, detección por evento y distribución NORMAL para análisis de drift descriptivo. **Pendiente validación real del scoring en VM; TEST aún no adquirido**. No ajustar umbrales ni reentrenar tras observar VALIDATION. Mantener S06 80 % técnico estimado hasta TEST, análisis de errores y aceptación del alcance FAULT/pronóstico.
+
 ## 5. Diseño permanente de la consola
 
 Especificación de menú, arquitectura y mapeo de procedimientos:
