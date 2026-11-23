@@ -32,4 +32,4 @@ Tras 30 s la captura caduca; el panel vuelve a UNKNOWN, incluso cuando NOC S05 y
 
 ## Estado
 
-Código en PR S06-047; pendiente comprobar CI, fusionar y validar el NOC previsualizado. Issues #6/#25/#26 abiertas; S07/S08 no se consideran implementadas.
+**Código y CI aceptados:** PR [#172](https://github.com/recm0708/netlab360/pull/172) fusionado `5fd9986`; regresión general **751 pruebas** (750 aprobadas, una omitida), CI específica S05 correcta. **Pendiente ejecutar y validar en VM** el NOC de previsualización 9131 y la API S06 9145; no afirmar que la integración ya se vio operando en la VM. Issues #6/#25/#26 abiertas; S07/S08 no se consideran implementadas.
