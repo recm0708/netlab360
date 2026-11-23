@@ -49,6 +49,7 @@ La validación final de S05 comprobó 21 namespaces, cuatro contenedores y seis 
 - [Plan maestro S06–S08, objetivos y criterios de aceptación](docs/diseno/s06-s08-plan-maestro-y-criterios.md)
 - [Adquisición de telemetría S06 y diseño de sesiones de observación](docs/diseno/s06-adquisicion-observacional.md)
 - [Pruebas de rendimiento RTT, pérdidas y HTTP S06](docs/diseno/s06-mediciones-rendimiento.md)
+- [Normalización y validación de calidad S06](docs/diseno/s06-normalizacion-y-calidad.md)
 - [Diseño del programa interactivo S08 y catálogo de acciones](docs/diseno/s08-consola-interactiva-y-acciones.md)
 
 ## Alcance
