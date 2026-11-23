@@ -265,6 +265,16 @@ RTT NORMAL medio (ms) S1 TRAIN 0.0780, VALIDATION 0.0798, TEST 0.0799; S2 0.0796
 
 PR [#180](https://github.com/recm0708/netlab360/pull/180), commit `64e61e4`, CI **837 tests (836 aprobadas, una omitida)**. Auditor read-only de deriva normal descriptiva en cuatro features y latencia retrospectiva de primera ventana positiva, sin confundirla con alerta en vivo/anticipación, y con declaraciones explícitas `NO_EVALUABLE` de concept drift robusto, horizonte/MAE de pronóstico y FAULT independiente. **Pendiente ejecución real en VM y decisión posterior del escenario FAULT**. No cerrar la fase ni issues hasta resolver requisitos pendientes, evidencias y texto del informe.
 
+## 4.33. Cierre científico S06 V2 y gestión de hitos (23/11/2026)
+
+**Auditoría real validada:** `S06_V2_CIERRE_CIENTIFICO=OK`, RC 0, 16 tests locales de deriva/latencia OK. Cuatro modelos V2 congelados y cuatro legacy sin modificación; corpus TRAIN/VALIDATION/TEST con 3 ICMP homogéneos y TEST posterior verificado. Resultados TEST F1 P95/IsolationForest/LogisticRegression HQ→S1 `0.941/0.941/1.000`, HQ→S2 `1.000/0.941/1.000`, todos con 0 FN y 0 FP en RECOVERY; dos eventos por partición compartidos entre rutas.
+
+Data drift NORMAL exclusivamente **descriptivo**: RTT TRAIN→TEST HQ→S1 `0.0780→0.0799 ms` (cambio +0.0018), KS 0.200; HQ→S2 `0.0796→0.0752 ms` (cambio aproximado −0.0043), KS 0.125. La primera oportunidad de detección offline después de aplicar NETEM fue 1416 y 1402 ms por evento, y se repite en las dos rutas y tres modelos; **no mide alerta en tiempo real ni pronóstico anterior al evento**. Concept drift inferencial, horizonte futuro y MAE de forecast quedan `NO_EVALUABLE`; FAULT genuino diferente de retardo 40 ms todavía no tiene ground truth S06. Bitácora `~/netlab360-bootstrap/s06/estudio-uniforme-v2/cierre-cientifico-20261123_105451/S06_V2_Cierre_Cientifico.txt`, JSON privado `~/netlab360-bootstrap/s06/estudio-uniforme-v2/evaluaciones-v2/auditoria-cientifica-final.json`. Guardias NONE/BASELINE, noqueue, NOC, Prometheus y LACP/SDN operativos, 21 namespaces/4 Docker.
+
+**Avance técnico estimado S06 ≈90 %**, separado de la barra de milestone de GitHub: queda definir y demostrar una condición `FAULT` independiente con recuperación y etiqueta propia (o justificar expresamente alcance no cumplido), comprobar posible integración V2 solo lectura y terminar capturas/redacción del informe académico. No cerrar S06 ni sus issues antes de esos gates.
+
+**Gestión GitHub:** la S05 está cerrada y contiene 6 issues realmente cerradas (#5, #23, #31, #32, #64, #105); el contador persistente de milestone puede estar desincronizado. La ampliación opcional #24 de cuarta sede/WireGuard se reabrió en S08 **sin atribuir implementación**; también #17 OpenTofu externo permanece en S08 como condicionado. PR #181 fusionado: [descripciones estandarizadas de los ocho hitos y reconciliación segura](../gestion/s01-s08-hitos-descripciones-y-contador-s05.md). El conector no dispone de escritura directa de milestones; el procedimiento auditado requiere ejecución explícita con `gh api` autorizado en la VM.
+
 ## 5. Diseño permanente de la consola
 
 Especificación de menú, arquitectura y mapeo de procedimientos:
