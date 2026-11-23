@@ -46,6 +46,8 @@ La validación final de S05 comprobó 21 namespaces, cuatro contenedores y seis 
 - [Automatización Ansible](ansible/s03/README.md)
 - [Infraestructura declarativa OpenTofu](iac/s03/README.md)
 - [NOC multisede](servicios/topologia-s05/README.md)
+- [Plan maestro S06–S08, objetivos y criterios de aceptación](docs/diseno/s06-s08-plan-maestro-y-criterios.md)
+- [Diseño del programa interactivo S08 y catálogo de acciones](docs/diseno/s08-consola-interactiva-y-acciones.md)
 
 ## Alcance
 
