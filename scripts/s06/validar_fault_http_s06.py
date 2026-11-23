@@ -21,7 +21,27 @@ STUDY=BASE/"estudio-uniforme-v2"
 SOURCES=ROOT/"s05/evidencias/ha-noc"
 OUT=STUDY/"fault-http-s06"
 SCHEMA="NETLAB360_S06_FAULT_HTTP_HQ_GROUND_TRUTH_V1"
-SRC_RE=re.compile(r"S05_HA_NOC_CICLO_(\d{8}T\d{6}Z)\.jsonl")
+SRC_RE=re.compile(r"S05_HA_NOC_CICLO_(\\d{8}T\\d{6}Z)\\.jsonl")
+SESSION_RE=re.compile(
+    r"^S06_WINDOW_(?:NORMAL|DEGRADED|RECOVERY)_(\\d{8}T\\d{6}Z)_[a-f0-9]{6}$"
+)
+
+def session_time(identifier: str) -> datetime:
+    """Parsear el identificador V2 localmente, sin importar S06-049.
+
+    La evaluación se carga por importlib.util durante unittest; importar el
+    auditor histórico desde aquí dependía accidentalmente de sys.path.
+    """
+    if not isinstance(identifier,str):
+        raise ValueError("invalid_session_identifier")
+    match=SESSION_RE.fullmatch(identifier)
+    if not match:
+        raise ValueError("invalid_session_timestamp")
+    try:
+        return datetime.strptime(match.group(1),"%Y%m%dT%H%M%SZ").replace(tzinfo=timezone.utc)
+    except ValueError as exc:
+        raise ValueError("invalid_session_timestamp") from exc
+
 MARKERS=(
     "S05_HA_RESCATE_TIMER_ARMADO=",
     "S05_HA_RESCATE_PLAZO=120s",
@@ -124,7 +144,6 @@ def evaluate(log:Path)->dict:
     change,derived=phases(records)
     # Debe ser una prueba posterior al TEST cronológico V2.
     prior=STUDY/"TEST_Manifest.json"
-    from auditar_gates_prospectivos import session_time
     val=json.loads(regular(prior,50000))
     ids=[val["normal_session"]]+val["degraded_sessions"]+val["recovery_sessions"]
     if utc(records[0]["observed_utc"])<=max(map(session_time,ids)):
