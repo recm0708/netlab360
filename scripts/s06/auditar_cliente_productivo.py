@@ -15,6 +15,11 @@ import secrets
 import subprocess
 import sys
 
+# Admitir importacion desde unittest por ruta, ademas de ejecucion directa.
+SCRIPT_DIR = str(Path(__file__).resolve().parent)
+if SCRIPT_DIR not in sys.path:
+    sys.path.insert(0, SCRIPT_DIR)
+
 from precheck_escenarios import (  # Reusar invariantes S06-035 validadas en VM.
     BASE, NS, DEVICE, CLIENT_IP, CLIENT_GW, classify_qdisc,
     inspect as inspect_035, read_json,
