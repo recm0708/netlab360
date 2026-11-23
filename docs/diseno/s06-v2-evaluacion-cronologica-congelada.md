@@ -21,3 +21,7 @@ La evaluación se conserva una sola vez: `~/netlab360-bootstrap/s06/estudio-unif
 5. Data drift: comparar distribuciones de RTT NORMAL por ruta entre TRAIN, VALIDATION y TEST con muestreo 3 uniforme; concept drift se limita a variación de errores en TEST posterior por eventos (dos eventos/poco poder estadístico). Distinguir **latencia de detección después del estímulo** de pronóstico con horizonte futuro, que permanece `NO_EVALUABLE` sin objetivo temporal ni eventos suficientes.
 
 No cerrar Fase S06 antes de auditar evidencia FAULT o exclusión razonada de alcance, detección temporal, deriva/robustez y el capítulo escrito actualizado. Conservar abiertas issues #6/#25/#26 y el milestone de S06.
+
+## Integración de código (23/11/2026)
+
+PR [#179](https://github.com/recm0708/netlab360/pull/179), commit `aac2dae`, **821 tests de CI (820 correctos y uno omitido)**. El evaluador valida los cuatro archivos congelados, tokens y watchdogs, rechaza reuso y cronología incorrecta, y dispone de salidas privadas únicas por etapa. **Su ejecución real sobre VALIDATION/TEST en VM está pendiente**, y ninguna métrica de F1 V2 puede declararse antes de ella.
