@@ -1,5 +1,7 @@
 # NETLAB360 — Plan maestro vigente S06–S08
 
+**ESTADO CANÓNICO AL 23/11/2026 — S06 CERRADA TÉCNICAMENTE:** issues #6, #25 y #26 cerradas tras verificar las evidencias. El estudio V2 usa TRAIN/VALIDATION/TEST cronológicos con cuatro modelos congelados y P95; la API IA/NOC funciona en solo lectura; FAULT HTTP HQ independiente: 2 NORMAL, 15 FAULT, 2 RECOVERY y HA HQ→S1→HQ, sin modificar el TEST ICMP. **No demostrados:** forecast/horizonte/MAE, concept drift inferencial, generalización a fallas HTTP, costes de producción ni evaluación multivariable exhaustiva. **Pendientes académicos en S08:** insertar 6.11 y 7.11 en Word, inventariar PNG definitivos, completar informe/TAR/PPT y obtener dictamen docente (#27, #43). El historial de progreso que sigue describe cortes anteriores, no el estado actual.**
+
 **Corte:** 22–23 de noviembre de 2026. **Finalidad:** documento técnico permanente para retomar el trabajo sin reconstruir el contexto de conversaciones. **No sustituye los PDF docentes originales ni equivale a resultados no ejecutados.**
 
 ## 1. Objetivo del proyecto
@@ -319,7 +321,7 @@ No afirmar OVA/OVF obligatorio sin confirmación explícita. Revisar tamaño y c
 
 ## 7. GitHub, persistencia y conservación
 
-Repositorio `recm0708/netlab360`, rama estable `main`; issues S01–S05 cerradas; **S06–S08 siguen abiertas**, sin confundir dependencias instaladas con funcionalidad. Referencias maestras: #6, #7, #8, #25, #26, #27, #34, #44, #45 y #106. #17 (OpenTofu externo) y #29 (OVA/OVF) son ampliaciones condicionadas y no bloquean las funciones obligatorias si no se requieren.
+Repositorio `recm0708/netlab360`, rama estable `main`; issues S01–S06 cerradas técnicamente; **S07–S08 abiertas**, sin confundir dependencias instaladas con funcionalidad ni cierre técnico con aceptación académica. Referencias maestras: #6, #7, #8, #25, #26, #27, #34, #44, #45 y #106. #17 (OpenTofu externo) y #29 (OVA/OVF) son ampliaciones condicionadas y no bloquean las funciones obligatorias si no se requieren.
 
 El histórico `docs/_temporal_continuidad/` es archivo temporal, no entrega final; solo eliminarlo cuando no contenga evidencias únicas y el informe/TAR estén completados. Estados runtime, registros originales privados, datasets en bruto y entornos Python permanecen bajo `~/netlab360-bootstrap/`. No eliminar imágenes Docker ni snapshots de recuperación sin validar.
 
@@ -337,4 +339,4 @@ El histórico `docs/_temporal_continuidad/` es archivo temporal, no entrega fina
 
 ### Actualización de los controles de S06 — 23/11/2026
 
-En el corte histórico del PR [#184](https://github.com/recm0708/netlab360/pull/184), commit `215fa64`, el protocolo FAULT todavía estaba pendiente de intervención y el catálogo de etiquetas exigía reanudación. **Ese estado histórico fue superado**: el FAULT HTTP HQ se ejecutó una sola vez con autorización y watchdog; `S06_FAULT_RECUPERACION_FINAL=OK`; se verificó la integridad V2, la normalización GitHub y la auditoría transversal; el NOC IA fue restaurado con un solo reinicio autorizado (`S06_NOC_IA_RECUPERADO=OK`). Véanse las secciones 4.35 y 4.36 y el registro de gestión actualizado. **No seguir usando el estimado histórico de ~90 % ni repetir `gh --apply`**. S06 permanece abierta por criterios y revisión académica, no por un FAULT técnico sin ejecutar.
+En el corte histórico del PR [#184](https://github.com/recm0708/netlab360/pull/184), commit `215fa64`, el protocolo FAULT todavía estaba pendiente de intervención y el catálogo de etiquetas exigía reanudación. **Ese estado histórico fue superado**: el FAULT HTTP HQ se ejecutó una sola vez con autorización y watchdog; `S06_FAULT_RECUPERACION_FINAL=OK`; se verificó la integridad V2, la normalización GitHub y la auditoría transversal; el NOC IA fue restaurado con un solo reinicio autorizado (`S06_NOC_IA_RECUPERADO=OK`). Véanse las secciones 4.35 y 4.36 y el registro de gestión actualizado. **No seguir usando el estimado histórico de ~90 % ni repetir `gh --apply`**. S06 quedó cerrada técnicamente con alcance experimental delimitado; la integración de 6.11/7.11, las imágenes PNG finales y la aceptación académica se siguen en S08 (#27, #43).
