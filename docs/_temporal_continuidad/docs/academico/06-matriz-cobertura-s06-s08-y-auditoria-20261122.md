@@ -27,7 +27,7 @@ Los capítulos docentes, actividades individuales, laboratorios resueltos y parc
 | Capítulo X y Laboratorio 7 | Detección de anomalías, Isolation Forest, referencias históricas y análisis no intrusivo | Comparar detección estadística con contexto de red, detección no equivale a incidente o autorización de cambios | S06 #25, #26; S07 #7 |
 | Capítulo XI y Laboratorio 8 + libro de cálculos | Predicción de degradación, series temporales, horizonte `t+10`, uso de MAE y costo de alertas; análisis pre/post QoS | Pronóstico por horizonte medible, comparación de MAE con FP/FN y impacto del cambio de QoS en SLI/servicio; no usar información futura en predicción | S06 #26; S08 #8 |
 | Capítulo XII y Laboratorio 8 | Explicabilidad, overfitting, model/data/concept drift, cambios de contexto y revisión humana | Monitorizar explicación/deriva, calidad y degradación del desempeño; nueva calibración cronológica cuando proceda | S06 #26, S07 #7 |
-| Guía de elaboración y formato de proyecto | Informe mínimo 40 páginas, diseño, implementación, pruebas, resultados, referencias, anexos; PowerPoint y demostración | Mapear resultados propios a estructura docente, evitar redundancias y mostrar cambios reales desde menú sin comandos | S08 #27, #44, #45 |
+| Guía de elaboración y formato de proyecto | Informe mínimo 40 páginas, diseño, implementación, pruebas, resultados y referencias; **excepción docente para NETLAB360:** anexos técnicos mediante TAR externo; PowerPoint y demostración | Mapear resultados propios a estructura docente, evitar redundancias y mostrar cambios reales desde menú sin comandos | S08 #27, #44, #45 |
 
 ## Arquitectura funcional prevista S06–S08 (diseño, no implementación)
 
@@ -47,7 +47,7 @@ Los capítulos docentes, actividades individuales, laboratorios resueltos y parc
 
 ## Riesgos y decisiones abiertas
 
-- **Guía vs política de anexos:** la guía oficial incluye anexos como apartado 12; el plan interno actual eligió informe sin anexos y TAR técnico separado. Resolver explícitamente el modo de cumplimiento antes de dar por cerrado #27; un TAR no equivale automáticamente a cumplir la estructura escrita.
+- **Excepción docente sobre anexos (confirmada el 22/11/2026 por el estudiante):** aunque la guía general enumera un capítulo de Anexos, la profesora autorizó **para NETLAB360** un informe académico PDF sin dicho capítulo y un archivo `.tar` técnico separado con programas, YAML, JSON, HCL, configuraciones, pruebas y demás recursos finales. Esta autorización específica resuelve la discrepancia de formato; no significa que el requisito general haya sido modificado para otros proyectos. En el TAR no se incluirán datos privados ni archivos temporales. Ver #27 y #45.
 - **Datos sintéticos:** están permitidos como material de enseñanza/modelización, pero deben marcarse y mantenerse separados de las mediciones reales del entorno NETLAB360; no usar datos rotulados por la propia acción como única evidencia de exactitud predictiva.
 - **Escalabilidad:** no desplegar más sedes, WireGuard, VyOS, Kubernetes o Cilium sin caso de uso, presupuesto de recursos y pruebas de aislamiento. Conservar la red principal funcional.
 - **Persistencia:** la reconstrucción de S02–S05 ya fue probada manualmente tras reinicio, pero arranque automático desde VM apagada y runbook de usuario final aún pendientes (#106).
