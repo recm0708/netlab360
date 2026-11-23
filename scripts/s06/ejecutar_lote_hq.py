@@ -75,7 +75,7 @@ def check_ready() -> None:
 
 
 def validated_session(log: str, expected: str, token: str,
-                      expected_rounds: int) -> dict:
+                      expected_rounds: int, expected_packets: int | None = None) -> dict:
     ids = re.findall(r"^S06_042_SESION=(.+)$", log, flags=re.MULTILINE)
     dirs = re.findall(r"^S06_042_DIRECTORIO=(.+)$", log,
                       flags=re.MULTILINE)
@@ -109,6 +109,8 @@ def validated_session(log: str, expected: str, token: str,
             if s.strip()]
     if len(rows) != expected_rounds:
         raise RuntimeError("window_count_unexpected")
+    if expected_packets is not None and meta.get("packets") != expected_packets:
+        raise RuntimeError("measurement_protocol_metadata_mismatch")
     seen = set()
     observed_rtt = []
     guard_status = "APPLIED" if expected == "DEGRADED" else "RESTORED"
@@ -139,6 +141,12 @@ def validated_session(log: str, expected: str, token: str,
             raise RuntimeError("unexpected_measurement_count_or_route")
         for m in measurements:
             result = m.get("result", {})
+            if expected_packets is not None and (
+                m.get("requested_packets") != expected_packets
+                or result.get("sent") != expected_packets
+                or result.get("received") != expected_packets
+            ):
+                raise RuntimeError("measurement_protocol_packets_mismatch")
             if result.get("measurement_valid") is not True:
                 raise RuntimeError("invalid_measurement")
             observed_rtt.append(float(result["rtt_avg_ms"]))
@@ -217,7 +225,8 @@ def run_one(index: int, folder: Path, report: dict, packets: int = 2) -> dict:
          "--expected", "DEGRADED", "--rounds",
          str(ROUND_DEGRADED), "--packets", str(packets)], timeout=29)
     (folder / f"ciclo_{label}_degraded.txt").write_text(data_d)
-    degraded = validated_session(data_d, "DEGRADED", token, ROUND_DEGRADED)
+    degraded = validated_session(data_d, "DEGRADED", token, ROUND_DEGRADED,
+                                 expected_packets=packets if packets == 3 else None)
     cycle.update(degraded=degraded, status="waiting_for_timer")
     save_manifest(folder / "manifest.json", report)
 
@@ -234,7 +243,8 @@ def run_one(index: int, folder: Path, report: dict, packets: int = 2) -> dict:
          "--expected", "RECOVERY", "--rounds",
          str(ROUND_RECOVERY), "--packets", "3"], timeout=40)
     (folder / f"ciclo_{label}_recovery.txt").write_text(data_r)
-    recovery = validated_session(data_r, "RECOVERY", token, ROUND_RECOVERY)
+    recovery = validated_session(data_r, "RECOVERY", token, ROUND_RECOVERY,
+                                 expected_packets=3 if packets == 3 else None)
     if degraded["rtt_avg_ms"] <= recovery["rtt_avg_ms"] + 15:
         raise RuntimeError("measured_degradation_not_separated_from_recovery")
     cycle.update(recovery=recovery, status="ready_to_cleanup")
