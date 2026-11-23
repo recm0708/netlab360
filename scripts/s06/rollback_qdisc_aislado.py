@@ -215,6 +215,9 @@ def prepare() -> dict:
         # Solo crea un espacio de red nuevo sin veth, IP ni puente.
         run("ip", "netns", "add", NS)
         run("ip", "-n", NS, "link", "add", IFACE, "type", "dummy")
+        # Desactivar IPv6 solamente en dummy0 para evitar link-local automatica.
+        run("ip", "netns", "exec", NS, "sysctl", "-qw",
+            "net.ipv6.conf.dummy0.disable_ipv6=1")
         run("ip", "-n", NS, "link", "set", IFACE, "up")
         inspect_dummy()
         if qdisc() != "BASELINE":
