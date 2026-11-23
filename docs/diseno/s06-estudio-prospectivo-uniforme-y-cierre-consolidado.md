@@ -58,3 +58,23 @@ Dos ciclos aprobados con la cadena humana exacta, watchdog autónomo y recuperac
 15 tests de entrenamiento OK; `--freeze` y `--check` confirmaron cuatro modelos V2 privados, P95 de HQ→S1 **0.10405 ms** y HQ→S2 **0.11055 ms**. Las muestras VALIDATION fueron posteriores a TRAIN y a la congelación: NORMAL `S06_WINDOW_NORMAL_20261123T151633Z_973a31` (20 ventanas) y dos eventos controlados en `~/netlab360-bootstrap/s06/experimentos/S06_043_20261123T151706Z_e1ca29/manifest.json` (8 DEGRADED, 12 RECOVERY por ruta); las tres clases usan 3 paquetes ICMP. Watchdog restauró ambos ciclos (RTT DEGRADED/RECOVERY 40.522/0.078 ms y 40.396/0.093 ms), controlador NONE/BASELINE, qdisc noqueue, NOC, 21 namespaces y 4 contenedores conservados. `S06_V2_VALIDATION_COMPLETA=OK`, RC0.
 
 **VALIDATION se adquirió, pero aún no se puntuó**. No repetir TRAIN/VALIDATION ni ajustar modelos. El siguiente gate es puntuar VALIDATION con pesos congelados, después adquirir TEST posterior e independiente, puntuarlo una sola vez y analizar falsas alarmas, deriva, latencia de detección, FAULT y límites del pronóstico.
+
+## Estudio V2: VALIDATION y TEST prospectivo verificados (23/11/2026)
+
+**Evidencia real:** `S06_V2_TEST_CRONOLOGICO_COMPLETO=OK`, `RESULTADO_RC=0`; 14 tests específicos VM OK. Cuatro modelos V2 congelados e idénticos en ambas etapas, sin reentrenamiento ni cambios de umbral; modelos históricos preservados. Corpus de 3 paquetes ICMP por ventana y ruta: TRAIN 40 NORMAL/8 DEGRADED/12 RECOVERY, VALIDATION 20/8/12, TEST 20/8/12, con dos eventos nuevos por etapa. TEST NORMAL `S06_WINDOW_NORMAL_20261123T153501Z_4d1e6c`; batch TEST `~/netlab360-bootstrap/s06/experimentos/S06_043_20261123T153534Z_36ea51/manifest.json`.
+
+**VALIDATION** (TP/FP/TN/FN/F1/FP RECOVERY):
+- HQ→S1: P95 `8/0/20/0/1.000/0`, IsolationForest `8/1/19/0/0.941/1`, LogisticRegression `8/0/20/0/1.000/0`.
+- HQ→S2: P95 `8/1/19/0/0.941/2`, IsolationForest `8/1/19/0/0.941/2`, LogisticRegression `8/0/20/0/1.000/0`.
+
+**TEST** (TP/FP/TN/FN/F1/FP RECOVERY):
+- HQ→S1: P95 `8/1/19/0/0.941/0`, IsolationForest `8/1/19/0/0.941/0`, LogisticRegression `8/0/20/0/1.000/0`.
+- HQ→S2: P95 `8/0/20/0/1.000/0`, IsolationForest `8/1/19/0/0.941/0`, LogisticRegression `8/0/20/0/1.000/0`.
+
+Los tres métodos tuvieron **0 FN en TEST** y detectaron al menos una ventana en cada uno de los dos eventos por ruta. Cada TEST tiene 20 negativos y solo ocho positivos por ruta; ambos destinos comparten estímulo y no son eventos independientes entre rutas. Los resultados son válidos para retardo artificial HQ de 40 ms, no prueban pronóstico, fallas OSPF/WAN/HA/LACP/SDN ni generalización a otros tipos de perturbación.
+
+**RTT NORMAL medio (ms):** HQ→S1 TRAIN `0.0780`, VALIDATION `0.0798`, TEST `0.0799` (+0.0018 desde TRAIN); HQ→S2 TRAIN `0.0796`, VALIDATION `0.0849`, TEST `0.0752` (−0.0044 desde TRAIN). Estos cambios son observaciones descriptivas, no evidencia de concept drift ni deterioro demostrado.
+
+**Seguridad:** watchdog restauró dos ciclos TEST (RTT degradado/recuperado 40.476/0.075 ms y 40.469/0.073 ms), controlador `NONE/BASELINE`, qdisc `noqueue`, 21 namespaces, 4 Docker, NOC saludable y cero mutaciones permanentes. Salidas privadas `~/netlab360-bootstrap/s06/estudio-uniforme-v2/evaluaciones-v2/validation.json` y `test.json`. Bitácora `~/netlab360-bootstrap/s06/estudio-uniforme-v2/validacion-test-20261123_103455/S06_V2_Evaluacion_Test_Completa.txt`. No recapturar ni reajustar tras TEST.
+
+**Pendiente S06:** informe final de deriva descriptiva y costo operativo, latencia retrospectiva de oportunidad de detección, limitación o escenario FAULT independientemente verificado, horizonte futuro y MAE si son evaluables, evidencias académicas y revisión del capítulo del informe. El gate de detección prospectiva bajo 40 ms está verificado; la generalización de fallas diferentes no.
