@@ -183,6 +183,12 @@ La evaluación binaria NORMAL/DEGRADED fue **ejecutada y validada** en `netlab36
 
 **S06 estimado 80 % técnico**, no calificación docente. **S06-047 próximo:** adaptación de solo lectura NOC S05 al servicio IA, estado por ruta y modelo, timeout/UNKNOWN cuando API desconectada o muestra obsoleta, pruebas CI y verificación en VM. No duplicar NOC ni alterar su diagrama, FIB, redes ni usuarios; la visualización es experimental, sin atribuir producción ni remediación. Issues #6/#25/#26 y S06 milestone siguen abiertos por pronóstico, evaluación prospectiva, deriva y generalización pendientes.
 
+## 4.18. S06-047 — integración de código NOC IA, CI aprobada, VM pendiente (23/11/2026)
+
+PR [#172](https://github.com/recm0708/netlab360/pull/172) fusionado en `5fd9986`, **751 pruebas generales CI (750 aprobadas, 1 omitida)** y regresión propia S05 aprobada. Añade a la aplicación existente `servicios/topologia-s05/app.py` un endpoint read-only `/api/v1/s06/diagnostics`, consulta las dos rutas de IA por loopback `127.0.0.1:9145` con rutas fijas y TTL/contrato/normalidad scoped verificados, devuelve UNKNOWN si no hay modelo ni muestra confiable. `index.html` agrega panel IA separado del SVG topológico con RTT, pérdida, edad y tres clasificadores; no altera router, FIB, estado HTTP/HA, LACP, Faucet ni servicios. Pruebas nuevas en `tests/test_s06_noc_ia_bridge.py` y [guía](s06-047-panel-ia-noc-readonly.md).
+
+**Punto inmediato:** validar en VM usando previsualización temporal 9131, conservando S05 en 9130; API IA temporal 9145, una nueva captura acotada de tres ICMP por ruta, verificar `/api/v1/s06/diagnostics` y caducidad `UNKNOWN`. **No afirmar integración aceptada en VM ni F09 aprobada** hasta recibir resultados y captura verificables. Mantener abiertas #6/#25/#26 y el milestone S06; no abrir servicios en 0.0.0.0 ni instalar demonios hasta aceptación separada.
+
 ## 5. Diseño permanente de la consola
 
 Especificación de menú, arquitectura y mapeo de procedimientos:
