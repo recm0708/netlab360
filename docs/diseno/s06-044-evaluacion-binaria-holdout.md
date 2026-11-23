@@ -39,4 +39,22 @@ El script escribe una evidencia independiente con marcadores `========== INICIO 
 
 Siguiente lote tras aprobar S06-044: informe técnico de análisis de error/limitaciones, API de inferencia **solo lectura**, comportamiento UNKNOWN para datos insuficientes, explicación de alertas y conexión a NOC; luego S07/S08 deberán respetar el catálogo de acciones autorizadas. No sumar un nuevo experimento ni crear interfaces ficticias para este incremento.
 
-Esta documentación describe una implementación pendiente de ejecución en VM; las métricas no deben inventarse ni declararse exitosas antes de observarlas.
+## Aceptación real en VM — 23/11/2026
+
+El evaluador se ejecutó sobre los datasets genuinos ya guardados y finalizó con `S06_044_EVALUACION_BINARIA=OK_EXPLORATORIA`, `S06-044_EVALUACION_VALIDADA=OK` y `RESULTADO_RC=0`. Pasaron 23 pruebas específicas en la VM, se verificó que TRAIN/TEST no compartieran sesiones, se recalcularon las matrices de confusión, se revisó integridad de los artefactos privados y se generó el TXT académico `S06_F06_Evaluacion_Binaria_Modelos_HQ`, cuya captura PNG fue revisada y aprobada en el chat.
+
+| Ruta | Método | TP | FP | TN | FN | Precisión | Recall | F1 | FP sobre RECOVERY (6) |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| HQ_A_S1 | P95_RTT | 4 | 3 | 17 | 0 | 0.571 | 1.000 | 0.727 | 0 |
+| HQ_A_S1 | IsolationForest | 4 | 1 | 19 | 0 | 0.800 | 1.000 | 0.889 | 0 |
+| HQ_A_S1 | LogisticRegression | 4 | 0 | 20 | 0 | 1.000 | 1.000 | 1.000 | 0 |
+| HQ_A_S2 | P95_RTT | 4 | 1 | 19 | 0 | 0.800 | 1.000 | 0.889 | 0 |
+| HQ_A_S2 | IsolationForest | 4 | 1 | 19 | 0 | 0.800 | 1.000 | 0.889 | 0 |
+| HQ_A_S2 | LogisticRegression | 4 | 0 | 20 | 0 | 1.000 | 1.000 | 1.000 | 0 |
+
+**Conclusión restringida:** LogisticRegression fue superior entre los tres métodos **en este holdout concreto**, pero dos rutas comparten experimento, solo hay cuatro muestras positivas por ruta, el caso se limita a 40 ms fijos y **no hay holdout cronológico global**. No se autoriza inferencia en producción, remediación automática, ni afirmaciones de generalización a otras clases de fallas. Las seis muestras RECOVERY por ruta se midieron separadamente como falsas alarmas, no como una tercera clase.
+
+**Estado de infraestructura tras ejecutar:** 21 namespaces, cuatro contenedores, `ens33`/gateway conservados, guardia HQ `NONE/BASELINE`, qdisc `noqueue`, Prometheus READY y NOC saludable; sin unidades fallidas. Los datos y modelos privados permanecen en la VM, no en GitHub. Evidencia textual `~/netlab360-bootstrap/s06/evidencias/informe/S06_F06_Evaluacion_Binaria_Modelos_HQ.txt`; evaluación `~/netlab360-bootstrap/s06/evaluaciones/S06_044_20261123T081627Z_2ade0e/` y bitácora `~/netlab360-bootstrap/s06/validacion-s06-044-20261123_031619/S06_044_Validacion_Completa.txt`.
+
+**Próximo incremento S06-045:** análisis de errores, API/servicio de inferencia solo lectura con datos actuales y respuesta `UNKNOWN` cuando falte calidad, explicación simple y eventual integración al NOC, siempre sin cambios de red.
+
