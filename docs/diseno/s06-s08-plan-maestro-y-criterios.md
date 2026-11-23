@@ -209,6 +209,14 @@ PR [#174](https://github.com/recm0708/netlab360/pull/174) integrado como `8a5baa
 
 **Gate real en VM pendiente:** ejecutar S06-049, cotejar 60 NORMAL/16 DEGRADED/24 RECOVERY, confirmar que TRAIN/TEST histórico carece de holdout global cronológico, emitir reporte privado y validar NOC/21 namespaces/4 contenedores. Se espera `S06_049_AUDITORIA_READONLY=OK` con `S06_049_GATE=PENDING_NEW_PROSPECTIVE_EVIDENCE`: el auditor puede aprobar aunque todavía falten pruebas predictivas de S06. Mantener fase al **80 % técnico validado** hasta resultados reales nuevos y su aceptación. [Protocolo](s06-049-auditoria-readiness-prospectiva.md).
 
+## 4.22. S06-049 validado en VM; siguientes gates S06-050 (23/11/2026)
+
+**S06-049 aprobado**: 11 tests locales correctos, `S06-049_AUDITORIA_VALIDADA=OK` y RC 0. Informe privado `~/netlab360-bootstrap/s06/auditorias-prospectivas/S06_049_20261123T110156Z_5ef7af/auditoria-readiness.json`, bitácora `~/netlab360-bootstrap/s06/validacion-s06-049-20261123_060155/S06_049_Validacion_Completa.txt`. Datos históricos por ruta: **60 NORMAL, 16 DEGRADED, 24 RECOVERY, 0 FAULT**; TRAIN/TEST tienen IDs de sesión disjuntos pero **NO holdout cronológico global**, solo cuatro ventanas positivas por ruta en TEST y ambas rutas correlacionadas. Tampoco existen TEST futuro nuevo etiquetado, horizonte de pronóstico ni deriva de concepto evaluada. Estado del gate `PENDING_NEW_PROSPECTIVE_EVIDENCE` es correcto, no fallo. Los tres ICMP por ruta de S06-046/047 son no etiquetados y no tienen equivalencia estadística con las ventanas antiguas.
+
+**Infraestructura preservada:** 21 namespaces, cuatro contenedores, IP administrativa `.40/24` y gateway `.2`, controlador `NONE/BASELINE`, qdisc `noqueue`, Prometheus/NOC/observabilidad LACP/SDN, Git `main` limpio. Sin nuevas fallas, reentrenamiento o operaciones sobre servicios. **S06 permanece en 80 % técnico estimado**, todavía sin cierre #6/#25/#26.
+
+**S06-050 próximo:** preregistro reproducible de evaluación futura con modelos congelados y gate de adquisición comparable; evitar contaminar el TEST y no inducir otra degradación antes de permisos/watchdog. Luego capturar normalidad posterior y eventos genuinamente nuevos con validación independente, evaluar deriva y horizonte solo si hay datos. [Informe S06-049](s06-049-auditoria-readiness-prospectiva.md).
+
 ## 5. Diseño permanente de la consola
 
 Especificación de menú, arquitectura y mapeo de procedimientos:
