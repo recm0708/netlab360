@@ -203,6 +203,21 @@ class HQGuardTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError,"token"):
             g.expire("abcdef0123456789")
 
+    def test_restore_manual_registra_trigger_y_restaura(self):
+        self.seed("APPLIED")
+        with mock.patch.object(g,"netns_identity",return_value=[8,7]), \
+             mock.patch.object(g,"qdisc",
+                               side_effect=["OWN_NETEM","BASELINE","BASELINE"]), \
+             mock.patch.object(g,"run"):
+            state=g.expire("0123456789abcdef",trigger="MANUAL_APPROVED")
+        self.assertEqual(state["state"],"RESTORED")
+        self.assertEqual(state["restoration_trigger"],"MANUAL_APPROVED")
+
+    def test_trigger_ajeno_rechazado(self):
+        self.seed()
+        with self.assertRaisesRegex(ValueError,"trigger_invalid"):
+            g.expire("0123456789abcdef",trigger="FOREIGN")
+
     def test_expire_espera_lock(self):
         self.seed("APPLIED")
         with mock.patch.object(g,"exclusive",wraps=g.exclusive) as lock, \
