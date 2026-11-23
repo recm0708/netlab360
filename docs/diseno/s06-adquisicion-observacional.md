@@ -26,6 +26,8 @@ La calidad se marca `UNKNOWN` si falta una fuente, no hay scrape, la topología 
 
 La adquisición complementaria de RTT, pérdida ICMP y HTTP desde namespaces se describe en [Mediciones de rendimiento S06](s06-mediciones-rendimiento.md). Es un desarrollo incremental independiente, sin fallas inducidas ni etiquetas supervisadas.
 
+La normalización posterior de ambas sesiones se especifica en [S06 normalización y calidad](s06-normalizacion-y-calidad.md), aún sujeta a pruebas reales en VM.
+
 ## Evolución prevista, todavía no implementada
 
 - **Instrumentar mediciones de desempeño:** RTT, pérdida, variación temporal, throughput y tiempos HTTP con herramientas existentes y endpoints aislados del IPAM; medir antes y después de intervenciones reversibles.
