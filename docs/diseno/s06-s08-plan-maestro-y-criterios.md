@@ -81,3 +81,12 @@ Repositorio `recm0708/netlab360`, rama estable `main`; issues S01–S05 cerradas
 El histórico `docs/_temporal_continuidad/` es archivo temporal, no entrega final; solo eliminarlo cuando no contenga evidencias únicas y el informe/TAR estén completados. Estados runtime, registros originales privados, datasets en bruto y entornos Python permanecen bajo `~/netlab360-bootstrap/`. No eliminar imágenes Docker ni snapshots de recuperación sin validar.
 
 **Para reanudar en otra conversación:** leer este documento y el diseño S08; consultar issues activas y estado local `git status`/comprobaciones S02–S05. **No** reejecutar despliegues `up` mientras existan los estados de propiedad; no apagar VM sin entender la volatilidad de los namespaces.
+
+## 8. Política obligatoria de aceptación y cierre en GitHub
+
+- Ninguna issue debe cerrarse mientras exista al menos una casilla `- [ ]` pendiente de implementación o validación.
+- Marcar `- [x]` **solo** tras comprobar la condición con código, pruebas, bitácoras o evidencias identificables; nunca marcar para forzar el cierre.
+- Si una tarea está resuelta pero quedó sin marcar por omisión, comprobar su evidencia y después actualizar su casilla. Si no existe evidencia, mantenerla abierta.
+- Antes de cerrar una issue: revisar todas sus casillas, enlaces, dependencias, criterios de aceptación y correspondencia con la fase.
+- No cerrar un milestone por calendario; verificar que las issues asignadas se hayan completado y cerrado formalmente.
+- Auditoría del 22/11/2026: 38 issues cerradas revisadas; la única inconsistencia (#153) se corrigió contrastando PR #154, pruebas S06-029 y recuperación S06-030/031. Resultado: cero issues cerradas con casillas sin completar.
