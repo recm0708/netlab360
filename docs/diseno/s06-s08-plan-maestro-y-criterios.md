@@ -203,6 +203,12 @@ La captura F09 de previsualización 9131 mostró LACP/SDN `SIN DATOS` porque el 
 
 **Estimación S06: 80 % técnico validado** (no porcentaje de calificación ni estimación científica). Persisten criterios no completados del plan maestro: partición cronológica global, validación prospectiva verdaderamente no vista y más de un escenario, tratamiento FAULT si hay fuente/verificación, monitor de deriva, predicción con horizonte auténtico y errores frente a cambios controlados. La próxima **S06-049 será una auditoría read-only de validez temporal, cobertura y preparación de nuevos datos**, sin reentrenar ni inducir fallas. Mantener abiertas #6/#25/#26 y milestone S06; no comenzar conclusiones finales del informe todavía.
 
+## 4.21. S06-049 — auditoría de gates prospectivos fusionada, VM pendiente (23/11/2026)
+
+PR [#174](https://github.com/recm0708/netlab360/pull/174) integrado como `8a5baa7` tras **764 pruebas CI (763 aprobadas, una omitida)**. El auditor `scripts/s06/auditar_gates_prospectivos.py` usa únicamente los dataset NORMAL/DEGRADED/RECOVERY y el informe verificado de S06-044; inspecciona fechas TRAIN/TEST, separación por sesión, corpus real, ausencia de FAULT, inexistencia de horizonte/deriva comprobados y requisitos para un TEST prospectivo futuro. No modifica redes ni reentrena o puntúa otra vez el TEST para seleccionar modelos.
+
+**Gate real en VM pendiente:** ejecutar S06-049, cotejar 60 NORMAL/16 DEGRADED/24 RECOVERY, confirmar que TRAIN/TEST histórico carece de holdout global cronológico, emitir reporte privado y validar NOC/21 namespaces/4 contenedores. Se espera `S06_049_AUDITORIA_READONLY=OK` con `S06_049_GATE=PENDING_NEW_PROSPECTIVE_EVIDENCE`: el auditor puede aprobar aunque todavía falten pruebas predictivas de S06. Mantener fase al **80 % técnico validado** hasta resultados reales nuevos y su aceptación. [Protocolo](s06-049-auditoria-readiness-prospectiva.md).
+
 ## 5. Diseño permanente de la consola
 
 Especificación de menú, arquitectura y mapeo de procedimientos:
