@@ -235,6 +235,10 @@ El preregistro S06-050 está bloqueado por muestreo de **2 y 3 paquetes**, con 1
 
 **Pendiente en VM:** auditar distribución efectiva de tamaños por clase y partición, obtener reporte privado y comprobar infraestructura sin mutaciones. El gate sigue `INDEPENDENT_COMPARABILITY_PROTOCOL_BEFORE_NEW_LABELED_TEST`; no ejecutar nuevas fallas, no reentrenar modelos congelados, ni generar una evaluación prospectiva mientras el muestreo continúe sin protocolo comparable. Documento: [S06-051](s06-051-auditoria-muestreo-protocolo-historico.md). **S06 = 80 % técnico estimado; #6/#25/#26 permanecen abiertas.**
 
+## 4.26. S06-051 validado, comparabilidad por clase bloqueada
+
+13 pruebas locales OK; once sesiones verificadas, `S06-051_AUDITORIA_VALIDADA=OK`, RC=0. La distribución real **NORMAL 60 × 3 paquetes, DEGRADED 16 × 2, RECOVERY 24 × 3 por ruta** coincide con metadatos. TRAIN y TEST tienen separación perfecta de número de paquetes por etiqueta NORMAL/DEGRADED: el F1 histórico es exploratorio y no prueba generalización. El acta S06-050 permanece bloqueada, sin reentrenar ni volver a puntuar datos antiguos. Reporte `~/netlab360-bootstrap/s06/auditorias-muestreo/S06_051_20261123T112245Z_290a26/auditoria-muestreo.json`; bitácora `~/netlab360-bootstrap/s06/validacion-s06-051-20261123_062243/S06_051_Validacion_Completa.txt`. Infraestructura HQ y NOC intacta. Próximo bloque consolidado: estudio **nuevo** uniforme de 3 paquetes con TRAIN/VALIDATION/TEST temporales, eventos protegidos por watchdog y métrica de deriva; FAULT y pronóstico solo si existen etiquetas/horizonte auténticos. Mantener S06 en 80 % estimado hasta realizar resultados prospectivos.
+
 ## 5. Diseño permanente de la consola
 
 Especificación de menú, arquitectura y mapeo de procedimientos:
