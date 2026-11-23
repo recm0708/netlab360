@@ -24,6 +24,8 @@ Fuente técnica: S04 exporter (`127.0.0.1:9110`), topología NOC S05 (`127.0.0.1
 
 La calidad se marca `UNKNOWN` si falta una fuente, no hay scrape, la topología discrepa o el estado de HA/LACP/SDN difiere del escenario de referencia. No convertir `UNKNOWN` en falla de red ni en ejemplo válido de clasificación.
 
+La adquisición complementaria de RTT, pérdida ICMP y HTTP desde namespaces se describe en [Mediciones de rendimiento S06](s06-mediciones-rendimiento.md). Es un desarrollo incremental independiente, sin fallas inducidas ni etiquetas supervisadas.
+
 ## Evolución prevista, todavía no implementada
 
 - **Instrumentar mediciones de desempeño:** RTT, pérdida, variación temporal, throughput y tiempos HTTP con herramientas existentes y endpoints aislados del IPAM; medir antes y después de intervenciones reversibles.
