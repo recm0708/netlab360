@@ -70,7 +70,7 @@ El estudiante confirmó que **para NETLAB360** la docente autorizó **TAR indepe
 - **`.tar` externo**: scripts `.py/.sh`, `.yml/.yaml`, `.json`, `.tf/.hcl`, configuraciones FRR/OVS/Faucet, pruebas, inventarios e instrucciones reproducibles; excluir secretos, llaves, estados privados, respaldos, material temporal y archivos ajenos.
 - **PowerPoint y demo**: problema, objetivos, arquitectura, metodología, pruebas, limitaciones y demostración **mediante el menú web, no tecleando comandos**.
 
-No afirmar OVA/OVF obligatorio sin confirmación explícita. Revisar tamaño y canal de entrega antes de empaquetar. Conservar SHA-256, auditar `tar -tf`, extracción en directorio limpio y pruebas offline.
+No afirmar OVA/OVF obligatorio sin confirmación explícita. Revisar tamaño y canal de entrega antes de empaquetar. Verificar la integridad del paquete, auditar `tar -tf`, la extracción en directorio limpio y las pruebas offline.
 
 ## 7. GitHub, persistencia y conservación
 
