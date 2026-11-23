@@ -247,6 +247,12 @@ PR [#177](https://github.com/recm0708/netlab360/pull/177), commit `f4612a0`; **7
 
 25 tests de orquestador OK; dos sesiones posteriores al preregistro histórico de S06-050 aceptadas, IDs `S06_WINDOW_NORMAL_20261123T143842Z_1e1812` y `S06_WINDOW_NORMAL_20261123T143913Z_b5d57c`. **40 ventanas NORMAL por ruta, 3 paquetes por muestra**, guardia HQ `NONE/BASELINE`, red original intacta. En el prompt de intervención se escribió `AUTORIZACION` (no la frase literal), por lo que **no ocurrió ninguna degradación nueva**; el RC 0 corresponde a salida segura, no a TRAIN V2 completo. Continuar desde los registros existentes; nunca recapturar NORMAL por ese motivo. S06 mantiene 80 % técnico estimado; TRAIN positivo, VALIDATION y TEST V2 pendientes.
 
+## 4.29. TRAIN V2 obtenido; modelos V2 pendientes de congelar (23/11/2026)
+
+Se obtuvieron **40 NORMAL, 8 DEGRADED, 12 RECOVERY por ruta** con muestreo uniforme 3 paquetes. Dos ciclos fueron aprobados de forma explícita y restaurados por watchdog root (40.494/0.088 ms y 40.456/0.078 ms, RTT DEGRADED/RECOVERY). Bitácora `~/netlab360-bootstrap/s06/estudio-uniforme-v2/TRAIN_Eventos.txt`, índice `TRAIN_Manifest.json`, batch `~/netlab360-bootstrap/s06/experimentos/S06_043_20261123T150227Z_b399ae/manifest.json`. Seguridad comprobada `NONE/BASELINE` y `noqueue`, namespaces/servicios conservados. `S06_V2_TRAIN_COMPLETO=OK`, RC0.
+
+PR [#178](https://github.com/recm0708/netlab360/pull/178), commit `9ff338f`, CI 807 tests (806 OK, 1 omitida): scripts y controles para **entrenar/congelar** cuatro modelos nuevos exclusivamente con el TRAIN V2, sin tocar modelos legacy y sin exponer datos futuros. **Aún no se ejecutó el entrenamiento real ni hay resultados VALIDATION/TEST**. Próximo paso `--freeze` y `--check` en VM, después adquisición cronológica validada. S06 en 80 % técnico estimado.
+
 ## 5. Diseño permanente de la consola
 
 Especificación de menú, arquitectura y mapeo de procedimientos:
