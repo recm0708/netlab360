@@ -42,3 +42,9 @@ Primero fusionar la adaptación del orquestador con CI aprobada y ejecutar dos s
 ## Aprobación del código antes de nuevas sesiones
 
 PR [#177](https://github.com/recm0708/netlab360/pull/177) fusionado a `main` mediante `f4612a0`, CI general **792 pruebas (791 aprobadas y una omitida)**. Se mantiene el valor por defecto histórico de dos paquetes y se permite elegir tres en el orquestador protegido con `--packets 3`; nuevos controles cotejan metadatos y paquetes reales enviados/recibidos. **Todavía no se ha ejecutado una sola sesión V2 ni autorizado otro estímulo de red.**
+
+## Primera ejecución real V2 — NORMAL TRAIN aceptado, estímulo pendiente (23/11/2026)
+
+La VM sincronizó `main` en `e6b519a`, ejecutó 25/25 pruebas del orquestador y aprobó la guardia `NONE/BASELINE`, `noqueue` y 21 namespaces. Se obtuvieron **dos sesiones NORMAL TRAIN nuevas de 20 ventanas verificadas cada una, con 3 paquetes por ruta**: `S06_WINDOW_NORMAL_20261123T143842Z_1e1812` (A) y `S06_WINDOW_NORMAL_20261123T143913Z_b5d57c` (B). `NORMAL_TRAIN_VERIFICADO=OK`; registros bajo `~/netlab360-bootstrap/s06/estudio-uniforme-v2/TRAIN_Normal_A.txt` y `TRAIN_Normal_B.txt`, además de `TRAIN_Normal_Sesiones.json`. No duplicar estas sesiones.
+
+En la solicitud de aprobación, el operador introdujo `AUTORIZACION` en lugar de la cadena literal del controlador, por lo que el bloque concluyó en **`EVENTOS_TRAIN=NO_AUTORIZADOS`** y RC 0 sin ejecutar DEGRADED/RECOVERY. Esta salida segura no equivale a TRAIN V2 completo. Próximo paso: verificar las sesiones conservadas y estado HQ, requerir aprobación humana literal antes de `--cycles 2 --packets 3`; si no se autoriza, no modificar red ni inventar etiquetas. Los modelos V2 aún no se han entrenado.
