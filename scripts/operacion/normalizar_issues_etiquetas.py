@@ -87,7 +87,7 @@ DEFINITIONS = {
     "resolución:no-planificada": ("FFFFFF", "Funcionalidad descartada de forma justificada por alcance."),
     "colaboración:primer-aporte": ("7057FF", "Actividad apropiada para una primera contribución."),
     "colaboración:ayuda-solicitada": ("008672", "Actividad en la que se solicita apoyo técnico."),
-    "estado:bloqueado": ("B60205", "Actividad detenida por una dependencia o condición explícita documentada en su descripción; no implica cierre."),
+    "estado:bloqueado": ("B60205", "Actividad detenida por una dependencia documentada; no implica cierre."),
 }
 ALIASES = {
     **{f"semana:{n:02d}": f"fase:{n:02d}" for n in range(1, 9)},
@@ -115,6 +115,13 @@ UNWANTED_TITLE_STATUS = re.compile(
     r"validad[oa]|reprogramad[oa]|completad[oa])\s*$", re.IGNORECASE
 )
 CHECKBOX_UNDONE = re.compile(r"(?m)^\s*-\s*\[ \]")
+
+
+def validate_definitions() -> None:
+    """Verificar los límites GitHub antes de cualquier mutación de etiquetas."""
+    for name, (color, description) in DEFINITIONS.items():
+        if not isinstance(description, str) or not description or len(description) > 100:
+            raise ValueError(f"label_description_invalid_{name}")
 
 
 def gh(path: str, method: str = "GET", obj: dict | None = None,
@@ -314,6 +321,7 @@ def remove_aliases_safely(items: list[dict]) -> None:
 
 
 def run(apply: bool) -> None:
+    validate_definitions()
     if len(ALL_IDS) != 53 or sum(len(x) for x in PHASES.values()) != 53:
         raise ValueError("phase_inventory_size_invalid")
     issues = check_baseline(all_items())

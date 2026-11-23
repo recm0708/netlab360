@@ -46,3 +46,9 @@ PR [#183](https://github.com/recm0708/netlab360/pull/183) fusionado como `53d46b
 ## Auditoría acumulada de PR tras el arreglo de S06
 
 Tras fusionar [#185](https://github.com/recm0708/netlab360/pull/185), la consulta a GitHub confirmó **132 PR fusionados, cero abiertos y 132 títulos ajustados** al patrón `[SNN]` / `[GESTIÓN]`. Las cifras históricas de 129 y 131 registradas arriba corresponden a cortes anteriores, no al inventario actual. Este dato puede aumentar con futuros PR; validar nuevamente con `scripts/operacion/auditar_titulos_prs.py --check`. La migración del catálogo de etiquetas todavía requiere `--apply` real en VM.
+
+## Reanudación tras la migración parcial de etiquetas (23/11/2026)
+
+La ejecución desde la VM pasó 16 pruebas FAULT aisladas y ocho de gestión de GitHub. Durante `--apply`, GitHub aceptó los renombrados iniciales de etiquetas, pero respondió **HTTP 422** al actualizar `estado:bloqueado`. La descripción original tenía 110 caracteres y excedía el máximo de 100 caracteres que GitHub permite. Esta corrección la acorta sin cambiar su semántica y añade una comprobación preventiva de todas las definiciones antes de cualquier escritura en API, junto con pruebas de regresión.
+
+La migración queda **parcialmente aplicada** hasta que una nueva ejecución en VM complete el `--check`, continúe `--apply` de manera idempotente y verifique que todos los diagnósticos queden vacíos. No se requiere ni se autoriza repetir TRAIN/VALIDATION/TEST ni el experimento FAULT por este error. La bitácora de la reanudación fallida permanece bajo `~/netlab360-bootstrap/s06/reanudacion-fault-20261123_122220/`.

@@ -108,6 +108,18 @@ class IssuesSpanishTests(unittest.TestCase):
             self.assertRegex(color,r"^[0-9A-F]{6}$")
             self.assertTrue(description.endswith("."))
             self.assertTrue(description)
+            self.assertLessEqual(len(description), 100, name)
+
+    def test_reject_overlong_description_before_api_call(self):
+        color, _ = m.DEFINITIONS["estado:bloqueado"]
+        with mock.patch.dict(m.DEFINITIONS, {
+            "estado:bloqueado": (color, "x" * 101)
+        }):
+            with mock.patch.object(m, "gh") as gh:
+                with self.assertRaisesRegex(ValueError,
+                                            "label_description_invalid_estado:bloqueado"):
+                    m.run(True)
+                gh.assert_not_called()
 
     def test_no_unknown_labels_in_pure_catalogue(self):
         rows=[make_item(n) for n in m.ALL_IDS]
