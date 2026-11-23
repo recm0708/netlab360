@@ -311,3 +311,8 @@ El histórico `docs/_temporal_continuidad/` es archivo temporal, no entrega fina
 - Antes de cerrar una issue: revisar todas sus casillas, enlaces, dependencias, criterios de aceptación y correspondencia con la fase.
 - No cerrar un milestone por calendario; verificar que las issues asignadas se hayan completado y cerrado formalmente.
 - Auditoría del 22/11/2026: 38 issues cerradas revisadas; la única inconsistencia (#153) se corrigió contrastando PR #154, pruebas S06-029 y recuperación S06-030/031. Resultado: cero issues cerradas con casillas sin completar.
+
+
+### Actualización de los controles de S06 — 23/11/2026
+
+CI del protocolo FAULT independiente: PR [#184](https://github.com/recm0708/netlab360/pull/184), commit `215fa64`, 896 pruebas (895 aprobadas, una omitida). La intervención del backend HTTP HQ requiere autorización humana y su restauración por watchdog de 120 s; el lector S06 no interviene la red ni reentrena modelos. Se mantiene **S06 ≈90 % estimado** hasta adquisición/validación reales de FAULT y evidencias finales. PR #183 corrige el catálogo `accessibility`/`estado:bloqueado`, pendiente de `gh --apply` en VM. Los 131 títulos de PR están normalizados directamente en GitHub y S05 conserva 6/6 issues cerradas.
