@@ -50,8 +50,18 @@ Las primeras sesiones servirán para observar **DEGRADED/RECOVERY reales del cli
 
 - `S06_F01_Dataset_Normal_60_Ventanas_120_ICMP`: bitácora S06-041 sección de auditoría de sesiones y estado final.
 - `S06_F02_Modelos_IsolationForest_vs_P95`: líneas de los dos modelos y validación TRAIN/TEST de S06-041.
-- `S06_F03_Degradacion_Real_HQ`: intervención `APPLIED` junto con RTT observado durante el estímulo del cliente real (cuando se ejecute).
-- `S06_F04_Recuperacion_Automatica_HQ`: timer `RESTORED`, qdisc `noqueue` y RTT posterior.
+- `S06_F03_Degradacion_Real_HQ`: intervención APPLIED sobre el cliente existente y RTT DEGRADED 40.440 ms, captura tomada y revisada.
+- `S06_F04_Recuperacion_Automatica_HQ`: RESTORED, qdisc noqueue y RTT RECOVERY 0.070 ms; captura tomada y revisada.
 - `S06_F05_Evaluacion_Modelos_Multiclase`: resultados validación/test cuando existan suficientes clases. No inventar capturas de resultados pendientes.
 
-**Progreso S06 tras S06-041: 45 % estimado**, no calificación docente. Este documento por sí solo no acredita ejecución S06-042.
+**Progreso S06 tras S06-042: 55 % técnico estimado**, no calificación docente. S06-042 está **ejecutado y verificado en VM**, no solo diseñado. La ejecución demuestra una intervención reversible acotada pero todavía no valida generalización de ML: hay solo una sesión DEGRADED y una RECOVERY.
+
+## 6. Aceptación real, capturas y transición a S06-043 (23/11/2026)
+
+El lote completo S06-042 terminó en `S06-042_EXPERIMENTO_REAL_VALIDADO=OK`, RC 0, con fuente `main=2ffe8fd`, script root íntegro, 26 pruebas de guardia y 16 del recolector correctas, CI previa de 644 pruebas. Se verificaron 21 namespaces, cuatro Docker, ausencia de dummy/S06 temporal, `ens33 192.168.47.40/24` gateway `.2` y `eth0` de cliente HQ conectado a switch original; 7 servicios y Prometheus siguieron disponibles.
+
+El token usado `b3484afcd16995a4` solo identifica el **experimento histórico**; no es válido para nuevas sesiones. El timer se armó antes de `netem 40ms` handle `142:`, expiró autónomamente y registró `RESTORED` a `2026-11-23T07:04:20.031+00:00` y `final_qdisc_state=BASELINE`, seguido de `cleanup=OK` y `state=NONE`. El estímulo generó `S06_WINDOW_DEGRADED_20261123T070344Z_984563` con 4/4 ventanas, 8 mediciones ICMP, RTT medio 40.440 ms. La fase posterior `S06_WINDOW_RECOVERY_20261123T070420Z_6c4e05` produjo 6/6 ventanas, 12 ICMP, RTT 0.070 ms. Ninguna de estas ventanas se ha presentado como puntuación F1 o recall sobre test externo.
+
+**Bitácora verificable local:** `~/netlab360-bootstrap/s06/S06_042_REAL_HQ_20261123_020337/S06_042_Experimento_Real_HQ.txt`. TXT delimitados de evidencias bajo `~/netlab360-bootstrap/s06/evidencias/informe/`; **cuatro PNG F01–F04 proporcionados en el chat y revisados**, no se supone que se transfirieron a la VM o al repositorio. La sección [§4.11 del plan maestro](s06-s08-plan-maestro-y-criterios.md) tiene inventario de sesiones, modelos, capturas y próxima acción.
+
+**S06-043:** repetir un número pequeño de sesiones controladas sobre **el mismo cliente existente**, una aprobación por ensayo, watchdog activo, captura de DEGRADED/RECOVERY por estados/mediciones independientes, preservación de originales y abandono si la configuración sale de baseline. Evaluar modelos con *holdout por sesión de experimento*, sin mezclar TRAIN/TEST. Como RECOVERY puede tener métricas indistinguibles de NORMAL, priorizar detección binaria de degradación y tratamiento operacional de RESTORED; no afirmar un clasificador multiclase fiable si las features no contienen señales para identificar la transición.
