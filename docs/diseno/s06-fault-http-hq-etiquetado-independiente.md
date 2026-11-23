@@ -27,3 +27,7 @@ Solo después se deben tomar las capturas finales necesarias y revisar el docume
 ## Integración de código — pendiente ejecución real en VM
 
 PR [#184](https://github.com/recm0708/netlab360/pull/184) fusionado como `215fa64`; **896 pruebas CI, 895 OK y una omitida**. El validador S06 registra estados de servicio NORMAL/FAULT/RECOVERY con procedencia `systemctl stop` + NOC + temporizador systemd de 120 s, pero **todavía no se ha autorizado ni ejecutado un nuevo FAULT HTTP de S06**. No modificar el valor de avance ni cerrar ninguna issue antes de observar la salida real y la recuperación.
+
+## Corrección del importador de sesiones (23/11/2026)
+
+En la primera ejecución real, el lote se detuvo **antes de `--apply` de etiquetas y antes de FAULT**: `python3 -m unittest discover -s tests -p test_s06_fault_http_verificado.py` identificó dos errores `ModuleNotFoundError: auditar_gates_prospectivos`. El validador era importado por `importlib.util` en las pruebas aisladas y dependía erróneamente del PYTHONPATH. PR [#185](https://github.com/recm0708/netlab360/pull/185) fusionado como `12f7468`: se sustituyó la importación cruzada por un parser local de IDs UTC validado, se restauró y comprobó el patrón JSONL, y se agregaron tres pruebas. **CI 899 tests, 898 aprobados y uno omitido**. No se alteraron modelos, datasets, redes o servicios; **el FAULT real sigue pendiente de autorización y ejecución**.
