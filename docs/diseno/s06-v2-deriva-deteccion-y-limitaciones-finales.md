@@ -27,3 +27,7 @@ Se guarda una sola vez en `~/netlab360-bootstrap/s06/estudio-uniforme-v2/evaluac
 Ejecutar los 16 tests específicos y el auditor privado `--save` una vez; verificar su JSON contra TRAIN/VALIDATION/TEST ya guardados. Revisar que los cuatro modelos V2 siguen congelados, S06-050 no fue alterado, qdisc cliente `noqueue`, controlador `NONE/BASELINE`, 21 namespaces, cuatro contenedores, NOC y observador LACP/SDN sanos, Git limpio. Registrar los resultados numéricos reales en el informe y preparar capturas académicas solo cuando correspondan a las tablas/figuras finales.
 
 Esta auditoría no cierra automáticamente S06: se debe resolver la cobertura FAULT frente al plan original y cerrar la documentación; S07 no requiere que se afirme una generalización inexistente.
+
+## Integración de código (23/11/2026)
+
+PR [#180](https://github.com/recm0708/netlab360/pull/180) fusionado en `main` con commit `64e61e4`, **837 pruebas CI ejecutadas (836 aprobadas, una omitida)**. El script y sus 16 pruebas unitarias quedaron integrados. **No se afirma todavía un resultado numérico de deriva o latencia de detección**: pendiente ejecución real en la VM sobre TRAIN/VALIDATION/TEST V2. No volver a puntuar para seleccionar parámetros; el replay temporal usa exactamente los modelos congelados y comprueba el conteo de predicciones contra `test.json`.
