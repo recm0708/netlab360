@@ -131,6 +131,12 @@ Los TXT de apoyo existen bajo `~/netlab360-bootstrap/s06/evidencias/informe/` en
 
 **Estado de planificación:** S06 **55 % estimado**, no nota docente; S07 y S08 mantienen sus criterios pendientes. No cerrar issues con checkboxes incompletos. Esta sección es el punto de continuidad y evita rehacer auditorías históricas en otro chat.
 
+## 4.12. S06-043 — tres ciclos de cliente HQ existentes, código aprobado CI (23/11/2026)
+
+PR [#168](https://github.com/recm0708/netlab360/pull/168) fusionado `1db3a49`: `scripts/s06/ejecutar_lote_hq.py`, `tests/test_s06_lote_multisesion.py` y [protocolo operativo](s06-043-lotes-multisesion-hq.md). **666/666 tests offline GitHub CI aprobados** (22 tests nuevos del orquestador). A diferencia de ensayos antiguos, este código NO crea namespaces, dummy ni nuevas veth: utiliza exclusivamente el controlador root existente para `nl360-s02-h-hq-120/eth0`, aprobado en S06-042. Cada ciclo independiente verifica `STATE=NONE`, qdisc `noqueue`, gestión y NOC, aprobación del estímulo `40ms` con timer `35s` previo a tc, captura **4 DEGRADED** con estado comprobado, confirma RESTORED por WATCHDOG antes de capturar **6 RECOVERY** y ejecuta cleanup solo al verificar estado basal. **Si falla cualquier ciclo, NO empieza otro**; estado y logs quedan disponibles para análisis. Directorio de resultados privados: `~/netlab360-bootstrap/s06/experimentos/S06_043_*/`.
+
+**La ejecución real en VM de S06-043 permanece PENDIENTE.** No presentar como obtenidas las nuevas 12 DEGRADED/18 RECOVERY ni la quinta captura hasta ver `S06_043_SESIONES_MULTIPLES=OK` en bitácora y verificar el registro de los tres ciclos. El comando destinado a VM requiere `--cycles 3 --approve-batch AUTORIZO_HQ_VLAN120_NETEM_40MS_35S`; al ejecutarlo se autorizarán tres intervenciones secuenciales delimitadas, nunca simultáneas. Tras completar, validar el dataset, guardar `S06_F05_Dataset_Multisesion_Real_HQ` con INICIO/FIN y avanzar a la evaluación binaria NORMAL vs DEGRADED (RECOVERY como estado operacional posincidente) con partición independiente por sesión. **Progreso S06: 55 % estimado hasta aceptación en VM**. Mantener issues S06/S07/S08 abiertas y no borrar evidencias originales.
+
 ## 5. Diseño permanente de la consola
 
 Especificación de menú, arquitectura y mapeo de procedimientos:
