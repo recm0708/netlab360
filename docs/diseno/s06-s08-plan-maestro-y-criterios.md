@@ -71,6 +71,10 @@ Se recibieron capítulos **I–XII**, materiales complementarios, actividades in
 - **Pendiente inmediato:** S06-035 validar aislamiento físico/lógico de interfaces candidatas, qdisc actual y plan de experimentación con intervención y reversión. Luego recopilar sesiones con etiquetas verificadas, iperf3 TCP/UDP restringido, TRAIN/VALIDATION/TEST por sesión/tiempo, modelos/anomalías, pronóstico/drift e integración.
 - **Política GitHub:** issues #6, #25, #26 y dependientes #7/#8 actualizadas con esta evidencia; no cerrar ninguna con casillas sin comprobar. Los programas para S08 seguirán usando un catálogo de acciones allowlisted y autorización humana.
 
+## 4.2. S06-035: precheck de escenarios de degradación (solo código)
+
+PR [#158](https://github.com/recm0708/netlab360/pull/158) fusionado con commit `317ab99`: `scripts/s06/precheck_escenarios.py`, 18 pruebas unitarias nuevas y el [protocolo de escenarios](s06-escenarios-y-etiquetado.md). CI **441/441 tests offline** aprobada. El programa audita sin modificar red la interfaz de un cliente experimental en HQ VLAN120, qdisc, ruta, estado NOC y referencia S06-034. **El precheck todavía no se ha ejecutado en Ubuntu**; su aprobación no da permiso para aplicar `tc netem` sin watchdog, rollback y pruebas independientes. El porcentaje técnico estimado sigue en **35 %**.
+
 ## 5. Diseño permanente de la consola
 
 Especificación de menú, arquitectura y mapeo de procedimientos:
