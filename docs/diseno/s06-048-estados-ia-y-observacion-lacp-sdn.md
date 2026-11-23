@@ -29,3 +29,7 @@ Esto **habilita observación**, no activa ni modifica LACP/SDN. No reiniciar el 
 4. Si se toma otra captura, hacerlo solo cuando una validación funcional realmente lo justifique; F09 y F09B ya documentan estado normal y desacuerdo.
 
 No declarar pronóstico de fallas ni remediación automática; el `ground_truth` de mediciones recientes continúa `UNKNOWN`.
+
+## Estado de desarrollo (23/11/2026)
+
+PR [#173](https://github.com/recm0708/netlab360/pull/173) fusionado en `b8265d0`. CI general **753 tests (752 aprobados, uno omitido)**, CI S05 de contrato gráfico también aprobada. **Comprobación en VM aún pendiente:** NOC original 9130, variable del servicio systemd y telemetría actual de LACP/SDN; no se realizaron cambios de red ni reinicios. No se requiere repetir F09.
