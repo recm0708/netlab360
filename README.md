@@ -77,6 +77,7 @@ La validación final de S05 comprobó 21 namespaces, cuatro contenedores y seis 
 - [S06 V2 TRAIN congelación de modelos (validada en VM)](docs/diseno/s06-v2-train-freeze-modelos.md)
 - [S06 V2 evaluación VALIDATION/TEST con modelos congelados (TEST prospectivo validado en VM)](docs/diseno/s06-v2-evaluacion-cronologica-congelada.md)
 - [S06 V2 análisis final de deriva, detección temporal y limitaciones (validado en VM)](docs/diseno/s06-v2-deriva-deteccion-y-limitaciones-finales.md)
+- [S06 FAULT HTTP HQ: protocolo y etiquetado independiente del dataset ICMP](docs/diseno/s06-fault-http-hq-etiquetado-independiente.md)
 - [Diseño del programa interactivo S08 y catálogo de acciones](docs/diseno/s08-consola-interactiva-y-acciones.md)
 
 ## Alcance
