@@ -72,7 +72,8 @@ La validación final de S05 comprobó 21 namespaces, cuatro contenedores y seis 
 - [S06-050 preregistro de TEST futuro y modelos congelados (validado VM; muestreo 2/3 bloqueado)](docs/diseno/s06-050-preregistro-futuro-modelos-congelados.md)
 - [S06-051 auditoría del muestreo por clase y split (validada VM; sesgo de protocolo confirmado)](docs/diseno/s06-051-auditoria-muestreo-protocolo-historico.md)
 - [S06 — estudio prospectivo uniforme V2 y plan consolidado de cierre (CI aprobada; adquisición pendiente)](docs/diseno/s06-estudio-prospectivo-uniforme-y-cierre-consolidado.md)
-- [S06 V2 TRAIN congelación de modelos (CI aprobada; VM pendiente)](docs/diseno/s06-v2-train-freeze-modelos.md)
+- [S06 V2 TRAIN congelación de modelos (validada en VM)](docs/diseno/s06-v2-train-freeze-modelos.md)
+- [S06 V2 evaluación VALIDATION/TEST con modelos congelados (CI/VM pendientes)](docs/diseno/s06-v2-evaluacion-cronologica-congelada.md)
 - [Diseño del programa interactivo S08 y catálogo de acciones](docs/diseno/s08-consola-interactiva-y-acciones.md)
 
 ## Alcance
