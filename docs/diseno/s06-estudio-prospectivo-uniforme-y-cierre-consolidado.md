@@ -52,3 +52,9 @@ En la solicitud de aprobación, el operador introdujo `AUTORIZACION` en lugar de
 ## TRAIN V2 real: confirmación de adquisición y código de entrenamiento
 
 Dos ciclos aprobados con la cadena humana exacta, watchdog autónomo y recuperación verificada. Ciclo 1 RTT DEGRADED 40.494 ms y RECOVERY 0.088 ms; ciclo 2 40.456 ms y 0.078 ms. Por ruta: 40 NORMAL, 8 DEGRADED, 12 RECOVERY, todos de 3 paquetes. `S06_V2_TRAIN_COMPLETO=OK`, `RESULTADO_RC=0`; batch privado `~/netlab360-bootstrap/s06/experimentos/S06_043_20261123T150227Z_b399ae/manifest.json`. PR [#178](https://github.com/recm0708/netlab360/pull/178) fusionado en `9ff338f` con CI 807 tests (806 OK, una omitida). La congelación real `--freeze` en VM y siguientes VALIDATION/TEST están pendientes; no tratar CI como ejecución experimental.
+
+## VALIDATION V2 real y modelos congelados (23/11/2026)
+
+15 tests de entrenamiento OK; `--freeze` y `--check` confirmaron cuatro modelos V2 privados, P95 de HQ→S1 **0.10405 ms** y HQ→S2 **0.11055 ms**. Las muestras VALIDATION fueron posteriores a TRAIN y a la congelación: NORMAL `S06_WINDOW_NORMAL_20261123T151633Z_973a31` (20 ventanas) y dos eventos controlados en `~/netlab360-bootstrap/s06/experimentos/S06_043_20261123T151706Z_e1ca29/manifest.json` (8 DEGRADED, 12 RECOVERY por ruta); las tres clases usan 3 paquetes ICMP. Watchdog restauró ambos ciclos (RTT DEGRADED/RECOVERY 40.522/0.078 ms y 40.396/0.093 ms), controlador NONE/BASELINE, qdisc noqueue, NOC, 21 namespaces y 4 contenedores conservados. `S06_V2_VALIDATION_COMPLETA=OK`, RC0.
+
+**VALIDATION se adquirió, pero aún no se puntuó**. No repetir TRAIN/VALIDATION ni ajustar modelos. El siguiente gate es puntuar VALIDATION con pesos congelados, después adquirir TEST posterior e independiente, puntuarlo una sola vez y analizar falsas alarmas, deriva, latencia de detección, FAULT y límites del pronóstico.
