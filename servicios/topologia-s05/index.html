@@ -196,6 +196,19 @@ body.presentation .ha-overview{margin:6px 0;padding:8px 14px}
 .ob-sources{margin-top:10px}
 @media(max-width:1060px){.ob-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.ob-grid{grid-template-columns:1fr}}
+
+/* S06-047: diagnóstico IA separado de topología/FIB; nunca ordena cambios. */
+.ai-panel{border:1px solid #36556b;border-radius:13px;background:#10263b;padding:14px 16px;margin-bottom:14px}
+.ai-panel h2{font-size:1rem;margin:0 0 6px}
+.ai-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}
+.ai-item{border:1px solid #36536c;border-radius:10px;background:#152c43;padding:12px;min-width:0}
+.ai-item strong{font-size:.85rem;color:#d4ebff}
+.ai-state{display:inline-block;margin-left:10px;font-weight:750;color:#f7c971}
+.ai-state.normal{color:#51d8a8}
+.ai-meta,.ai-methods{display:block;color:#a9bfd6;font-size:.79rem;line-height:1.5;margin-top:6px;overflow-wrap:anywhere}
+.ai-note{font-size:.76rem;color:#b5c9dd;line-height:1.5;margin:0}
+@media(max-width:660px){.ai-grid{grid-template-columns:1fr}}
+body.presentation .ai-panel{display:none}
 </style></head>
 <body>
 <header>
@@ -237,6 +250,15 @@ body.presentation .ha-overview{margin:6px 0;padding:8px 14px}
 <div class="ob-item"><strong>FAUCET · OPENFLOW</strong><span id="obs-sdn-state" class="ob-state">SIN DATOS</span><span id="obs-sdn-detail" class="ob-detail">Sin lectura del controlador</span></div>
 </div>
 <div id="obs-sources" class="ob-sources">Muestras verificadas y caducidad pendiente</div>
+</section>
+<section class="ai-panel" aria-label="Diagnóstico IA exploratorio de egreso HQ">
+<h2>Diagnóstico IA · Egreso HQ (solo lectura)</h2>
+<p class="ai-note">Se muestran mediciones reales recientes de HQ→S1/S2, no el estado de toda la WAN. Si no hay datos frescos o la API IA está detenida, se muestra SIN DATOS. Ninguna predicción autoriza cambios.</p>
+<div class="ai-grid">
+<div class="ai-item" id="ai-hq-s1"><strong>HQ → S1</strong><span class="ai-state" id="ai-s1-state" aria-live="polite">SIN DATOS</span><span class="ai-meta" id="ai-s1-meta">Sin muestra reciente verificada</span><span class="ai-methods" id="ai-s1-methods">P95 · IsolationForest · LogisticRegression: sin datos</span></div>
+<div class="ai-item" id="ai-hq-s2"><strong>HQ → S2</strong><span class="ai-state" id="ai-s2-state" aria-live="polite">SIN DATOS</span><span class="ai-meta" id="ai-s2-meta">Sin muestra reciente verificada</span><span class="ai-methods" id="ai-s2-methods">P95 · IsolationForest · LogisticRegression: sin datos</span></div>
+</div>
+<p id="ai-footnote" class="ai-note">Modo exploratorio. Ground truth de las muestras nuevas: UNKNOWN. Sin confianza calibrada ni remediación automática.</p>
 </section>
 <div class="layout">
 <section class="canvas" aria-label="Diagrama de red multisede">
@@ -653,6 +675,51 @@ function render(data){
  drawExtensions(data);
  renderSelection();
 }
+
+/* S06-047: el panel IA tiene su propio circuito de consulta; si falla,
+   nunca reutiliza un NORMAL de una respuesta anterior. */
+function aiRenderRoute(route, data){
+ const suffix=route==="HQ_A_S1"?"s1":"s2";
+ const state=$("ai-"+suffix+"-state");
+ const meta=$("ai-"+suffix+"-meta");
+ const methods=$("ai-"+suffix+"-methods");
+ const available=data&&data.available===true&&data.route===route;
+ const classified=available&&data.state==="NORMAL"&&data.consensus==="NORMAL";
+ state.className="ai-state"+(classified?" normal":"");
+ state.textContent=classified?"NORMAL · EGRESO HQ":"SIN DATOS / UNKNOWN";
+ if(!available){
+  meta.textContent="Fuente IA ausente, caducada o no verificable";
+  methods.textContent="P95 · IsolationForest · LogisticRegression: sin datos";
+  return;
+ }
+ const rtt=Number(data.rtt_avg_ms),loss=Number(data.loss_pct),age=Number(data.age_seconds);
+ if(!Number.isFinite(rtt)||!Number.isFinite(loss)||!Number.isFinite(age)){
+  meta.textContent="Muestra numérica inválida";
+  methods.textContent="Sin datos verificables";state.textContent="SIN DATOS / UNKNOWN";
+  state.className="ai-state";return;
+ }
+ meta.textContent="RTT "+rtt.toFixed(3)+" ms · Pérdida "+loss.toFixed(1)+
+  "% · Edad "+age.toFixed(1)+" s · Verdad de terreno UNKNOWN";
+ const m=data.methods||{};
+ methods.textContent=["P95_RTT","IsolationForest","LogisticRegression"]
+  .map(name=>name+": "+(m[name]||"UNKNOWN")).join(" · ");
+ if(!classified){
+  meta.textContent+=" · Clasificación no confirmada como estado global";
+ }
+}
+async function updateAI(){
+ try{
+  const response=await fetch("/api/v1/s06/diagnostics",{cache:"no-store"});
+  if(!response.ok)throw Error("HTTP "+response.status);
+  const data=await response.json();
+  if(data.schema!=="NETLAB360_S06_047_NOC_AI_ADAPTER_V1")throw Error("Contrato IA");
+  aiRenderRoute("HQ_A_S1",(data.routes||{}).HQ_A_S1);
+  aiRenderRoute("HQ_A_S2",(data.routes||{}).HQ_A_S2);
+ }catch(error){
+  aiRenderRoute("HQ_A_S1",null);
+  aiRenderRoute("HQ_A_S2",null);
+ }
+}
 async function update(){
  try{
   const response=await fetch("/api/v1/graph",{cache:"no-store"});
@@ -682,5 +749,6 @@ document.addEventListener("keydown",event=>{
  }
 });
 update();setInterval(update,3000);
+updateAI();setInterval(updateAI,3000);
 </script>
 </body></html>
