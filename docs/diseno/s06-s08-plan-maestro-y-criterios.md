@@ -73,7 +73,7 @@ Se recibieron capítulos **I–XII**, materiales complementarios, actividades in
 
 ## 4.2. S06-035: precheck de escenarios de degradación (solo código)
 
-PR [#158](https://github.com/recm0708/netlab360/pull/158) fusionado con commit `317ab99`: `scripts/s06/precheck_escenarios.py`, 18 pruebas unitarias nuevas y el [protocolo de escenarios](s06-escenarios-y-etiquetado.md). CI **441/441 tests offline** aprobada. El programa audita sin modificar red la interfaz de un cliente experimental en HQ VLAN120, qdisc, ruta, estado NOC y referencia S06-034. **El precheck todavía no se ha ejecutado en Ubuntu**; su aprobación no da permiso para aplicar `tc netem` sin watchdog, rollback y pruebas independientes. El porcentaje técnico estimado sigue en **35 %**.
+PR [#158](https://github.com/recm0708/netlab360/pull/158) fusionado (`317ab99`), con el precheck de escenarios y 18 pruebas nuevas. **S06-035 validado en VM real**: 441/441 tests offline, `S06-035_PLANIFICACION_VALIDADA=OK`, RC=0; `nl360-s02-h-hq-120`/`eth0` UP con `10.70.20.20/24`, gateway `10.70.20.1` y qdisc `noqueue` (estado `CANDIDATE_NOQUEUE`), plan JSON privado `S06_035_20261123T050249Z_6cb815`. Red `ens33 192.168.47.40/24`/gateway `.2`, 21 namespaces, 4 contenedores, NOC intactos, sin fallas inducidas ni etiquetas. **S06-036 código de prueba de timer incorporado** por PR #159 (`bf4699a`), **457/457 tests CI**, pero **prueba de ejecución real en VM pendiente**; solo crea un marcador, no altera qdiscs. No se permite `tc netem` hasta probar un watchdog real de restauración y su rollback. El avance técnico estimado sigue en **35 %**.
 
 ## 5. Diseño permanente de la consola
 
