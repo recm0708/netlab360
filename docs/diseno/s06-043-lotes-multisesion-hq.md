@@ -39,6 +39,12 @@ El período de recuperación debe mantenerse como clase/estado operacional indep
 
 F01–F04 están aprobadas y no deben repetirse. Para nuevas evidencias, cada comando muestra `========== INICIO CAPTURA <nombre> ==========` y `========== FIN CAPTURA <nombre> ==========`; tomar solo la región entre ambas marcas, y usar nombre descriptivo sin extensión. El siguiente candidato es `S06_F05_Dataset_Multisesion_Real_HQ` al verificar nuevos ciclos. La captura comparativa de modelos debería denominarse `S06_F06_Evaluacion_Binaria_Modelos_HQ` y solo tomarse tras ejecutar y auditar una evaluación con holdout real; no titularla «multiclase» si no se ha demostrado esa capacidad.
 
+## Aceptación real S06-043 y evidencia F05 (23/11/2026)
+
+**Tres ciclos completados en VM sobre el cliente HQ real existente**, cada uno con cuatro ventanas DEGRADED y seis RECOVERY verificadas por qdisc y control root. RTT degradación 40.419, 40.376, 40.381 ms; RTT recuperación 0.071, 0.075, 0.068 ms, watchdog RESTORED en todos y cleanup STATE=NONE. `S06_043_SESIONES_MULTIPLES=OK` se emitió antes de un **error posterior del wrapper en el here-doc que generaba F05**, que hizo que el wrapper global terminara RC 1. Esa incidencia de presentación se corrigió **sin repetir experimentos** con validación de solo lectura `S06-043_AUDITORIA_FINAL_CORREGIDA=OK`: integridad de registros/datos, 21 namespaces, 4 contenedores, gestión intacta, qdisc noqueue, NOC/Prometheus/7 servicios activos, sin interfaces ficticias.
+
+Registro local validado `~/netlab360-bootstrap/s06/experimentos/S06_043_20261123T073108Z_344e1e/manifest.json`; TXT de evidencia `~/netlab360-bootstrap/s06/evidencias/informe/S06_F05_Dataset_Multisesion_Real_HQ.txt`. La captura F05 con INICIO/FIN fue entregada en el chat, revisada y aprobada. Totales **100 ventanas reales**, 60 NORMAL, 16 DEGRADED y 24 RECOVERY; la imagen no está versionada en Git ni se afirma copiada a la VM. **S06-044: evaluación por sesiones separadas, sin nuevas intervenciones**. Progreso S06 ~65 % estimado.
+
 ## Continuidad en otro chat
 
 La fuente canónica de reanudación es [§4.11 del plan maestro](s06-s08-plan-maestro-y-criterios.md). El estado de GitHub/CI solo valida código; las cifras de nuevas sesiones no deben marcarse como realizadas hasta ver la bitácora `S06_043_SESIONES_MULTIPLES=OK` y el registro JSON real de VM. Mantener las issues S06 #6, #25 y #26 abiertas hasta completar sus criterios.
