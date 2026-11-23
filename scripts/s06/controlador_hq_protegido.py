@@ -314,8 +314,10 @@ def start(approval: str) -> dict:
         return data
 
 
-def expire(token: str) -> dict:
+def expire(token: str, *, trigger: str = "WATCHDOG") -> dict:
     token_check(token)
+    if trigger not in ("WATCHDOG", "MANUAL_APPROVED"):
+        raise ValueError("restore_trigger_invalid")
     # Bloqueo de espera: el watchdog no pierde su disparo si el padre
     # está usando el lock o muere inesperadamente.
     with exclusive(wait=True):
@@ -347,6 +349,7 @@ def expire(token: str) -> dict:
             data["state"] = "ESCALATED"
             data["failure"] = f"{type(exc).__name__}: {exc}"[:220]
         data["expired_at_utc"] = utc()
+        data["restoration_trigger"] = trigger
         data["final_qdisc_state"] = qdisc() if data["state"] != "ESCALATED" else "REVIEW"
         save(data)
         return data
@@ -389,6 +392,9 @@ def main() -> None:
     cmds.add_parser("status")
     e = cmds.add_parser("expire")
     e.add_argument("--token", required=True)
+    emergency = cmds.add_parser("restore-now")
+    emergency.add_argument("--token", required=True)
+    emergency.add_argument("--approve", required=True)
     cmds.add_parser("cleanup")
     args = p.parse_args()
     os.umask(0o077)
@@ -406,6 +412,10 @@ def main() -> None:
     elif args.action == "expire":
         data = expire(args.token)
         print("S06_042_EXPIRY_STATE=" + data["state"])
+    elif args.action == "restore-now":
+        authorize(args.approve)
+        data = expire(args.token, trigger="MANUAL_APPROVED")
+        print("S06_042_EMERGENCY_STATE=" + data["state"])
     elif args.action == "cleanup":
         cleanup()
         print("S06_042_CLEANUP=OK")
