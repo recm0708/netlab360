@@ -289,6 +289,14 @@ El primer lote se detuvo **después de recuperar HQ**, por una coincidencia text
 
 **Estado:** escenario FAULT independiente aceptado; TEST V2 no alterado. El resultado no demuestra predicción IA de FAULT, deriva de concepto inferencial, pronóstico MAE ni generalización a WAN/OSPF/LACP/SDN. **S06 y sus issues #6/#25/#26 siguen abiertas** a la espera de regresión transversal, conciliación de casillas, evidencias e informe; la estimación anterior de ~90 % era previa a FAULT y no debe confundirse con cierre automático.
 
+## 4.36. Regresión transversal y actualización puntual de NOC IA (23/11/2026)
+
+Después de validar FAULT HTTP HQ, las comprobaciones de solo lectura ratificaron WAN/LAN `status` OK, OSPF FULL 4/2/2 en HQ/S1/S2, rutas FIB S1 `s1p` y S2 `s2p`, NOC 18 nodos/21 enlaces, LACP HQ/S1/S2 `up` con 2/2 miembros, Faucet/OpenFlow conectado con 25 reglas, 0 advertencias, HA HTTP principal HQ y Prometheus 1/1 targets `up`. Red administrativa `192.168.47.40/24`, gateway `.2`, 21 namespaces, cuatro Docker, controlador `NONE/BASELINE` y qdisc `noqueue` intactos. `S06_AUDITORIA_READONLY_FINALIZADA=OK`, RC=0.
+
+La única discrepancia fue un **HTTP 404** del adaptador `GET /api/v1/s06/diagnostics` debido a que el NOC Python se había iniciado antes de añadirse el endpoint al archivo fuente. Tras verificar código, unidad y prechecks, el operador autorizó un **único reinicio limitado a `netlab360-s05-noc.service`**, sin tocar FRR/HA/Docker/SDN. Nuevo proceso 2138999, `HTTP_GRAFO=200` y `HTTP_IA=200` y `S06_NOC_IA_RECUPERADO=OK`, RC=0. Ambas rutas IA devolvieron `UNKNOWN` con `ground_truth=UNKNOWN`, comportamiento correcto por falta de muestreo fresco, no indicio de fallo de redes ni prueba de predicción. Bitácora privada `~/netlab360-bootstrap/s06/recuperacion-noc-ia-20261123T180136Z/S06_Recuperacion_NOC_IA.txt`. Detalles técnicos: [S06-048](s06-048-estados-ia-y-observacion-lacp-sdn.md).
+
+La aceptación operacional es positiva; las issues #6/#25/#26 siguen abiertas por reconciliación de criterios, selección de evidencias e informe académico. **Ni el FAULT HTTP ni esta auditoría acreditan concept drift inferencial o pronóstico futuro con MAE.**
+
 ## 5. Diseño permanente de la consola
 
 Especificación de menú, arquitectura y mapeo de procedimientos:
