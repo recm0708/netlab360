@@ -28,4 +28,4 @@ Tras aprobar CI, ejecutar los 12 tests específicos y `python3 scripts/s06/prerr
 
 Cerrar con qdisc HQ `noqueue`, guardia `NONE/BASELINE`, 21 namespaces/cuatro contenedores, IP administrativa .40 y gateway .2, NOC, Prometheus y observabilidad LACP/SDN sanos, Git limpio. No se necesita captura académica adicional por esta congelación: la bitácora y acta privada son evidencias metodológicas para el informe.
 
-**Estado:** CI y VM pendientes. Fase S06 permanece al 80 % técnico validado mientras no existan sesiones nuevas etiquetadas, prospectiva y drift verificables.
+**Estado:** PR [#175](https://github.com/recm0708/netlab360/pull/175) fusionado en `main` mediante `32b108a` y **776 pruebas CI (775 aprobadas, una omitida)**. Queda pendiente ejecutar `--freeze` y `--check` en la VM y auditar el conteo de paquetes de las sesiones originales. Fase S06 permanece al 80 % técnico validado mientras no existan sesiones nuevas etiquetadas, prospectiva y drift verificables.
