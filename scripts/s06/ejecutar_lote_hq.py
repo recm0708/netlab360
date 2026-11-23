@@ -188,7 +188,7 @@ def wait_recovery(token: str, timeout: int = 75) -> dict:
     raise RuntimeError("watchdog_timeout_leave_state_untouched")
 
 
-def run_one(index: int, folder: Path, report: dict) -> dict:
+def run_one(index: int, folder: Path, report: dict, packets: int = 2) -> dict:
     check_ready()
     label = f"{index:02d}"
     cycle = {"number": index, "status": "preparing",
@@ -215,7 +215,7 @@ def run_one(index: int, folder: Path, report: dict) -> dict:
     data_d = run(
         [sys.executable, "-u", str(COLLECTOR),
          "--expected", "DEGRADED", "--rounds",
-         str(ROUND_DEGRADED), "--packets", "2"], timeout=25)
+         str(ROUND_DEGRADED), "--packets", str(packets)], timeout=29)
     (folder / f"ciclo_{label}_degraded.txt").write_text(data_d)
     degraded = validated_session(data_d, "DEGRADED", token, ROUND_DEGRADED)
     cycle.update(degraded=degraded, status="waiting_for_timer")
@@ -256,11 +256,13 @@ def run_one(index: int, folder: Path, report: dict) -> dict:
     return cycle
 
 
-def orchestrate(cycles: int, approval: str) -> dict:
+def orchestrate(cycles: int, approval: str, packets: int = 2) -> dict:
     if os.geteuid() == 0:
         raise RuntimeError("execute_orchestrator_as_unprivileged_user")
     if cycles < 2 or cycles > 3:
         raise ValueError("cycles_must_be_2_or_3")
+    if packets not in (2, 3):
+        raise ValueError("packets_must_be_2_or_3")
     if approval != APPROVAL:
         raise RuntimeError("explicit_approval_required_for_entire_batch")
     if not COLLECTOR.is_file():
@@ -278,6 +280,7 @@ def orchestrate(cycles: int, approval: str) -> dict:
         "management_interface_mutated": False,
         "new_namespaces_created": False, "new_interfaces_created": False,
         "ground_truth_source": "root_controller_and_tc_status_not_rtt",
+        "packets_per_degraded_window": packets,
         "operational_deployment_authorized": False,
         "cycles": [],
     }
@@ -286,7 +289,10 @@ def orchestrate(cycles: int, approval: str) -> dict:
     print("S06_043_DIRECTORIO=" + str(folder), flush=True)
     try:
         for i in range(1, cycles + 1):
-            run_one(i, folder, report)
+            if packets == 2:
+                run_one(i, folder, report)
+            else:
+                run_one(i, folder, report, packets=packets)
         report["status"] = "complete"
         report["finished_utc"] = utc()
         report["complete_cycles"] = cycles
@@ -306,9 +312,11 @@ def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--cycles", required=True, type=int)
     p.add_argument("--approve-batch", required=True)
+    p.add_argument("--packets", type=int, default=2, choices=(2, 3),
+                   help="Cantidad ICMP por ventana DEGRADED (2 histórico; 3 nuevo estudio)")
     args = p.parse_args()
     os.umask(0o077)
-    outcome = orchestrate(args.cycles, args.approve_batch)
+    outcome = orchestrate(args.cycles, args.approve_batch, packets=args.packets)
     deg = sum(c["degraded"]["windows"] for c in outcome["cycles"])
     rec = sum(c["recovery"]["windows"] for c in outcome["cycles"])
     print("S06_043_CICLOS_VALIDOS=" + str(outcome["complete_cycles"]))
