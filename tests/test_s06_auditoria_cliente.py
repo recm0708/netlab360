@@ -45,12 +45,12 @@ class ProductionReadonlyAuditTests(unittest.TestCase):
         self.assertEqual(actual["interface"], "eth0")
         self.assertEqual(actual["gateway_seen"], "10.70.20.1")
 
-    def test_ruta_sin_gateway_no_es_falsa_prueba_de_falla(self):
-        actual = m.confirm_route([{
-            "dst": "10.71.20.20", "dev": "eth0",
-            "prefsrc": "10.70.20.20"
-        }], "10.71.20.20")
-        self.assertIsNone(actual["gateway_seen"])
+    def test_ruta_sin_gateway_es_bloqueante(self):
+        with self.assertRaisesRegex(RuntimeError, "Next-hop"):
+            m.confirm_route([{
+                "dst": "10.71.20.20", "dev": "eth0",
+                "prefsrc": "10.70.20.20"
+            }], "10.71.20.20")
 
     def test_rechaza_salida_por_ens33(self):
         with self.assertRaisesRegex(RuntimeError, "cliente"):
