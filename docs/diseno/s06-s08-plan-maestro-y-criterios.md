@@ -86,6 +86,10 @@ PR [#158](https://github.com/recm0708/netlab360/pull/158) fusionado (`317ab99`),
 
 `S06-037_SIMULACION_VALIDADA=OK`, RC=0: 21 tests específicos, **478/478** pruebas offline; 14 escenarios de simulación con estados `RESTORED=4`, `ABORTED=1`, `ESCALATED=2`, `NEW=5`, `APPROVED=2`. El reporte privado `~/netlab360-bootstrap/s06/rollback-simulaciones/S06_037_20261123T051618Z_66720c/simulacion_rollback.json` fue verificado contra la huella indicada por el programa. Qdisc real `noqueue` antes/después, `ens33 .40`, gateway `.2`, 21 namespaces, 4 contenedores, NOC 18/21, Prometheus READY, cero unidades fallidas. **No hubo cambios de red, netem real, etiquetas verificadas ni rollback real.** El porcentaje técnico S06 sigue estimado en **35 %**. S06-038 deberá implementar guardas privilegiadas, timer efectivo y restauración demostrable con pruebas adversas; las issues siguen abiertas y no se permiten cierres con casillas sin verificar.
 
+## 4.5. S06-038A — guardia root y timer de estado NOOP (23/11/2026)
+
+PR [#161](https://github.com/recm0708/netlab360/pull/161) fusionado (`509a3da`) tras pasar **499/499 tests offline** (21 nuevas pruebas específicas). La guardia `scripts/s06/guardia_protegida.py` se instala como copia root-owned en `/usr/local/libexec/netlab360/s06-guardia.py`, revisa exclusivamente `ens33` y el cliente HQ `nl360-s02-h-hq-120/eth0`, protege estado y lock bajo `/run/netlab360-s06`, programa timer transitorio de 5–30 s y registra vencimiento de estado `EXPIRED_NOOP`. **No contiene ninguna operación que agregue, borre o reemplace qdiscs.** La prueba de instalación/ejecución real S06-038A en VM está pendiente. Se exige aceptación local antes de avanzar con S06-038B/039 (restauración efectiva y ensayos adversos). El código simulado y el NOOP no acreditan rollback real ni permiten fallas inducidas. `S06=35 %` estimado. [Protocolo](s06-038-guardia-root-y-watchdog-noop.md).
+
 ## 5. Diseño permanente de la consola
 
 Especificación de menú, arquitectura y mapeo de procedimientos:
