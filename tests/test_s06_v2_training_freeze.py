@@ -159,6 +159,10 @@ class V2FreezeTests(unittest.TestCase):
     def test_watchdog_duplicate_token_rejected(self):
         self.events[1]["token"] = self.events[0]["token"]
         self.manifest.write_text(json.dumps(self.batch))
+        watchdog_file = self.folder / "ciclo_02_watchdog.json"
+        watchdog = json.loads(watchdog_file.read_text())
+        watchdog["token"] = self.events[0]["token"]
+        watchdog_file.write_text(json.dumps(watchdog))
         with self.assertRaisesRegex(ValueError, "training_tokens_reused"):
             self._read_sources()
 
