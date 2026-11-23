@@ -149,6 +149,16 @@ PR [#169](https://github.com/recm0708/netlab360/pull/169) fusionado `aa9553c`, *
 
 **Código y CI aprobados, ejecución real del evaluador S06-044 en VM todavía PENDIENTE**. No declarar F1/recall ni captura F06 hasta comprobar `S06_044_EVALUACION_BINARIA=OK_EXPLORATORIA`, archivo `evaluacion.json` y TXT con INICIO/FIN. Progreso S06 **65 % técnico estimado** y issues abiertas.
 
+## 4.15. S06-044 aceptado en VM; reanudar desde S06-045 (23/11/2026)
+
+La evaluación binaria NORMAL/DEGRADED fue **ejecutada y validada** en `netlab360-lab` con `S06_044_EVALUACION_BINARIA=OK_EXPLORATORIA`, `S06-044_EVALUACION_VALIDADA=OK` y `RESULTADO_RC=0`. 23 tests específicos OK, conjuntos TRAIN/TEST separados por sesión, integridad de cuatro modelos serializados comprobada (IsolationForest/LogisticRegression, dos rutas). En cada ruta se usaron 40 NORMAL + 12 DEGRADED de entrenamiento y 20 NORMAL + 4 DEGRADED de test; seis RECOVERY adicionales para evaluar falsas alarmas sin participar en clasificación binaria.
+
+**Resultados TEST HQ→S1:** P95: TP4/FP3/TN17/FN0, precisión .571, recall 1.000, F1 .727; IsolationForest: TP4/FP1/TN19/FN0, precisión .800, recall 1.000, F1 .889; LogisticRegression: TP4/FP0/TN20/FN0, precisión 1.000, recall 1.000, F1 1.000. **HQ→S2:** P95: TP4/FP1/TN19/FN0, F1 .889; IsolationForest: TP4/FP1/TN19/FN0, F1 .889; LogisticRegression: TP4/FP0/TN20/FN0, F1 1.000. Los seis casos RECOVERY por ruta produjeron 0 falsos positivos para cada método. **Es una comparación exploratoria**: dos rutas correlacionadas, cuatro positivos por ruta, falla únicamente de latencia 40 ms y separación no cronológica global. LogisticRegression fue el mejor **solo en el test observado**; no declarar generalización ni permitir remediación.
+
+**Evidencia F06 aceptada:** `S06_F06_Evaluacion_Binaria_Modelos_HQ`, captura PNG recibida y revisada, delimitadores INICIO/FIN completos. Salida TXT local `~/netlab360-bootstrap/s06/evidencias/informe/S06_F06_Evaluacion_Binaria_Modelos_HQ.txt`. Dataset fuente de S06-043 y modelos permanecen intactos en VM. Registro de evaluación `~/netlab360-bootstrap/s06/evaluaciones/S06_044_20261123T081627Z_2ade0e/` y bitácora `~/netlab360-bootstrap/s06/validacion-s06-044-20261123_031619/S06_044_Validacion_Completa.txt`. Seguridad posterior: 21 namespaces, cuatro Docker, guardia HQ `NONE/BASELINE`, qdisc `noqueue`, Prometheus READY, NOC saludable, cero unidades fallidas y `ens33` sin cambios.
+
+**Progreso técnico S06 estimado: 70 %** (no calificación docente). **S06-045 siguiente:** diagnóstico comparativo y error de predicción, inferencia y respuestas `UNKNOWN` ante entradas insuficientes, API read-only y futura exposición en NOC, con pruebas offline y aprobación en VM. No volver a inyectar `netem` ni crear interfaces. **Mantener abiertas #6, #25, #26 y milestone S06** hasta que todos los criterios pendientes estén efectivamente cumplidos; S07/S08 no se consideran implementadas por esta evaluación.
+
 ## 5. Diseño permanente de la consola
 
 Especificación de menú, arquitectura y mapeo de procedimientos:
