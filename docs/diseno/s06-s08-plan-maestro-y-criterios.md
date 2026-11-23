@@ -243,6 +243,10 @@ El preregistro S06-050 está bloqueado por muestreo de **2 y 3 paquetes**, con 1
 
 PR [#177](https://github.com/recm0708/netlab360/pull/177), commit `f4612a0`; **792 pruebas CI, 791 OK, 1 omitida**. Nuevo protocolo documentado **antes** de la adquisición: NORMAL/DEGRADED/RECOVERY **3 paquetes por ruta** y splits TRAIN (40 NORMAL/8 DEGRADED), VALIDATION (20/8) y TEST (20/8) con sesiones/tiempos y tokens distintos. El orquestador S06-043 tiene `--packets 3` opcional, sin modificar su valor histórico 2, y verifica paquetes realmente emitidos. La intervención sigue restringida por controlador root y watchdog TTL 35s; exige autorización humana en cada lote. **No se ha ejecutado ninguna captura V2 ni se ha reentrenado**, la limitación histórica permanece, S06 al 80 % estimado y las issues siguen abiertas. [Protocolo íntegro](s06-estudio-prospectivo-uniforme-y-cierre-consolidado.md).
 
+## 4.28. Primer NORMAL TRAIN V2 real (23/11/2026)
+
+25 tests de orquestador OK; dos sesiones posteriores al preregistro histórico de S06-050 aceptadas, IDs `S06_WINDOW_NORMAL_20261123T143842Z_1e1812` y `S06_WINDOW_NORMAL_20261123T143913Z_b5d57c`. **40 ventanas NORMAL por ruta, 3 paquetes por muestra**, guardia HQ `NONE/BASELINE`, red original intacta. En el prompt de intervención se escribió `AUTORIZACION` (no la frase literal), por lo que **no ocurrió ninguna degradación nueva**; el RC 0 corresponde a salida segura, no a TRAIN V2 completo. Continuar desde los registros existentes; nunca recapturar NORMAL por ese motivo. S06 mantiene 80 % técnico estimado; TRAIN positivo, VALIDATION y TEST V2 pendientes.
+
 ## 5. Diseño permanente de la consola
 
 Especificación de menú, arquitectura y mapeo de procedimientos:
