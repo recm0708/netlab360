@@ -70,7 +70,7 @@ La validación final de S05 comprobó 21 namespaces, cuatro contenedores y seis 
 - [S06-048 estados IA explícitos y auditoría LACP/SDN (validado en VM)](docs/diseno/s06-048-estados-ia-y-observacion-lacp-sdn.md)
 - [S06-049 auditoría de cronología y suficiencia prospectiva (validada en VM; gate pendiente de nuevos datos)](docs/diseno/s06-049-auditoria-readiness-prospectiva.md)
 - [S06-050 preregistro de TEST futuro y modelos congelados (validado VM; muestreo 2/3 bloqueado)](docs/diseno/s06-050-preregistro-futuro-modelos-congelados.md)
-- [S06-051 auditoría del muestreo por clase y split (CI aprobada; VM pendiente)](docs/diseno/s06-051-auditoria-muestreo-protocolo-historico.md)
+- [S06-051 auditoría del muestreo por clase y split (validada VM; sesgo de protocolo confirmado)](docs/diseno/s06-051-auditoria-muestreo-protocolo-historico.md)
 - [Diseño del programa interactivo S08 y catálogo de acciones](docs/diseno/s08-consola-interactiva-y-acciones.md)
 
 ## Alcance
