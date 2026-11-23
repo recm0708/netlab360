@@ -60,6 +60,16 @@ Se recibieron capítulos **I–XII**, materiales complementarios, actividades in
 
 **Inicio de adquisición S06, sin validar aún en VM:** el PR #155 incorporó `scripts/s06/capturar_baseline.py` y pruebas offline (388 tests CI aprobadas). Realiza consultas de solo lectura a exporter S04, NOC S05, Prometheus y SQLite; guarda sesiones privadas con `ground_truth_label=UNKNOWN`. La primera captura real y sus controles de calidad están pendientes; no se cuenta como modelo entrenado ni fase S06 completada. Protocolo: `docs/diseno/s06-adquisicion-observacional.md`.
 
+## 4.1. Continuidad comprobada tras S06-033 (22/11/2026, Panamá)
+
+**Avance funcional estimado de S06: 30 %**, cálculo conservador del esfuerzo implementado frente al alcance total de datos, experimentos, modelos, pronóstico y API; no calificación docente. No usar la proporción de casillas ni la cantidad de pruebas como porcentaje de IA completada.
+
+- **Infraestructura validada:** S06-029 corrigió WAN/LAN (PR #154) y confirmó 376 pruebas, HA/LACP/SDN/NOC. S06-030/031 restauró Prometheus 3.7.0 en localhost 9091 mediante unidad temporal systemd, resguardó la TSDB y observó cinco familias de métricas S04. S06-032/033 alcanzó 407 pruebas offline, siete servicios operativos, 21 namespaces, cuatro contenedores, sin modificar `ens33` ni el gateway.
+- **Sesión de referencia S06-032:** `S06_BASELINE_20261123T043741Z_39a268`, 12/12 observaciones JSONL íntegros; 25 series por consulta, cinco familias, etiqueta `UNKNOWN` y `ground_truth_verified=false`.
+- **Sesión de rendimiento S06-033:** `S06_PERF_20261123T044532Z_cea2dc`, enlazada a S06-032, 9 pruebas ICMP (3 por ruta) y 3 HTTP. Pérdida 0 % en el periodo observado; RTT promedio HQ→S1 **0.084 ms**, HQ→S2 **0.074 ms**, S2→frontend HQ **0.081 ms**; HTTP medio **7.594 ms**, backend `BACKEND_HQ`; JSONL y permisos comprobados, `S06-033_RENDIMIENTO_VALIDADO=OK`, RC=0. Son tiempos en una VM, no WAN físicos ni un SLO estadístico.
+- **Pendiente inmediato:** S06-034 normalizar fuentes, valores/unidades, timestamps y calidad; preservar raw; registrar cobertura, ausencias y duplicados. Después sesiones experimentales con etiquetas verificables, iperf3 TCP/UDP restringido, train/validation/test por sesión y tiempo, modelos/anomalías, predicción/drift e integración.
+- **Política GitHub:** issues #6, #25, #26 y dependientes #7/#8 actualizadas con esta evidencia; no cerrar ninguna con casillas sin comprobar. Los programas para S08 seguirán usando un catálogo de acciones allowlisted y autorización humana.
+
 ## 5. Diseño permanente de la consola
 
 Especificación de menú, arquitectura y mapeo de procedimientos:
