@@ -21,9 +21,9 @@ STUDY=BASE/"estudio-uniforme-v2"
 SOURCES=ROOT/"s05/evidencias/ha-noc"
 OUT=STUDY/"fault-http-s06"
 SCHEMA="NETLAB360_S06_FAULT_HTTP_HQ_GROUND_TRUTH_V1"
-SRC_RE=re.compile(r"S05_HA_NOC_CICLO_(\\d{8}T\\d{6}Z)\\.jsonl")
+SRC_RE=re.compile(r"S05_HA_NOC_CICLO_(\d{8}T\d{6}Z)\.jsonl")
 SESSION_RE=re.compile(
-    r"^S06_WINDOW_(?:NORMAL|DEGRADED|RECOVERY)_(\\d{8}T\\d{6}Z)_[a-f0-9]{6}$"
+    r"^S06_WINDOW_(?:NORMAL|DEGRADED|RECOVERY)_(\d{8}T\d{6}Z)_[a-f0-9]{6}$"
 )
 
 def session_time(identifier: str) -> datetime:
