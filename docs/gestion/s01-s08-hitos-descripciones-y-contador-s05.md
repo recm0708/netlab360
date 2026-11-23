@@ -17,7 +17,7 @@ El script ofrece dos modos:
 - `--check`: GET de las ocho milestones, inventario de las seis issues S05 y verificación de #24 en S08; imprime diferencias sin modificar GitHub.
 - `--apply`: modifica exclusivamente las ocho **descripciones** vía GitHub API conservando título, fecha, estado y dueños. Si el contador S05 sigue erróneo, aplica **un solo intento de recálculo**: retira temporalmente la asignación de la issue cerrada #5 y la restaura inmediatamente como S05, sin tocar estado, cuerpo ni checkbox. Verifica los seis estados cerrados y la asignación final. Si persiste la inconsistencia, informa `AUN_DESINCRONIZADO_REQUIERE_SOPORTE_GITHUB` sin repetir operaciones ni reclamar éxito de porcentaje.
 
-El script aborta ante una nueva issue abierta en S05, un PR asignado inesperadamente, una cuarta sede realmente desplegada no documentada, un cambio de estado de milestone o si #24 deja de estar abierta en S08. Nunca reabre S01–S05 ni cierra S06–S08.
+El script aborta ante una nueva issue abierta en S05, un PR asignado inesperadamente, un cambio de estado de milestone o si #24 deja de estar abierta en S08. La existencia de una eventual cuarta sede debe comprobarse mediante el inventario técnico del proyecto, no se deduce de la API de milestones. Nunca reabre S01–S05 ni cierra S06–S08.
 
 ## Estado técnico por fase
 
