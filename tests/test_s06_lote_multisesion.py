@@ -168,7 +168,7 @@ class MultiSessionTests(unittest.TestCase):
             for item in row["measurements"]:
                 item["requested_packets"] = 3
                 item["result"].update(sent=3, received=3)
-        raw = "".join(json.dumps(x) + "\\n" for x in rows).encode()
+        raw = "".join(json.dumps(x) + "\n" for x in rows).encode()
         rows_file.write_bytes(raw)
         meta["data_digest_sha256"] = hashlib.sha256(raw).hexdigest()
         meta_file.write_text(json.dumps(meta))
@@ -176,7 +176,7 @@ class MultiSessionTests(unittest.TestCase):
             log, "DEGRADED", "0123456789abcdef", 4, expected_packets=3
         )["windows"], 4)
         rows[0]["measurements"][0]["result"]["sent"] = 2
-        altered = "".join(json.dumps(x) + "\\n" for x in rows).encode()
+        altered = "".join(json.dumps(x) + "\n" for x in rows).encode()
         rows_file.write_bytes(altered)
         meta["data_digest_sha256"] = hashlib.sha256(altered).hexdigest()
         meta_file.write_text(json.dumps(meta))
