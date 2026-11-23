@@ -275,6 +275,12 @@ Data drift NORMAL exclusivamente **descriptivo**: RTT TRAIN→TEST HQ→S1 `0.07
 
 **Gestión GitHub:** la S05 está cerrada y contiene 6 issues realmente cerradas (#5, #23, #31, #32, #64, #105); el contador persistente de milestone puede estar desincronizado. La ampliación opcional #24 de cuarta sede/WireGuard se reabrió en S08 **sin atribuir implementación**; también #17 OpenTofu externo permanece en S08 como condicionado. PR #181 fusionado: [descripciones estandarizadas de los ocho hitos y reconciliación segura](../gestion/s01-s08-hitos-descripciones-y-contador-s05.md). El conector no dispone de escritura directa de milestones; el procedimiento auditado requiere ejecución explícita con `gh api` autorizado en la VM.
 
+## 4.34. FAULT independiente de HTTP HQ — implementación preparada
+
+En S06 se observaron prospectivamente NORMAL/DEGRADED/RECOVERY ICMP de 40 ms con modelos V2 congelados y análisis científico validado. Para cubrir la clase adicional **FAULT**, la arquitectura S05 ofrece un segundo mecanismo: caída intencional del backend HTTP HQ y conmutación controlada a S1, con frontal de alta disponibilidad, NOC y rescate systemd autónomo de 120 s. El precheck real previo está aprobado y dos sesiones S05 históricas exhiben BACKEND_HQ→BACKEND_S1→BACKEND_HQ con FIB conservada; no son TEST V2 ni evento nuevo S06.
+
+Nuevo validador **de solo lectura** `scripts/s06/validar_fault_http_s06.py` coteja la bitácora de intervención autorizada y el JSONL del NOC, exige backend HQ realmente caído durante S1, frontend vivo, transición de retorno, integridad UTC/FIB y watchdog armado/cancelado. Emite etiquetas independientes `NORMAL_HTTP_HQ`, `FAULT_HTTP_BACKEND_HQ`, `RECOVERY_HTTP_HQ` sin reentrenar modelos ni agregar este dataset al TEST ICMP. El estímulo requiere autorización literal humana mediante el runbook existente `s05-lote-ha-instancia-con-watchdog.sh --run --confirm-fault`, exclusivamente si prechecks son correctos. **La intervención S06 FAULT todavía no se ha ejecutado**; no presentar código/CI como ensayo real. Después, evidencia mínima y capítulo académico pendiente. Pronóstico/MAE y concept drift inferencial permanecen NO_EVALUABLE.
+
 ## 5. Diseño permanente de la consola
 
 Especificación de menú, arquitectura y mapeo de procedimientos:
