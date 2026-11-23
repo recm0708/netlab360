@@ -32,3 +32,7 @@ python3 scripts/s06/auditar_gates_prospectivos.py --save
 Se espera 60 NORMAL, 16 DEGRADED, 24 RECOVERY y 0 FAULT **por ruta**, TRAIN/TEST por sesiones sin coincidencias pero sin holdout cronológico global; ninguna prueba prospectiva independiente, ningún pronóstico con horizonte y ninguna deriva validada con ground truth. `S06_049_GATE=PENDING_NEW_PROSPECTIVE_EVIDENCE` confirma la insuficiencia del conjunto original, **no** que el código haya fallado.
 
 Registrar salud `ens33`/gateway, 21 namespaces, cuatro contenedores, controlador HQ `NONE/BASELINE`, qdisc `noqueue`, NOC 9130, LACP/SDN y Prometheus después. Evitar nuevas capturas académicas mientras la auditoría solo confirme limitaciones ya conocidas; el JSON y bitácora bastan para preparar el texto del informe. S06 y #6/#25/#26 continúan abiertas.
+
+## CI y fusión (23/11/2026)
+
+PR [#174](https://github.com/recm0708/netlab360/pull/174) fusionado en `main` mediante `8a5baa7`. La CI general ejecutó **764 pruebas (763 aprobadas, una omitida)**, incluidas las 11 pruebas nuevas de auditoría cronológica, conteos, tokens y ausencia de cambios de red. La **ejecución real sobre datasets privados aún está pendiente**; no reportar conclusiones del auditor hasta revisar la bitácora VM. El avance conservador de S06 permanece al 80 % validado.
