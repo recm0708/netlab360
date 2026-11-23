@@ -28,8 +28,18 @@ Tras 30 s la captura caduca; el panel vuelve a UNKNOWN, incluso cuando NOC S05 y
 
 ## Aceptación y evidencia
 
-**Pendiente de ejecución en VM**: revisar CI, prueba de regresión del adaptador, health y conteo S05 en 9130 y 9131, comparación estructura de graph sin cambios, panel visible con observación fresca seguida de caducidad a UNKNOWN, conservación de `ens33`, 21 namespaces, cuatro Docker, `noqueue`, Prometheus y S04/S05. Sólo después preparar una captura **S06_F09_Panel_IA_NOC_HQ** legible que incluya el panel con ambas rutas o, si se tomó tras caducidad, un texto de validación de diseño temporal y un comando que presente los datos de prueba válidos. No declarar que el panel es productivo ni que F09 existe antes de que el usuario comparta su imagen.
+**Ejecución técnica validada en VM**: 21 pruebas de integración S06 y 14 pruebas de S05 aprobadas, health de NOC 9130 y previsualización 9131 correctos, grafo comparado (18 nodos y 21 enlaces), observación nueva recibida por API, fail-closed al detener el servicio de IA, controlador `NONE/BASELINE`, 21 namespaces y cuatro contenedores conservados. **La inspección visual en navegador todavía está pendiente**. Se prepara la captura **S06_F09_Panel_IA_NOC_HQ** mediante previsualización en navegador Windows por túnel SSH, con medición nueva y datos frescos en ambas tarjetas. Debe mostrar el panel y contexto NOC sin confundir estado operacional acotado con ground truth. **No se declara F09 aprobada hasta recibir y revisar su PNG**.
 
 ## Estado
 
-**Código y CI aceptados:** PR [#172](https://github.com/recm0708/netlab360/pull/172) fusionado `5fd9986`; regresión general **751 pruebas** (750 aprobadas, una omitida), CI específica S05 correcta. **Pendiente ejecutar y validar en VM** el NOC de previsualización 9131 y la API S06 9145; no afirmar que la integración ya se vio operando en la VM. Issues #6/#25/#26 abiertas; S07/S08 no se consideran implementadas.
+**Código y CI aceptados:** PR [#172](https://github.com/recm0708/netlab360/pull/172) fusionado `5fd9986`; regresión general **751 pruebas** (750 aprobadas, una omitida), CI específica S05 correcta. **Aceptación técnica de backend/API en VM lograda** con `S06-047_VALIDACION_COMPLETA=OK` y `RESULTADO_RC=0`; aún falta comprobar el diseño visual en el navegador y aprobar F09. Issues #6/#25/#26 abiertas; S07/S08 no se consideran implementadas.
+
+## Verificación técnica real — 23/11/2026
+
+La VM sincronizó `main` en `70671a4`, ejecutó 21 pruebas unitarias del puente IA y 14 de la topología S05, todas correctas. El NOC estable `9130` respondió `healthy`; las previsualizaciones temporales del NOC `9131` y de IA `9145` estuvieron activas durante la verificación y se detuvieron al concluir, sin reiniciar NOC S05.
+
+**Adquisición inédita limitada a ICMP:** fuente privada `~/netlab360-bootstrap/s06/telemetria-hq-live/S06_046_HQ_20261123T095025Z_065b6b10.json`. HQ→S1 RTT 0.062 ms, consenso de tres métodos NORMAL, edad 0.99 s; HQ→S2 RTT 0.064 ms, consenso NORMAL, edad 1.01 s. `ground_truth=UNKNOWN` conservado, sin aprobación para actuar. Grafo S05 comprobado: **18 nodos, 21 enlaces**, mismo inventario que el servicio original. `PANEL_HTML=INTEGRADO` y `S06_047_DIAGNOSTICO_NOC=OK`.
+
+**Contención:** después de detener la API IA se obtuvieron `HQ_A_S1=UNKNOWN` y `HQ_A_S2=UNKNOWN` desde el NOC de previsualización, `S06_047_FAIL_CLOSED=OK`. Controlador HQ `NONE/BASELINE`, NOC original `healthy`, 21 namespaces, cuatro contenedores, ninguna mutación de red y procesos de preview detenidos. Registro `~/netlab360-bootstrap/s06/validacion-s06-047-20261123_045016/S06_047_Validacion_Completa.txt`, fin `S06-047_VALIDACION_COMPLETA=OK` y `RESULTADO_RC=0`.
+
+**Pendiente concreto:** confirmación visual del panel en navegador de Windows y captura F09; el TXT del comando de validación no reemplaza la evidencia visual. Toda observación fresca caduca en 30 s. No se programa adquisición automática, no se despliega como servicio persistente y no se atribuye capacidad predictiva prospectiva.
