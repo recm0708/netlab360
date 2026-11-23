@@ -16,7 +16,7 @@ import os
 from pathlib import Path
 import socket
 import subprocess
-from urllib.request import urlopen
+from urllib.request import urlopen, build_opener, ProxyHandler
 from urllib.parse import urlsplit
 import yaml
 
@@ -565,6 +565,144 @@ def current() -> dict:
     return result
 
 
+
+# S06-047: fuente opcional de IA; el grafo S05 no depende de ella.
+S06_AI_ENDPOINT = "http://127.0.0.1:9145/api/v1/s06/live?route="
+S06_AI_ROUTES = ("HQ_A_S1", "HQ_A_S2")
+S06_AI_METHODS = ("P95_RTT", "IsolationForest", "LogisticRegression")
+S06_AI_SCHEMA = "NETLAB360_S06_046_FRESH_INFERENCE_V1"
+
+
+def _s06_ai_unknown(route: str, reason: str) -> dict:
+    return {
+        "route": route, "state": "UNKNOWN", "consensus": "UNKNOWN",
+        "ground_truth": "UNKNOWN", "reason": reason,
+        "available": False, "rtt_avg_ms": None, "loss_pct": None,
+        "observed_at_utc": None, "age_seconds": None,
+        "methods": None, "production_deployment_authorized": False,
+        "network_mutations_authorized": False,
+    }
+
+
+def _s06_ai_validate(route: str, data: object,
+                     now: datetime | None = None) -> dict:
+    """Lista blanca de campos: NO proyectar JSON externo directamente en UI."""
+    if route not in S06_AI_ROUTES or not isinstance(data, dict):
+        raise ValueError("S06_ROUTE_OR_DATA_INVALID")
+    if (data.get("schema") != S06_AI_SCHEMA
+            or data.get("route") != route
+            or data.get("mode") != "FRESH_READONLY_EXPLORATORY"
+            or data.get("fresh_telemetry_verified") is not True
+            or data.get("ground_truth_label") != "UNKNOWN"
+            or data.get("production_deployment_authorized") is not False
+            or data.get("network_mutations_authorized") is not False
+            or data.get("model_generalization_demonstrated") is not False
+            or data.get("new_independent_validation") is not False):
+        raise ValueError("S06_SOURCE_CONTRACT_INVALID")
+    predicted = data.get("predictions")
+    if (not isinstance(predicted, dict)
+            or set(predicted) != set(S06_AI_METHODS)
+            or any(v not in ("NORMAL", "DEGRADED") for v in predicted.values())):
+        raise ValueError("S06_METHODS_INVALID")
+    consensus = data.get("binary_consensus")
+    state = data.get("operational_state")
+    if consensus not in ("NORMAL", "DEGRADED", "UNKNOWN"):
+        raise ValueError("S06_CONSENSUS_INVALID")
+    unanimous = len(set(predicted.values())) == 1
+    expected_consensus = next(iter(predicted.values())) if unanimous else "UNKNOWN"
+    if consensus != expected_consensus:
+        raise ValueError("S06_CONSENSUS_CONTRADICTS_METHODS")
+    expected_state = "NORMAL" if consensus == "NORMAL" else "UNKNOWN"
+    if state != expected_state:
+        raise ValueError("S06_OPERATIONAL_STATE_INVALID")
+    if (state == "NORMAL"
+            and data.get("reason") != "BASELINE_AND_UNANIMOUS_NORMAL_SCOPED"):
+        raise ValueError("S06_SCOPE_LABEL_MISMATCH")
+    if (consensus == "UNKNOWN" and data.get("reason") != "MODEL_DISAGREEMENT"):
+        raise ValueError("S06_DISAGREEMENT_REASON_MISMATCH")
+    if (consensus == "DEGRADED"
+            and data.get("reason") != "DEGRADATION_INDICATION_UNCONFIRMED"):
+        raise ValueError("S06_ANOMALY_REASON_MISMATCH")
+
+    stamp = datetime.fromisoformat(str(data.get("observed_at_utc")))
+    if stamp.tzinfo is None:
+        raise ValueError("S06_TIMESTAMP_WITHOUT_ZONE")
+    current = now if now is not None else datetime.now(timezone.utc)
+    age = (current.astimezone(timezone.utc)
+           - stamp.astimezone(timezone.utc)).total_seconds()
+    sidecar_age = data.get("age_seconds")
+    if (type(sidecar_age) not in (int, float) or not 0 <= sidecar_age <= 30
+            or not -2 <= age <= 30):
+        raise ValueError("S06_SAMPLE_STALE")
+
+    features = data.get("features")
+    explanation = data.get("explanation")
+    if not isinstance(features, dict) or not isinstance(explanation, dict):
+        raise ValueError("S06_FEATURES_MISSING")
+    if (set(features) != {"rtt_avg_ms", "rtt_p95_ms", "rtt_mdev_ms", "loss_pct"}
+            or explanation.get("source") != "NETLAB360_REAL_HQ_TO_S1_S2"
+            or explanation.get("target") != "nl360-s02-h-hq-120/eth0"
+            or explanation.get("scope") != "HQ_CLIENT_EGRESS_NETWORK_STATE"
+            or explanation.get("confidence_calibrated") is not False
+            or explanation.get("model_generalization_demonstrated") is not False):
+        raise ValueError("S06_PROVENANCE_INVALID")
+    import math
+    if any(type(v) not in (int, float) or not math.isfinite(v) or v < 0
+           for v in features.values()):
+        raise ValueError("S06_FEATURE_NONFINITE")
+    if features["loss_pct"] != 0:
+        raise ValueError("S06_LOSS_NOT_TRAINED")
+    return {
+        "route": route,
+        "state": state,
+        "consensus": consensus,
+        "ground_truth": "UNKNOWN",
+        "reason": str(data["reason"]),
+        "available": True,
+        "rtt_avg_ms": round(float(features["rtt_avg_ms"]), 3),
+        "loss_pct": float(features["loss_pct"]),
+        "observed_at_utc": stamp.astimezone(timezone.utc).isoformat(),
+        "age_seconds": round(age, 3),
+        "methods": {name: predicted[name] for name in S06_AI_METHODS},
+        "production_deployment_authorized": False,
+        "network_mutations_authorized": False,
+    }
+
+
+def s06_diagnostics() -> dict:
+    """Gateway read-only local. Nunca arranca la API, hace ping ni reconfigura."""
+    opener = build_opener(ProxyHandler({}))
+    result = {}
+    for route in S06_AI_ROUTES:
+        try:
+            # El valor de route viene solo del allowlist; nunca de URL del cliente.
+            with opener.open(S06_AI_ENDPOINT + route, timeout=1.2) as response:
+                if response.status != 200:
+                    raise ValueError("S06_UPSTREAM_HTTP_INVALID")
+                if response.headers.get("Content-Length") and int(
+                        response.headers["Content-Length"]) > 8192:
+                    raise ValueError("S06_UPSTREAM_TOO_LARGE")
+                raw = response.read(8193)
+                if len(raw) > 8192:
+                    raise ValueError("S06_UPSTREAM_TOO_LARGE")
+            data = json.loads(raw)
+            result[route] = _s06_ai_validate(route, data)
+        except (OSError, ValueError, KeyError, TypeError,
+                TimeoutError, OverflowError):
+            result[route] = _s06_ai_unknown(
+                route, "IA_OFFLINE_OR_SAMPLE_INVALID")
+    return {
+        "schema": "NETLAB360_S06_047_NOC_AI_ADAPTER_V1",
+        "mode": "READ_ONLY_EXPLORATORY",
+        "source": "S06 local loopback 127.0.0.1:9145",
+        "routes": result,
+        "graph_s05_independent": True,
+        "production_deployment_authorized": False,
+        "network_mutations_authorized": False,
+        "note": "Solo egreso HQ. Sin nueva validacion de generalizacion.",
+    }
+
+
 def serve(port: int) -> None:
     class Handler(BaseHTTPRequestHandler):
         def send(self, status: int, content: bytes, mime: str):
@@ -588,6 +726,9 @@ def serve(port: int) -> None:
                 except (ValueError, KeyError, OSError) as exc:
                     self.send(503, json.dumps({"error": str(exc)[:150]}).encode(),
                               "application/json")
+            elif route == "/api/v1/s06/diagnostics":
+                self.send(200, json.dumps(s06_diagnostics(), ensure_ascii=False).encode(),
+                          "application/json; charset=utf-8")
             elif route == "/healthz":
                 self.send(200, b'{"healthy":true,"service":"netlab360-s05-topologia"}',
                           "application/json")
