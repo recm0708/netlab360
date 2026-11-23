@@ -54,6 +54,7 @@ La validación final de S05 comprobó 21 namespaces, cuatro contenedores y seis 
 - [S06 watchdog y requisitos de rollback seguro](docs/diseno/s06-watchdog-rollback-gates.md)
 - [S06 simulación de autorización, TTL y rollback](docs/diseno/s06-rollback-simulacion.md)
 - [S06-038A guardia root y temporizador sin cambio de red](docs/diseno/s06-038-guardia-root-y-watchdog-noop.md)
+- [S06-038B restauración real de qdisc en namespace aislado](docs/diseno/s06-038b-restauracion-aislada.md)
 - [Diseño del programa interactivo S08 y catálogo de acciones](docs/diseno/s08-consola-interactiva-y-acciones.md)
 
 ## Alcance
