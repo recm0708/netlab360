@@ -30,7 +30,7 @@ Salida privada bajo netlab360-bootstrap/s06/datasets/curated/S06_QA_*/ con los a
 
 ## Validaciones de calidad
 
-- Comprobar SHA-256 declarado en cada metadata original; rechazar manipulación, archivos incompletos o enlaces simbólicos.
+- Comprobar la huella de integridad declarada en cada metadata original; rechazar manipulación, archivos incompletos o enlaces simbólicos.
 - Validar identidad de sesión, esquema, etiquetas UNKNOWN, indicadores de ground truth no verificado, índices y orden temporal UTC.
 - Conservar para cada valor: fuente S04, ICMP o HTTP; sesión; índice; tiempo observado; tiempo de adquisición; señal; valor; unidad; contexto de etiquetas Prometheus o sonda.
 - Mantener unidades distintas: estado/administración, paquetes, porcentaje, milisegundos. No mezclar eventos de servicio con rendimiento ICMP.
