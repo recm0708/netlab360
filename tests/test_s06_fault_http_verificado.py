@@ -132,6 +132,19 @@ class FaultHttpReadOnlyTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"missing_approved"):
             m.log_file(self.log)
 
+    def test_session_parser_no_external_import_context(self):
+        valid="S06_WINDOW_NORMAL_20261123T153501Z_4d1e6c"
+        self.assertEqual(m.session_time(valid).year, 2026)
+        self.assertEqual(m.session_time(valid).minute, 35)
+
+    def test_session_parser_rejects_bad_identifier(self):
+        with self.assertRaisesRegex(ValueError,"invalid_session_timestamp"):
+            m.session_time("S06_WINDOW_NORMAL_invalido_abcdef")
+
+    def test_session_parser_rejects_invalid_clock(self):
+        with self.assertRaisesRegex(ValueError,"invalid_session_timestamp"):
+            m.session_time("S06_WINDOW_NORMAL_20261399T259999Z_abcdef")
+
     def test_new_fault_evidence_not_training_data(self):
         obj=m.evaluate(self.log)
         self.assertEqual(obj["sample_counts"]["FAULT_HTTP_BACKEND_HQ"],4)
