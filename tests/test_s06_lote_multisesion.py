@@ -80,6 +80,27 @@ class MultiSessionTests(unittest.TestCase):
                 with self.subTest(cycles=cycles),self.assertRaises(ValueError):
                     m.orchestrate(cycles,m.APPROVAL)
 
+    def test_protocolo_uniforme_tres_paquetes_sin_alterar_defecto(self):
+        self.assertIn('--packets", str(packets)', FILE.read_text())
+        self.assertIn("def orchestrate(cycles: int, approval: str, packets: int = 2)", FILE.read_text())
+        def fake_cycle(index, folder, report, *, packets=2):
+            self.assertEqual(packets, 3)
+            report["cycles"].append({
+                "number": index, "status": "complete",
+                "degraded": {"windows": 4}, "recovery": {"windows": 6},
+            })
+        with mock.patch.object(m.os, "geteuid", return_value=1000), \
+             mock.patch.object(m, "check_ready"), \
+             mock.patch.object(m, "run_one", side_effect=fake_cycle) as runner:
+            out = m.orchestrate(2, m.APPROVAL, packets=3)
+        self.assertEqual(out["packets_per_degraded_window"], 3)
+        self.assertEqual(runner.call_count, 2)
+
+    def test_protocolo_paquetes_no_autorizado(self):
+        with mock.patch.object(m.os, "geteuid", return_value=1000):
+            with self.assertRaisesRegex(ValueError, "packets"):
+                m.orchestrate(2, m.APPROVAL, packets=4)
+
     def test_aprobacion_explicita_obligatoria(self):
         with mock.patch.object(m.os,"geteuid",return_value=1000):
             with self.assertRaisesRegex(RuntimeError,"approval"):
