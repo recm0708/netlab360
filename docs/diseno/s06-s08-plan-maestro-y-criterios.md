@@ -195,6 +195,14 @@ PR [#173](https://github.com/recm0708/netlab360/pull/173) fusionado como `b8265d
 
 La captura F09 de previsualización 9131 mostró LACP/SDN `SIN DATOS` porque el comando de lanzamiento de 9131 omitió `NETLAB360_PRIV_OBSERVER`; esa salida **no demuestra componentes apagados**. La unidad systemd estable 9130 tiene esa variable en el archivo versionado y el lote S05-145B verificó anteriormente dos muestras reales LACP/SDN. **Pendiente verificar estado ACTUAL del endpoint 9130 en VM**, sin reinstalar ni reiniciar servicios prematuramente. Documento: [S06-048](s06-048-estados-ia-y-observacion-lacp-sdn.md). Mantener S06 al 80 % técnico estimado hasta validación de próximos criterios.
 
+## 4.20. S06-048 aceptado en VM; S06-049 siguiente (23/11/2026)
+
+**Gate S06-048 aprobado:** 23 tests locales de puente IA OK; `S06-048_VALIDACION_COMPLETA=OK`, `RESULTADO_RC=0`, bitácora `~/netlab360-bootstrap/s06/cierre-s06-048-20261123_055201/S06_048_Cierre_Final.txt`. NOC original `9130` activo, exporter S04 activo, observador privilegiado instalado y configurado; LACP de HQ/S1/S2 `up` con **2/2 miembros** por switch/cliente, Faucet/OpenFlow `connected` con **25 reglas**, grafo 18 nodos/21 enlaces y **cero advertencias**. El `SIN DATOS` de F09 resultaba de la previsualización temporal sin la variable del helper, no de equipos apagados.
+
+**Seguridad:** 21 namespaces, 4 contenedores, `ens33 192.168.47.40/24`, gateway `.2`, controlador S06 `NONE/BASELINE`, qdisc HQ `noqueue`, Git `main` limpio, sin cambios de configuración ni reinicio. Primer lote previo falló en `sudo -n` por caché de credenciales vacía, no por falla funcional; el lote definitivo aprobó tras `sudo -v`. Estados visuales NORMAL, SIN DATOS, DESACUERDO IA e INDICIO DE DEGRADACIÓN presentes en el código; F09/F09B conservadas sin nueva captura.
+
+**Estimación S06: 80 % técnico validado** (no porcentaje de calificación ni estimación científica). Persisten criterios no completados del plan maestro: partición cronológica global, validación prospectiva verdaderamente no vista y más de un escenario, tratamiento FAULT si hay fuente/verificación, monitor de deriva, predicción con horizonte auténtico y errores frente a cambios controlados. La próxima **S06-049 será una auditoría read-only de validez temporal, cobertura y preparación de nuevos datos**, sin reentrenar ni inducir fallas. Mantener abiertas #6/#25/#26 y milestone S06; no comenzar conclusiones finales del informe todavía.
+
 ## 5. Diseño permanente de la consola
 
 Especificación de menú, arquitectura y mapeo de procedimientos:
