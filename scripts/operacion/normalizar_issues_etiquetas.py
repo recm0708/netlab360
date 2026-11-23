@@ -70,6 +70,7 @@ TYPE_INFO = {
     "gestión-académica": ("FBCA04", "Coordinación académica, revisiones y requisitos docentes."),
     "pruebas": ("BFDADC", "Ensayos, regresión y validaciones reproducibles."),
     "visualización": ("C5DEF5", "Consola NOC, paneles, gráficos e interfaz de observación."),
+    "accesibilidad": ("C5DEF5", "Accesibilidad de interfaces, navegación y usabilidad para diferentes capacidades."),
 }
 DEFINITIONS = {
     **{f"fase:{n:02d}": ("E4EAF1", f"Actividades correspondientes a la fase S{n:02d} de NETLAB360.")
@@ -86,6 +87,7 @@ DEFINITIONS = {
     "resolución:no-planificada": ("FFFFFF", "Funcionalidad descartada de forma justificada por alcance."),
     "colaboración:primer-aporte": ("7057FF", "Actividad apropiada para una primera contribución."),
     "colaboración:ayuda-solicitada": ("008672", "Actividad en la que se solicita apoyo técnico."),
+    "estado:bloqueado": ("B60205", "Actividad detenida por una dependencia o condición explícita documentada en su descripción; no implica cierre."),
 }
 ALIASES = {
     **{f"semana:{n:02d}": f"fase:{n:02d}" for n in range(1, 9)},
@@ -104,6 +106,7 @@ ALIASES = {
     "invalid": "resolución:inválida",
     "question": "tipo:consulta",
     "wontfix": "resolución:no-planificada",
+    "accessibility": "tipo:accesibilidad",
 }
 OLD_OR_CANONICAL = frozenset(DEFINITIONS) | frozenset(ALIASES)
 TITLE_PATTERN = re.compile(r"^\[S(\d{2})\] [^\n]{12,160}$")

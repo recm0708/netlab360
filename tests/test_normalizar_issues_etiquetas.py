@@ -130,6 +130,22 @@ class IssuesSpanishTests(unittest.TestCase):
         rows.append({"number":181,"pull_request":{"url":"..."}})
         self.assertEqual(len(m.check_baseline(rows)),53)
 
+    def test_accessibility_and_bloqueado_explicit(self):
+        self.assertEqual(m.ALIASES["accessibility"], "tipo:accesibilidad")
+        self.assertIn("estado:bloqueado", m.DEFINITIONS)
+        self.assertIn("dependencia", m.DEFINITIONS["estado:bloqueado"][1])
+        labels={
+            name:{"name":name,"color":color,"description":description}
+            for name,(color,description) in m.DEFINITIONS.items()
+        }
+        labels["accessibility"]={
+            "name":"accessibility","color":"e4e4e4","description":"Accessibility"
+        }
+        # Etiqueta heredada conocida, no equivale a un nombre desconocido.
+        result=m.inspect([make_item(n) for n in m.ALL_IDS],labels)
+        self.assertEqual(result["unknown_labels"],[])
+        self.assertIn("accessibility",result["legacy_labels"])
+
     def test_legacy_alias_mapped(self):
         self.assertEqual(m.ALIASES["semana:05"],"fase:05")
         self.assertEqual(m.ALIASES["tipo:docs"],"tipo:documentación")
