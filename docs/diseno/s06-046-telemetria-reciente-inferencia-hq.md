@@ -21,14 +21,26 @@ Con consenso binario **NORMAL** de los tres métodos y guardas de la red verific
 
 La API temporal sigue en `127.0.0.1:9145`, sin instalación como servicio ni apertura hacia Windows. No modifica el NOC S05 actual. Una integración visual con el NOC requerirá un adaptador de lectura específico después de aprobar la adquisición real.
 
-## Aceptación operativa propuesta
+## Procedimiento de aceptación ejecutado
 
 1. Fusionar código tras CI y ejecutar una adquisición en `netlab360-lab` con permisos sudo previamente autenticados, sin ejecutar scripts bajo root.
 2. Verificar archivo original reciente, tiempos UTC, features por ruta, estado de guardia y ausencia de modificaciones de red.
 3. Ejecutar API temporal en loopback y consultar ambas rutas *antes* de los 30 s de antigüedad. Detenerla y comprobar que el puerto quede libre.
 4. Reconsultar el archivo tras vencer 30 s: debe responder `UNKNOWN` con `LIVE_TELEMETRY_MISSING_STALE_OR_INVALID`. No lanzar otra medición para forzar clasificación ni inventar el estado de falla.
-5. Comprobar 21 namespaces, cuatro contenedores, `ens33` 192.168.47.40/24, gateway .2, `qdisc noqueue`, NOC/Prometheus activos y árbol Git limpio. **Solo entonces** preparar la captura F08; no declararla aprobada antes de recibir y revisar su PNG.
+5. Comprobar 21 namespaces, cuatro contenedores, `ens33` 192.168.47.40/24, gateway .2, `qdisc noqueue`, NOC/Prometheus activos y árbol Git limpio. **Cumplido:** la captura F08 se recibió, revisó y aprobó; no se repite la medición.
 
 ## Límites
 
 Los modelos se entrenaron y probaron con ventanas de duración y número de paquetes distintos de este muestreo (tres paquetes por ruta). No afirmar equivalencia de distribuciones, confiabilidad productiva ni mejora de F1 en vivo; esta etapa valida el transporte y las condiciones de calidad para inferencia. S06 permanece incompleta; las issues #6, #25 y #26 y S07/S08 permanecen abiertas.
+
+## Resultado real S06-046 — aceptado en VM el 23/11/2026
+
+PR [#171](https://github.com/recm0708/netlab360/pull/171), commit `50abc66`, CI **730 pruebas ejecutadas (729 aprobadas, una omitida)**. En `netlab360-lab` pasaron las **21 pruebas específicas**; el lote verificó adquisición de una muestra nueva de tres ICMP por ruta, TTL de 30 s, API FastAPI temporal y poscondiciones de infraestructura. `S06-046_VALIDACION_COMPLETA=OK` y `RESULTADO_RC=0`.
+
+Fuente privada: `~/netlab360-bootstrap/s06/telemetria-hq-live/S06_046_HQ_20261123T090337Z_1c01a6c8.json` y `ultima.json`; bitácora `~/netlab360-bootstrap/s06/validacion-s06-046-20261123_040333/S06_046_Validacion_Completa.txt`. **HQ→S1:** RTT medio **0.089 ms**, pérdida **0 %**, P95/IsolationForest/LogisticRegression `NORMAL`, edad 0.59 s. **HQ→S2:** RTT medio **0.100 ms**, pérdida **0 %**, tres modelos `NORMAL`, edad 1.30 s. Consenso NORMAL limitado al egreso HQ; **ground truth nuevo `UNKNOWN`**.
+
+Las guardas rechazaron una muestra artificialmente envejecida 40 s (`S06_046_FRESHNESS_GATE=OK`), mantuvieron denegadas acciones correctivas, detuvieron API temporal 9145, restauración root `NONE/BASELINE`, `noqueue`, 21 namespaces, cuatro Docker, gestión `ens33 192.168.47.40/24` y gateway `.2`, Prometheus READY y NOC saludable; sin mutaciones de red ni reentrenamiento.
+
+**Evidencia F08 aceptada:** `S06_F08_Telemetria_Reciente_Inferencia_HQ` — TXT privado y **captura PNG recibida y revisada en el chat**, legibles las marcas INICIO/FIN, ambas rutas, seis decisiones, TTL y seguridad. No afirmar que la captura PNG ya está versionada en GitHub o copiada a la VM; se proporcionó en esta conversación.
+
+**Continuidad S06-047:** conectar el diagnóstico limitado y conservador al NOC existente por adaptador read-only, conservar comportamiento UNKNOWN si la API IA está detenida o una observación caduca, no tocar el diagrama ni crear un segundo NOC.
