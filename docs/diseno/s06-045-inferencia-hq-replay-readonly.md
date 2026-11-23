@@ -2,7 +2,7 @@
 
 ## Estado y objetivo
 
-Incremento posterior a S06-044, que **sí se ejecutó en VM**: F06 aprobada, 23 pruebas locales, TRAIN/TEST separados por sesión y modelos privados íntegros. S06-045 introduce código nuevo; **no se declara aceptado en VM hasta ejecutar las pruebas y auditoría reales**.
+Incremento posterior a S06-044, que **sí se ejecutó en VM**: F06 aprobada, 23 pruebas locales, TRAIN/TEST separados por sesión y modelos privados íntegros. S06-045 introduce código nuevo; **aceptado técnicamente en VM el 23/11/2026**, tras validaciones completas de los modelos y API temporal.
 
 No se intenta "predecir" estados futuros: la API reproduce inferencias sobre el TEST histórico reservado de S06-044. Son **las mismas muestras evaluadas anteriormente**, por lo que la reproducción NO constituye una segunda validación independiente ni evidencia de generalización. La siguiente integración de telemetría fresca y NOC requerirá fuentes comprobadas, age gates y otra aceptación.
 
@@ -29,7 +29,7 @@ Servicio temporal en `127.0.0.1:9145` dentro de la VM. No se instala daemon, se 
 
 `route` es exclusivamente `HQ_A_S1` o `HQ_A_S2`. `scenario` es `NORMAL`, `DEGRADED` o `RECOVERY` y `window_index` entero entre 1 y 20, limitado adicionalmente al tamaño real de la sesión. Son categorías de selección de datos históricamente verificados, **no características de entrada del modelo**. No hay métodos POST/PUT/PATCH/DELETE de cambio de estado.
 
-## Ejecución y criterios de aceptación en VM (PENDIENTE)
+## Ejecución y criterios de aceptación en VM (VALIDADA)
 
 ```bash
 cd ~/proyectos/netlab360
@@ -52,6 +52,20 @@ El experimento contiene solo un retardo de 40 ms, cuatro ventanas positivas por 
 
 ## Próximos pasos
 
-1. Revisar CI de PR S06-045 y aceptar ejecución local en VM; tomar futura evidencia F07 únicamente después del gate completo.
+1. CI y validación local aceptadas; el TXT F07 está preparado. Revisar PNG en el chat antes de declarar aprobada la evidencia gráfica.
 2. Diseñar lectura de telemetría fresca y conexión no invasiva al NOC existente, con límites por edad, calidad y permisos.
 3. Mantener abiertas las issues #6, #25, #26 y las fases S07–S08 hasta demostrar los requisitos faltantes.
+
+## Aceptación en VM — 23/11/2026
+
+PR [#170](https://github.com/recm0708/netlab360/pull/170) fusionado en `fedd89e`; CI completa **709 pruebas**, 708 aprobadas y una omitida por FastAPI ausente en CI mínima. La VM ejecutó 20 pruebas específicas, 19 aprobadas y una omitida, más la misma regresión integral de 709. El paquete FastAPI sí estaba disponible en el entorno científico; la API temporal funcionó en loopback.
+
+**Incidencia de ejecución corregida, sin repetir los modelos ni experimentos:** el primer wrapper terminó RC 1 por un delimitador Python/here-document que interpretó una línea de `tee` como Python después de guardar la auditoría. Los resultados originales permanecieron y se reutilizaron desde `~/netlab360-bootstrap/s06/validacion-s06-045-20261123_033350/05_Auditoria_Errores.txt`. La reanudación validó las métricas y terminó `S06-045_VALIDACION_COMPLETA=OK`, `RESULTADO_RC=0`. Bitácora final: `~/netlab360-bootstrap/s06/validacion-s06-045-20261123_033350/S06_045_Reanudacion_Completa.txt`.
+
+**Falsas alarmas reconstruidas (mismas ventanas de TEST, no nuevas muestras):** HQ→S1 P95=3 (índices 3/17/19), IsolationForest=1 (índice 3), LogisticRegression=0; HQ→S2 P95=1 e IsolationForest=1 (índice 16), LogisticRegression=0. FN DEGRADED=0 y FP RECOVERY=0 para todos. `S06_045_METRICAS_REPRODUCIDAS=OK`, `S06_045_ERROR_AUDIT=OK_REPLAY_ONLY`.
+
+**API temporal:** `API_HEALTH=OK`, `API_LIVE=UNKNOWN_CORRECTO`, `API_REPLAY_NORMAL=NORMAL`, `API_REPLAY_DEGRADED=DETECTADO_3_MODELOS`, `API_REPLAY_RECOVERY=UNKNOWN_CORRECTO`, `API_AUDITORIA=OK`, ruta no autorizada rechazada (422), POST rechazado (405), `S06_045_API_SMOKE=OK`. Se verificó `API_TEMPORAL=DETENIDA`; ningún servicio permanente instalado. Es inferencia **histórica reproducida**, no clasificación sobre tráfico en vivo ni validación prospectiva.
+
+**Poscondiciones:** 21 namespaces, 4 contenedores, `ens33 192.168.47.40/24` y gateway `192.168.47.2`, controlador HQ `NONE/BASELINE`, `qdisc noqueue`, Prometheus READY, NOC saludable y Git limpio. No hubo intervención de red ni reentrenamiento. TXT `~/netlab360-bootstrap/s06/evidencias/informe/S06_F07_Inferencia_Historica_API_Unknown_HQ.txt` preparado y verificado en la VM; **la captura PNG F07 todavía debe recibirse y revisarse**.
+
+**Siguiente fase incremental:** S06-046, adaptar telemetría fresca con timestamps, contexto de ruta/ventana, estado de calidad, obsolescencia y UNKNOWN ante fallas, sin alterar S05 ni equiparar un resultado exploratorio con servicio productivo.
