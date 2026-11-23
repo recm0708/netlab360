@@ -223,6 +223,12 @@ PR [#175](https://github.com/recm0708/netlab360/pull/175) fusionado como `32b108
 
 Antes de aceptar el protocolo se comprobará muestreo por paquetes de las sesiones normales/degradadas; si no coincide se declara `BLOCKED_INCOMPATIBLE_SAMPLING` en vez de calificar resultados incompatibles. Para nuevos estímulos de red se exigirán autorización humana independiente, guardas y watchdog. Concept drift requiere etiquetas futuras, forecast requiere objetivo/horizonte y la deriva de datos exige ventanas comparables; reportar NO_EVALUABLE donde corresponda. VM pendiente, [protocolo](s06-050-preregistro-futuro-modelos-congelados.md). **S06 aún al 80 % técnico validado; #6/#25/#26 y milestone abiertos.**
 
+## 4.24. S06-050 validado; muestreo histórico mixto bloqueado (23/11/2026)
+
+Preregistro privado creado y verificado en VM (`--freeze` y `--check`), con **12 pruebas unitarias OK**. Se congelaron cuatro modelos, tres métodos y las sesiones; resultado `PAQUETES_ORIGINALES=2,3`, `MUESTREO_COMPATIBLE=NO`, `STATUS=BLOCKED_INCOMPATIBLE_SAMPLING`. No hay segundo TEST ni reentrenamiento. `S06-050_PRERREGISTRO_VALIDADO=OK`, RC=0. Acta: `~/netlab360-bootstrap/s06/preregistros/S06_050_Prerregistro_Prospectivo.json` (privada, no sobrescribir). Bitácora: `~/netlab360-bootstrap/s06/validacion-s06-050-20261123_061334/S06_050_Validacion_Completa.txt`.
+
+Red administrativa, 21 namespaces, cuatro contenedores, controlador `NONE/BASELINE`, qdisc `noqueue` y NOC LACP/SDN intactos. **S06 sigue al 80 % técnico estimado**, ya que el preregistro no demuestra generalización. Próximo S06-051: inventario de paquetes efectivos por sesión/clase/split, sin modificar el acta ni inducir fallas.
+
 ## 5. Diseño permanente de la consola
 
 Especificación de menú, arquitectura y mapeo de procedimientos:
