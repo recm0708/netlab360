@@ -64,6 +64,7 @@ La validación final de S05 comprobó 21 namespaces, cuatro contenedores y seis 
 - [S06-042 intervención breve y etiquetado en el cliente real HQ](docs/diseno/s06-042-experimentos-hq-reales-y-watchdog.md)
 - [S06-043 sesiones independientes y rollback protegido del cliente real HQ](docs/diseno/s06-043-lotes-multisesion-hq.md)
 - [S06-044 evaluación binaria por sesión y análisis posrecuperación](docs/diseno/s06-044-evaluacion-binaria-holdout.md)
+- [S06-045 replay de inferencia, UNKNOWN y auditoría de errores (pendiente aceptación VM)](docs/diseno/s06-045-inferencia-hq-replay-readonly.md)
 - [Diseño del programa interactivo S08 y catálogo de acciones](docs/diseno/s08-consola-interactiva-y-acciones.md)
 
 ## Alcance
