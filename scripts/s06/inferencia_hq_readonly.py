@@ -13,6 +13,12 @@ import json
 import math
 from pathlib import Path
 import re
+import sys
+from typing import Literal
+
+HERE = Path(__file__).resolve().parent
+if str(HERE) not in sys.path:
+    sys.path.insert(0, str(HERE))
 
 from evaluar_deteccion_binaria import (
     FEATURES, PROBES, EVAL_SCHEMA, NORMAL_TEST, SOURCE_MANIFEST,
@@ -230,7 +236,6 @@ def audit_errors() -> dict:
 def make_app():
     """FastAPI opcional: la CI offline no necesita dependencias web."""
     from fastapi import FastAPI, Query
-    from typing import Literal
 
     app = FastAPI(title="NETLAB360 S06-045 (replay read-only)",
                   docs_url=None, redoc_url=None,
