@@ -27,7 +27,7 @@ ROUTE = json.dumps([{
 QDISC = json.dumps([{"kind": "noqueue", "root": True, "handle": "0:"}])
 
 
-def readonly_response(cmd):
+def readonly_response(*cmd):
     if cmd == ("ip", "-4", "-o", "addr", "show", "dev", "ens33"):
         return "2: ens33 inet 192.168.47.40/24 scope global ens33"
     if cmd == ("ip", "-4", "route", "show", "default"):
@@ -102,7 +102,7 @@ class GuardRootNoopTests(unittest.TestCase):
 
     def test_preflight_rechaza_management_cambiada(self):
         def other(*args):
-            ret = readonly_response(args)
+            ret = readonly_response(*args)
             if args == ("ip", "-4", "route", "show", "default"):
                 return ret.replace("192.168.47.2", "192.168.47.3")
             return ret
