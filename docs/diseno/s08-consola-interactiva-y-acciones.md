@@ -10,7 +10,7 @@ Una sola aplicación local, con barra lateral, encabezado de estado general y pa
 
 | Pantalla | Consultas y resultados | Acciones permitidas |
 |---|---|---|
-| **1. Inicio / Salud** | Sedes HQ/S1/S2, 21 namespaces, 4 contenedores, 6 servicios, salud de fuentes y acciones recientes; sin asumir cantidades fijas en runtime | Actualizar inventario; diagnóstico seguro |
+| **1. Inicio / Salud** | Sedes HQ/S1/S2, 21 namespaces, 4 contenedores, 7 servicios, salud de fuentes y acciones recientes; sin asumir cantidades fijas en runtime | Actualizar inventario; diagnóstico seguro |
 | **2. Topología en vivo** | Diagrama NOC existente, 18 nodos/21 enlaces de referencia, rutas primarias/respaldo, colores por estado y tooltips | Seleccionar elemento para mediciones/diagnósticos |
 | **3. Redes/WAN/OSPF** | Vecinos FULL, costos, FIB, cuatro enlaces, ruta efectiva y causa probable | Estado de FRR; escenarios conmutación/autorización y retorno |
 | **4. LAN/VLAN/ACL** | Nueve VLAN, endpoints, conectividad permitida/denegada y segmentación | Ping y pruebas de política entre endpoints autorizados |
@@ -19,9 +19,10 @@ Una sola aplicación local, con barra lateral, encabezado de estado general y pa
 | **7. SDN/OVS/Faucet** | Estado del controlador, puertos, VLAN410/420, reglas y aislamiento | Verificar comunicación y aislamiento; falla/retorno de puerto autorizado |
 | **8. Pruebas de red** | Ping corto/extendido, traceroute, HTTP, iperf3 TCP/UDP con origen/destino permitido, pérdidas, RTT, tasa, jitter si se observa | Lanzar ensayo **acotado**, guardar resultado y compararlo |
 | **9. Observabilidad** | Prometheus/S04, SLI/SLO experimental, históricos, latencia P50/P95, pérdida, incidentes, alertas, calidad/edad de fuente | Seleccionar ventana/servicio y exportar gráfica o evidencia |
-| **10. Diagnóstico IA** | Detección, scores, explicación, confianza/UNKNOWN, baseline de reglas, pronóstico y drift **solo cuando S06 se implemente** | Inferencia solo lectura; consulta de evidencia |
+| **10. Diagnóstico IA** | Detección, scores, explicación, confianza/UNKNOWN, baseline de reglas, pronóstico y deriva **solo si futuras ampliaciones los validan** | Inferencia solo lectura; consulta de evidencia |
 | **11. Incidentes y AIOps** | Correlación de fuente, línea de tiempo, recomendación, riesgo y postcondición **solo cuando S07 se implemente** | Solicitar aprobación, aplicar runbook autorizado, verificar, revertir |
-| **12. Evidencias y sistema** | Historial de trabajos, logs sanitizados, versiones, tests, métricas y catálogo | Descargar resultados JSON/CSV, generar inventario técnico y comprobar salud |
+| **12. Copiloto RAG** | Respuestas con fuentes propias, incertidumbre y citas | Consultas de solo lectura; sin autorización de cambios (#198) |
+| **13. Evidencias y sistema** | Historial de trabajos, logs sanitizados, versiones, tests, métricas y catálogo | Descargar resultados JSON/CSV, generar inventario técnico y comprobar salud |
 
 **Diseño adaptable:** desktop en VMware/Windows con barra lateral fija; tarjetas en pantallas estrechas; secciones sin implementación muestran `PENDIENTE` explícitamente, nunca resultados ficticios. Mantener el NOC S05 accesible durante la migración.
 
@@ -106,9 +107,10 @@ Los límites son **propuestas de diseño**, no capacidades ya desplegadas. `iper
 
 1. **Esqueleto UI read-only**: inicio + topología S05 + estado WAN/HA/LACP/SDN + API propia. No modificar el NOC S05 estable hasta tener pruebas de paridad.
 2. **Pruebas acotadas**: ping, traceroute, HTTP; luego iperf3 TCP/UDP con límites; gráficas, historial y exportación.
-3. **Integración S06**: analítica, detector, pronóstico, explicación y advertencias basados en datos propios verificados.
+3. **Integración S06**: detección experimental, explicación y advertencias con datos propios verificados; pronóstico no demostrado.
 4. **Integración S07**: catálogo de runbooks, aprobación, ejecución protegida, watchdog y recuperación controlada.
-5. **Demostración/aceptación**: escenarios de inicio sano → degradación → mediciones → detección/recomendación → autorización → cambio → verificación/retorno; contraste de métricas reales y evidencia.
-6. **Entrega**: test limpio de restauración, documentación de versiones, informe PDF sin anexos por instrucción docente, TAR externo sanitizado, PowerPoint y guion.
+5. **Copiloto RAG (#198)**: corpus autorizado, generación con citas y abstención, evaluación de fidelidad, relevancia y seguridad; sin autorización ni ejecución de cambios.
+6. **Demostración/aceptación**: escenarios de inicio sano → degradación → mediciones → detección/recomendación → autorización → cambio → verificación/retorno; contraste de métricas reales y evidencia.
+7. **Entrega**: test limpio de restauración, documentación de versiones, informe PDF sin anexos por instrucción docente, TAR externo sanitizado, PowerPoint y guion.
 
 **Principio UX:** el usuario elige **qué comprobar o simular**; la aplicación decide **qué procedimiento autorizado ejecutar** y registra **qué ocurrió realmente**. Nunca se presenta como una consola de comandos arbitrarios.

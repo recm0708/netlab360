@@ -30,7 +30,9 @@ El laboratorio funciona sobre Ubuntu Desktop en VMware Workstation. La red admin
 | S04 | Métricas, incidentes y observabilidad de la red multisede |
 | S05 | HTTP HA, LACP, SDN con Faucet y NOC integrado |
 | S06 | Detección de anomalías, diagnóstico inteligente y evaluación experimental de modelos |
-| S07–S08 | Operación inteligente supervisada, integración y entrega final pendientes |
+| S07 | AIOps supervisado pendiente: issue maestra #7 y #190–#197 |
+| S08 | Consola integrada, copiloto RAG #198, recuperación y entrega pendientes |
+| S09 | Ampliación condicionada; sin milestone aprobada |
 
 **Estado de S06:** fase cerrada y validada. El protocolo uniforme V2 evaluó tres métodos de detección sobre dos rutas ICMP independientes, con 140 ventanas por ruta y separación cronológica de entrenamiento, validación y prueba. Los resultados del conjunto de prueba alcanzaron valores F1 entre 0,941 y 1,000, sin falsos negativos en las ocho ventanas degradadas de cada ruta. Se validó adicionalmente un escenario independiente de falla HTTP y recuperación. El estudio histórico se conserva como exploratorio. No se atribuyen al proyecto pronóstico de fallas futuras, evaluación de MAE prospectivo, generalización del modelo ICMP a HTTP ni remediación autónoma. Consultar el [plan maestro S06–S08](docs/diseno/s06-s08-plan-maestro-y-criterios.md) y el [catálogo de evidencias S06](evidencias/capturas/fase6/README.md).
 

@@ -37,22 +37,32 @@ Se mantiene un único informe académico acumulativo. La numeración de figuras 
 
 Los documentos técnicos se organizan por función, evitando duplicar cronologías, estados de avance y procedimientos.
 
-## Matriz preliminar de cobertura
+## Matriz de cobertura académica — línea base S06
 
-La siguiente matriz constituye una referencia de planificación al cierre de S06. Su revisión definitiva requiere contrastar nuevamente los capítulos, actividades, laboratorios y guías originales del curso.
+La planificación semestral del 17 de agosto de 2026 comprende cuatro módulos y dieciséis capítulos. Se contrastaron los materiales individuales disponibles I–XII, las guías publicadas de laboratorios 1–4 y 6–8, el parcial 1 y la guía de proyecto final. Para XIII–XVI se utiliza el programa oficial: sus documentos individuales y la guía del laboratorio 5 no se localizaron en esta revisión. La numeración de las actividades publicadas no coincide necesariamente con el cronograma inicial.
 
-| Fuente académica | Contenido relacionado | Estado preliminar en NETLAB360 | Seguimiento |
+| Capítulo | Competencias | Estado acreditado al cierre S06 | Destino |
 |---|---|---|---|
-| Capítulo I y laboratorio 1 | SoT, intención, drift, reconciliación, idempotencia y OSPF | Implementado parcialmente mediante S02 y S03 | Ampliar mediante verificaciones de intención |
-| Capítulo II y laboratorio 2 | OpenTofu, módulos, estado, locking, ownership y WireGuard | Recursos locales OpenTofu validados; túneles y proveedores externos no demostrados | Evaluar ampliación |
-| Capítulos III–IV y laboratorio 3 | Ansible, roles, CI/CD, Policy as Code y rollback | Automatización FRR y GitOps implementados | Ampliar operación supervisada; evaluar multivendor |
-| Capítulos V–VI y laboratorio 4 | Prometheus, Blackbox, SLI/SLO, error budget, burn rate y Grafana | Observabilidad, persistencia e incidentes WAN comprobados | Revisar cobertura individual de componentes |
-| Capítulo VII y parcial 1 | Redes híbridas, Kubernetes, Cilium, Hubble y eBPF | Metodología experimental aprovechada; tecnologías adicionales pendientes de evaluación | Ampliación condicionada |
-| Capítulo VIII | Calidad de datos, ventanas, particiones temporales y data leakage | Estudio uniforme V2 validado | Preservar metodología y trazabilidad |
-| Capítulo IX y laboratorio 6 | IA/ML, reglas, modelos y diagnóstico | Comparación P95, Isolation Forest y regresión logística sobre ICMP | Integrar recomendaciones supervisadas |
-| Capítulo X y laboratorio 7 | Anomalías y referencias históricas no intrusivas | Detección experimental de degradación y análisis retrospectivo | Ampliar correlación contextual |
-| Capítulo XI y laboratorio 8 | Pronóstico, horizonte temporal, MAE, costo de alertas y QoS | Pronóstico futuro y MAE prospectivo no demostrados | Evaluar ampliación experimental |
-| Capítulo XII y laboratorio 8 | Explicabilidad, overfitting, deriva y revisión humana | Evaluación cronológica y análisis descriptivo de deriva | Ampliar explicabilidad y validación de cambios de contexto |
+| I | SoT, estado deseado, drift, convergencia e intención | OSPF y reconciliación FRR comprobados; intención integral parcial | S07 |
+| II | OpenTofu, HCL, módulos, providers, state, locking y lifecycle | Metadatos locales; recursos externos, backend remoto y WireGuard no demostrados | S09 condicionada (#17, #24) |
+| III | Ansible, roles, idempotencia, compliance y multivendor | FRR validado; VyOS y multivendor no demostrados | S07/S09 |
+| IV | NetDevOps, CI/CD, GitOps, Policy as Code | Git y CI comprobados; reconciliación continua GitOps y autorización integral pendientes | S07/S08; ampliación S09 |
+| V | gNMI, OpenConfig, gRPC, Protobuf, suscripciones | Adquisición periódica comprobada; streaming real no demostrado | S09 |
+| VI | Prometheus, señales, SLI/SLO, error budget y burn rate | Exporter, NOC, TSDB, SQLite y SLI experimental comprobados; ampliar observación del servicio | S08/S09 |
+| VII | Dependencias híbridas, Kubernetes, Cilium, Hubble y eBPF | WAN/servicios multisede comprobados; cloud-native no demostrado | S09 |
+| VIII | Fuentes, esquemas, timestamps, calidad, ventanas y leakage | Estudio ICMP V2 experimental; fuentes heterogéneas y nuevas características ampliables | S07/S09 |
+| IX | Reglas, ML supervisado/no supervisado y evaluación | P95, Isolation Forest y regresión logística en ICMP; alcance experimental | S07 |
+| X | Anomalías, contexto y errores de detección | Detección controlada y análisis retrospectivo; no toda anomalía confirma incidente | S07/S09 |
+| XI | Predicción, capacidad, QoE, incertidumbre | Pronóstico futuro y MAE prospectivo no demostrados | S09 |
+| XII | Generalización, explicabilidad y deriva | Separación cronológica y análisis descriptivo; explicabilidad y concept drift inferencial limitados/no demostrados | S07/S09 |
+| XIII | Correlación temporal/topológica/contextual y RCA | Señales disponibles; correlación sistemática y priorización pendientes | S07 |
+| XIV | LLM, RAG, grounding y copilotos | No demostrado; recuperación documental y generación evaluada pendientes | S07/S08 |
+| XV | AIOps, orquestación, agentes y human-in-the-loop | Guardas y rollback acotados existentes; ciclo integral pendiente | S07/S08 |
+| XVI | Integración, aceptación, confiabilidad y riesgo | S01–S06 cerradas; ciclo extremo a extremo y arranque frío pendientes | S08, o aceptación final tras S09 si se aprueba |
+
+### Guías prácticas contrastadas
+
+Laboratorio 1: intención y diferenciación de drift/falla. Laboratorio 2: recursos reales, WireGuard y locking. Laboratorio 3: FRR/VyOS e idempotencia. Laboratorio 4: Blackbox, Grafana, SLI/SLO y burn rate. Laboratorio 6: incidentes, RFC, separación de responsabilidades y runbooks; reserva de TEST. Laboratorio 7: Isolation Forest y contexto histórico. Laboratorio 8: pronóstico a diez minutos, MAE, costo y cambio QoS. Parcial 1: integración OSPF con Kubernetes/Cilium/Hubble. Los resultados de esas prácticas no se atribuyen a NETLAB360.
 
 ## Estado técnico de referencia
 
@@ -64,11 +74,27 @@ El estudio V2 utiliza particiones cronológicas independientes, modelos congelad
 
 S07 desarrollará la operación inteligente supervisada mediante correlación de eventos, diagnóstico, recomendación, aprobación humana, ejecución autorizada, comprobación y rollback.
 
-S08 consolidará la aplicación interactiva, las pruebas reproducibles, la recuperación operativa y la preparación de la entrega según el alcance aprobado.
+S08 consolidará la aplicación interactiva, las pruebas reproducibles, el copiloto generativo RAG (#198), la recuperación operativa y la preparación de la entrega según el alcance aprobado. S07 se controla mediante #7 y #190–#197.
 
 La eventual S09 constituye una ampliación condicionada, no una fase aprobada ni implementada. Su necesidad se determinará después de revisar esta matriz al cierre de S07 y S08.
 
 Las tecnologías adicionales deberán responder a un caso de uso propio, contar con recursos suficientes y conservar el aislamiento de la red administrativa.
+
+## Decisión condicionada de ampliación S09
+
+Reevaluar esta matriz al cierre de S07 y S08. No se crea milestone S09 ni se trasladan #17/#24 hasta aprobar alcance, recursos, calendario y valor académico. S08 sigue siendo la entrega comprometida; si S09 se incorpora formalmente al proyecto, la aceptación y empaquetado finales se programarán después de su validación. De lo contrario, S09 será una ampliación posterior.
+
+| Grupo candidato | Prueba requerida |
+|---|---|
+| IaC y multivendor | Provider real, módulos, data source, ownership, lifecycle, locking, WireGuard y VyOS en recursos aislados |
+| GitOps | Reconciliación periódica del estado deseado con autorización y control de cambios |
+| Streaming | Suscripciones gNMI/OpenConfig con timestamps, calidad y trazabilidad |
+| Observabilidad | Sondas Blackbox, Grafana, Alertmanager, burn rate de servicio y trazas OpenTelemetry cuando proceda |
+| Cloud-native | Kubernetes, Cilium, Hubble, eBPF y políticas de flujo verificadas en dominio separado |
+| Analítica | Nuevos escenarios y características, pronóstico temporal con MAE, evaluación de QoS/QoE, deriva con etiquetas independientes y explicabilidad |
+| Rendimiento | TCP/UDP, pérdida, jitter y capacidad experimental con límites de carga |
+
+Estas capacidades son candidatas, no compromisos de implementación ni resultados demostrados. No es obligatorio incorporar cada herramienta del programa si no resuelve el problema del proyecto.
 
 ## Preparación del paquete técnico y demostración
 

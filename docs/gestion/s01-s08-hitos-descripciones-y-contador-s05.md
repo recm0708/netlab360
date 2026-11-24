@@ -8,7 +8,7 @@ Las fases S01–S06 están cerradas técnicamente. S07 y S08 permanecen abiertas
 |---|---|---|
 | S01 | Cerrada | VM, IPAM, SSH y línea base |
 | S02 | Cerrada | Tres sedes, FRRouting, OSPF, cuatro WAN y nueve VLAN |
-| S03 | Cerrada | SoT candidata, Ansible, OpenTofu local y GitOps |
+| S03 | Cerrada | SoT candidata, Ansible, OpenTofu local y CI/CD |
 | S04 | Cerrada | Observabilidad, incidentes, persistencia y SLI/SLO experimentales |
 | S05 | Cerrada | HTTP HA, LACP multisede, SDN y NOC integrado |
 | S06 | Cerrada | Diagnóstico experimental V2, modelos congelados, FAULT HTTP independiente y recuperación |
@@ -19,7 +19,7 @@ Las fases S01–S06 están cerradas técnicamente. S07 y S08 permanecen abiertas
 
 La inconsistencia histórica del contador S05 fue resuelta. Las seis issues técnicas asignadas a dicha milestone permanecen cerradas.
 
-La issue #24 contempla una eventual ampliación mediante una cuarta sede o WireGuard. No constituye una funcionalidad demostrada de S05.
+S07 comprende la issue maestra #7 y las ocho issues técnicas #190–#197. S08 incorpora el copiloto RAG #198 además de sus issues vigentes. #17 (OpenTofu externo) y #24 (cuarta sede/WireGuard) permanecen condicionadas; su destino se decidirá al reevaluar S07 y S08. S09 no dispone de milestone aprobada.
 
 El cierre de una milestone exige comprobar el estado y los criterios de aceptación de sus issues. El porcentaje de GitHub no representa por sí solo el avance técnico ni una calificación académica.
 

@@ -28,6 +28,8 @@ Plataforma de laboratorio en Ubuntu Desktop 26.04.1 LTS/VMware Workstation, con 
 
 ## 3. Material académico que alimenta el diseño
 
+La planificación oficial comprende capítulos I–XVI. La matriz vigente distingue los contenidos revisados, las competencias acreditadas y las ampliaciones condicionadas. En XIII–XVI se utiliza el programa oficial hasta disponer de los documentos individuales.
+
 Se recibieron capítulos **I–XII**, materiales complementarios, actividades individuales, laboratorios resueltos y guías docentes del proyecto semestral, incluyendo laboratorios relacionados con IA, detección de anomalías, pronóstico, calidad de datos y QoS. Su matriz de cobertura por capítulo está en [Cobertura académica y criterios de aceptación](../gestion/cobertura-academica-netlab360.md).
 
 **Regla de procedencia:** capítulos y ejercicios son antecedentes didácticos, no mediciones NETLAB360. Para el informe solo atribuir resultados a ensayos genuinos con registros. No subir PDF docentes completos, respaldos privados ni material de terceros innecesariamente al TAR o repositorio.
@@ -45,24 +47,40 @@ Se recibieron capítulos **I–XII**, materiales complementarios, actividades in
 
 ### S07 — AIOps supervisado
 
-- Correlacionar evento, telemetría, estado OSPF/FIB, HA, LACP, SDN y diagnóstico S06.
-- Diseñar catálogo de procedimientos permitidos, prechecks, bloqueo de concurrencia, límites y aprobación humana antes de modificar redes.
-- Ciclo medido **detectar → explicar → recomendar → aprobar → ejecutar → verificar → rollback/restaurar**, con bitácoras y postcondiciones.
-- Sin autoejecución de cambios riesgosos por resultados IA. **Gate:** escenarios reales con aprobación, acciones reversibles, auditoría y red de gestión intacta. Issue #7.
+Issue maestra [#7](https://github.com/recm0708/netlab360/issues/7). Implementación pendiente, en este orden lógico:
 
-### S08 — Consola web interactiva, regresión y entrega
+| Bloque | Issue | Resultado exigido |
+|---|---|---|
+| S07.1 | [#190](https://github.com/recm0708/netlab360/issues/190) | Contrato común de eventos e incidentes, fuentes reales y calidad |
+| S07.2 | [#191](https://github.com/recm0708/netlab360/issues/191) | Correlación y RCA con evidencia, hipótesis e incertidumbre |
+| S07.3 | [#192](https://github.com/recm0708/netlab360/issues/192) | Runbooks permitidos, recomendaciones y recuperación documental |
+| S07.4 | [#193](https://github.com/recm0708/netlab360/issues/193) | Intent Assurance, compliance, políticas, RFC y aprobación separada |
+| S07.5 | [#194](https://github.com/recm0708/netlab360/issues/194) | Orquestación, ejecución protegida, ownership y concurrencia |
+| S07.6 | [#195](https://github.com/recm0708/netlab360/issues/195) | Post-checks, watchdog, rollback y escalamiento seguro |
+| S07.7 | [#196](https://github.com/recm0708/netlab360/issues/196) | Escenarios WAN/HA/LACP/SDN/drift y métricas de operación |
+| S07.8 | [#197](https://github.com/recm0708/netlab360/issues/197) | API autorizada, pruebas y aceptación integral |
 
-- Crear **un único menú web central**, integrando NOC S05 existente, pruebas ICMP corto/extendido, traceroute, HTTP y TCP/UDP iperf3 limitado entre endpoints permitidos, series y visualización, inferencia S06, recomendaciones/acciones S07 y resultados antes/después.
-- Vincular cada botón a **identificadores de acciones aprobadas** en un catálogo versionado, no a cadenas de shell ingresadas por el usuario. Guardar implementaciones en `scripts/s08/acciones/`; instalar ejecutores privilegiados revisados como archivos root-owned fuera de la carpeta Git editable.
-- API única y visualización operativa sin necesidad de teclear comandos en la demostración; auditar parámetros, tiempos, resultados y postcondiciones; distinguir READY/DEGRADED/DOWN/UNKNOWN.
-- Probar regresión y recuperación desde reinicio/arranque frío, sin afectar `ens33`.
-- **Gate:** demo integral y TAR técnico seguro/verificado, PowerPoint e informe académico validados. Issues #8, #27, #44, #45, #106.
+Implementar primero componentes de solo lectura y pruebas offline; habilitar cambios únicamente tras aprobar catálogo, políticas y ejecutores. El motor de autorización es determinista y no concede privilegios al LLM. El diagnóstico UNKNOWN no autoriza cambios. El gate exige ciclo real detectar → explicar → recomendar → aprobar → ejecutar → verificar → restaurar, evidencia reproducible, regresión y red administrativa intacta. Reevaluar la matriz académica al cierre.
 
-**Orden de implementación:** terminar regresión S06-025/026 y corregir `status` WAN → diseñar/adquirir datos S06 → modelos y métricas → AIOps S07 → consola S08 e integración progresiva → pruebas finales/entrega. Se puede crear el esqueleto del frontend en paralelo, pero no marcar pantallas de IA como operativas antes de su implementación.
+### S08 — Consola web interactiva, copiloto, regresión y entrega
+
+- Un menú web integra topología, WAN/OSPF/VLAN, HA, LACP, SDN, métricas, diagnóstico IA, incidentes, RFC, runbooks, auditoría y resultados.
+- API controlada S07, pruebas ICMP/traceroute/HTTP/iperf3 TCP/UDP con límites y catálogo versionado; sin shell libre ni privilegios del navegador.
+- Copiloto generativo RAG (#198) con corpus propio autorizado, citas verificables, evaluación de grounding, abstención y resistencia a instrucciones maliciosas. No autoriza cambios.
+- Recuperación desde apagado (#106), compatibilidad (#34), regresión, demostración e informe/TAR/PPT según #27, #43, #44 y #45. OVA condicionada a #29.
+- Reevaluar la cobertura al cierre; resolver #17/#24 sin confundir opciones con resultados. Gate: consola integrada, restauración y aceptación de extremo a extremo.
+
+### S09 — Ampliación condicionada
+
+No aprobada ni creada como milestone. Candidatos y criterios en [Cobertura académica](../gestion/cobertura-academica-netlab360.md). Evaluar al cierre de S07 y S08; si se aprueba como parte de la entrega, reprogramar aceptación y empaquetado finales; si no, conservar S08 como entrega y S09 como ampliación posterior.
+
+**Orden vigente:** baseline S01–S06 aprobada → S07 → S08 → decisión explícita sobre S09. No declarar resultados de funcionalidades pendientes.
 
 **Adquisición S06 validada en VM:** PR #155 incorporó `scripts/s06/capturar_baseline.py` y PR #156 `scripts/s06/medir_rendimiento.py`; ambos se probaron localmente en S06-032/033 (12+12 registros válidos), con procedencia y etiqueta `UNKNOWN`. Las sesiones fueron auditadas en S06-034 con el normalizador del PR #157; **no** constituyen un dataset de entrenamiento etiquetado ni acreditan un modelo de IA. Protocolos: `docs/diseno/s06-adquisicion-observacional.md`, `docs/diseno/s06-mediciones-rendimiento.md` y `docs/diseno/s06-normalizacion-y-calidad.md`.
 
 ## 4.1. Adquisición S06-032/033 y normalización S06-034 (22/11/2026, Panamá)
+
+**Antecedentes de validación S06:** los cortes fechados siguientes son registros históricos, no el plan de ejecución vigente. S06 está cerrada.
 
 **Avance funcional estimado de S06: 35 %**, cálculo conservador del esfuerzo implementado frente al alcance total de datos, experimentos, modelos, pronóstico y API; no calificación docente. No usar la proporción de casillas ni la cantidad de pruebas como porcentaje de IA completada.
 
