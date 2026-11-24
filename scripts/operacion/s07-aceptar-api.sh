@@ -28,7 +28,7 @@ GATEWAY="$(ip -4 route show default)"
 test "$(sudo -n ip netns list | wc -l)" -eq 21
 test "$(sudo -n docker ps -q | wc -l)" -eq 4
 for u in "$UNIT" netlab360-s07-ospf-broker.service netlab360-s07-rfc-live.service netlab360-s07-rfc-preview.service; do
-    ! systemctl is-active --quiet "$u"
+    if systemctl is-active --quiet "$u"; then echo "SERVICIO_PREVIO_ACTIVO=$u"; exit 19; fi
 done
 TIMERS="$(systemctl list-timers --all --plain --no-legend)"
 if grep -Eq 'netlab360-s07-(wan-rescue-|http-rescue-|ospf-|recovery-)|nl360-s05-.*rescate-' <<< "$TIMERS"; then
@@ -106,11 +106,13 @@ RID="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["rfc_id"]
 [[ "$RID" =~ ^[0-9a-f]{32}$ ]]
 TIMER="netlab360-s07-ospf-$RID.timer"
 if systemctl is-active --quiet "$TIMER"; then
-    if ! sudo -n systemctl stop "$TIMER"; then ! systemctl is-active --quiet "$TIMER"; fi
+    if ! sudo -n systemctl stop "$TIMER"; then
+        if systemctl is-active --quiet "$TIMER"; then exit 39; fi
+    fi
 fi
-! systemctl is-active --quiet "$TIMER"
+if systemctl is-active --quiet "$TIMER"; then exit 39; fi
 sudo -n systemctl stop "$UNIT"
-! systemctl is-active --quiet "$UNIT"
+if systemctl is-active --quiet "$UNIT"; then exit 39; fi
 sudo -n /usr/bin/python3 -I "$PF" check > "$RUN/preflight-final.json"
 python3 - "$RUN" <<'PY'
 from pathlib import Path
