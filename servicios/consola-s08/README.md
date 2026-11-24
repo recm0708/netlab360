@@ -78,6 +78,11 @@ La raíz redirige a /login o /home según la sesión. Servimos un documento
 independiente para el acceso y otro para las quince rutas de consola,
 protegidas en el servidor. La marca enlaza a /home; la cabecera reúne
 identidad, vencimiento y cierre de sesión. El menú se puede contraer.
+Usamos iconos SVG propios de 24 y 28 píxeles y barras de desplazamiento
+adaptadas al tema. En escritorio separamos el scroll de navegación del
+contenido. Recordamos por pestaña únicamente la posición numérica del
+menú, su estado contraído y el desplazamiento por ruta autorizada;
+no guardamos identidad, credenciales, cookies, CSRF ni respuestas.
 Las vistas todavía no habilitadas indican su indisponibilidad, sin
 simular datos. Reservamos /administration para la gestión de identidad
 propia y futura administración de cuentas (#242), y /debug para el

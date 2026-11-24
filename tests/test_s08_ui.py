@@ -56,12 +56,34 @@ class StructureTests(unittest.TestCase):
         for value in ("localStorage","sessionStorage","document.cookie","innerHTML"):
             self.assertNotIn(value,js)
 
-    def test_no_operational_fetch_or_browser_storage(self):
+    def test_no_operational_fetch_or_secret_storage(self):
         js = (UI / "static/app.js").read_text(encoding="utf-8")
-        for value in ("localStorage", "sessionStorage", "innerHTML",
+        for value in ("localStorage", "innerHTML",
                       "/api/v1/sources", "/api/v1/metrics", "/api/v1/advisory"):
             self.assertNotIn(value, js)
         self.assertIn('credentials: "omit"', js)
+
+    def test_vector_icons_and_scroll_layout(self):
+        html = (UI / "index.html").read_text(encoding="utf-8")
+        self.assertEqual(html.count('<svg class="nav-symbol"'), 15)
+        self.assertEqual(html.count('class="nav-text"'), 15)
+        self.assertIn('title="Diagnóstico técnico"', html)
+        self.assertNotIn('<span class="nav-symbol"', html)
+        css = (UI / "static/styles.css").read_text(encoding="utf-8")
+        for rule in ("scrollbar-color:", "--scroll-thumb", "height: 100dvh",
+                     "overflow-y: auto", "overscroll-behavior: contain",
+                     "width: 24px; height: 24px", "width: 28px; height: 28px"):
+            self.assertIn(rule, css)
+
+    def test_presentation_storage_is_limited(self):
+        js = (UI / "static/app.js").read_text(encoding="utf-8")
+        self.assertEqual(js.count("sessionStorage."), 2)
+        self.assertIn("sessionStorage.getItem(presentationKey)", js)
+        self.assertIn("sessionStorage.setItem(presentationKey, JSON.stringify(presentation))", js)
+        self.assertIn('const clean = {collapsed: false, menu: {expanded: 0, collapsed: 0}, pages: {}}', js)
+        self.assertIn("for (const path of allowedPages)", js)
+        self.assertIn('window.addEventListener("pagehide", savePresentation)', js)
+        self.assertIn("restorePresentation()", js)
 
     def test_login_structure(self):
         html = (UI / "login.html").read_text(encoding="utf-8")

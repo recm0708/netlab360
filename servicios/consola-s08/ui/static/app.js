@@ -188,7 +188,12 @@ function showIdentity(data) {
   accessState.dataset.state = "ok";
   shell.hidden = false;
   recoveryPanel.hidden = true;
-  if (first && location.pathname === "/home") update();
+  if (first) {
+    restorePresentation();
+    if (location.pathname === "/home") {
+      update().then(() => restoreContentIfUnchanged());
+    }
+  }
   authNotice.textContent = "Sesión vigente. Acciones de red deshabilitadas.";
   controls();
   tick();
@@ -339,11 +344,102 @@ if (active) {
   document.title = "NETLAB360 | " + label;
 }
 
+// Guardamos exclusivamente preferencias visuales por pestaña, nunca identidad ni CSRF.
 const menuToggle = document.getElementById("menu-toggle");
+const navigation = document.getElementById("navigation");
+const contentPanel = document.getElementById("main");
+const presentationKey = "netlab360.presentation.v1";
+const allowedPages = links.map(link => link.getAttribute("href"));
+
+function scrollValue(value) {
+  return Number.isFinite(value) ? Math.max(0, Math.min(1000000, Math.round(value))) : 0;
+}
+
+function readPresentation() {
+  const clean = {collapsed: false, menu: {expanded: 0, collapsed: 0}, pages: {}};
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(presentationKey) || "{}");
+    if (!saved || typeof saved !== "object") return clean;
+    clean.collapsed = saved.collapsed === true;
+    for (const mode of ["expanded", "collapsed"]) {
+      clean.menu[mode] = scrollValue(saved.menu?.[mode]);
+    }
+    for (const path of allowedPages) {
+      clean.pages[path] = scrollValue(saved.pages?.[path]);
+    }
+  } catch {
+    // La navegación sigue siendo funcional si el navegador bloquea almacenamiento.
+  }
+  return clean;
+}
+
+const presentation = readPresentation();
+let presentationReady = false;
+let contentRestore = null;
+
+function menuMode() {
+  return presentation.collapsed ? "collapsed" : "expanded";
+}
+
+function contentScroller() {
+  return matchMedia("(min-width: 701px)").matches ? contentPanel : document.scrollingElement;
+}
+
+function savePresentation() {
+  if (!presentationReady || shell.hidden) return;
+  if (navigation.clientHeight > 0) presentation.menu[menuMode()] = scrollValue(navigation.scrollTop);
+  if (allowedPages.includes(location.pathname)) {
+    presentation.pages[location.pathname] = scrollValue(contentScroller().scrollTop);
+  }
+  try {
+    sessionStorage.setItem(presentationKey, JSON.stringify(presentation));
+  } catch {
+    // No dependemos del almacenamiento para autenticar ni consultar.
+  }
+}
+
+function setMenuState() {
+  shell.classList.toggle("menu-collapsed", presentation.collapsed);
+  menuToggle.setAttribute("aria-expanded", String(!presentation.collapsed));
+  menuToggle.setAttribute("aria-label", presentation.collapsed ? "Expandir menú" : "Contraer menú");
+}
+
+function restorePresentation() {
+  if (presentationReady) return;
+  setMenuState();
+  navigation.scrollTop = presentation.menu[menuMode()];
+  const desired = presentation.pages[location.pathname] || 0;
+  const scroller = contentScroller();
+  scroller.scrollTop = desired;
+  contentRestore = {desired, initial: scroller.scrollTop};
+  presentationReady = true;
+}
+
+// El inicio puede crecer al recibir sus metadatos. Restauramos el punto
+// guardado tras cargar solo si el usuario aún no desplazó el contenido.
+function restoreContentIfUnchanged() {
+  if (!contentRestore || shell.hidden) return;
+  const scroller = contentScroller();
+  if (scroller.scrollTop === contentRestore.initial) {
+    scroller.scrollTop = contentRestore.desired;
+  }
+  contentRestore = null;
+}
+
 menuToggle.addEventListener("click", () => {
-  const collapsed = shell.classList.toggle("menu-collapsed");
-  menuToggle.setAttribute("aria-expanded", String(!collapsed));
-  menuToggle.setAttribute("aria-label", collapsed ? "Expandir menú" : "Contraer menú");
+  savePresentation();
+  presentation.collapsed = !presentation.collapsed;
+  setMenuState();
+  navigation.scrollTop = presentation.menu[menuMode()];
+  savePresentation();
+});
+
+navigation.addEventListener("scroll", savePresentation, {passive: true});
+contentPanel.addEventListener("scroll", savePresentation, {passive: true});
+window.addEventListener("scroll", savePresentation, {passive: true});
+window.addEventListener("pagehide", savePresentation);
+document.querySelectorAll("#navigation a, .sidebar .brand").forEach(link => {
+  link.addEventListener("click", savePresentation);
 });
 
 // Comprobar la sesión también al volver desde la caché de navegación.
