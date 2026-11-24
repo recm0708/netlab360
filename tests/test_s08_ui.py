@@ -56,6 +56,17 @@ class StructureTests(unittest.TestCase):
                          'id="session-panel" hidden', 'id="logout" type="button" disabled'):
             self.assertIn(fragment, html)
 
+    def test_product_labels_and_clock(self):
+        html = (UI / "index.html").read_text(encoding="utf-8")
+        self.assertNotRegex(html.lower(), r"\bfase\s*\d+|\bs0[1-9]\b|laboratorio académico")
+        self.assertIn("Supervisión multisede", html)
+        self.assertIn("Expiración (Panamá)", html)
+        self.assertEqual(html.count('aria-disabled="true"'), 12)
+        js = (UI / "static/app.js").read_text(encoding="utf-8")
+        self.assertIn('timeZone: "America/Panama"', js)
+        self.assertIn("formatPanama(stamp)", js)
+        self.assertIn("formatPanama(new Date(session.expiresAt * 1000))", js)
+
     def test_auth_client_fixed_routes(self):
         js = (UI / "static/app.js").read_text(encoding="utf-8")
         for route in ("/api/v1/auth/login", "/api/v1/auth/me", "/api/v1/auth/logout"):

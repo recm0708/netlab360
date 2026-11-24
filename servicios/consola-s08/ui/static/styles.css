@@ -75,3 +75,10 @@ footer { color: var(--muted); padding: 16px 28px; border-top: 1px solid var(--li
 #auth-notice { font-size: .88rem; color: var(--muted); margin-top: 14px; }
 #session-panel dl { max-width: 640px; }
 @media (max-width: 1000px) { .login-grid { grid-template-columns: minmax(0, 1fr); } }
+
+/* La navegación de escritorio conserva su posición al recorrer el contenido. */
+@media (min-width: 701px) {
+  .sidebar { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; }
+}
+#session-panel dl { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); max-width: 640px; }
+#session-panel dd { text-align: left; }

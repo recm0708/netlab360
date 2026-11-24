@@ -7,6 +7,20 @@ const capabilities = document.getElementById("capabilities");
 const observed = document.getElementById("observed");
 const notice = document.getElementById("notice");
 
+// Una zona horaria y un formato comunes para toda la presentación.
+const panamaClock = new Intl.DateTimeFormat("en-GB", {
+  timeZone: "America/Panama", year: "numeric", month: "2-digit",
+  day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit",
+  hourCycle: "h23"
+});
+
+function formatPanama(date) {
+  const parts = Object.fromEntries(panamaClock.formatToParts(date)
+    .filter(part => part.type !== "literal").map(part => [part.type, part.value]));
+  return parts.day + "/" + parts.month + "/" + parts.year + " " +
+    parts.hour + ":" + parts.minute + ":" + parts.second;
+}
+
 const fields = [
   ["authentication_enabled", "Autenticación HTTP"],
   ["persistence_enabled", "Persistencia privada"],
@@ -61,7 +75,7 @@ async function update() {
     if (!Number.isFinite(stamp.getTime())) throw new Error("INVALID_TIMESTAMP");
     apiState.textContent = health.healthy === true ? "Disponible" : "UNKNOWN";
     apiState.dataset.state = health.healthy === true ? "ok" : "unknown";
-    observed.textContent = "Respuesta del proceso (UTC): " + stamp.toISOString();
+    observed.textContent = "Respuesta del proceso (Panamá): " + formatPanama(stamp);
     showCapabilities(caps);
     notice.textContent = "Metadatos recibidos. La salud global de red sigue siendo UNKNOWN.";
   } catch {
@@ -140,7 +154,7 @@ function showIdentity(data) {
   document.getElementById("session-user").textContent = session.username;
   document.getElementById("session-role").textContent = session.role;
   document.getElementById("session-expiry").textContent =
-    new Date(session.expiresAt * 1000).toLocaleString("es-PA");
+    formatPanama(new Date(session.expiresAt * 1000));
   identityLabel.textContent = session.username + " · " + session.role;
   accessState.textContent = "Autenticado";
   accessState.dataset.state = "ok";

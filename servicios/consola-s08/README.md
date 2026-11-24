@@ -83,6 +83,20 @@ operacionales no consultados permanecen UNKNOWN. La navegación de detalle
 y Plotly se integrarán por separado. La política CSP permite solo scripts, estilos
 y consultas del mismo origen, sin código inline.
 
+Presentamos NETLAB360 como consola de operaciones: los identificadores
+académicos de fases, lotes e issues se conservan en código y documentación,
+no en textos, etiquetas, tablas o mensajes visibles. Traducimos los
+identificadores de procedencia a nombres funcionales de las fuentes.
+Mostramos fechas en la zona America/Panama, formato día/mes/año y 24 horas;
+conservamos UTC en los contratos internos.
+
+Durante el desarrollo, los recursos visuales se leen del disco en cada
+solicitud. Aplicamos cambios HTML, CSS y JavaScript mediante avance rápido
+de Git y recarga del navegador, sin reiniciar Uvicorn. Los cambios Python
+requieren reiniciar únicamente la consola, no los servicios de red.
+Validamos el código antes de actualizar la copia activa; la recarga exige
+volver a autenticar al usuario según la política de sesión vigente.
+
 ## Persistencia local
 
 Desde el mismo directorio y sin root, con el directorio
