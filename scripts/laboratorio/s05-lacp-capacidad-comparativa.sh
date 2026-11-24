@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-# NETLAB360 | Laboratorio: s05 lacp capacidad comparativa
-# Alcance: recursos propios del módulo, sin alterar la red administrativa.
-
 # NETLAB360 S05/P1B: rendimiento de LACP sin tope -b.
 # Solo dos namespaces privados + dos veth por extremo. Nunca toca ens33/VMnet8.
 # Contencion: 2 vCPU para servidor, 2 para cliente, nice +10 y timeout.
