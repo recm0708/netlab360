@@ -23,6 +23,12 @@ SOURCES = {
         "max_age": 60,
         "kind": "OBSERVATION",
     },
+    "FRR_S02": {
+        "subjects": frozenset({"OSPF", "FIB"}),
+        "endpoint": "local:FRR_S02_READONLY",
+        "max_age": 60,
+        "kind": "OBSERVATION",
+    },
     "IA_S06": {
         "subjects": frozenset({"ICMP_DIAGNOSIS"}),
         "endpoint": "/api/v1/s06/diagnostics",

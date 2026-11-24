@@ -57,3 +57,11 @@ Se normalizan 23 señales: dos de adquisición (scrape y lectura del colector), 
 El timestamp de Prometheus acredita el scrape, no la hora exacta de adquisición interna del exporter, que mantiene un snapshot cacheado. La calidad VALID en esta fuente indica un scrape vigente y utilizable, no vigencia independiente de la medición interna ni confirmación de forwarding. Las señales administrativas y de existencia conservan UNKNOWN operacional. El valor -1 representa desconocimiento, no DOWN. El estado FAULT del exporter se limita a su scrape fallido, no a la red.
 
 OSPF y FIB se incorporarán mediante lectura explícita de los routers en S07-001C2, porque el exporter S04 no publica estas métricas. No se modifican sus procesos ni reglas. La aceptación en la VM permanece pendiente al publicar este componente.
+
+## Lectura directa de OSPF y FIB
+
+S07-001C2 implementa [adaptador FRR S02](../../scripts/s07/adaptador_frr.py) y [pruebas](../../tests/test_s07_adaptador_frr.py). Incorpora una fuente independiente FRR_S02, ocho extremos de adyacencia OSPF y seis selecciones FIB entre loopbacks. La ejecución es puntual por un operador con sudo previamente autenticado, no un servicio privilegiado ni una API de ejecución. Las consultas son fijas: inspección Docker, show ip ospf neighbor e ip route get. No genera pings ni cambios de configuración.
+
+Antes y después de la lectura por router se verifica la identidad del contenedor y su PID contra el estado de propiedad S02; se comprueba la red administrativa antes y después del lote. El registro de fecha corresponde a la finalización de cada consulta, no a una medición simultánea de todas las fuentes. La información no disponible o sin identidad verificable permanece UNKNOWN.
+
+OSPF Full confirma únicamente la adyacencia observada; una fila no Full es una desviación de la línea base. La ausencia de fila no se declara automáticamente FAULT. La FIB principal o de respaldo se clasifica respecto al diseño esperado, sin afirmar tráfico real. La aceptación operativa queda pendiente de prueba en la VM. No se alteran los servicios existentes.
