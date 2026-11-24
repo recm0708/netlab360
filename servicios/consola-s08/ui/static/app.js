@@ -102,6 +102,19 @@ function dashboardBatch(key, payload, started) {
         !["NORMAL","DEGRADED","FAULT","RECOVERY","UNKNOWN"].includes(row.state)) {
       throw new Error("INVALID_OBSERVATION");
     }
+    const expectedKind = key === "diagnostics" ? "INFERENCE" : key === "advisory" ? "ADVISORY_SNAPSHOT" : "OBSERVATION";
+    const scope = row.resource === "FRONTAL_HQ" ? "HTTP_FROM_S2" :
+      row.resource === "FAUCET" ? "CONTROLLER_ONLY" :
+      row.resource.startsWith("LACP-") ? "BOND_MEMBER_STATE" :
+      row.resource.startsWith("WAN-END-") || row.resource.startsWith("VLAN-") ? "ADMIN_STATE_ONLY" :
+      row.source === "EXPORTER_S04" ? "ROUTER_EXISTENCE_ONLY" :
+      row.source === "NOC_S05" ? "TOPOLOGY_OBSERVATION" :
+      row.resource === "S04-EXPORTER" ? "SCRAPE_AVAILABILITY" :
+      row.resource === "S04-COLLECTOR" ? "COLLECTOR_READ" :
+      row.source === "PROMETHEUS_S04" ? (row.resource === "MULTISEDE" ?
+        "ROUTER_EXISTENCE_ONLY" : "CONTAINER_RUNNING_ONLY") :
+      key === "diagnostics" ? "HQ_CLIENT_EGRESS_NETWORK_STATE" : null;
+    if (row.kind !== expectedKind || (scope && row.scope !== scope)) throw new Error("INVALID_SCOPE");
     const valid = row.quality === "VALID";
     if (valid && (row.transport !== "OK" || typeof row.age_seconds !== "number" ||
         !Number.isFinite(row.age_seconds) || row.age_seconds < 0 || row.age_seconds > expected[4] ||
@@ -111,7 +124,8 @@ function dashboardBatch(key, payload, started) {
       throw new Error("INVALID_FRESHNESS");
     }
     const state = valid && key !== "advisory" &&
-      (key !== "diagnostics" || row.state === "NORMAL") ? row.state : "UNKNOWN";
+      (key !== "diagnostics" || row.state === "NORMAL") &&
+      !["ADMIN_STATE_ONLY","CONTAINER_RUNNING_ONLY","ROUTER_EXISTENCE_ONLY","TOPOLOGY_OBSERVATION"].includes(row.scope) ? row.state : "UNKNOWN";
     map.set(id, {source:expected[0],resource:expected[1],label:expected[2],
       name:expected[3],maxAge:expected[4],started,transport:row.transport,
       quality:row.quality,state,stamp:valid?row.observed_at_utc:null,
