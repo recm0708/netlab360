@@ -8,14 +8,14 @@ Utilizamos issues, pull requests y milestones para gestionar capacidades, valida
 
 - Issues: `[SNN] Descripción concreta de la capacidad o actividad`, en español y con términos técnicos originales cuando corresponda.
 - PR: título descriptivo con el código de la fase correspondiente.
-- Etiquetas: una `fase:NN`, una clasificación temática `tipo:<dominio>` y, solo cuando corresponda, `alcance:opcional`, `prioridad:alta` o `estado:bloqueado`.
+- Etiquetas: una clasificación temática `tipo:<dominio>`, las etiquetas `fase:NN` que correspondan al alcance real y, solo cuando proceda, `alcance:opcional`, `prioridad:alta` o `estado:bloqueado`.
 - Type nativo: `Feature` para una capacidad, `Task` para una actividad y `Bug` para un defecto. Es independiente de la etiqueta temática y no se asigna a PR.
 
 No incorporar estados como CERRADA o PENDIENTE en los títulos. Las etiquetas deben conservar su significado y descripción en español; los tipos nativos conservan sus nombres oficiales.
 
 ## Metadatos obligatorios de pull requests
 
-Cada PR, independientemente de su estado, debe tener al menos una etiqueta temática `tipo:<dominio>`, la etiqueta `fase:NN` del hito principal, una milestone y un responsable en Assignees. Un cambio transversal se adscribirá al hito de aceptación correspondiente, aunque afecte componentes de otras fases. Se permiten etiquetas de fases adicionales si describen el alcance real; el prefijo GESTIÓN identifica trabajos transversales sin eximir los metadatos. No se crea una fase ficticia ni se reabren milestones solo para asignar PR históricos.
+Cada PR, independientemente de su estado, debe tener al menos una etiqueta temática `tipo:<dominio>` y un responsable en Assignees. Los títulos `[SNN]` requieren su etiqueta de fase correspondiente; incorporamos etiquetas de otras fases únicamente cuando el alcance lo justifica. El prefijo `[GESTIÓN]` identifica cambios transversales o generales y permite prescindir de etiquetas de fase cuando no corresponden. Asignamos un milestone solo si existe un hito principal de aceptación inequívoco; si el cambio abarca varias fases sin un hito principal, dejamos ese campo vacío. Un milestone existente debe corresponder a una etiqueta de fase válida y a una aceptación documentada. Revisamos la pertinencia histórica a partir del propósito, los archivos modificados, las issues relacionadas y las validaciones, sin eliminar ni asignar hitos automáticamente por el número de etiquetas. No creamos fases ficticias ni reabrimos milestones solo para completar metadatos.
 
 Antes de fusionar verificamos los metadatos y las comprobaciones CI; el mantenimiento histórico conserva títulos, estados, autores, cuerpo y criterios no afectados. Consultamos los valores vigentes en GitHub, no en contadores duplicados en documentos.
 
