@@ -107,37 +107,83 @@ def review(services,network,compound,watchdog,human,denial):
             "continuous_availability_measured":False,"network_mutations_authorized":False}
 
 def show(d,section):
-    print("="*90)
-    print("NETLAB360 | S07 - "+section)
-    print("="*90)
+    """Presentación histórica ANSI, sin modificar el informe JSON."""
+    reset="\033[0m"
+    colors={"cyan":"\033[1;36m","green":"\033[1;32m","yellow":"\033[1;33m"}
+    def color(value,tone):
+        return colors[tone]+str(value)+reset
+    def rule():
+        print("-"*96)
+    def line():
+        print(color("="*96,"cyan"))
+    names={"HTTP":"ESCENARIO HTTP HA Y RCA","LACP":"ESCENARIO LACP S1 Y RCA",
+           "WAN":"CONMUTACION WAN Y RCA","SDN":"SDN - PLANO DE DATOS AISLADO",
+           "COMPOUND":"ESCENARIO COMPUESTO WAN + HTTP",
+           "EVALUACION":"EVALUACION DE HIPOTESIS Y RECOMENDACIONES",
+           "CONTROLES":"ABSTENCION, CONTROLES Y LIMITES"}
+    line()
+    print(" NETLAB360 | S07 - "+names[section])
+    line()
+    print("Modalidad: EVALUACION HISTORICA | SOLO LECTURA")
+    print("Zona horaria del laboratorio: America/Panama")
+    rule()
     if section in TARGETS:
-        for row in d["rows"]:
-            if row["case"]!=section: continue
-            print(f"{row['stage']:10} | H={row['observed']} | BRECHAS={row['coverage_gaps']} | {row['window_seconds']:.6f} s")
-            print("  "+row["decision"])
-            for h in row["hypotheses"]:
-                print(f"  {h['rule']} | {h['context']} | {h['uncertainty']}")
-                print("    "+", ".join(x["action_id"] for x in h["actions"]))
-            if "direct_evidence" in row:
-                e=row["direct_evidence"]
-                print(f"  PUERTO={e['port']} | A_B={e['a_b']} | B_C={e['b_c']} | FAUCET=CONNECTED")
-        print("RESTAURACION VERIFICADA | REGISTROS HISTORICOS")
+        rows=[r for r in d["rows"] if r["case"]==section]
+        print(f"{'ETAPA':12} {'HIPOTESIS':>10} {'BRECHAS':>10} {'VENTANA (s)':>14}  DECISION")
+        for r in rows:
+            tone="yellow" if r["stage"]=="FAULT" else "green"
+            print(color(f"{r['stage']:12}",tone)+
+                  f" {r['observed']:10} {r['coverage_gaps']:10} {r['window_seconds']:14.6f}  "+
+                  ("REVISAR" if r["hypotheses"] else "RECOPILAR EVIDENCIA" if r["coverage_gaps"] else "SIN INTERVENCION"))
+        rule()
+        if section=="SDN":
+            print(f"{'ETAPA':12} {'PUERTO':8} {'A-B':12} {'B-C':12} FAUCET")
+            for r in rows:
+                e=r["direct_evidence"]
+                print(f"{r['stage']:12} "+color(f"{e['port']:8}","yellow" if e["port"]=="DOWN" else "green")+
+                      f" {e['a_b']:12} {e['b_c']:12} "+color("CONNECTED","green"))
+            print("DETECCION AUTOMATICA DEL PUERTO: NO | EVIDENCIA DIRECTA")
+        else:
+            print(f"{'HIPOTESIS':27} {'CONTEXTO':26} INCERTIDUMBRE")
+            actions=set()
+            for r in rows:
+                for h in r["hypotheses"]:
+                    print(f"{h['rule']:27} {h['context']:26} "+color(h["uncertainty"],"yellow" if h["uncertainty"]!="SCOPED" else "green"))
+                    actions.update(x["action_id"] for x in h["actions"])
+            print("RUNBOOKS RECOMENDADOS (SOLO LECTURA):")
+            for a in sorted(actions):
+                print("  "+a)
+        print(color("RESTAURACION VERIFICADA","green"))
+        status="ESCENARIO VALIDADO"
     elif section=="EVALUACION":
-        for row in d["rows"]:
-            print(f"{row['case']:10} {row['stage']:10} ESP={row['expected']} OBS={row['observed']} RUNBOOK={row['correct_recommendations']}")
-        print("VENTANAS=15 | OBSERVACIONES=870")
-        for k,v in d["counts"].items(): print(k.upper()+"="+str(v))
+        print(f"{'ESCENARIO':12} {'ETAPA':12} {'ESPERADAS':>10} {'OBSERVADAS':>12} {'CORRECTAS':>12}")
+        for r in d["rows"]:
+            print(f"{r['case']:12} {r['stage']:12} {r['expected']:10} {r['observed']:12} "+
+                  color(f"{r['correct_recommendations']:12}","green"))
+        rule()
+        c=d["counts"]
+        print(f"VENTANAS: {d['windows']} | OBSERVACIONES: {d['observations']}")
+        print("HIPOTESIS COINCIDENTES: "+color(f"{c['matched']}/{c['expected']}","green"))
+        print("RECOMENDACIONES CORRECTAS: "+color(f"{c['correct_recommendations']}/{c['expected']}","green"))
+        print(f"INESPERADAS: {c['unexpected']} | FALTANTES: {c['missing']}")
+        status="EVALUACION HISTORICA VALIDADA"
     elif section=="CONTROLES":
-        print("VENTANA ALTERADA OFFLINE (NO ES ENSAYO REAL)")
-        print("DECISION="+d["abstention"]["decision"])
-        print("HIPOTESIS="+str(d["abstention"]["hypotheses"]))
-        print("RECHAZO REAL="+d["real_denial"])
-        print("DETECCION AUTOMATICA PUERTO SDN=NO")
-        print("GENERALIZACION ESTADISTICA=NO")
-        print("DISPONIBILIDAD CONTINUA MEDIDA=NO")
+        print("ABSTENCION: VENTANA ALTERADA OFFLINE (NO ES ENSAYO REAL)")
+        print("DECISION: "+color(d["abstention"]["decision"],"green"))
+        print("HIPOTESIS: "+str(d["abstention"]["hypotheses"]))
+        print("RECHAZO REAL: "+color(d["real_denial"],"yellow"))
+        rule()
+        print("DETECCION AUTOMATICA PUERTO SDN: NO")
+        print("GENERALIZACION ESTADISTICA: NO")
+        print("DISPONIBILIDAD CONTINUA MEDIDA: NO")
+        status="CONTROLES Y LIMITES VERIFICADOS"
     else: raise ValueError("SECTION_INVALID")
-    print("AUTORIZACION AUTOMATICA=NO | MUTACIONES NUEVAS=0")
-    print("="*90)
+    rule()
+    print("PRESENTACION HISTORICA | SIN NUEVAS MUTACIONES")
+    print("AUTORIZACION AUTOMATICA: NO")
+    line()
+    print(color(" S07-007G | "+status,"green"))
+    line()
 
 def main():
     p=argparse.ArgumentParser()
