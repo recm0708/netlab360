@@ -10,6 +10,9 @@ aceptados de las fases anteriores.
 
 | Componente | Función |
 |---|---|
+| [api/readers.py](api/readers.py) | Lectura fija de exporter S04 y NOC S05 |
+| [api/source_http.py](api/source_http.py) | Consulta de observaciones autenticada |
+| [Pruebas de lectores](../../tests/test_s08_readers.py) | Transporte, vigencia y alcance de fuentes |
 | [api/main.py](api/main.py) | Servidor HTTP de arranque y rutas públicas mínimas |
 | [api/auth_http.py](api/auth_http.py) | Login, identidad, roles y cierre de sesión HTTP |
 | [api/sessions.py](api/sessions.py) | Sesiones opacas, expiración y revocación |
@@ -30,7 +33,8 @@ Incorporamos un servidor de arranque con dos rutas públicas
 de metadatos, sin datos operacionales ni autorización.
 Incorporamos una base SQLite privada de inicialización explícita.
 Integramos la autenticación HTTP como modo explícito sobre SQLite v2.
-La interfaz gráfica, los lectores y las acciones requieren implementación independiente.
+Integramos los primeros lectores de exporter y NOC; las demás fuentes,
+la interfaz gráfica y las acciones requieren implementación independiente.
 
 ## Ejecución de desarrollo
 
@@ -50,7 +54,7 @@ mediante Ctrl+C. El contrato HTTP de arranque ofrece:
 | /healthz | Disponibilidad del proceso; infraestructura UNKNOWN |
 | /api/v1/capabilities | Funciones disponibles y deshabilitadas |
 
-La API no admite escrituras, documentación OpenAPI pública,
+El modo de arranque no admite escrituras, documentación OpenAPI pública,
 consultas de fuentes ni acceso a datos privados.
 La ejecución sin autenticación solo corresponde a estos
 metadatos de arranque. No constituye una consola autenticada.
@@ -114,6 +118,20 @@ deshabilitadas. Limitamos el login a ocho intentos por minuto
 por proceso y una derivación scrypt concurrente, sin cola.
 Este límite local se reinicia con el proceso y no constituye
 protección distribuida. No habilitamos acceso externo.
+
+## Observaciones operacionales
+
+En modo autenticado, GET /api/v1/sources devuelve observaciones
+normalizadas del exporter S04 (existencia de routers) y NOC S05
+(topología observada, LACP por sede, controlador SDN y HTTP HA).
+El estado general permanece UNKNOWN. Conservamos fechas individuales;
+los detalles no vigentes se omiten. Las lecturas utilizan destinos
+loopback fijos, sin redirecciones ni proxies, con cuerpo máximo de
+256 KiB y timeout de socket de tres segundos. Una sola adquisición
+concurrente por proceso; los errores de una fuente no reemplazan
+los datos de otra. No se aceptan parámetros de consulta.
+La topología gráfica, WAN/VLAN detalladas, Prometheus, IA y AIOps
+requieren integración posterior. No se expone el grafo bruto.
 
 ## Validación
 

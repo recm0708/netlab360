@@ -30,7 +30,7 @@ class Capabilities(PublicModel):
     schema_version: Literal[1] = 1
     mode: Literal["BOOTSTRAP_READ_ONLY", "AUTHENTICATED_READ_ONLY"] = "BOOTSTRAP_READ_ONLY"
     health_available: Literal[True] = True
-    source_readers_enabled: Literal[False] = False
+    source_readers_enabled: bool = False
     persistence_enabled: bool = False
     authentication_enabled: bool = False
     frontend_enabled: Literal[False] = False
@@ -67,4 +67,31 @@ class LoginResult(Identity):
 class LogoutResult(PublicModel):
     """Confirmación de revocación local."""
     logged_out: Literal[True] = True
+    network_mutations_authorized: Literal[False] = False
+
+
+class SourceObservation(PublicModel):
+    """Observación delimitada; los detalles no vigentes se omiten."""
+    schema: Literal["NETLAB360_S08_SOURCE_V1"]
+    source: Literal["EXPORTER_S04", "NOC_S05"]
+    kind: Literal["OBSERVATION"]
+    transport: Literal["OK", "UNAVAILABLE", "NOT_STARTED", "INVALID"]
+    quality: Literal["VALID", "MISSING", "INVALID", "FUTURE", "STALE"]
+    state: Literal["NORMAL", "DEGRADED", "FAULT", "RECOVERY", "UNKNOWN"]
+    observed_at_utc: str | None
+    received_at_utc: str
+    age_seconds: float | None
+    max_age_seconds: int
+    resource: str
+    scope: str
+    details: dict[str, str | int | bool | None]
+    network_mutations_authorized: Literal[False] = False
+
+
+class SourceBatch(PublicModel):
+    """Resultados independientes, sin inferencia global de salud."""
+    project: Literal["NETLAB360"] = "NETLAB360"
+    schema_version: Literal[1] = 1
+    observations: list[SourceObservation]
+    infrastructure_state: Literal["UNKNOWN"] = "UNKNOWN"
     network_mutations_authorized: Literal[False] = False
