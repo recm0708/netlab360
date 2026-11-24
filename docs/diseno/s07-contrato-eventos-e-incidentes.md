@@ -34,6 +34,16 @@ La identidad determinista corresponde al contenido normalizado, excluyendo la ho
 
 ## Aceptación incremental
 
-S07-001A implementa y prueba el contrato de observaciones en modo offline. S07-001B integrará adaptadores de lectura con fuentes reales, luego se validará normalización, calidad, duplicados y orden temporal. La issue #190 permanece abierta hasta completar todas sus condiciones de aceptación. La correlación y el RCA pertenecen a #191.
+S07-001A implementa y prueba el contrato de observaciones en modo offline. S07-001B incorpora adaptadores de lectura NOC/IA, pendientes de aceptación en la VM al publicar el código. S07-001C incorporará Prometheus; la persistencia y el contrato de incidente se validarán por separado. La issue #190 permanece abierta hasta completar todas sus condiciones de aceptación. La correlación y el RCA pertenecen a #191.
 
 Código: [contrato de eventos](../../scripts/s07/contrato_eventos.py) y [pruebas unitarias](../../tests/test_s07_contrato_eventos.py).
+
+## Adaptadores NOC e IA
+
+S07-001B implementa [adaptadores NOC e IA](../../scripts/s07/adaptadores_noc.py) y [pruebas sintéticas](../../tests/test_s07_adaptadores_noc.py). Consulta exclusivamente los endpoints locales fijos del NOC, sin proxy, redirecciones ni comandos. Se proyectan 19 señales de observación (topología, cuatro WAN, nueve VLAN, tres LACP, SDN y frontal HTTP) y dos inferencias ICMP.
+
+La marca temporal de la telemetría se utiliza para las señales administrativas WAN/VLAN. Estas conservan el estado administrativo como detalle y el estado operacional UNKNOWN: no prueban tráfico ni vecindades OSPF. LACP, SDN y HTTP conservan sus propias fechas de observación. FIB y OSPF requieren fuentes temporales verificables adicionales y no se simulan mediante la hora de generación del grafo.
+
+La pérdida de una fuente no invalida otra fuente independiente. Una respuesta fuera de contrato se excluye de la proyección útil (MISSING/UNKNOWN); fechas inválidas, futuras o vencidas se clasifican mediante el contrato. Los identificadores no previstos o duplicados no se eligen arbitrariamente. Una respuesta HTTP correcta no prueba vigencia ni disponibilidad de las señales que contiene.
+
+El estado DEGRADED del frontal con backend de respaldo indica selección alternativa, no interrupción HTTP. La desconexión de Faucet representa el plano de control y no prueba pérdida de tráfico. El consenso IA se verifica frente a los tres métodos y no autoriza intervención.
