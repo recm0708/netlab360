@@ -42,8 +42,8 @@ de metadatos, sin datos operacionales ni autorización.
 Incorporamos una base SQLite privada de inicialización explícita.
 Integramos la autenticación HTTP como modo explícito sobre SQLite v2.
 Integramos los lectores de exporter, NOC, Prometheus, inferencia S06 y
-asesor S07. Incorporamos la estructura visual inicial; el acceso gráfico,
-navegación de detalle y acciones requieren implementación independiente. La disponibilidad de una ruta no garantiza la de su fuente.
+asesor S07. Incorporamos la estructura visual y el acceso gráfico; la navegación
+de detalle y las acciones requieren implementación independiente. La disponibilidad de una ruta no garantiza la de su fuente.
 
 ## Ejecución de desarrollo
 
@@ -73,11 +73,31 @@ metadatos de arranque. No constituye una consola autenticada.
 En modo autenticado servimos la estructura HTML, CSS y JavaScript
 en la raíz del mismo origen. No publicamos el árbol de archivos,
 no utilizamos CDN ni abrimos rutas privadas sin sesión.
-La pantalla inicial consulta exclusivamente healthz y capabilities,
-sin credenciales; los estados operacionales no consultados permanecen
-UNKNOWN. El menú de detalle, el formulario de acceso y Plotly se
-integrarán por separado. La política CSP permite solo scripts, estilos
+La pantalla inicial consulta healthz y capabilities sin credenciales.
+El formulario utiliza login, me y logout del mismo origen, sin guardar
+credenciales ni tokens en almacenamiento web. El comprobante CSRF queda
+solo en memoria. Al recargar se exige otro login, que reemplaza la sesión
+previa de la misma cuenta; la recarga no implica revocación remota.
+La UI indica el rol y la expiración, pero no autoriza acciones. Los estados
+operacionales no consultados permanecen UNKNOWN. La navegación de detalle
+y Plotly se integrarán por separado. La política CSP permite solo scripts, estilos
 y consultas del mismo origen, sin código inline.
+
+Presentamos NETLAB360 como consola de operaciones: los identificadores
+académicos de fases, lotes e issues se conservan en código y documentación,
+no en textos, etiquetas, tablas o mensajes visibles. Traducimos los
+identificadores de procedencia a nombres funcionales de las fuentes.
+Mostramos fechas en la zona America/Panama, formato mes/día/año y
+12 horas con segundos e indicador AM/PM; conservamos UTC en los contratos
+internos. La etiqueta Fecha y hora en el panel de identidad representa
+el vencimiento de la sesión, indicado mediante una aclaración visible.
+
+Durante el desarrollo, los recursos visuales se leen del disco en cada
+solicitud. Aplicamos cambios HTML, CSS y JavaScript mediante avance rápido
+de Git y recarga del navegador, sin reiniciar Uvicorn. Los cambios Python
+requieren reiniciar únicamente la consola, no los servicios de red.
+Validamos el código antes de actualizar la copia activa; la recarga exige
+volver a autenticar al usuario según la política de sesión vigente.
 
 ## Persistencia local
 

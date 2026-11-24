@@ -17,27 +17,28 @@
       <nav aria-label="Menú principal">
         <p class="nav-label">Supervisión</p>
         <a class="current" href="#main" aria-current="page">Inicio / Salud</a>
-        <span class="pending">Topología en vivo</span>
-        <span class="pending">Redes / WAN / OSPF</span>
-        <span class="pending">LAN / VLAN / ACL</span>
-        <span class="pending">Servicios HTTP / HA</span>
-        <span class="pending">LACP</span>
-        <span class="pending">SDN / OVS / Faucet</span>
+        <span class="pending" aria-disabled="true">Topología en vivo</span>
+        <span class="pending" aria-disabled="true">Redes / WAN / OSPF</span>
+        <span class="pending" aria-disabled="true">LAN / VLAN / ACL</span>
+        <span class="pending" aria-disabled="true">Servicios HTTP / HA</span>
+        <span class="pending" aria-disabled="true">LACP</span>
+        <span class="pending" aria-disabled="true">SDN / OVS / Faucet</span>
         <p class="nav-label">Diagnóstico</p>
-        <span class="pending">Pruebas de red</span>
-        <span class="pending">Observabilidad</span>
-        <span class="pending">Diagnóstico IA</span>
-        <span class="pending">Incidentes y AIOps</span>
-        <span class="pending">Copiloto RAG</span>
+        <span class="pending" aria-disabled="true">Pruebas de red</span>
+        <span class="pending" aria-disabled="true">Observabilidad</span>
+        <span class="pending" aria-disabled="true">Diagnóstico IA</span>
+        <span class="pending" aria-disabled="true">Incidentes y AIOps</span>
+        <span class="pending" aria-disabled="true">Copiloto RAG</span>
         <p class="nav-label">Administración</p>
-        <span class="pending">Evidencias y sistema</span>
+        <span class="pending" aria-disabled="true">Evidencias y sistema</span>
       </nav>
-      <p class="sidebar-note">Navegación de detalle pendiente</p>
+      <p class="sidebar-note">Las secciones no habilitadas todavía no admiten consultas.</p>
     </aside>
     <div class="workspace">
       <header class="topbar">
-        <span>Laboratorio multisede <span class="muted">/ Fase 08</span></span>
+        <span>Supervisión multisede</span>
         <span class="mode">Solo lectura</span>
+        <span id="identity-label" class="muted">Sin sesión</span>
       </header>
       <main id="main" tabindex="-1">
         <div class="heading">
@@ -48,10 +49,36 @@
           </div>
           <button id="refresh" type="button">Actualizar estado</button>
         </div>
+        <!-- El formulario no envía datos por navegación ni funciona sin JavaScript. -->
+        <section class="panel access-panel" aria-labelledby="access-heading">
+          <h2 id="access-heading">Acceso a NETLAB360</h2>
+          <form id="login-form" method="post" autocomplete="on">
+            <fieldset id="login-fields" disabled>
+              <legend class="muted">Cuenta local</legend>
+              <div class="login-grid">
+                <label for="username">Usuario
+                  <input id="username" name="username" autocomplete="username" required maxlength="32" pattern="[a-z][a-z0-9_\-]{2,31}">
+                </label>
+                <label for="password">Contraseña
+                  <input id="password" name="password" type="password" autocomplete="current-password" required maxlength="256">
+                </label>
+                <button id="login-button" type="submit">Iniciar sesión</button>
+              </div>
+            </fieldset>
+          </form>
+          <div id="session-panel" hidden>
+            <dl><dt>Usuario</dt><dd id="session-user"></dd><dt>Rol</dt><dd id="session-role"></dd><dt>Fecha y hora</dt><dd id="session-expiry" aria-describedby="session-expiry-note"></dd></dl>
+            <p id="session-expiry-note" class="muted">Vencimiento de la sesión.</p>
+            <p class="muted">El rol no autoriza modificaciones de red.</p>
+            <button id="logout" type="button" disabled>Cerrar sesión</button>
+          </div>
+          <p id="auth-notice" role="status" aria-live="polite">Inicie sesión. Al recargar, deberá autenticarse nuevamente.</p>
+          <noscript>El acceso requiere JavaScript local.</noscript>
+        </section>
         <div class="status-grid" aria-label="Estado de arranque">
           <section class="panel"><h2>Proceso FastAPI</h2><p id="api-state" class="metric" data-state="unknown">Sin consultar</p><p class="muted">Disponibilidad del proceso, no de toda la red.</p></section>
           <section class="panel"><h2>Infraestructura</h2><p class="metric" data-state="unknown">UNKNOWN</p><p class="muted">No se ha consultado telemetría autenticada.</p></section>
-          <section class="panel"><h2>Acceso</h2><p class="metric" data-state="unknown">Pendiente</p><p class="muted">El inicio de sesión gráfico aún no está habilitado.</p></section>
+          <section class="panel"><h2>Acceso</h2><p id="access-state" class="metric" data-state="unknown">Sin sesión</p><p class="muted">Identidad HTTP; no concede privilegios de red.</p></section>
         </div>
         <section class="panel summary">
           <h2>Capacidades del backend</h2>
@@ -60,9 +87,9 @@
           <p id="observed" class="muted">Sin timestamp de respuesta.</p>
           <p id="notice" role="status" aria-live="polite">Esperando consulta local.</p>
         </section>
-        <section class="panel"><h2>Integración operacional</h2><p>Topología, métricas, diagnóstico, asesor y acciones: presentación de detalle pendiente. No se muestran mediciones simuladas.</p></section>
+        <section class="panel"><h2>Funciones de supervisión</h2><p>Las vistas de topología, métricas y diagnóstico aún no están disponibles. Las intervenciones de red están deshabilitadas.</p></section>
       </main>
-      <footer>NETLAB360 · Laboratorio académico · Acciones de red deshabilitadas</footer>
+      <footer>NETLAB360 · Consola de operaciones · Acciones de red deshabilitadas</footer>
     </div>
   </div>
 </body>
