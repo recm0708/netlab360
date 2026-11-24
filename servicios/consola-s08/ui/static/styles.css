@@ -64,3 +64,14 @@ footer { color: var(--muted); padding: 16px 28px; border-top: 1px solid var(--li
   :root { color-scheme: light; --bg: #eef2f7; --surface: #fff; --sidebar: #f7f9fc; --line: #c9d4e2; --text: #17283b; --muted: #485c73; --accent: #176ba3; --ok: #146345; --warn: #80560d; }
   button, .brand-mark { color: #fff; }
 }
+
+/* El panel de acceso mantiene el foco visible y se adapta al ancho disponible. */
+[hidden] { display: none !important; }
+.access-panel fieldset { min-width: 0; padding: 0; margin: 0; border: 0; }
+.access-panel legend { margin-bottom: 12px; }
+.login-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; gap: 12px; align-items: end; }
+.login-grid label { display: grid; gap: 5px; font-size: .85rem; }
+.login-grid input { width: 100%; min-width: 0; padding: 9px 10px; font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; }
+#auth-notice { font-size: .88rem; color: var(--muted); margin-top: 14px; }
+#session-panel dl { max-width: 640px; }
+@media (max-width: 1000px) { .login-grid { grid-template-columns: minmax(0, 1fr); } }

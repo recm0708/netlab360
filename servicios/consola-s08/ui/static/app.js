@@ -1,4 +1,4 @@
-/* Consultamos exclusivamente metadatos públicos; no almacenamos sesiones ni secretos. */
+/* Metadatos públicos e identidad local; el comprobante CSRF solo vive en memoria. */
 "use strict";
 
 const refresh = document.getElementById("refresh");
@@ -76,3 +76,167 @@ async function update() {
 
 refresh.addEventListener("click", update);
 update();
+
+/* La autoridad reside en FastAPI, no en el estado visual del navegador. */
+const form = document.getElementById("login-form");
+const loginFields = document.getElementById("login-fields");
+const username = document.getElementById("username");
+const password = document.getElementById("password");
+const sessionPanel = document.getElementById("session-panel");
+const logout = document.getElementById("logout");
+const authNotice = document.getElementById("auth-notice");
+const accessState = document.getElementById("access-state");
+const identityLabel = document.getElementById("identity-label");
+
+let session = null;
+let busy = false;
+let expiryTimer = null;
+
+function controls() {
+  loginFields.disabled = busy || session !== null;
+  logout.disabled = busy || session === null;
+}
+
+function clearIdentity(message) {
+  clearTimeout(expiryTimer);
+  session = null;
+  form.hidden = false;
+  sessionPanel.hidden = true;
+  password.value = "";
+  document.getElementById("session-user").textContent = "";
+  document.getElementById("session-role").textContent = "";
+  document.getElementById("session-expiry").textContent = "";
+  identityLabel.textContent = "Sin sesión";
+  accessState.textContent = "Sin sesión";
+  accessState.dataset.state = "unknown";
+  authNotice.textContent = message;
+  controls();
+}
+
+function validIdentity(data) {
+  return data && typeof data.username === "string" &&
+    /^[a-z][a-z0-9_-]{2,31}$/.test(data.username) &&
+    ["VIEWER", "OPERATOR"].includes(data.role) &&
+    data.network_mutations_authorized === false;
+}
+
+async function authRequest(path, options = {}) {
+  // Rutas constantes del mismo origen. La cookie HttpOnly la gestiona el navegador.
+  return fetch(path, {
+    credentials: "same-origin", cache: "no-store", redirect: "error",
+    signal: AbortSignal.timeout(10000), ...options
+  });
+}
+
+function showIdentity(data) {
+  const remaining = data.expires_at * 1000 - Date.now();
+  if (!validIdentity(data) || typeof data.csrf_token !== "string" ||
+      !/^[A-Za-z0-9_-]{43}$/.test(data.csrf_token) ||
+      !Number.isSafeInteger(data.expires_at) || remaining <= 0) {
+    throw new Error("INVALID_IDENTITY");
+  }
+  session = {username: data.username, role: data.role, csrf: data.csrf_token,
+             expiresAt: data.expires_at};
+  document.getElementById("session-user").textContent = session.username;
+  document.getElementById("session-role").textContent = session.role;
+  document.getElementById("session-expiry").textContent =
+    new Date(session.expiresAt * 1000).toLocaleString("es-PA");
+  identityLabel.textContent = session.username + " · " + session.role;
+  accessState.textContent = "Autenticado";
+  accessState.dataset.state = "ok";
+  form.hidden = true;
+  sessionPanel.hidden = false;
+  authNotice.textContent = "Sesión iniciada. Acciones de red deshabilitadas.";
+  expiryTimer = setTimeout(() => clearIdentity("Sesión expirada. Inicie sesión nuevamente."),
+    Math.min(remaining, 1800000));
+}
+
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (busy || session !== null) return;
+  busy = true;
+  controls();
+  authNotice.textContent = "Verificando credenciales…";
+  try {
+    const request = authRequest("/api/v1/auth/login", {
+      method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({username: username.value, password: password.value})
+    });
+    password.value = "";
+    const response = await request;
+    if (response.status === 401) {
+      authNotice.textContent = "Credenciales incorrectas o cuenta no disponible.";
+    } else if (response.status === 429) {
+      authNotice.textContent = "Límite de intentos alcanzado. Intente nuevamente en un minuto.";
+    } else if (!response.ok) {
+      throw new Error("LOGIN_FAILED");
+    } else {
+      showIdentity(await response.json());
+      logout.focus();
+    }
+  } catch {
+    clearIdentity("No se pudo confirmar el inicio de sesión. Vuelva a intentarlo.");
+  } finally {
+    password.value = "";
+    busy = false;
+    controls();
+    if (session !== null) logout.focus();
+  }
+});
+
+logout.addEventListener("click", async () => {
+  if (busy || session === null) return;
+  busy = true;
+  controls();
+  try {
+    const response = await authRequest("/api/v1/auth/logout", {
+      method: "POST", headers: {"X-CSRF-Token": session.csrf}
+    });
+    if (response.status === 401) {
+      clearIdentity("Sesión no vigente. Inicie sesión nuevamente.");
+    } else if (response.ok && (await response.json()).logged_out === true) {
+      clearIdentity("Sesión cerrada correctamente.");
+    } else {
+      throw new Error("LOGOUT_NOT_CONFIRMED");
+    }
+  } catch {
+    authNotice.textContent = "No se confirmó el cierre remoto. Reintente; la sesión tiene expiración absoluta.";
+  } finally {
+    busy = false;
+    controls();
+    if (session === null) username.focus();
+  }
+});
+
+// Una sesión reemplazada o deshabilitada se detecta al regresar a la ventana.
+window.addEventListener("focus", async () => {
+  if (busy || session === null) return;
+  busy = true;
+  controls();
+  try {
+    const response = await authRequest("/api/v1/auth/me");
+    if (response.status === 401) {
+      clearIdentity("Sesión no vigente. Inicie sesión nuevamente.");
+    } else {
+      if (!response.ok) throw new Error("IDENTITY_UNAVAILABLE");
+      const data = await response.json();
+      if (!validIdentity(data) || !session ||
+          data.username !== session.username || data.role !== session.role) {
+        clearIdentity("Identidad no confirmada. Inicie sesión nuevamente.");
+      } else {
+        accessState.textContent = "Autenticado";
+        accessState.dataset.state = "ok";
+        authNotice.textContent = "Sesión verificada. Acciones de red deshabilitadas.";
+      }
+    }
+  } catch {
+    authNotice.textContent = "No se pudo verificar la sesión. No se muestran datos privados.";
+    accessState.textContent = "UNKNOWN";
+    accessState.dataset.state = "unknown";
+  } finally {
+    busy = false;
+    controls();
+  }
+});
+
+clearIdentity("Inicie sesión. Al recargar, deberá autenticarse nuevamente.");

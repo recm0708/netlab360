@@ -42,12 +42,29 @@ class StructureTests(unittest.TestCase):
         self.assertTrue({"main", "refresh", "notice", "api-state", "capabilities", "observed"} <= set(parser.ids))
         self.assertFalse(parser.inline)
 
-    def test_no_private_fetch_or_browser_storage(self):
+    def test_no_operational_fetch_or_browser_storage(self):
         js = (UI / "static/app.js").read_text(encoding="utf-8")
-        for value in ("localStorage", "sessionStorage", "innerHTML", "/api/v1/auth/",
+        for value in ("localStorage", "sessionStorage", "innerHTML",
                       "/api/v1/sources", "/api/v1/metrics", "/api/v1/advisory"):
             self.assertNotIn(value, js)
         self.assertIn('credentials: "omit"', js)
+
+    def test_login_structure(self):
+        html = (UI / "index.html").read_text(encoding="utf-8")
+        for fragment in ('id="login-form" method="post"', 'id="login-fields" disabled',
+                         'type="password"', 'autocomplete="current-password"',
+                         'id="session-panel" hidden', 'id="logout" type="button" disabled'):
+            self.assertIn(fragment, html)
+
+    def test_auth_client_fixed_routes(self):
+        js = (UI / "static/app.js").read_text(encoding="utf-8")
+        for route in ("/api/v1/auth/login", "/api/v1/auth/me", "/api/v1/auth/logout"):
+            self.assertIn(route, js)
+        self.assertIn('"X-CSRF-Token": session.csrf', js)
+        self.assertIn('credentials: "same-origin"', js)
+        self.assertNotIn("document.cookie", js)
+        self.assertNotIn("console.log", js)
+        self.assertNotIn("/api/v1/actions", js)
 
 
 if AVAILABLE:
@@ -59,7 +76,7 @@ if AVAILABLE:
     module = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = module
     spec.loader.exec_module(module)
-    from netlab360_s08_ui import storage
+    from netlab360_s08_ui import storage, security
     from netlab360_s08_ui.main import create_app
 
 
@@ -71,6 +88,7 @@ class UIHttpTests(unittest.TestCase):
         directory = Path(tmp.name) / "estado"
         storage.initialize(directory)
         storage.migrate(directory)
+        self.directory = directory
         self.client = TestClient(create_app(directory), base_url="http://127.0.0.1:9140")
         self.addCleanup(self.client.close)
 
@@ -107,6 +125,21 @@ class UIHttpTests(unittest.TestCase):
         self.assertEqual(r.headers["content-security-policy"],
                          "default-src 'none'; frame-ancestors 'none'")
         self.assertIs(self.client.get("/api/v1/capabilities").json()["frontend_enabled"], True)
+
+    def test_login_logout_in_same_origin(self):
+        security.create_user(self.directory, "viewer", "synthetic test phrase only", "VIEWER")
+        origin = {"Origin": "http://127.0.0.1:9140"}
+        self.assertEqual(self.client.get("/api/v1/auth/me").status_code, 401)
+        result = self.client.post("/api/v1/auth/login", headers=origin,
+                                  json={"username": "viewer", "password": "synthetic test phrase only"})
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result.json()["role"], "VIEWER")
+        self.assertIn("HttpOnly", result.headers["set-cookie"])
+        self.assertEqual(self.client.get("/api/v1/auth/me").status_code, 200)
+        self.assertEqual(self.client.post("/api/v1/auth/logout", headers=origin).status_code, 403)
+        self.assertEqual(self.client.post("/api/v1/auth/logout",
+                         headers={**origin, "X-CSRF-Token": result.json()["csrf_token"]}).status_code, 200)
+        self.assertEqual(self.client.get("/api/v1/auth/me").status_code, 401)
 
     def test_bootstrap_no_ui(self):
         with TestClient(create_app(), base_url="http://127.0.0.1:9140") as client:
