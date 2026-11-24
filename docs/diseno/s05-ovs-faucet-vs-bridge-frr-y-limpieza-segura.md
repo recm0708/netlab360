@@ -24,6 +24,16 @@ Comprobamos que A y B podían comunicarse dentro de la VLAN 410 y que el host C 
 
 Las reglas OpenFlow observadas indican la configuración del datapath en ese momento; no sustituyen las pruebas de conectividad ni representan una medida de capacidad del enlace.
 
+## Recuperación selectiva del controlador
+
+Durante la integración se identificó un fallo de acceso al directorio de registros de Faucet que impedía iniciar correctamente el controlador.
+
+La recuperación selectiva comprobó la propiedad de los recursos, el estado del bridge, los puertos, los montajes y la configuración del controlador. Se corrigieron los permisos del directorio afectado y se inició el contenedor existente sin recrear el dominio SDN.
+
+La aceptación posterior exigió conexión OpenFlow, comunicación bidireccional permitida entre A y B, aislamiento bidireccional entre A y C y conservación de la infraestructura multisede.
+
+El procedimiento de recuperación está implementado en [s05-sdn-recuperar-faucet-logs.py](../../scripts/laboratorio/s05-sdn-recuperar-faucet-logs.py). La intervención requiere precheck y confirmación explícita; no constituye una reparación autónoma general.
+
 ## Limitaciones
 
 La arquitectura dispone de un controlador Faucet en un solo entorno virtual. No se implementó redundancia física del controlador ni tolerancia a la caída del host. Las funciones de retirada selectiva de recursos permanecen protegidas para evitar la eliminación accidental del laboratorio activo.

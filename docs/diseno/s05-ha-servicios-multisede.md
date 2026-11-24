@@ -21,6 +21,16 @@ Durante una única interrupción controlada del backend HQ, el NOC registró **1
 
 La validación posterior acreditó seis servicios activos, rutas principales S1=`s1p` y S2=`s2p`, y continuidad de la interfaz administrativa `ens33`.
 
+## Protección de la intervención controlada
+
+El ensayo de interrupción del backend HQ utilizó un temporizador independiente de la conexión SSH, gestionado por systemd, para solicitar la recuperación del servicio principal después de 120 segundos si permanecía detenido.
+
+La intervención se limita a la instancia autorizada. Los controles previos y posteriores verifican los servicios, las rutas, la red administrativa y la selección del backend.
+
+Este mecanismo reduce el riesgo de dejar el servicio detenido cuando se interrumpe la sesión del operador. No garantiza recuperación si Ubuntu se apaga o deja de ejecutar systemd.
+
+Procedimiento: [ciclo HA protegido](../../scripts/operacion/s05-lote-ha-instancia-con-watchdog.sh).
+
 ## Limitaciones
 
 La conmutación se produce entre instancias de aplicación dentro de una misma VM. No constituye redundancia del frontal, de Ubuntu, de VMware ni del hardware físico. Tampoco debe confundirse con la recuperación de un miembro LACP o con la conmutación de un enlace WAN.

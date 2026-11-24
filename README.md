@@ -81,6 +81,8 @@ La validación final de S05 comprobó 21 namespaces, cuatro contenedores y seis 
 - [S06 FAULT HTTP HQ: protocolo y etiquetado independiente del dataset ICMP](docs/diseno/s06-fault-http-hq-etiquetado-independiente.md)
 - [Diseño del programa interactivo S08 y catálogo de acciones](docs/diseno/s08-consola-interactiva-y-acciones.md)
 
+- [Cobertura académica y criterios de aceptación](docs/gestion/cobertura-academica-netlab360.md)
+
 ## Alcance
 
 El repositorio contiene el código y los documentos técnicos que describen el sistema desarrollado y sus resultados. Los registros privados y los recursos de ejecución propios de la VM se mantienen fuera del código fuente. Las ampliaciones no implementadas no se presentan como funcionalidades terminadas.

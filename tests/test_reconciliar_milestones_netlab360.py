@@ -14,7 +14,7 @@ spec.loader.exec_module(m)
 
 def ms(n, open_count=0, closed_count=0, description="antigua"):
     return {"number": n, "title": f"S{n:02d}",
-            "state": "closed" if n <= 5 else "open",
+            "state": "closed" if n <= 6 else "open",
             "open_issues": open_count, "closed_issues": closed_count,
             "description": description}
 
@@ -36,10 +36,21 @@ class MilestoneReconcileTests(unittest.TestCase):
         self.assertIn("No incluye HA física", d)
         self.assertIn("WireGuard", d)
 
-    def test_s06_does_not_claim_forecast_or_fault(self):
-        self.assertIn("90 %", m.DESCRIPTIONS[6])
-        self.assertIn("FAULT distinto aún no verificado", m.DESCRIPTIONS[6])
+    def test_s06_closed_with_experimental_limits(self):
+        self.assertEqual(m.EXPECTED_STATES[6], "closed")
+        self.assertIn("CERRADA", m.DESCRIPTIONS[6])
+        self.assertIn("FAULT HTTP HQ independiente", m.DESCRIPTIONS[6])
         self.assertIn("pronóstico/horizonte MAE no evaluables", m.DESCRIPTIONS[6])
+        self.assertNotIn("90 %", m.DESCRIPTIONS[6])
+
+    def test_s06_milestone_identity_and_closed_state(self):
+        with patch.object(m, "gh", return_value=ms(6)):
+            self.assertEqual(m.milestone(6)["state"], "closed")
+
+    def test_s06_rejects_unexpected_open_state(self):
+        with patch.object(m, "gh", return_value=ms(6) | {"state": "open"}):
+            with self.assertRaisesRegex(RuntimeError, "unexpected_state"):
+                m.milestone(6)
 
     def test_s07_s08_stay_open(self):
         self.assertEqual(m.EXPECTED_STATES[7], "open")

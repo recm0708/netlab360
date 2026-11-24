@@ -2,6 +2,8 @@
 
 ## Alcance auditado
 
+Los inventarios y estados fechados de esta página corresponden a cortes históricos de gestión. El estado vigente de cada fase se consulta en su milestone y en el plan maestro.
+
 Inventario GitHub del 23/11/2026: **53 issues reales** (PR excluidos), distribuidas entre las ocho milestones S01–S08. Las issues cerradas carecen de casillas sin marcar; las abiertas conservan requisitos futuros sin completar. **No se cerrará ni reabrirá ninguna issue como resultado de este cambio.** La issue #5 permanece cerrada en S05, cuyo porcentaje el operador ya comprobó visualmente al 100 % tras la reparación del contador. La ejecución previa del reconciliador reportó RC=1 durante la desasignación transitoria de #5, pero se ha verificado que #5 está de nuevo asignada a S05; **no volver a ejecutar `--apply` del script antiguo de milestones**.
 
 ## Política de títulos
@@ -24,7 +26,7 @@ El script puede actualizar labels de PR *únicamente si conserva un alias obsole
 
 ## Fase S06 y siguiente hito
 
-El estudio prospectivo V2 de S06 y su auditoría científica read-only están aceptados en VM: TRAIN/VALIDATION/TEST con muestreo uniforme, modelos congelados, F1 TEST P95/IF/LR de 0.941/0.941/1.000 para HQ→S1 y 1.000/0.941/1.000 para HQ→S2, y oportunidad temporal retrospectiva de 1416/1402 ms. Concept drift inferencial y pronóstico/MAE no son evaluables con este corpus; **FAULT independiente aún no verificado**. Mantener las issues #6/#25/#26 abiertas y la estimación de ~90 % técnico, sin confundirla con la barra GitHub. El siguiente procedimiento operativo será comprobar primero el candidato controlado de falla de backend HTTP HQ y verificar vigilancia/rescate antes de ejecutar un ensayo nuevo.
+S06 quedó cerrada técnicamente tras validar el protocolo uniforme V2 y el escenario independiente de falla HTTP HQ con recuperación. Las issues #6, #25 y #26 están cerradas. Se mantienen los límites experimentales sobre pronóstico, MAE prospectivo, deriva de concepto y generalización entre protocolos. S07 y S08 conservan sus criterios pendientes.
 
 ## Validación de la implementación en GitHub (23/11/2026)
 

@@ -73,7 +73,7 @@ DESCRIPTIONS = {
 
 **Criterio de aceptación:** trazabilidad de datos, TEST no visto, ausencia de leakage, modelos congelados, seguridad y limitaciones explícitas de escenarios, FAULT y pronóstico.
 
-**Estado:** ABIERTA, avance técnico estimado ~90 %. TEST V2 y auditoría científica validados para retardo artificial de 40 ms sobre cliente HQ; FAULT distinto aún no verificado, concept drift inferencial y pronóstico/horizonte MAE no evaluables con datos disponibles. Pendientes cierre de alcance, evidencias y revisión del informe. Issues #6, #25, #26.""",
+**Estado:** CERRADA y técnicamente aceptada. TEST V2 y auditoría científica validados para degradación ICMP controlada. FAULT HTTP HQ independiente y recuperación verificados, sin alterar TEST V2. Concept drift inferencial y pronóstico/horizonte MAE no evaluables. Once capturas incorporadas al catálogo oficial. Issues #6, #25 y #26 cerradas.""",
 
   7: """## S07 — AIOps supervisado, recomendaciones y reversión segura
 **Propósito:** operar diagnósticos S06 mediante un ciclo asistido y auditable, con decisiones y cambios sensibles siempre supervisados.
@@ -93,7 +93,7 @@ DESCRIPTIONS = {
 
 **Estado:** ABIERTA. Opcionales condicionados y no implementados: cuarta sede/WireGuard (#24), data sources/recursos externos OpenTofu (#17) y OVA/OVF si lo exige la entrega (#29). No acreditarlos como realizados ni convertirlos automáticamente en requisitos del núcleo S08."""
 }
-EXPECTED_STATES = {n: ("closed" if n <= 5 else "open") for n in range(1, 9)}
+EXPECTED_STATES = {n: ("closed" if n <= 6 else "open") for n in range(1, 9)}
 
 
 def gh(path: str, data: dict | None = None) -> object:
@@ -223,8 +223,8 @@ def run(apply: bool) -> None:
     print("MILestones_8_DESCRIPCIONES=VERIFICADAS")
     print(f"S05_ISSUES_REALES=CERRADAS_{inv['closed']}_ABIERTAS_{inv['open']}")
     print("ISSUE24=S08_ABIERTA_OPCIONAL")
-    print("FASES_01_A_05=CONSERVADAS_CERRADAS")
-    print("FASES_06_A_08=CONSERVADAS_ABIERTAS")
+    print("FASES_01_A_06=CONSERVADAS_CERRADAS")
+    print("FASES_07_A_08=CONSERVADAS_ABIERTAS")
     print("CAMBIOS_EN_REDES=NINGUNO")
     print("========== MILESTONES_NETLAB360_RECONCILIADAS=OK ==========")
 
