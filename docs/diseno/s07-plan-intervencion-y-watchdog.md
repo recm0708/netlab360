@@ -29,7 +29,9 @@ RFC c9db14c3cd87496db05073bf4484f8d0: ambas confirmaciones administrativas acept
 | Verificación del drift | 0,700264 | 0,698642 |
 | Decisión y revalidación | No aplicable | 11,179696 |
 | Actuación desde aprobación | No aplicable | 0,500384 |
-| Postverificación desde restauración | Pendiente de extracción monotónica | 0,703804 |
+| Postverificación desde restauración | 0,704518 | 0,703804 |
 | Ciclo desde DRIFT_APPLIED | 91,275855 | 13,082526 |
 
 Los intervalos principales se derivan del reloj monotónico del journal. La diferencia entre los dos ciclos incluye la espera programada del watchdog. No representa un SLA ni una comparación estadística generalizable. La decisión incluye la revalidación previa, no exclusivamente reacción humana. El flujo sudo de intervención no equivale todavía a un broker operacional con separación de roles. El comparador [de ciclos OSPF](../../scripts/s07/comparar_ciclos_ospf.py) usa únicamente registros históricos, comprueba las postcondiciones y distingue los orígenes de recuperación. No modifica la red.
+
+S07-007A revalidó ambos journals contra los registros protegidos originales, sin repetir estímulos. Restauración efectiva (RESTORING→RESTORED_UNVERIFIED): 0,384864 s y 0,399483 s; diferencia descriptiva del ciclo: 78,193329 s. 1177 pruebas ejecutadas (una omitida), CI 45328939211 satisfactoria.
