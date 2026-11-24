@@ -20,6 +20,8 @@ aceptados de las fases anteriores.
 | [api/prometheus_reader.py](api/prometheus_reader.py) | Métricas de scrapes mediante el adaptador S07 |
 | [Pruebas de métricas](../../tests/test_s08_metrics.py) | Reutilización, vigencia y acceso HTTP |
 | [api/readers.py](api/readers.py) | Lectura fija de exporter S04 y NOC S05 |
+| [api/debug_http.py](api/debug_http.py) | Catálogo y diagnóstico técnico restringido |
+| [Pruebas de diagnóstico técnico](../../tests/test_s08_debug.py) | Autorización, límites y proyección |
 | [api/source_http.py](api/source_http.py) | Consulta de observaciones autenticada |
 | [Pruebas de lectores](../../tests/test_s08_readers.py) | Transporte, vigencia y alcance de fuentes |
 | [api/main.py](api/main.py) | Servidor HTTP de arranque y rutas públicas mínimas |
@@ -51,6 +53,20 @@ para instalaciones anteriores; la restauración requiere la copia previa.
 Integramos los lectores de exporter, NOC, Prometheus, inferencia S06 y
 asesor S07. Incorporamos la estructura visual y el acceso gráfico; la navegación
 de detalle y las acciones requieren implementación independiente. La disponibilidad de una ruta no garantiza la de su fuente.
+
+## Explorador técnico
+
+Habilitamos /debug para OPERATOR. El catálogo incluye seis rutas GET
+existentes y sus consultas delimitadas en /api/v1/debug/probe/{key}.
+El servidor comprueba sesión y rol en cada llamada, rechaza parámetros
+arbitrarios, reutiliza los lectores y limita concurrencia y frecuencia.
+La proyección contiene procedencia, ámbito, transporte, vigencia, estado
+y fechas; omite cuerpos originales, detalles libres y secretos.
+Las respuestas válidas se pueden copiar o exportar como JSON y CSV,
+con neutralización de fórmulas. No se almacenan resultados en el navegador.
+Los enlaces a las rutas originales conservan su autorización propia.
+El esquema v3 y la gestión administrativa permanecen diferidos mientras
+completamos las funciones operacionales.
 
 ## Ejecución de desarrollo
 

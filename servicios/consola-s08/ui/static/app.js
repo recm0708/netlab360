@@ -188,6 +188,7 @@ function initializeConsole() {
     activityTimer = null;
     lastActivitySent = -Infinity;
     session = null;
+    resetDebug();
     if (idleDialog.open) idleDialog.close();
     shell.hidden = true;
     recoveryPanel.hidden = false;
@@ -241,6 +242,7 @@ function initializeConsole() {
     identityLabel.textContent = session.username + " · " + session.role;
     document.querySelector('[data-view="debug"]').hidden = session.role !== "OPERATOR";
     if (location.pathname === "/debug" && session.role !== "OPERATOR") {
+      resetDebug();
       location.replace("/home");
       return;
     }
@@ -252,6 +254,8 @@ function initializeConsole() {
       restorePresentation();
       if (location.pathname === "/home") {
         update().then(() => restoreContentIfUnchanged());
+      } else if (location.pathname === "/debug") {
+        loadDebug().then(() => restoreContentIfUnchanged());
       }
     }
     authNotice.textContent = "Sesión vigente. Acciones de red deshabilitadas.";
@@ -398,11 +402,199 @@ function initializeConsole() {
     active.setAttribute("aria-current", "page");
     const home = active.dataset.view === "home";
     document.getElementById("home-view").hidden = !home;
-    document.getElementById("module-view").hidden = home;
+    const debug = active.dataset.view === "debug";
+    document.getElementById("module-view").hidden = home || debug;
+    document.getElementById("debug-view").hidden = !debug;
     const label = active.querySelector(".nav-text").textContent;
     document.getElementById("module-title").textContent = label;
     document.title = "NETLAB360 | " + label;
   }
+
+  // El explorador nunca toma URLs del usuario ni exporta respuestas de error.
+  const debugSelect = document.getElementById("debug-select");
+  const debugRun = document.getElementById("debug-run");
+  const debugNotice = document.getElementById("debug-notice");
+  const debugMeta = document.getElementById("debug-meta");
+  const debugOutput = document.getElementById("debug-output");
+  const debugCatalog = document.getElementById("debug-catalog");
+  const exportButtons = ["debug-copy", "debug-json", "debug-csv"].map(id => document.getElementById(id));
+  const debugPaths = new Map([
+    ["health", "/healthz"], ["capabilities", "/api/v1/capabilities"],
+    ["sources", "/api/v1/sources"], ["metrics", "/api/v1/metrics"],
+    ["diagnostics", "/api/v1/diagnostics"], ["advisory", "/api/v1/advisory"]
+  ]);
+  let debugEpoch = 0;
+  let debugResult = null;
+  let debugReady = false;
+  let debugBusy = false;
+
+  function debugAllowed() {
+    return location.pathname === "/debug" && session?.role === "OPERATOR" &&
+      serverNow() < session.expiresAt;
+  }
+
+  function resetDebug() {
+    debugEpoch++;
+    debugResult = null;
+    debugReady = false;
+    debugBusy = false;
+    debugSelect.replaceChildren();
+    debugCatalog.replaceChildren();
+    debugSelect.disabled = true;
+    debugRun.disabled = true;
+    exportButtons.forEach(button => button.disabled = true);
+    debugOutput.textContent = "Sin resultados.";
+    debugMeta.textContent = "Sin consulta.";
+    debugNotice.textContent = "Esperando catálogo.";
+  }
+
+  async function debugRead(path) {
+    const response = await fetch(path, {method: "GET", credentials: "same-origin",
+      cache: "no-store", redirect: "error", signal: AbortSignal.timeout(15000)});
+    if (!response.ok) return {status: response.status, data: null};
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder("utf-8", {fatal: true});
+    let size = 0, raw = "";
+    try {
+      for (;;) {
+        const {done, value} = await reader.read();
+        if (done) break;
+        size += value.byteLength;
+        if (size > 262144) throw new Error("LIMIT");
+        raw += decoder.decode(value, {stream: true});
+      }
+      raw += decoder.decode();
+      return {status: response.status, data: JSON.parse(raw)};
+    } finally {
+      await reader.cancel().catch(() => {});
+      reader.releaseLock();
+    }
+  }
+
+  async function loadDebug() {
+    if (!debugAllowed()) return;
+    resetDebug();
+    const epoch = debugEpoch;
+    try {
+      const {status, data} = await debugRead("/api/v1/debug/catalog");
+      if (epoch !== debugEpoch || !debugAllowed()) return;
+      if (status !== 200 || data?.network_mutations_authorized !== false ||
+          !Array.isArray(data.endpoints) || data.endpoints.length !== debugPaths.size) {
+        throw new Error("CATALOG");
+      }
+      const seen = new Set();
+      for (const item of data.endpoints) {
+        if (seen.has(item.id) || !debugPaths.has(item.id) || debugPaths.get(item.id) !== item.path ||
+            item.method !== "GET" || item.role !== "OPERATOR" ||
+            item.probe !== "/api/v1/debug/probe/" + item.id) throw new Error("CATALOG");
+        seen.add(item.id);
+        const option = document.createElement("option");
+        option.value = item.id;
+        option.textContent = item.description;
+        debugSelect.append(option);
+        const row = document.createElement("p");
+        const anchor = document.createElement("a");
+        anchor.href = item.path;
+        anchor.target = "_blank";
+        anchor.rel = "noopener noreferrer";
+        anchor.textContent = "GET " + item.path;
+        row.append(anchor, document.createTextNode(" — " + item.schema + " · " + item.description));
+        debugCatalog.append(row);
+      }
+      debugReady = true;
+      debugSelect.disabled = false;
+      debugRun.disabled = false;
+      debugNotice.textContent = "Catálogo disponible. Seleccione una consulta.";
+    } catch {
+      if (epoch !== debugEpoch) return;
+      resetDebug();
+      debugNotice.textContent = "No se pudo validar el catálogo. Recargue la página.";
+    }
+  }
+
+  async function runDebug() {
+    if (!debugReady || !debugAllowed() || debugBusy || !debugPaths.has(debugSelect.value)) return;
+    const epoch = debugEpoch;
+    const key = debugSelect.value;
+    debugBusy = true;
+    debugResult = null;
+    debugRun.disabled = true;
+    exportButtons.forEach(button => button.disabled = true);
+    debugOutput.textContent = "Consultando…";
+    debugNotice.textContent = "Consulta en curso.";
+    debugMeta.textContent = "Sin resultado confirmado.";
+    const start = performance.now();
+    try {
+      const {status, data} = await debugRead("/api/v1/debug/probe/" + key);
+      if (epoch !== debugEpoch || !debugAllowed()) return;
+      debugMeta.textContent = "HTTP " + status + " · " + Math.round(performance.now()-start) + " ms";
+      if (status !== 200 || data?.network_mutations_authorized !== false ||
+          data.endpoint !== debugPaths.get(key) || !Array.isArray(data.records) ||
+          data.records.length > 128 || typeof data.summary !== "object" || data.summary === null ||
+          !Number.isFinite(Date.parse(data.queried_at_utc))) {
+        debugOutput.textContent = "Sin respuesta exportable.";
+        debugNotice.textContent = status === 429 ? "Límite de consultas. Reintente después de dos segundos." :
+          "No se confirmó la consulta.";
+        if (status === 401 || status === 403) recover();
+        return;
+      }
+      debugResult = data;
+      debugMeta.textContent += " · " + formatPanama(new Date(data.queried_at_utc));
+      debugOutput.textContent = JSON.stringify(data, null, 2);
+      debugNotice.textContent = "Respuesta normalizada: " + data.records.length + " observaciones.";
+      exportButtons.forEach(button => button.disabled = false);
+    } catch {
+      if (epoch !== debugEpoch) return;
+      debugOutput.textContent = "Sin respuesta exportable.";
+      debugNotice.textContent = "Consulta no disponible o respuesta demasiado extensa.";
+    } finally {
+      if (epoch === debugEpoch) {
+        debugBusy = false;
+        debugRun.disabled = !debugAllowed() || !debugReady;
+      }
+    }
+  }
+
+  function csvCell(value) {
+    let text = String(value ?? "");
+    if (/^[\s]*[=+@-]|^[\t\r\n]/.test(text)) text = "'" + text;
+    return '"' + text.replace(/"/g, '""') + '"';
+  }
+
+  function debugCsv(data) {
+    const fields = ["endpoint","queried_at_utc","source","resource","scope","transport",
+      "quality","state","observed_at_utc","received_at_utc","age_seconds","max_age_seconds","value"];
+    const rows = data.records.length ? data.records :
+      Object.entries(data.summary).map(([resource,value]) => ({resource,value}));
+    return [fields.map(csvCell).join(","), ...rows.map(row =>
+      fields.map(field => csvCell(field === "endpoint" || field === "queried_at_utc" ?
+        data[field] : row[field])).join(","))].join("\r\n") + "\r\n";
+  }
+
+  function saveDebug(format) {
+    if (!debugResult || !debugAllowed()) return;
+    const text = format === "csv" ? debugCsv(debugResult) : JSON.stringify(debugResult, null, 2);
+    const url = URL.createObjectURL(new Blob([text], {type: format === "csv" ?
+      "text/csv;charset=utf-8" : "application/json"}));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "netlab360-diagnostico-" + Date.now() + "." + format;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  debugRun.addEventListener("click", runDebug);
+  exportButtons[0].addEventListener("click", async () => {
+    if (!debugResult || !debugAllowed()) return;
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(debugResult, null, 2));
+      debugNotice.textContent = "JSON copiado.";
+    } catch {
+      debugNotice.textContent = "No se pudo copiar. Seleccione el texto del resultado.";
+    }
+  });
+  exportButtons[1].addEventListener("click", () => saveDebug("json"));
+  exportButtons[2].addEventListener("click", () => saveDebug("csv"));
 
   // Guardamos exclusivamente preferencias visuales por pestaña, nunca identidad ni CSRF.
   const menuToggle = document.getElementById("menu-toggle");

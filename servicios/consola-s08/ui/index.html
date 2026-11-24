@@ -79,7 +79,24 @@
         </section>
         <section id="module-view" hidden>
           <h1 id="module-title"></h1>
-          <div class="panel"><h2>Función no disponible</h2><p>La vista de este módulo aún no está habilitada. No se han realizado consultas ni acciones.</p><a href="/home">Volver al inicio</a></div>
+          <div id="module-placeholder" class="panel"><h2>Función no disponible</h2><p>La vista de este módulo aún no está habilitada. No se han realizado consultas ni acciones.</p><a href="/home">Volver al inicio</a></div>
+        </section>
+        <section id="debug-view" hidden>
+          <div class="heading"><div><p class="eyebrow">Administración técnica</p><h1>Diagnóstico técnico</h1><p class="muted">Explorador de API de solo lectura. No ejecuta comandos ni cambios de red.</p></div></div>
+          <section class="panel">
+            <h2>Catálogo de consultas</h2>
+            <p class="muted">Las rutas originales conservan sus permisos. La prueba utiliza una proyección técnica delimitada.</p>
+            <div id="debug-catalog" class="debug-catalog"></div>
+            <label for="debug-select">Consulta autorizada</label>
+            <div class="debug-actions"><select id="debug-select" disabled></select><button id="debug-run" type="button" disabled>Ejecutar consulta</button></div>
+            <p id="debug-notice" role="status" aria-live="polite">Esperando catálogo.</p>
+          </section>
+          <section class="panel">
+            <h2>Resultado de la consulta</h2>
+            <p id="debug-meta" class="muted">Sin consulta.</p>
+            <div class="debug-actions"><button id="debug-copy" class="secondary" type="button" disabled>Copiar JSON</button><button id="debug-json" class="secondary" type="button" disabled>Descargar JSON</button><button id="debug-csv" class="secondary" type="button" disabled>Descargar CSV</button></div>
+            <pre id="debug-output" tabindex="0">Sin resultados.</pre>
+          </section>
         </section>
       </main>
       <footer>NETLAB360 · Consola de operaciones · Acciones de red deshabilitadas</footer>

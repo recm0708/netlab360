@@ -57,12 +57,26 @@ class StructureTests(unittest.TestCase):
         for value in ("localStorage","sessionStorage","document.cookie","innerHTML"):
             self.assertNotIn(value,js)
 
-    def test_no_operational_fetch_or_secret_storage(self):
+    def test_no_arbitrary_fetch_or_secret_storage(self):
         js = (UI / "static/app.js").read_text(encoding="utf-8")
         for value in ("innerHTML",
-                      "/api/v1/sources", "/api/v1/metrics", "/api/v1/advisory"):
+                      "document.cookie", "eval(", "new Function("):
             self.assertNotIn(value, js)
         self.assertIn('credentials: "omit"', js)
+
+    def test_debug_structure_and_exports(self):
+        html = (UI / "index.html").read_text(encoding="utf-8")
+        self.assertIn('id="debug-view" hidden', html)
+        for name in ("debug-run", "debug-copy", "debug-json", "debug-csv"):
+            self.assertIn(f'id="{name}"', html)
+        js = (UI / "static/app.js").read_text(encoding="utf-8")
+        self.assertIn('debugPaths.has(debugSelect.value)', js)
+        self.assertIn('debugRead("/api/v1/debug/probe/" + key)', js)
+        self.assertIn('size > 262144', js)
+        self.assertIn('debugEpoch++', js)
+        self.assertIn('URL.revokeObjectURL(url)', js)
+        self.assertIn('csvCell', js)
+        self.assertIn('debugOutput.textContent = JSON.stringify(data, null, 2)', js)
 
     def test_vector_icons_and_scroll_layout(self):
         html = (UI / "index.html").read_text(encoding="utf-8")
