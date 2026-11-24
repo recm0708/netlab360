@@ -8,17 +8,17 @@ const observed = document.getElementById("observed");
 const notice = document.getElementById("notice");
 
 // Una zona horaria y un formato comunes para toda la presentación.
-const panamaClock = new Intl.DateTimeFormat("en-GB", {
+const panamaClock = new Intl.DateTimeFormat("en-US", {
   timeZone: "America/Panama", year: "numeric", month: "2-digit",
   day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit",
-  hourCycle: "h23"
+  hourCycle: "h12"
 });
 
 function formatPanama(date) {
   const parts = Object.fromEntries(panamaClock.formatToParts(date)
     .filter(part => part.type !== "literal").map(part => [part.type, part.value]));
-  return parts.day + "/" + parts.month + "/" + parts.year + " " +
-    parts.hour + ":" + parts.minute + ":" + parts.second;
+  return parts.month + "/" + parts.day + "/" + parts.year + " " +
+    parts.hour + ":" + parts.minute + ":" + parts.second + " " + parts.dayPeriod;
 }
 
 const fields = [

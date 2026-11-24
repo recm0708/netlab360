@@ -87,8 +87,10 @@ Presentamos NETLAB360 como consola de operaciones: los identificadores
 académicos de fases, lotes e issues se conservan en código y documentación,
 no en textos, etiquetas, tablas o mensajes visibles. Traducimos los
 identificadores de procedencia a nombres funcionales de las fuentes.
-Mostramos fechas en la zona America/Panama, formato día/mes/año y 24 horas;
-conservamos UTC en los contratos internos.
+Mostramos fechas en la zona America/Panama, formato mes/día/año y
+12 horas con segundos e indicador AM/PM; conservamos UTC en los contratos
+internos. La etiqueta Fecha y hora en el panel de identidad representa
+el vencimiento de la sesión, indicado mediante una aclaración visible.
 
 Durante el desarrollo, los recursos visuales se leen del disco en cada
 solicitud. Aplicamos cambios HTML, CSS y JavaScript mediante avance rápido
