@@ -1,0 +1,14 @@
+fuente	destino	propietario	grupo	modo
+scripts/s06/guardia_protegida.py	/usr/local/libexec/netlab360/s06-guardia.py	root	root	0750
+scripts/s06/controlador_hq_protegido.py	/usr/local/libexec/netlab360/s06-hq-controlador.py	root	root	0750
+scripts/s06/rollback_qdisc_aislado.py	/usr/local/libexec/netlab360/s06-rollback-isotest.py	root	root	0750
+scripts/s06/rollback_veth_aislado.py	/usr/local/libexec/netlab360/s06-veth-rollback.py	root	root	0750
+scripts/s07/api_s07.py	/usr/local/libexec/netlab360/s07-api.py	root	root	0755
+scripts/s07/rfc_ospf_operacional.py	/usr/local/libexec/netlab360/s07-ospf-broker.py	root	root	0755
+scripts/s07/ospf_trial.py	/usr/local/libexec/netlab360/s07-ospf-trial.py	root	root	0755
+scripts/s07/preflight_protegido.py	/usr/local/libexec/netlab360/s07-preflight.py	root	root	0755
+scripts/s07/recovery_rehearsal.py	/usr/local/libexec/netlab360/s07-recovery.py	root	root	0755
+scripts/s07/rfc_live_read.py	/usr/local/libexec/netlab360/s07-rfc-live.py	root	root	0755
+scripts/s07/rfc_protegido_preview.py	/usr/local/libexec/netlab360/s07-rfc-preview.py	root	root	0755
+scripts/s07/wan_trial_guard.py	/usr/local/libexec/netlab360/s07-wan-trial.py	root	root	0755
+scripts/operacion/s05_observador_privilegiado.py	/usr/local/libexec/netlab360-observer	root	root	0755

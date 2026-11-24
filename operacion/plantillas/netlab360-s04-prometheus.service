@@ -1,0 +1,27 @@
+# NETLAB360: unidad candidata para reconstruir Prometheus S04.
+# Se inicia después de comprobar el exporter y su configuración.
+[Unit]
+Description=NETLAB360 Prometheus de observabilidad multisede
+After=network-online.target netlab360-s04-exporter.service
+Requires=netlab360-s04-exporter.service
+
+[Service]
+Type=simple
+User=rc-aa-ec
+Group=rc-aa-ec
+WorkingDirectory=/home/rc-aa-ec/netlab360-bootstrap/prometheus/s04
+Environment=HOME=/home/rc-aa-ec
+ExecStart=/home/rc-aa-ec/netlab360-bootstrap/prometheus/bin/prometheus --config.file=/home/rc-aa-ec/netlab360-bootstrap/prometheus/s04/prometheus-runtime.yml --storage.tsdb.path=/home/rc-aa-ec/netlab360-bootstrap/prometheus/s04/data --storage.tsdb.retention.time=1d --web.listen-address=127.0.0.1:9091 --log.level=info
+Restart=on-failure
+RestartSec=5
+UMask=0027
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/rc-aa-ec/netlab360-bootstrap/prometheus/s04/data
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+CapabilityBoundingSet=
+AmbientCapabilities=

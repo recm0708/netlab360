@@ -5,7 +5,8 @@ set -Eeuo pipefail
 REPO="$HOME/proyectos/netlab360"
 BASE="$HOME/netlab360-bootstrap/prometheus"
 BIN="$BASE/bin"
-IMAGE="quay.io/prometheus/prometheus:v3.7.0"
+# Utilizamos la imagen exacta registrada para la reconstrucción.
+IMAGE="quay.io/prometheus/prometheus@sha256:29c1e0b48ad816750245dea3d65ac3ce57dda30547e67b1e9a5176e2953cc4dc"
 TEMP="nl360-prometheus-extract-$$"
 CREATED=0
 finish() {
