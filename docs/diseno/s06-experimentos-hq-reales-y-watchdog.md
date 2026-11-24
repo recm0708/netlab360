@@ -1,12 +1,12 @@
-# S06-042 — Ventanas experimentales en el cliente real de NETLAB360
+# Intervención controlada y watchdog del cliente HQ — Fase 06
 
-## Evidencia previa y decisión de topología
+## Descripción y alcance
 
 S06-041 está **ejecutado y aprobado en Ubuntu**: `S06-041_DATASET_Y_ML_VALIDADO=OK`, RC 0, 60 ventanas NORMAL de egreso HQ verificadas (120 mediciones ICMP reales), dos IsolationForest (HQ→S1/S2) entrenados en sesiones A/B con 40 observaciones por destino y evaluados en sesión TEST distinta con 20 observaciones por destino. FPR normal HQ→S1: IF 5 % vs regla P95 15 %; HQ→S2 ambos 5 %. No existe recall/F1 válido hasta tener degradaciones reales.
 
 El experimento S06-040B probó un watchdog tras caída SIGKILL en una veth **aislada** y sus recursos ya fueron eliminados. La infraestructura real del proyecto es la topología S02–S05 formada por 21 namespaces, routers FRR, VLANs, WAN, HA/LACP/SDN y clientes con comunicación multisede. La petición actual es **NO crear interfaces dummy, namespaces nuevos, veth ficticias ni más redes de prueba**. S06-042 actúa sobre un **único cliente ya existente** de esa topología: `nl360-s02-h-hq-120/eth0`, IPv4 `10.70.20.20/24`, gateway `10.70.20.1`, peer switch `nl360-s02-sw-hq`. No interviene `ens33`, routers, switches ni otros clientes.
 
-## 1. Política de intervención real acotada
+## Política de intervención
 
 Una copia instalada y cotejada del ejecutor Python `scripts/s06/controlador_hq_protegido.py` debe ser propiedad root y modo 0750 en `/usr/local/libexec/netlab360/s06-hq-controlador.py`. El usuario no pasa namespace, dispositivo, dirección, handle o retardo: están **fijados en código**. Aprobación por ejecución mediante la cadena literal `AUTORIZO_HQ_VLAN120_NETEM_40MS_35S`. Esta autorización corresponde exclusivamente al ensayo de latencia durante 35 segundos; no permite acceso al host de gestión, ni cambios posteriores automatizados.
 
@@ -16,7 +16,7 @@ El watchdog (`expire --token`) espera lock, valida identidad del namespace e ide
 
 `cleanup` solo retira el archivo de estado protegido tras validar `RESTORED` o `RESTORED_NO_CHANGE`, qdisc basal, rutas y NOC sanos; **nunca elimina interfaces ni namespaces**.
 
-## 2. Obtención de etiquetas independientes de las features
+## Etiquetado independiente
 
 `scripts/s06/capturar_ventanas_controladas.py` es observacional. Captura dos rutas de ICMP de bajo volumen antes/durante/después de la intervención, con autorización root separada. Por ventana, registra el estado firmado operacionalmente por el controlador root y las rutas de salida tanto **antes como después** de la medición.
 
@@ -27,7 +27,7 @@ El watchdog (`expire --token`) espera lock, valida identidad del namespace e ide
 
 Las observaciones contienen features de RTT, pérdidas y variación independientes de las etiquetas y de la información del controlador. Ningún token, estado root, qdisc, ventana temporal o campo de etiqueta puede alimentar el modelo como feature. Todos los JSONL originales se conservan privados e íntegros.
 
-## 3. Ejecución segura propuesta
+## Procedimiento seguro
 
 1. **Auditoría sin cambio** de restos de los laboratorios antiguos: buscar `nl360-s06-*` y tipos dummy en host y 21 namespaces; si hay elementos inesperados, detenerse antes de cualquier borrado, identificar propietario y dependencias. No eliminar recursos legítimos.
 2. Verificar `main`, sintaxis, pruebas CI y pruebas específicas, red management, qdisc HQ y salud de servicios.
@@ -38,7 +38,7 @@ Las observaciones contienen features de RTT, pérdidas y variación independient
 7. Solo al comprobar restauración real, ejecutar `cleanup` y validar gestión, 21 namespaces, 4 Docker y NOC 18 nodos/21 enlaces.
 8. Analizar las etiquetas y ventanas; repetir ciclos separados con aprobación nueva y sin mezclar entrenamiento y test únicamente después de aceptar el primero.
 
-## 4. Seguridad, excepciones y alcance
+## Seguridad y limitaciones
 
 El cambio actúa sobre un cliente de la topología de laboratorio; **no es una red empresarial real**, pero sí es tráfico y configuración reales del proyecto. Se tolera una latencia temporal breve de 40 ms desde el cliente HQ VLAN120; no es un corte WAN, fallo de OSPF ni pérdida de paquetes deliberada. No ejecutarlo si hay trabajo sensible o servicios críticos en ese cliente.
 
@@ -46,22 +46,12 @@ La qdisc de Linux no almacena propietario de la aplicación. La comprobación de
 
 Las primeras sesiones servirán para observar **DEGRADED/RECOVERY reales del cliente de laboratorio**. Para entrenar y medir generalización se requieren varias sesiones independientes por clase, split por sesión/tiempo y TEST no visto; no calcular F1/recall sobre un solo experimento. La eventual API de inferencia será inicialmente de solo lectura; controles mutantes futuros de S07/S08 requieren aprobación individual y catálogos allowlisted.
 
-## 5. Capturas del informe, nombres sin extensión
-
-- `S06_F01_Dataset_Normal_60_Ventanas_120_ICMP`: bitácora S06-041 sección de auditoría de sesiones y estado final.
-- `S06_F02_Modelos_IsolationForest_vs_P95`: líneas de los dos modelos y validación TRAIN/TEST de S06-041.
-- `S06_F03_Degradacion_Real_HQ`: intervención APPLIED sobre el cliente existente y RTT DEGRADED 40.440 ms, captura tomada y revisada.
-- `S06_F04_Recuperacion_Automatica_HQ`: RESTORED, qdisc noqueue y RTT RECOVERY 0.070 ms; captura tomada y revisada.
-- `S06_F05_Evaluacion_Modelos_Multiclase`: resultados validación/test cuando existan suficientes clases. No inventar capturas de resultados pendientes.
-
-**Progreso S06 tras S06-042: 55 % técnico estimado**, no calificación docente. S06-042 está **ejecutado y verificado en VM**, no solo diseñado. La ejecución demuestra una intervención reversible acotada pero todavía no valida generalización de ML: hay solo una sesión DEGRADED y una RECOVERY.
-
-## 6. Aceptación real, capturas y transición a S06-043 (23/11/2026)
+## Validación
 
 El lote completo S06-042 terminó en `S06-042_EXPERIMENTO_REAL_VALIDADO=OK`, RC 0, con fuente `main=2ffe8fd`, script root íntegro, 26 pruebas de guardia y 16 del recolector correctas, CI previa de 644 pruebas. Se verificaron 21 namespaces, cuatro Docker, ausencia de dummy/S06 temporal, `ens33 192.168.47.40/24` gateway `.2` y `eth0` de cliente HQ conectado a switch original; 7 servicios y Prometheus siguieron disponibles.
 
 El token usado `b3484afcd16995a4` solo identifica el **experimento histórico**; no es válido para nuevas sesiones. El timer se armó antes de `netem 40ms` handle `142:`, expiró autónomamente y registró `RESTORED` a `2026-11-23T07:04:20.031+00:00` y `final_qdisc_state=BASELINE`, seguido de `cleanup=OK` y `state=NONE`. El estímulo generó `S06_WINDOW_DEGRADED_20261123T070344Z_984563` con 4/4 ventanas, 8 mediciones ICMP, RTT medio 40.440 ms. La fase posterior `S06_WINDOW_RECOVERY_20261123T070420Z_6c4e05` produjo 6/6 ventanas, 12 ICMP, RTT 0.070 ms. Ninguna de estas ventanas se ha presentado como puntuación F1 o recall sobre test externo.
 
-**Bitácora verificable local:** `~/netlab360-bootstrap/s06/S06_042_REAL_HQ_20261123_020337/S06_042_Experimento_Real_HQ.txt`. TXT delimitados de evidencias bajo `~/netlab360-bootstrap/s06/evidencias/informe/`; **cuatro PNG F01–F04 proporcionados en el chat y revisados**, no se supone que se transfirieron a la VM o al repositorio. La sección [§4.11 del plan maestro](s06-s08-plan-maestro-y-criterios.md) tiene inventario de sesiones, modelos, capturas y próxima acción.
+Los registros originales se conservan fuera del repositorio. [Evidencias S06](../../evidencias/capturas/fase6/README.md).
 
-**S06-043:** repetir un número pequeño de sesiones controladas sobre **el mismo cliente existente**, una aprobación por ensayo, watchdog activo, captura de DEGRADED/RECOVERY por estados/mediciones independientes, preservación de originales y abandono si la configuración sale de baseline. Evaluar modelos con *holdout por sesión de experimento*, sin mezclar TRAIN/TEST. Como RECOVERY puede tener métricas indistinguibles de NORMAL, priorizar detección binaria de degradación y tratamiento operacional de RESTORED; no afirmar un clasificador multiclase fiable si las features no contienen señales para identificar la transición.
+La extensión multisesión se documenta en [adquisición experimental multisesión](s06-lotes-multisesion-hq.md).

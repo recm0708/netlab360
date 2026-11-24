@@ -1,12 +1,12 @@
-# S06-046 — Mediciones frescas HQ, validación de calidad e inferencia exploratoria
+# Telemetría reciente e inferencia exploratoria — Fase 06
 
-## Propósito
+## Descripción
 
 Después de S06-045 (replay histórico verificado y captura F07 aprobada) se incorpora una fuente de **mediciones recientes** desde el cliente verdadero `nl360-s02-h-hq-120`, hacia `10.71.20.20` (S1) y `10.72.20.20` (S2). Son seis solicitudes ICMP por ejecución, **tres por ruta**, por `sudo -n ip netns exec` permitido y con origen/destino fijos. No se inducen fallas, no se crean interfaces/namespace ni se cambia qdisc, FRR u otros servicios.
 
 **Esta etapa es observación real de baja carga, no una nueva evaluación independiente de sensibilidad**: las respuestas a mediciones nuevas carecen de etiqueta de verdad de terreno de degradación, que siempre se conserva como `UNKNOWN`. La comparación con modelos de S06-044 es exploratoria y no certifica otras clases de fallo ni predicción temprana.
 
-## Código y contrato
+## Implementación y contrato
 
 - `scripts/s06/telemetria_hq_live.py` implementa `--collect`, preflight de gestión e infraestructura, verifica estado root `NONE/BASELINE` y snapshot de qdisc/rutas/NOC tanto antes como después de las pruebas; reaprovecha `measure_ping` del capturador existente y genera un archivo privado de cada captura.
 - `scripts/s06/inferencia_hq_readonly.py` mantiene los endpoints de S06-045 para replay y amplía `GET /api/v1/s06/live?route=HQ_A_S1` o `HQ_A_S2`. **Los GET no realizan ping**, sino que leen exclusivamente la última observación creada con `--collect`.
@@ -21,7 +21,7 @@ Con consenso binario **NORMAL** de los tres métodos y guardas de la red verific
 
 La API temporal sigue en `127.0.0.1:9145`, sin instalación como servicio ni apertura hacia Windows. No modifica el NOC S05 actual. Una integración visual con el NOC requerirá un adaptador de lectura específico después de aprobar la adquisición real.
 
-## Procedimiento de aceptación ejecutado
+## Procedimiento de validación
 
 1. Fusionar código tras CI y ejecutar una adquisición en `netlab360-lab` con permisos sudo previamente autenticados, sin ejecutar scripts bajo root.
 2. Verificar archivo original reciente, tiempos UTC, features por ruta, estado de guardia y ausencia de modificaciones de red.
@@ -29,11 +29,11 @@ La API temporal sigue en `127.0.0.1:9145`, sin instalación como servicio ni ape
 4. Reconsultar el archivo tras vencer 30 s: debe responder `UNKNOWN` con `LIVE_TELEMETRY_MISSING_STALE_OR_INVALID`. No lanzar otra medición para forzar clasificación ni inventar el estado de falla.
 5. Comprobar 21 namespaces, cuatro contenedores, `ens33` 192.168.47.40/24, gateway .2, `qdisc noqueue`, NOC/Prometheus activos y árbol Git limpio. **Cumplido:** la captura F08 se recibió, revisó y aprobó; no se repite la medición.
 
-## Límites
+## Limitaciones
 
-Los modelos se entrenaron y probaron con ventanas de duración y número de paquetes distintos de este muestreo (tres paquetes por ruta). No afirmar equivalencia de distribuciones, confiabilidad productiva ni mejora de F1 en vivo; esta etapa valida el transporte y las condiciones de calidad para inferencia. S06 permanece incompleta; las issues #6, #25 y #26 y S07/S08 permanecen abiertas.
+Los modelos se entrenaron y probaron con ventanas de duración y número de paquetes distintos de este muestreo (tres paquetes por ruta). No afirmar equivalencia de distribuciones, confiabilidad productiva ni mejora de F1 en vivo; esta etapa valida el transporte y las condiciones de calidad para inferencia. Los resultados corresponden a la versión exploratoria, no al posterior protocolo uniforme V2.
 
-## Resultado real S06-046 — aceptado en VM el 23/11/2026
+## Resultados
 
 PR [#171](https://github.com/recm0708/netlab360/pull/171), commit `50abc66`, CI **730 pruebas ejecutadas (729 aprobadas, una omitida)**. En `netlab360-lab` pasaron las **21 pruebas específicas**; el lote verificó adquisición de una muestra nueva de tres ICMP por ruta, TTL de 30 s, API FastAPI temporal y poscondiciones de infraestructura. `S06-046_VALIDACION_COMPLETA=OK` y `RESULTADO_RC=0`.
 
@@ -41,6 +41,6 @@ Fuente privada: `~/netlab360-bootstrap/s06/telemetria-hq-live/S06_046_HQ_2026112
 
 Las guardas rechazaron una muestra artificialmente envejecida 40 s (`S06_046_FRESHNESS_GATE=OK`), mantuvieron denegadas acciones correctivas, detuvieron API temporal 9145, restauración root `NONE/BASELINE`, `noqueue`, 21 namespaces, cuatro Docker, gestión `ens33 192.168.47.40/24` y gateway `.2`, Prometheus READY y NOC saludable; sin mutaciones de red ni reentrenamiento.
 
-**Evidencia F08 aceptada:** `S06_F08_Telemetria_Reciente_Inferencia_HQ` — TXT privado y **captura PNG recibida y revisada en el chat**, legibles las marcas INICIO/FIN, ambas rutas, seis decisiones, TTL y seguridad. No afirmar que la captura PNG ya está versionada en GitHub o copiada a la VM; se proporcionó en esta conversación.
+[Evidencias S06](../../evidencias/capturas/fase6/README.md).
 
 **Continuidad S06-047:** conectar el diagnóstico limitado y conservador al NOC existente por adaptador read-only, conservar comportamiento UNKNOWN si la API IA está detenida o una observación caduca, no tocar el diagrama ni crear un segundo NOC.

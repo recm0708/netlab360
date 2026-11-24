@@ -1,6 +1,6 @@
-# S06-044 — Evaluación binaria por sesiones independientes, sin modificar redes
+# Evaluación binaria exploratoria por sesiones — Fase 06
 
-## Fuentes verificadas y alcance
+## Descripción y alcance
 
 S06-043 tiene tres experimentos nuevos completos en el **cliente real existente HQ**; la corrección de lectura validó el registro de ciclos y el dataset. El acumulado S06-041–043 es de **60 ventanas NORMAL**, **16 DEGRADED** y **24 RECOVERY**. La captura académica F05 ya fue entregada, revisada y aprobada, con delimitadores INICIO/FIN. Se conservaron 21 namespaces originales, 4 contenedores, ruta de administración y `eth0` del cliente HQ con qdisc `noqueue`. Fuente de los eventos: `~/netlab360-bootstrap/s06/experimentos/S06_043_20261123T073108Z_344e1e/manifest.json`.
 
@@ -25,7 +25,7 @@ No se mezclan ventanas de una sesión entre entrenamiento y prueba. Un evento `D
 
 Cada método se evalúa sobre las mismas 20 ventanas NORMAL + 4 DEGRADED por ruta del TEST; calcula TP, FP, TN, FN, precisión, recall, F1 y especificidad. También se mide cuántas de las seis ventanas RECOVERY del test son marcadas erróneamente como degradadas. La lista de variables del modelo se limita a RTT medio, RTT P95, variación mdev y porcentaje de pérdida medidos por ICMP. No entran la qdisc, el token, el estado del controlador, la etiqueta, la fecha ni el ID de sesión como predictores.
 
-## Interpretación obligatoria
+## Limitaciones
 
 Con solo **cuatro ventanas de degradación por ruta en TEST**, el recall varía en saltos de 25 puntos porcentuales. Hay únicamente un **tipo de fallo inyectado: retardo fijo de 40 ms** en el mismo cliente y misma topología. Un resultado excelente no demostraría generalización a pérdidas, congestión variable, falla WAN, OSPF, SDN, caída de HA ni incidentes desconocidos.
 
@@ -33,15 +33,9 @@ La clase RECOVERY registra un **estado operacional posterior al evento** y no ti
 
 La evaluación guarda `evaluacion.json`, modelos privados y un TXT para evidencia en `~/netlab360-bootstrap/s06/evaluaciones/S06_044_*/`. No subir datos originales ni modelos privados a Git. No abrir objetos de modelos de terceros no confiables.
 
-## Captura académica y continuidad
+## Resultados
 
-El script escribe una evidencia independiente con marcadores `========== INICIO CAPTURA S06_F06_Evaluacion_Binaria_Modelos_HQ ==========` y `========== FIN CAPTURA S06_F06_Evaluacion_Binaria_Modelos_HQ ==========`. **Tomar F06 solo después de ejecutar el script en VM y validar los resultados reales**. Contiene matriz TP/FP/TN/FN, precisión, recall, F1 y falsas alarmas RECOVERY para tres métodos y dos destinos.
-
-Siguiente lote tras aprobar S06-044: informe técnico de análisis de error/limitaciones, API de inferencia **solo lectura**, comportamiento UNKNOWN para datos insuficientes, explicación de alertas y conexión a NOC; luego S07/S08 deberán respetar el catálogo de acciones autorizadas. No sumar un nuevo experimento ni crear interfaces ficticias para este incremento.
-
-## Aceptación real en VM — 23/11/2026
-
-El evaluador se ejecutó sobre los datasets genuinos ya guardados y finalizó con `S06_044_EVALUACION_BINARIA=OK_EXPLORATORIA`, `S06-044_EVALUACION_VALIDADA=OK` y `RESULTADO_RC=0`. Pasaron 23 pruebas específicas en la VM, se verificó que TRAIN/TEST no compartieran sesiones, se recalcularon las matrices de confusión, se revisó integridad de los artefactos privados y se generó el TXT académico `S06_F06_Evaluacion_Binaria_Modelos_HQ`, cuya captura PNG fue revisada y aprobada en el chat.
+El evaluador se ejecutó sobre los datasets originales, con 23 pruebas específicas aprobadas. Se verificó separación por sesión entre TRAIN y TEST y se recalcularon matrices de confusión.
 
 | Ruta | Método | TP | FP | TN | FN | Precisión | Recall | F1 | FP sobre RECOVERY (6) |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -56,5 +50,4 @@ El evaluador se ejecutó sobre los datasets genuinos ya guardados y finalizó co
 
 **Estado de infraestructura tras ejecutar:** 21 namespaces, cuatro contenedores, `ens33`/gateway conservados, guardia HQ `NONE/BASELINE`, qdisc `noqueue`, Prometheus READY y NOC saludable; sin unidades fallidas. Los datos y modelos privados permanecen en la VM, no en GitHub. Evidencia textual `~/netlab360-bootstrap/s06/evidencias/informe/S06_F06_Evaluacion_Binaria_Modelos_HQ.txt`; evaluación `~/netlab360-bootstrap/s06/evaluaciones/S06_044_20261123T081627Z_2ade0e/` y bitácora `~/netlab360-bootstrap/s06/validacion-s06-044-20261123_031619/S06_044_Validacion_Completa.txt`.
 
-**Próximo incremento S06-045:** análisis de errores, API/servicio de inferencia solo lectura con datos actuales y respuesta `UNKNOWN` cuando falte calidad, explicación simple y eventual integración al NOC, siempre sin cambios de red.
-
+[Inferencia histórica](s06-inferencia-hq-replay-readonly.md).
