@@ -2,7 +2,7 @@
 
 ## Antecedentes observacionales
 
-- S06-032: referencia de 12 observaciones reales en S04/Prometheus/NOC con etiqueta UNKNOWN.
+- S06-032: referencia de 12 observaciones reales del exportador de la fase 04, Prometheus y NOC con etiqueta UNKNOWN.
 - S06-033: nueve sondas ICMP y tres HTTP sin fallas inducidas, tres rondas; valores medidos de RTT, pérdida y respuesta HA.
 - S06-034: 375 filas normalizadas procedentes de 2 sesiones, fuentes y unidades tipadas, sin valores faltantes ni scrapes repetidos detectados; raw intacto. **No son 375 incidentes ni un dataset supervisado**.
 
@@ -13,7 +13,7 @@
 
 - Namespace candidato: nl360-s02-h-hq-120.
 - Interfaz candidata: eth0, IPv4 10.70.20.20/24, gateway 10.70.20.1.
-- Rutas de medición: HQ→S1 (10.71.20.20) y HQ→S2 (10.72.20.20), usando catálogo S06 existente.
+- Rutas de medición: HQ→S1 (10.71.20.20) y HQ→S2 (10.72.20.20), usando catálogo de la fase 06 existente.
 - Interfaz protegida: ens33 192.168.47.40/24, gateway 192.168.47.2. La aplicación no puede inducir condiciones en ens33, Docker, routers WAN, backend HTTP HA, puentes LACP, controlador Faucet ni otros clientes.
 - Estado operativo de referencia: 21 namespaces, cuatro contenedores, 18 nodos/21 enlaces NOC y backend HQ.
 

@@ -1,36 +1,27 @@
 #!/usr/bin/env python3
-"""NETLAB360 — reconciliación segura de milestones S01–S08.
+"""Audita y normaliza los hitos de NETLAB360 sin alterar sus estados."""
 
---check: comprobar estados de forma no mutadora.
---apply: actualizar SOLO descripciones, y si GitHub mantiene un contador
-        S05 obsoleto intentar UNA desvinculación/reasignación de la issue #5
-        conservando cierre/casillas; nunca reabrir issues ni milestones.
-
-Se requiere gh CLI autenticado como colaborador del repositorio.
-"""
 from __future__ import annotations
 
 import argparse
 import json
 import subprocess
-import time
 import sys
 
 REPO = "recm0708/netlab360"
 ENDPOINT = f"repos/{REPO}"
-S05_EXPECTED = frozenset((5, 23, 31, 32, 64, 105))
 
 DESCRIPTIONS = {
-  1: """## S01 — Fundamentos, VM y línea base
+  1: """## Fase 1 — Fundamentos, VM y línea base
 **Propósito:** establecer un entorno NETLAB360 reproducible, administrable y seguro para el proyecto multisede.
 
 **Alcance y entregables:** VMware/Ubuntu, accesos SSH y GitHub, IP fija de gestión 192.168.47.40/24, inventario IPAM, convenciones de evidencias y diseño base de redes; validaciones iniciales de la infraestructura y continuidad académica.
 
 **Criterio de aceptación:** disponibilidad de VM y red de gestión, accesos verificables, reserva sin colisiones, documentación y pruebas iniciales registradas.
 
-**Estado:** CERRADA y técnicamente aceptada. Este hito no acredita por sí solo la ejecución de funcionalidades avanzadas S02–S08. Referencia: issue #1.""",
+**Estado:** CERRADA y técnicamente aceptada. Este hito no acredita por sí solo la ejecución de funcionalidades avanzadas de las fases 02–08. Referencia: issue #1.""",
 
-  2: """## S02 — Topología multisede y enrutamiento resiliente
+  2: """## Fase 2 — Topología multisede y enrutamiento resiliente
 **Propósito:** construir la red empresarial virtual de tres sedes (HQ, S1 y S2).
 
 **Alcance y entregables:** FRRouting, OSPF, cuatro enlaces WAN principales/alternativos, nueve VLAN, direccionamiento coherente, conmutación de enlaces y restauración de rutas.
@@ -39,16 +30,16 @@ DESCRIPTIONS = {
 
 **Estado:** CERRADA y técnicamente aceptada. Se limita a topología virtual multisede de tres sedes; no representa enlaces WAN físicos. Referencias: issues #2, #13 y #14.""",
 
-  3: """## S03 — Automatización, SoT e integración GitOps
+  3: """## Fase 3 — Automatización, SoT e integración GitOps
 **Propósito:** automatizar auditoría y cambios de configuración reproducibles en FRR sin perder control del estado deseado.
 
 **Alcance y entregables:** Source of Truth (SoT) candidate, inventario, Ansible para compliance/drift/reconciliación, OpenTofu como metadatos locales con terraform_data, pruebas unitarias, PR y CI GitOps.
 
 **Criterio de aceptación:** cambios Ansible verificables, plan idempotente OpenTofu, separación entre configuración candidata y red operativa y pruebas CI aprobadas.
 
-**Estado:** CERRADA y técnicamente aceptada. OpenTofu no administra proveedores/recursos externos reales en esta fase; esa ampliación opcional continúa separada en S08 (#17). Referencias: issues #3, #16, #18, #19.""",
+**Estado:** CERRADA y técnicamente aceptada. OpenTofu no administra proveedores/recursos externos reales en esta fase; esa ampliación opcional continúa separada en la fase 08 (#17). Referencias: issues #3, #16, #18, #19.""",
 
-  4: """## S04 — Observabilidad, incidentes y calidad de servicio
+  4: """## Fase 4 — Observabilidad, incidentes y calidad de servicio
 **Propósito:** obtener visibilidad reproducible de la red y registrar degradaciones e incidentes controlados.
 
 **Alcance y entregables:** exporter de telemetría, Prometheus/TSDB, NOC e histórico SQLite, indicadores SLI/SLO experimentales, API de incidentes y pruebas de persistencia y retorno.
@@ -57,16 +48,16 @@ DESCRIPTIONS = {
 
 **Estado:** CERRADA y técnicamente aceptada. El objetivo SLO del laboratorio no se presenta como garantía contractual en producción. Referencias: issues #4, #15 y #20–#22.""",
 
-  5: """## S05 — Servicios resilientes, LACP, SDN y NOC integrado
+  5: """## Fase 5 — Servicios resilientes, LACP, SDN y NOC integrado
 **Propósito:** integrar resiliencia de servicios y enlaces con observabilidad multisede comprobable.
 
 **Alcance y entregables:** HA HTTP lógica HQ → S1 → HQ, LACP IEEE 802.3ad en HQ/S1/S2 (2→1→2), OVS/Faucet con VLAN de comunicación/aislamiento, NOC con 18 nodos y 21 enlaces, catálogo de 71 PNG y evidencias HTTP.
 
 **Criterio de aceptación:** conmutación y restauración reales documentadas, LACP/SDN observables, pruebas de seguridad sin afectar gestión, seis issues técnicas completadas (#5, #23, #31, #32, #64 y #105).
 
-**Estado:** CERRADA y técnicamente aceptada; seis issues asignadas, todas cerradas. No incluye HA física, cuarta sede ni WireGuard. Propuesta opcional de ampliación reubicada en S08, issue #24. Si GitHub muestra un porcentaje menor, verificar contadores de milestone frente a las seis issues.""",
+**Estado:** CERRADA y técnicamente aceptada; seis issues asignadas, todas cerradas. No incluye HA física, cuarta sede ni WireGuard. Propuesta opcional de ampliación reubicada en la fase 08, issue #24. Si GitHub muestra un porcentaje menor, contrastar el contador con todas las issues y pull requests asignados.""",
 
-  6: """## S06 — Ciencia de datos y diagnóstico inteligente en NETLAB360
+  6: """## Fase 6 — Ciencia de datos y diagnóstico inteligente en NETLAB360
 **Propósito:** convertir mediciones de red en diagnósticos explicables y contrastados con datos nuevos sin automatizar acciones sobre la infraestructura.
 
 **Alcance y entregables:** ventanas etiquetadas y calidad de datos, control root/watchdog, regla P95, IsolationForest y LogisticRegression, inferencia y NOC de solo lectura, estudio prospectivo V2 con TRAIN→VALIDATION→TEST cronológico y muestreo homogéneo (3 ICMP), TP/FP/TN/FN, F1, recuperación y deriva descriptiva.
@@ -75,171 +66,219 @@ DESCRIPTIONS = {
 
 **Estado:** CERRADA y técnicamente aceptada. TEST V2 y auditoría científica validados para degradación ICMP controlada. FAULT HTTP HQ independiente y recuperación verificados, sin alterar TEST V2. Concept drift inferencial y pronóstico/horizonte MAE no evaluables. Once capturas incorporadas al catálogo oficial. Issues #6, #25 y #26 cerradas.""",
 
-  7: """## S07 — AIOps supervisado, recomendaciones y reversión segura
-**Propósito:** operar diagnósticos S06 mediante un ciclo asistido y auditable, con decisiones y cambios sensibles siempre supervisados.
+  7: """## Fase 7 — AIOps supervisado
 
-**Alcance y entregables:** correlación telemetría–estado de red–incidentes, catálogo allowlisted de acciones/runbooks, prechecks de propiedad, bloqueo, permisos y carga, explicación, recomendación, aprobación humana, ejecución, verificación y rollback.
+**Propósito:** integrar diagnóstico y gestión supervisada de intervenciones.
 
-**Criterio de aceptación:** escenarios reales reversibles y trazados de detectar → explicar → recomendar → aprobar → ejecutar → verificar → restaurar; comportamiento seguro ante UNKNOWN/falla parcial, sin shell arbitrario ni mutaciones desatendidas.
+**Alcance y entregables:** normalización de eventos, correlación RCA,
+runbooks, Intent Assurance, RFC, aprobación administrativa, ejecución
+protegida, watchdog y API local controlada.
 
-**Estado:** ABIERTA. Fuentes S04/S05 y diagnóstico S06 disponibles; el flujo AIOps propio aún no está completado. Referencia: issue #7.""",
+**Criterio de aceptación:** intervenciones delimitadas con autorización,
+auditoría, verificación y recuperación independiente.
 
-  8: """## S08 — Consola interactiva, regresión integral y entrega académica
+**Estado:** CERRADA. Issues #7 y #190–#197 completadas, 49 capturas
+oficiales y 253 acumuladas. Informe 7.3 revisado (184 páginas).
+Regresión histórica: 1258 casos, uno omitido y cero fallos.
+La aceptación no demuestra pronóstico futuro ni remediación autónoma.
+""",
+
+  8: """## Fase 8 — Consola interactiva, regresión integral y entrega académica
 **Propósito:** consolidar NETLAB360 en una demostración web operativa y entregar los artefactos técnicos y académicos verificados.
 
-**Alcance y entregables:** menú único para topología, OSPF/WAN, HA, LACP, SDN, diagnóstico IA, métricas, pruebas seguras e incidentes; APIs y acciones controladas con autorización; arranque/reconstrucción desde VM apagada, regresión, catálogo de evidencias, informe académico, presentación y TAR técnico independiente autorizado.
+**Alcance y entregables:** menú único para topología, OSPF/WAN, HA, LACP, SDN, diagnóstico IA, copiloto RAG, métricas, pruebas seguras e incidentes; APIs y acciones controladas con autorización; arranque/reconstrucción desde VM apagada, regresión, catálogo de evidencias, informe académico, presentación y TAR técnico independiente autorizado.
 
 **Criterio de aceptación:** interfaz funcional sin shell libre, escenarios demostrables con rollback y gestión intacta, documentación y evidencias revisadas, TAR íntegro y entregables que satisfacen guía docente.
 
-**Estado:** ABIERTA. Opcionales condicionados y no implementados: cuarta sede/WireGuard (#24), data sources/recursos externos OpenTofu (#17) y OVA/OVF si lo exige la entrega (#29). No acreditarlos como realizados ni convertirlos automáticamente en requisitos del núcleo S08."""
+**Estado:** ABIERTA. Opcionales condicionados y no implementados: cuarta sede/WireGuard (#24), data sources/recursos externos OpenTofu (#17) y OVA/OVF si lo exige la entrega (#29). No acreditarlos como realizados ni convertirlos automáticamente en requisitos del núcleo de la fase 08."""
 }
-EXPECTED_STATES = {n: ("closed" if n <= 6 else "open") for n in range(1, 9)}
 
 
-def gh(path: str, data: dict | None = None) -> object:
-    cmd = ["gh", "api", "--method", "PATCH" if data is not None else "GET", path]
+# Los estados se corresponden con la aceptación al cierre de la fase 07.
+EXPECTED_STATES = {
+    n: "closed" if n <= 7 else "open"
+    for n in range(1, 9)
+}
+
+
+EXPECTED_ISSUES = {
+    5: {5, 23, 31, 32, 64, 105},
+    7: {7, *range(190, 198)},
+}
+
+
+def gh(path, data=None, *, paginate=False):
+    """Consulta REST paginada o modificación explícita de metadatos."""
+    command = ["gh", "api", path]
+
+    if paginate:
+        if data is not None:
+            raise ValueError("pagination_with_write")
+        command += ["--paginate", "--slurp"]
+
     if data is not None:
-        cmd += ["--input", "-"]
-    run = subprocess.run(
-        cmd, input=json.dumps(data) if data is not None else None,
-        capture_output=True, text=True, timeout=45, check=False,
+        command += ["--method", "PATCH", "--input", "-"]
+
+    result = subprocess.run(
+        command,
+        input=json.dumps(data) if data is not None else None,
+        capture_output=True,
+        text=True,
+        timeout=120,
+        check=True,
     )
-    if run.returncode:
-        raise RuntimeError("github_api_failed: " + path + ": " + run.stderr.strip()[:600])
-    try:
-        return json.loads(run.stdout)
-    except json.JSONDecodeError as exc:
-        raise RuntimeError("github_response_not_json: " + path) from exc
+
+    value = json.loads(result.stdout)
+
+    if paginate:
+        if not isinstance(value, list) or not all(
+            isinstance(page, list) for page in value
+        ):
+            raise RuntimeError("invalid_pagination")
+        return [item for page in value for item in page]
+
+    return value
 
 
-def milestone(number: int) -> dict:
-    obj = gh(f"{ENDPOINT}/milestones/{number}")
-    if not isinstance(obj, dict) or obj.get("number") != number or obj.get("title") != f"S{number:02d}":
+def milestone(number):
+    """Valida identidad y estado sin depender exclusivamente del título."""
+    result = gh(f"{ENDPOINT}/milestones/{number}")
+
+    if (
+        result.get("number") != number
+        or result.get("title") not in {
+            f"S{number:02d}", f"Fase {number}"
+        }
+    ):
         raise RuntimeError(f"milestone_{number}_identity_mismatch")
-    if obj.get("state") != EXPECTED_STATES[number]:
+
+    if result.get("state") != EXPECTED_STATES[number]:
         raise RuntimeError(f"milestone_{number}_unexpected_state")
-    return obj
+
+    return result
 
 
-def s05_inventory() -> dict:
-    entries = gh(f"{ENDPOINT}/issues?milestone=5&state=all&per_page=100")
-    if not isinstance(entries, list) or len(entries) >= 100:
-        raise RuntimeError("s05_inventory_paginated_or_invalid")
-    if any("pull_request" in x for x in entries):
-        raise RuntimeError("s05_unexpected_pull_request")
-    numbers = {x.get("number") for x in entries}
-    if numbers != S05_EXPECTED:
-        raise RuntimeError("s05_issue_inventory_changed: " + str(sorted(numbers)))
-    if any(x.get("state") != "closed" for x in entries):
-        raise RuntimeError("s05_issue_open_do_not_force_completion")
-    return {"total": len(entries), "closed": len(entries), "open": 0,
-            "numbers": sorted(numbers)}
+def inventory(number):
+    """Cuenta issues y PR sin confiar en los contadores agregados."""
+    entries = gh(
+        f"{ENDPOINT}/issues?milestone={number}&state=all&per_page=100",
+        paginate=True
+    )
+
+    items = {}
+
+    for entry in entries:
+        identifier = entry["number"]
+        state = entry.get("state")
+
+        if identifier in items or state not in {"open", "closed"}:
+            raise RuntimeError("invalid_inventory")
+
+        if (entry.get("milestone") or {}).get("number") != number:
+            raise RuntimeError("membership_mismatch")
+
+        items[identifier] = (
+            "pr" if "pull_request" in entry else "issue",
+            state
+        )
+
+    issues = {
+        key for key, value in items.items()
+        if value[0] == "issue"
+    }
+
+    if number in EXPECTED_ISSUES and issues != EXPECTED_ISSUES[number]:
+        raise RuntimeError(f"phase_{number}_issue_inventory_changed")
+
+    opened = sum(value[1] == "open" for value in items.values())
+    closed = len(items) - opened
+
+    if EXPECTED_STATES[number] == "closed" and opened:
+        raise RuntimeError(f"phase_{number}_open_items")
+
+    if number == 7:
+        if items.get(202) != ("pr", "closed"):
+            raise RuntimeError("phase_7_pr_202_missing")
+
+        pr = gh(f"{ENDPOINT}/pulls/202")
+
+        if pr.get("state") != "closed" or pr.get("merged") is not True:
+            raise RuntimeError("phase_7_pr_202_not_merged")
+
+    return {"items": items, "open": opened, "closed": closed}
 
 
-def optional_issue_scope() -> None:
-    item = gh(f"{ENDPOINT}/issues/24")
-    if (not isinstance(item, dict) or item.get("state") != "open"
-            or (item.get("milestone") or {}).get("number") != 8):
-        raise RuntimeError("issue24_not_reassigned_to_s08")
+def counts_ok(hito, observed):
+    """Distingue el inventario real del contador remoto."""
+    return (
+        hito.get("open_issues") == observed["open"]
+        and hito.get("closed_issues") == observed["closed"]
+    )
 
 
-def counts_ok(m: dict, inv: dict) -> bool:
-    return m.get("open_issues") == inv["open"] and m.get("closed_issues") == inv["closed"]
+def run(apply):
+    """La aplicación solo modifica títulos y descripciones."""
+    before = {n: milestone(n) for n in EXPECTED_STATES}
+    inventories = {n: inventory(n) for n in EXPECTED_STATES}
 
+    for n, current in before.items():
+        inv = inventories[n]
 
-def refresh_s05_once(inv: dict) -> None:
-    before = milestone(5)
-    if counts_ok(before, inv):
-        print("S05_CONTADOR=100_POR_CIENTO_CONFIRMADO")
-        return
-    issue = gh(f"{ENDPOINT}/issues/5")
-    if (issue.get("state") != "closed"
-            or (issue.get("milestone") or {}).get("number") != 5):
-        raise RuntimeError("s05_anchor_issue_invalid")
-    print("S05_CONTADOR=DESINCRONIZADO_INTENTO_UNICO_RECUENTO")
-    removed = False
-    try:
-        gh(f"{ENDPOINT}/issues/5", {"milestone": None})
-        removed = True
-        gh(f"{ENDPOINT}/issues/5", {"milestone": 5})
-        removed = False
-    finally:
-        if removed:
-            print("S05_RESTAURACION_DE_ASIGNACION=INTENTANDO")
-            gh(f"{ENDPOINT}/issues/5", {"milestone": 5})
-    verify = gh(f"{ENDPOINT}/issues/5")
-    if verify.get("state") != "closed" or (verify.get("milestone") or {}).get("number") != 5:
-        raise RuntimeError("s05_anchor_not_recovered")
-    # La lista de issues por milestone puede tardar en sincronizarse tras PATCH.
-    # Releer en vez de mover/reabrir una segunda vez la issue cerrada.
-    inv2 = None
-    for intento in range(5):
-        try:
-            inv2 = s05_inventory()
-            break
-        except RuntimeError as exc:
-            if "s05_issue_inventory_changed" not in str(exc) or intento == 4:
-                raise
-            time.sleep(1)
-    after = milestone(5)
-    print(f"S05_CONTADOR_API_POST_RECUENTO={after.get('closed_issues')}/{after.get('open_issues', 0)+after.get('closed_issues',0)}")
-    print("S05_RECUENTO="+("100_POR_CIENTO" if counts_ok(after, inv2)
-                          else "AUN_DESINCRONIZADO_REQUIERE_SOPORTE_GITHUB"))
+        print(
+            f"FASE={n:02d} TITULO={current['title']} "
+            f"ESTADO={current['state']} "
+            f"ABIERTOS_REALES={inv['open']} "
+            f"CERRADOS_REALES={inv['closed']} "
+            f"CONTADOR={'OK' if counts_ok(current, inv) else 'DISCREPANCIA'}"
+        )
 
-
-def run(apply: bool) -> None:
-    if set(DESCRIPTIONS) != set(range(1, 9)):
-        raise RuntimeError("missing_phase_descriptions")
-    inv = s05_inventory()
-    optional_issue_scope()
-    before = [milestone(i) for i in range(1, 9)]
-    print("========== NETLAB360 MILESTONES S01-S08 ==========")
-    print(f"S05_INVENTARIO_REAL=CERRADAS_{inv['closed']}_ABIERTAS_{inv['open']}")
-    print(f"S05_CONTADOR_API_ACTUAL=CERRADAS_{before[4]['closed_issues']}_ABIERTAS_{before[4]['open_issues']}")
-    for index, m in enumerate(before, 1):
-        status = "VIGENTE" if (m.get("description") or "").strip() == DESCRIPTIONS[index].strip() else "ACTUALIZACION_NECESARIA"
-        print(f"MILESTONE=S{index:02d} ESTADO={m['state'].upper()} DESCRIPCION={status}")
     if not apply:
-        print("MODO=SOLO_AUDITORIA")
         print("CAMBIOS_GITHUB=NINGUNO")
         return
-    for number, previous in enumerate(before, 1):
-        desired = DESCRIPTIONS[number].strip()
-        if (previous.get("description") or "").strip() == desired:
-            print(f"DESCRIPCION_S{number:02d}=YA_ACTUALIZADA")
-            continue
-        result = gh(f"{ENDPOINT}/milestones/{number}", {"description": desired})
-        if result.get("description") != desired:
-            raise RuntimeError(f"milestone_{number}_description_not_saved")
-        if result.get("state") != EXPECTED_STATES[number]:
-            raise RuntimeError(f"milestone_{number}_state_changed")
-        print(f"DESCRIPCION_S{number:02d}=ACTUALIZADA")
-    refresh_s05_once(inv)
-    for i in range(1,9):
-        current=milestone(i)
-        if (current.get("description") or "").strip() != DESCRIPTIONS[i].strip():
-            raise RuntimeError(f"milestone_{i}_final_description_mismatch")
-    inv = s05_inventory()
-    print("MILestones_8_DESCRIPCIONES=VERIFICADAS")
-    print(f"S05_ISSUES_REALES=CERRADAS_{inv['closed']}_ABIERTAS_{inv['open']}")
-    print("ISSUE24=S08_ABIERTA_OPCIONAL")
-    print("FASES_01_A_06=CONSERVADAS_CERRADAS")
-    print("FASES_07_A_08=CONSERVADAS_ABIERTAS")
-    print("CAMBIOS_EN_REDES=NINGUNO")
-    print("========== MILESTONES_NETLAB360_RECONCILIADAS=OK ==========")
+
+    # Conservamos estados, fechas, membresías y numeración.
+    for n, current in before.items():
+        desired = {
+            "title": f"Fase {n}",
+            "description": DESCRIPTIONS[n].strip()
+        }
+
+        if any(current.get(k) != v for k, v in desired.items()):
+            gh(f"{ENDPOINT}/milestones/{n}", desired)
+
+        verified = milestone(n)
+
+        if any(verified.get(k) != v for k, v in desired.items()):
+            raise RuntimeError(f"phase_{n}_metadata_not_saved")
+
+        if verified.get("due_on") != current.get("due_on"):
+            raise RuntimeError(f"phase_{n}_due_date_changed")
+
+        if inventory(n)["items"] != inventories[n]["items"]:
+            raise RuntimeError(f"phase_{n}_membership_changed")
+
+        print(f"FASE_{n:02d}_METADATOS=VERIFICADOS")
+
+    print("MILESTONES_NETLAB360=ACTUALIZADAS")
 
 
 def main():
-    p = argparse.ArgumentParser(description=__doc__)
-    g = p.add_mutually_exclusive_group(required=True)
-    g.add_argument("--check", action="store_true")
-    g.add_argument("--apply", action="store_true")
-    a = p.parse_args()
-    run(a.apply)
+    parser = argparse.ArgumentParser(description=__doc__)
+
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--check", action="store_true")
+    mode.add_argument("--apply", action="store_true")
+
+    args = parser.parse_args()
+    run(args.apply)
 
 
 if __name__ == "__main__":
-    try: main()
-    except (RuntimeError, OSError, ValueError, KeyError, TypeError, subprocess.TimeoutExpired) as err:
-        print("RECONCILIACION_ERROR=" + type(err).__name__ + ": " + str(err), file=sys.stderr)
+    try:
+        main()
+    except (
+        RuntimeError, OSError, ValueError, KeyError,
+        TypeError, subprocess.SubprocessError
+    ) as error:
+        print("RECONCILIACION_ERROR=" + str(error), file=sys.stderr)
         sys.exit(1)

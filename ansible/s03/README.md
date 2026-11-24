@@ -21,4 +21,4 @@ Ansible administra la configuración FRRouting del laboratorio. La fuente de inf
 
 ## Documentación relacionada
 
-[Validación S01–S04](../../docs/validacion/s01-s04-resultados.md) · [OpenTofu](../../iac/s03/README.md).
+[Validación de las fases 01–04](../../docs/validacion/s01-s04-resultados.md) · [OpenTofu](../../iac/s03/README.md).

@@ -37,4 +37,4 @@ La conmutación se produce entre instancias de aplicación dentro de una misma V
 
 ## Documentación relacionada
 
-[Arquitectura multisede](../arquitectura/arquitectura-multisede-implementada.md) · [Validación S05](../validacion/s05-integracion-y-aceptacion.md) · [Capturas S05](../../evidencias/capturas/fase5/README.md).
+[Arquitectura multisede](../arquitectura/arquitectura-multisede-implementada.md) · [Validación de la fase 05](../validacion/s05-integracion-y-aceptacion.md) · [Capturas de la fase 05](../../evidencias/capturas/fase5/README.md).

@@ -1,23 +1,25 @@
-# Gestión y aceptación de milestones S01–S08
+# Gestión y aceptación de hitos de las fases 01–08
 
 ## Estado vigente
 
-Las fases S01–S06 están cerradas. La fase 7 tiene sus ocho issues técnicas cerradas, catálogo validado e informe 7.3 revisado; el cierre administrativo se verifica en GitHub. La fase 8 conserva sus criterios de implementación y aceptación.
+Las fases 01 a 07 están cerradas. La fase 08 permanece abierta para su implementación y aceptación integral.
 
-| Milestone | Estado | Criterio central |
+Utilizamos la denominación «Fase 01», «Fase 02» y sucesivas en la documentación técnica. Los títulos de los hitos de GitHub utilizan «Fase 1», «Fase 2» y sucesivos, como convención administrativa. Conservamos los códigos S01, S02 y sucesivos exclusivamente como identificadores técnicos cuando forman parte de rutas, archivos, esquemas, ensayos, prefijos de issues y pull requests o evidencias originales.
+
+| Hito | Estado | Criterio central |
 |---|---|---|
-| S01 | Cerrada | VM, IPAM, SSH y línea base |
-| S02 | Cerrada | Tres sedes, FRRouting, OSPF, cuatro WAN y nueve VLAN |
-| S03 | Cerrada | SoT candidata, Ansible, OpenTofu local y CI/CD |
-| S04 | Cerrada | Observabilidad, incidentes, persistencia y SLI/SLO experimentales |
-| S05 | Cerrada | HTTP HA, LACP multisede, SDN y NOC integrado |
-| S06 | Cerrada | Diagnóstico experimental V2, modelos congelados, FAULT HTTP independiente y recuperación |
-| S07 | Aceptada técnica y documentalmente; cierre administrativo en GitHub | AIOps supervisado, aprobación, reversión segura y API validadas |
-| S08 | Abierta | Consola interactiva, regresión y entrega académica |
+| Fase 01 | Cerrada | VM, IPAM, SSH y línea base |
+| Fase 02 | Cerrada | Tres sedes, FRRouting, OSPF, cuatro WAN y nueve VLAN |
+| Fase 03 | Cerrada | SoT candidata, Ansible, OpenTofu local y CI/CD |
+| Fase 04 | Cerrada | Observabilidad, incidentes, persistencia y SLI/SLO experimentales |
+| Fase 05 | Cerrada | HTTP HA, LACP multisede, SDN y NOC integrado |
+| Fase 06 | Cerrada | Diagnóstico experimental V2, modelos congelados, FAULT HTTP independiente y recuperación |
+| Fase 07 | Cerrada | AIOps supervisado, aprobación, reversión segura y API validadas |
+| Fase 08 | Abierta | Consola interactiva, regresión y entrega académica |
 
 ## Reconciliación de GitHub
 
-S07 comprende la issue maestra #7 y las ocho issues técnicas #190–#197. S08 incorpora el copiloto RAG #198 además de sus issues vigentes. #17 (OpenTofu externo) y #24 (cuarta sede/WireGuard) permanecen condicionadas; su destino se decidirá al reevaluar S07 y S08. S09 no dispone de milestone aprobada.
+La fase 07 comprende la issue maestra #7 y las ocho issues técnicas #190–#197. La fase 08 incorpora el copiloto RAG #198 además de sus issues vigentes. #17 (OpenTofu externo) y #24 (cuarta sede/WireGuard) permanecen condicionadas; su destino se decidirá al reevaluar las fases 07 y 08. La fase 09 no dispone de milestone aprobada.
 
 Asignamos un pull request a un milestone únicamente cuando existe un hito de aceptación inequívoco. Los PR transversales conservan sus etiquetas temáticas y de fase pertinentes; cuando no existe un hito principal, permanecen sin milestone. Revisamos las asignaciones históricas según el alcance y la evidencia de aceptación de cada cambio. Esta clasificación no acredita funcionalidades adicionales ni altera por sí sola la aceptación académica.
 
@@ -27,7 +29,7 @@ El [reconciliador de milestones](../../scripts/operacion/reconciliar_milestones_
 
 ## Límites y seguimiento
 
-S06 no acredita pronóstico de fallas futuras, MAE prospectivo, deriva de concepto inferencial, generalización entre ICMP y HTTP ni remediación autónoma.
+La fase 06 no acredita pronóstico de fallas futuras, MAE prospectivo, deriva de concepto inferencial, generalización entre ICMP y HTTP ni remediación autónoma.
 
 Las ampliaciones tecnológicas se evaluarán conforme a su necesidad, viabilidad y pruebas propias, sin modificar retroactivamente los resultados de las fases cerradas.
 

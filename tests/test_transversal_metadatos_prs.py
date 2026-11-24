@@ -61,3 +61,30 @@ class MetadatosPRTests(unittest.TestCase):
         for rows in ([], [self.pr, self.pr]):
             with self.assertRaises(ValueError):
                 audit(rows)
+
+
+    def test_nuevos_titulos_de_hitos(self):
+        for n in range(1, 9):
+            with self.subTest(fase=n):
+                self.pr["milestone"] = {
+                    "title": f"Fase {n}", "number": n
+                }
+                self.pr["labels"] = [
+                    {"name": f"fase:{n:02d}"},
+                    {"name": "tipo:documentación"}
+                ]
+                self.assertEqual(audit([self.pr])["defects"], [])
+
+    def test_numero_de_hito_inconsistente(self):
+        self.pr["milestone"] = {"title": "Fase 8", "number": 7}
+        self.assertIn(
+            "MILESTONE_INVALIDO",
+            audit([self.pr])["defects"][0]["reasons"]
+        )
+
+    def test_fase_no_aprobada(self):
+        self.pr["milestone"] = {"title": "Fase 9"}
+        self.assertIn(
+            "MILESTONE_INVALIDO",
+            audit([self.pr])["defects"][0]["reasons"]
+        )

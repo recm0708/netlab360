@@ -73,4 +73,4 @@ Las mediciones proceden de interfaces virtuales sobre una VM. No describen el re
 
 ## Documentación relacionada
 
-[Validación S05](../validacion/s05-integracion-y-aceptacion.md) · [Capturas S05](../../evidencias/capturas/fase5/README.md).
+[Validación de la fase 05](../validacion/s05-integracion-y-aceptacion.md) · [Capturas de la fase 05](../../evidencias/capturas/fase5/README.md).

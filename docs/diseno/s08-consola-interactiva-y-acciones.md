@@ -1,6 +1,6 @@
 # Consola interactiva y acciones — Fase 08
 
-**Estado:** diseño técnico aprobado como base de trabajo, **no código implementado**. El NOC S05 y la API protegida S07 son antecedentes comprobados; la consola aún no está implementada. Destino: demostración académica ejecutable sin escribir comandos frente a la profesora y funcionamiento reproducible en la VM.
+**Estado:** diseño técnico aprobado como base de trabajo, **no código implementado**. El NOC de la fase 05 y la API protegida de la fase 07 son antecedentes comprobados; la consola aún no está implementada. Destino: demostración académica ejecutable sin escribir comandos frente a la profesora y funcionamiento reproducible en la VM.
 
 ## 1. Experiencia de usuario
 
@@ -18,19 +18,19 @@ Una sola aplicación local, con barra lateral, encabezado de estado general y pa
 | **6. LACP** | Cada sede, miembros por extremo 2/2, velocidad/estado, degradación | Ensayo autorizado 2→1→2 con rollback |
 | **7. SDN/OVS/Faucet** | Estado del controlador, puertos, VLAN410/420, reglas y aislamiento | Verificar comunicación y aislamiento; falla/retorno de puerto autorizado |
 | **8. Pruebas de red** | Ping corto/extendido, traceroute, HTTP, iperf3 TCP/UDP con origen/destino permitido, pérdidas, RTT, tasa, jitter si se observa | Lanzar ensayo **acotado**, guardar resultado y compararlo |
-| **9. Observabilidad** | Prometheus/S04, SLI/SLO experimental, históricos, latencia P50/P95, pérdida, incidentes, alertas, calidad/edad de fuente | Seleccionar ventana/servicio y exportar gráfica o evidencia |
+| **9. Observabilidad** | Prometheus de la fase 04, SLI/SLO experimental, históricos, latencia P50/P95, pérdida, incidentes, alertas, calidad/edad de fuente | Seleccionar ventana/servicio y exportar gráfica o evidencia |
 | **10. Diagnóstico IA** | Detección, scores, explicación, confianza/UNKNOWN, baseline de reglas, pronóstico y deriva **solo si futuras ampliaciones los validan** | Inferencia solo lectura; consulta de evidencia |
-| **11. Incidentes y AIOps** | Correlación de fuente, línea de tiempo, recomendación, riesgo y postcondición mediante la API S07 validada, con integración S08 pendiente | Crear solicitud, consultar estado y resultado; aprobación administrativa separada, ejecución protegida y retorno |
+| **11. Incidentes y AIOps** | Correlación de fuente, línea de tiempo, recomendación, riesgo y postcondición mediante la API de la fase 07 validada, con integración de la fase 08 pendiente | Crear solicitud, consultar estado y resultado; aprobación administrativa separada, ejecución protegida y retorno |
 | **12. Copiloto RAG** | Respuestas con fuentes propias, incertidumbre y citas | Consultas de solo lectura; sin autorización de cambios (#198) |
 | **13. Evidencias y sistema** | Historial de trabajos, logs sanitizados, versiones, tests, métricas y catálogo | Descargar resultados JSON/CSV, generar inventario técnico y comprobar salud |
 
-**Diseño adaptable:** desktop en VMware/Windows con barra lateral fija; tarjetas en pantallas estrechas; secciones sin implementación muestran `PENDIENTE` explícitamente, nunca resultados ficticios. Mantener el NOC S05 accesible durante la migración.
+**Diseño adaptable:** desktop en VMware/Windows con barra lateral fija; tarjetas en pantallas estrechas; secciones sin implementación muestran `PENDIENTE` explícitamente, nunca resultados ficticios. Mantener el NOC de la fase 05 accesible durante la migración.
 
 ## 2. Arquitectura escogida (preferencia práctica)
 
 - **UI:** HTML/CSS/JavaScript con componentes sencillos y gráficas Plotly. Reutilizar modelos y SVG/visuales del `servicios/topologia-s05/index.html`; no crear un segundo NOC desconectado. Dash opcional solo si se acredita beneficio de integración, no necesario para un menú.
-- **Backend:** Python FastAPI + Uvicorn usando venv S06–S08. Endpoints tipados para estado, series, pruebas, catálogo, ejecuciones y evidencia. Servir API y frontend desde la misma aplicación (sin CORS público).
-- **Fuentes:** adaptadores locales de S04 exporter `127.0.0.1:9110`, S05 NOC `127.0.0.1:9130`, Prometheus local `9091` si está activo, histórico SQLite, estados de operación y módulos S06/S07.
+- **Backend:** Python FastAPI + Uvicorn usando entorno virtual de las fases 06–08. Endpoints tipados para estado, series, pruebas, catálogo, ejecuciones y evidencia. Servir API y frontend desde la misma aplicación (sin CORS público).
+- **Fuentes:** adaptadores locales del exportador de la fase 04 `127.0.0.1:9110`, NOC de la fase 05 `127.0.0.1:9130`, Prometheus local `9091` si está activo, histórico SQLite, estados de operación y módulos de las fases 06 y 07.
 - **Persistencia propia:** SQLite privado bajo `netlab360-bootstrap/s08/` con registros de trabajos/eventos, parámetros validados, acciones, estados previos y posteriores y artefactos; **no** dentro de Git.
 - **Exposición:** por defecto solo `127.0.0.1:9140` en la VM. Demo desde Windows: túnel SSH `ssh -L 9140:127.0.0.1:9140 rc-aa-ec@192.168.47.40`; navegador Windows `http://127.0.0.1:9140`. Acceso externo solo tras revisar controles de autenticación, CSRF y autorizaciones.
 - **Protocolo UI:** peticiones REST + actualización ligera por polling/SSE; límites de frecuencia y tiempo. Evitar WebSockets por defecto si no se justifican.
@@ -64,7 +64,7 @@ tests/
 
 **Flujo de un clic:** usuario elige `action_id` + parámetros tipados → backend consulta registro `acciones.yaml` → verifica política/destinos y prechecks → autorización humana si cambia estado → ejecutor con permisos mínimos invoca **script revisado por ruta fija** → almacena resultados y hash → revalida red/NOC → UI presenta métricas y retorno.
 
-**Crítico:** NO pasar cadenas libres a `bash -c`, `shell=True`, `sudo` con rutas de scripts editables por el usuario o interpolaciones del navegador. Los scripts que requieran privilegios deben instalarse como ejecutores **propiedad root, no editables por usuario web**, y recibir únicamente acciones/argumentos autorizados; el observador de S05 permanece read-only. Verificar política de ejecución y pruebas de intrusión antes de conectar botones que produzcan fallos.
+**Crítico:** NO pasar cadenas libres a `bash -c`, `shell=True`, `sudo` con rutas de scripts editables por el usuario o interpolaciones del navegador. Los scripts que requieran privilegios deben instalarse como ejecutores **propiedad root, no editables por usuario web**, y recibir únicamente acciones/argumentos autorizados; el observador de la fase 05 permanece read-only. Verificar política de ejecución y pruebas de intrusión antes de conectar botones que produzcan fallos.
 
 ## 4. Catálogo inicial de acciones (IDs estables)
 
@@ -105,16 +105,16 @@ Los límites son **propuestas de diseño**, no capacidades ya desplegadas. `iper
 
 ## 6. Construcción incremental
 
-1. **Esqueleto UI read-only**: inicio + topología S05 + estado WAN/HA/LACP/SDN + API propia. No modificar el NOC S05 estable hasta tener pruebas de paridad.
+1. **Esqueleto UI read-only**: inicio + topología de la fase 05 + estado WAN/HA/LACP/SDN + API propia. No modificar el NOC de la fase 05 estable hasta tener pruebas de paridad.
 2. **Pruebas acotadas**: ping, traceroute, HTTP; luego iperf3 TCP/UDP con límites; gráficas, historial y exportación.
-3. **Integración S06**: detección experimental, explicación y advertencias con datos propios verificados; pronóstico no demostrado.
-4. **Integración S07**: catálogo de runbooks, aprobación, ejecución protegida, watchdog y recuperación controlada.
+3. **Integración de la fase 06**: detección experimental, explicación y advertencias con datos propios verificados; pronóstico no demostrado.
+4. **Integración de la fase 07**: catálogo de runbooks, aprobación, ejecución protegida, watchdog y recuperación controlada.
 5. **Copiloto RAG (#198)**: corpus autorizado, generación con citas y abstención, evaluación de fidelidad, relevancia y seguridad; sin autorización ni ejecución de cambios.
 6. **Demostración/aceptación**: escenarios de inicio sano → degradación → mediciones → detección/recomendación → autorización → cambio → verificación/retorno; contraste de métricas reales y evidencia.
 7. **Entrega**: test limpio de restauración, documentación de versiones, informe PDF sin anexos por instrucción docente, TAR externo sanitizado, PowerPoint y guion.
 
 ## 8. Cobertura académica y auditoría de inicio
 
-La [matriz de cobertura académica](../gestion/cobertura-academica-netlab360.md) establece las capacidades visibles, los componentes de segundo plano, la evidencia histórica y las brechas. Antes de implementar, reanudar y auditar la VM sin modificar la infraestructura. Los escenarios mutadores del catálogo son propuestas: la API S07 acredita únicamente el costo OSPF delimitado de R-S1/s1b; WAN, HTTP, LACP, SDN y netem requieren aceptación individual de ejecutores y rollback. El navegador y el copiloto no adquieren privilegios de aprobación administrativa. La fase 9 sigue condicionada y no se incorpora al alcance por defecto.
+La [matriz de cobertura académica](../gestion/cobertura-academica-netlab360.md) establece las capacidades visibles, los componentes de segundo plano, la evidencia histórica y las brechas. Antes de implementar, reanudar y auditar la VM sin modificar la infraestructura. Los escenarios mutadores del catálogo son propuestas: la API de la fase 07 acredita únicamente el costo OSPF delimitado de R-S1/s1b; WAN, HTTP, LACP, SDN y netem requieren aceptación individual de ejecutores y rollback. El navegador y el copiloto no adquieren privilegios de aprobación administrativa. La fase 9 sigue condicionada y no se incorpora al alcance por defecto.
 
 **Principio UX:** el usuario elige **qué comprobar o simular**; la aplicación decide **qué procedimiento autorizado ejecutar** y registra **qué ocurrió realmente**. Nunca se presenta como una consola de comandos arbitrarios.

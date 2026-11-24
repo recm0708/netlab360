@@ -2,7 +2,7 @@
 
 ## Descripción
 
-Unificamos las observaciones S06-032 (estados S04/NOC/Prometheus) con las mediciones S06-033 (ICMP y HTTP), de forma que se puedan auditar las fuentes, unidades, marcas de tiempo, identidad de sondas, cobertura, duplicados y ausencias. El producto de este paso es un **conjunto analítico preliminar**, NO un dataset supervisado ni un modelo entrenado.
+Unificamos las observaciones S06-032 (estados del exportador de la fase 04, NOC y Prometheus) con las mediciones S06-033 (ICMP y HTTP), de forma que se puedan auditar las fuentes, unidades, marcas de tiempo, identidad de sondas, cobertura, duplicados y ausencias. El producto de este paso es un **conjunto analítico preliminar**, NO un dataset supervisado ni un modelo entrenado.
 
 ## Fuentes
 
@@ -32,7 +32,7 @@ Salida privada bajo netlab360-bootstrap/s06/datasets/curated/S06_QA_*/ con los a
 
 - Comprobar la huella de integridad declarada en cada metadata original; rechazar manipulación, archivos incompletos o enlaces simbólicos.
 - Validar identidad de sesión, esquema, etiquetas UNKNOWN, indicadores de ground truth no verificado, índices y orden temporal UTC.
-- Conservar para cada valor: fuente S04, ICMP o HTTP; sesión; índice; tiempo observado; tiempo de adquisición; señal; valor; unidad; contexto de etiquetas Prometheus o sonda.
+- Conservar para cada valor: fuente de la fase 04, ICMP o HTTP; sesión; índice; tiempo observado; tiempo de adquisición; señal; valor; unidad; contexto de etiquetas Prometheus o sonda.
 - Mantener unidades distintas: estado/administración, paquetes, porcentaje, milisegundos. No mezclar eventos de servicio con rendimiento ICMP.
 - Reportar valores nulos explícitamente; en ausencia de respuestas ICMP, no inventar RTT = 0.
 - Contar repeticiones de scrapes Prometheus con la misma identidad/fecha. Una repetición de muestra no aumenta la cantidad efectiva de observaciones independientes.
@@ -51,4 +51,4 @@ Salida privada bajo netlab360-bootstrap/s06/datasets/curated/S06_QA_*/ con los a
 
 ## Resultados
 
-El normalizador produjo 375 filas de métricas de las dos sesiones originales: 300 de Prometheus, 72 de ICMP y tres de HTTP. No se detectaron valores faltantes ni scrapes repetidos. Las familias S04 aportaron routers 36, source 12, topology 48, VLAN 108 y WAN 96. No existen etiquetas supervisadas en este derivado; las 375 filas no son incidentes ni observaciones independientes de aprendizaje. Los datos crudos quedaron intactos.
+El normalizador produjo 375 filas de métricas de las dos sesiones originales: 300 de Prometheus, 72 de ICMP y tres de HTTP. No se detectaron valores faltantes ni scrapes repetidos. Las familias de la fase 04 aportaron routers 36, source 12, topology 48, VLAN 108 y WAN 96. No existen etiquetas supervisadas en este derivado; las 375 filas no son incidentes ni observaciones independientes de aprendizaje. Los datos crudos quedaron intactos.

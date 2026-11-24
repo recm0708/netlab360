@@ -26,6 +26,6 @@ Los componentes descritos se comprobaron en un entorno virtualizado. El resultad
 
 ## Resultado
 
-Consideramos **completada la validación técnica de la fase 05**. La integración de estos resultados al informe académico único y las fases S06–S08 constituyen actividades posteriores del proyecto.
+Consideramos **completada la validación técnica de la fase 05**. La integración de estos resultados al informe académico único y las fases 06–08 constituyen actividades posteriores del proyecto.
 
 [Validación técnica](../validacion/s05-integracion-y-aceptacion.md) · [Catálogo gráfico](../../evidencias/capturas/fase5/README.md).

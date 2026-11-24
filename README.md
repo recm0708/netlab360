@@ -25,16 +25,16 @@ Desarrollamos NETLAB360 para integrar tres sedes (HQ, S1 y S2) en un laboratorio
 
 | Fase | Alcance validado |
 |---|---|
-| S01 | Preparación del entorno y línea base |
-| S02 | Tres sedes, cuatro enlaces WAN y nueve VLAN |
-| S03 | Automatización, cumplimiento y metadatos OpenTofu |
-| S04 | Observabilidad multisede e incidentes |
-| S05 | HTTP HA, LACP, SDN y NOC integrado |
-| S06 | Detección experimental de anomalías y diagnóstico inteligente |
-| S07 | AIOps supervisado, RCA, Intent Assurance, RFC, watchdog y API controlada |
-| S08 | Consola, copiloto RAG, recuperación integral y entrega: pendientes de aceptación |
+| Fase 01 | Preparación del entorno y línea base |
+| Fase 02 | Tres sedes, cuatro enlaces WAN y nueve VLAN |
+| Fase 03 | Automatización, cumplimiento y metadatos OpenTofu |
+| Fase 04 | Observabilidad multisede e incidentes |
+| Fase 05 | HTTP HA, LACP, SDN y NOC integrado |
+| Fase 06 | Detección experimental de anomalías y diagnóstico inteligente |
+| Fase 07 | AIOps supervisado, RCA, Intent Assurance, RFC, watchdog y API controlada |
+| Fase 08 | Consola, copiloto RAG, recuperación integral y entrega: pendientes de aceptación |
 
-S07 cuenta con las ocho issues técnicas cerradas, 49 capturas y regresión de 1258 pruebas (una omitida y ninguna fallida). El informe acumulativo 7.3 (184 páginas) documenta las siete primeras fases; su aceptación documental interna y el cierre se registran en la [issue maestra #7](https://github.com/recm0708/netlab360/issues/7). La [matriz de cobertura](docs/gestion/cobertura-academica-netlab360.md) distingue los resultados validados de las brechas y las demostraciones previstas. La ampliación S09 es condicionada y no dispone de milestone aprobada.
+La fase 07 cuenta con las ocho issues técnicas cerradas, 49 capturas y regresión de 1258 pruebas (una omitida y ninguna fallida). El informe acumulativo 7.3 (184 páginas) documenta las siete primeras fases; su aceptación documental interna y el cierre se registran en la [issue maestra #7](https://github.com/recm0708/netlab360/issues/7). La [matriz de cobertura](docs/gestion/cobertura-academica-netlab360.md) distingue los resultados validados de las brechas y las demostraciones previstas. La ampliación de la fase 09 está condicionada y no dispone de milestone aprobada.
 
 ## Documentación
 
@@ -50,9 +50,9 @@ Organizamos la documentación por componente. El [índice completo de documentac
 | Diagnóstico inteligente | [Protocolo V2](docs/diseno/s06-protocolo-uniforme-v2.md) · [Evaluación](docs/diseno/s06-v2-evaluacion-cronologica-congelada.md) · [Falla HTTP](docs/diseno/s06-fault-http-hq-etiquetado-independiente.md) |
 | AIOps supervisado | [Eventos](docs/diseno/s07-contrato-eventos-e-incidentes.md) · [RCA](docs/diseno/s07-contexto-y-correlacion-rca.md) · [Runbooks](docs/diseno/s07-runbooks-y-recomendaciones.md) |
 | Actuación y API | [Intent Assurance y RFC](docs/diseno/s07-intent-assurance-y-rfc.md) · [Watchdog](docs/diseno/s07-intervencion-ospf-y-watchdog.md) · [API](docs/diseno/s07-api-controlada.md) |
-| Validación | [S01–S04](docs/validacion/s01-s04-resultados.md) · [S05](docs/validacion/s05-integracion-y-aceptacion.md) · [S07](docs/diseno/s07-ensayos-operacionales.md) |
+| Validación | [Fases 01–04](docs/validacion/s01-s04-resultados.md) · [Fase 05](docs/validacion/s05-integracion-y-aceptacion.md) · [Fase 07](docs/diseno/s07-ensayos-operacionales.md) |
 | Evidencias | [Catálogo general](evidencias/capturas/README.md) |
-| Planificación | [Plan maestro](docs/diseno/s06-s08-plan-maestro-y-criterios.md) · [Consola S08](docs/diseno/s08-consola-interactiva-y-acciones.md) · [Cobertura académica](docs/gestion/cobertura-academica-netlab360.md) |
+| Planificación | [Plan maestro](docs/diseno/s06-s08-plan-maestro-y-criterios.md) · [Consola de la fase 08](docs/diseno/s08-consola-interactiva-y-acciones.md) · [Cobertura académica](docs/gestion/cobertura-academica-netlab360.md) |
 
 ## Comprobaciones
 
@@ -67,7 +67,7 @@ Las regresiones de software no sustituyen las comprobaciones de la infraestructu
 
 ## Alcance y limitaciones
 
-El laboratorio funciona dentro de una única máquina virtual. La disponibilidad lógica no acredita redundancia física ni disponibilidad continua. Los modelos S06 se evaluaron bajo un protocolo ICMP controlado; el escenario HTTP es independiente. S07 conserva incertidumbre, autorización humana y alcance acotado, sin remediación autónoma. La reconstrucción automática tras apagado completo y la consola integrada corresponden a S08.
+El laboratorio funciona dentro de una única máquina virtual. La disponibilidad lógica no acredita redundancia física ni disponibilidad continua. Los modelos de la fase 06 se evaluaron bajo un protocolo ICMP controlado; el escenario HTTP es independiente. La fase 07 conserva incertidumbre, autorización humana y alcance acotado, sin remediación autónoma. La reconstrucción automática tras apagado completo y la consola integrada corresponden a la fase 08.
 
 ## Autoría, licencia y contribuciones
 

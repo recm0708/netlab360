@@ -14,7 +14,7 @@ No se intenta "predecir" estados futuros: la API reproduce inferencias sobre el 
 - El contrato es binario NORMAL/DEGRADED y su **consenso** entre tres métodos. Si discrepan, `operational_state=UNKNOWN` en lugar de forzar predicción. Las muestras RECOVERY nunca se presentan como una clase ML aprendida: aunque el consenso binario sea NORMAL, `operational_state=UNKNOWN` porque RTT/pérdida solos no demuestran estado de recuperación.
 - Todas las respuestas declaran `production_deployment_authorized=false`, `network_mutations_authorized=false` y `new_independent_validation=false`. Se omiten probabilidades como "confianza calibrada".
 - Si faltan archivos, metadatos verificables, modelo, integridad o suficientes ventanas, se devuelve UNKNOWN. La API `/api/v1/s06/live` devuelve **siempre** UNKNOWN con razón `LIVE_TELEMETRY_NOT_INTEGRATED` hasta disponer de un colector en vivo comprobado.
-- No se modifican el NOC S05, FRR, qdisc, namespaces, interfaz administrativa, Docker, Prometheus, servicio systemd ni el dataset.
+- No se modifican el NOC de la fase 05, FRR, qdisc, namespaces, interfaz administrativa, Docker, Prometheus, servicio systemd ni el dataset.
 
 ## Endpoints (solo GET)
 

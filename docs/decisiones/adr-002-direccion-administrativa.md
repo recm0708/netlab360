@@ -14,7 +14,7 @@ La VM utiliza Ubuntu Desktop 26.04.1 LTS, servicio SSH y autenticación mediante
 
 ## Validación
 
-Comprobamos la dirección, la ruta por defecto y la conectividad SSH desde Windows. Las pruebas S01–S05 mantuvieron la interfaz de administración activa antes y después de los escenarios controlados de falla.
+Comprobamos la dirección, la ruta por defecto y la conectividad SSH desde Windows. Las pruebas de las fases 01–05 mantuvieron la interfaz de administración activa antes y después de los escenarios controlados de falla.
 
 ## Limitaciones
 

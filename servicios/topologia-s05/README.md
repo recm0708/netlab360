@@ -22,4 +22,4 @@ La consola consulta fuentes reales, pero no administra directamente rutas ni swi
 
 ## Documentación relacionada
 
-[Validación S05](../../docs/validacion/s05-integracion-y-aceptacion.md) · [Diseño HTTP](../../docs/diseno/s05-ha-servicios-multisede.md) · [Capturas S05](../../evidencias/capturas/fase5/README.md).
+[Validación de la fase 05](../../docs/validacion/s05-integracion-y-aceptacion.md) · [Diseño HTTP](../../docs/diseno/s05-ha-servicios-multisede.md) · [Capturas de la fase 05](../../evidencias/capturas/fase5/README.md).
