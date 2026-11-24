@@ -12,7 +12,7 @@ import re
 import subprocess
 import sys
 
-LAB = Path(__file__).resolve().parents[1] / "laboratorio/s05-sdn-ovs-faucet-aislado.py"
+LAB = Path(__file__).resolve().parents[1] / "laboratorio/s05_sdn_ovs_faucet_aislado.py"
 spec = importlib.util.spec_from_file_location("s05_sdn_lab_evidencia", LAB)
 assert spec and spec.loader
 lab = importlib.util.module_from_spec(spec)

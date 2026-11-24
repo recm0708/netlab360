@@ -23,7 +23,7 @@ import time
 from urllib.request import urlopen
 
 ROOT = Path(__file__).resolve().parents[2]
-VALIDATOR = ROOT / "scripts/validacion/s05-lacp-integracion-precheck.py"
+VALIDATOR = ROOT / "scripts/validacion/s05_lacp_integracion_precheck.py"
 BASE = Path.home() / "netlab360-bootstrap/s05/lacp-multisede"
 STATE = BASE / "state-s2.json"
 OWNER = "NETLAB360_S05_LACP_S2_V1"

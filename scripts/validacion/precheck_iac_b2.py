@@ -14,7 +14,7 @@ ART=Path.home()/"netlab360-bootstrap/iac/s01"
 RENDER=ART/"rendered"
 MANIFEST=ART/"manifest.json"
 SOT=ROOT/"inventario/ipam/topologia-b1.yaml"
-COMPARE=ROOT/"scripts/validacion/validar-iac-frr.py"
+COMPARE=ROOT/"scripts/validacion/validar_iac_frr.py"
 
 def run(*cmd):
     result=subprocess.run(list(cmd), cwd=ROOT, text=True, capture_output=True)
@@ -43,7 +43,7 @@ def main():
     addr=run("ip","-4","-br","address","show","ens33")
     gw=run("ip","-4","route","show","default")
     assert "192.168.47.40/24" in addr and "default via 192.168.47.2 dev ens33" in gw
-    assert "VALIDACIÓN B1: OK" in run("python3","scripts/validacion/validar-ipam.py",str(SOT))
+    assert "VALIDACIÓN B1: OK" in run("python3","scripts/validacion/validar_ipam.py",str(SOT))
     assert {p.name for p in RENDER.iterdir()}=={"R-HQ.frr.conf","R-S1.frr.conf"}
     for router in ("R-HQ","R-S1"):
         assert not (RENDER/f"{router}.frr.conf").is_symlink()

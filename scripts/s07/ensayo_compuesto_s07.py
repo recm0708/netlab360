@@ -71,8 +71,8 @@ def historical(directory,services,network):
 
 def experiment(directory):
     base=preflight()
-    ha=load_s05("s05-ha-http-failover.py")
-    s02=load_s05("s02-failover-wan.py")
+    ha=load_s05("s05_ha_http_failover.py")
+    s02=load_s05("s02_failover_wan.py")
     ha.check(); ha.fib_check()
     pids=s02.validate_ownership()
     def direct(backend,path):

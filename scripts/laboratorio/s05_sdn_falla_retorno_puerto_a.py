@@ -18,8 +18,8 @@ import sys
 import time
 
 ROOT = Path(__file__).resolve().parents[2]
-LAB = ROOT / "scripts/laboratorio/s05-sdn-ovs-faucet-aislado.py"
-CHECK = ROOT / "scripts/validacion/s05-sdn-evidencia60-aislamiento.py"
+LAB = ROOT / "scripts/laboratorio/s05_sdn_ovs_faucet_aislado.py"
+CHECK = ROOT / "scripts/validacion/s05_sdn_evidencia60_aislamiento.py"
 spec = importlib.util.spec_from_file_location("s05_sdn_ovs_fault", LAB)
 assert spec and spec.loader
 lab = importlib.util.module_from_spec(spec)

@@ -16,7 +16,7 @@ import subprocess
 import sys
 import time
 
-LAB_PATH = Path(__file__).resolve().with_name("s05-sdn-ovs-faucet-aislado.py")
+LAB_PATH = Path(__file__).resolve().with_name("s05_sdn_ovs_faucet_aislado.py")
 spec = importlib.util.spec_from_file_location("s05_sdn_lab_recovery", LAB_PATH)
 assert spec is not None and spec.loader is not None
 lab = importlib.util.module_from_spec(spec)

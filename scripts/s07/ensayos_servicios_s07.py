@@ -135,7 +135,7 @@ def capture(directory,case,stage,not_before=None,timeout=18):
 
 
 def http_case(directory):
-    ha=load_s05("s05-ha-http-failover.py")
+    ha=load_s05("s05_ha_http_failover.py")
     ha.check()
     ha.fib_check()
     base=preflight()
@@ -188,7 +188,7 @@ def http_case(directory):
 
 
 def lacp_case(directory):
-    fault=load_s05("s05-lacp-s1-falla-retorno.py")
+    fault=load_s05("s05_lacp_s1_falla_retorno.py")
     lab=fault.lab
     data=fault.precheck()
     base=preflight()

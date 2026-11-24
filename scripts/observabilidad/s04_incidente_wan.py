@@ -2,8 +2,8 @@
 """G3: incidente S1 WAN principal observado por Prometheus/NOC y restaurado.
 
 Reutiliza el guardián S02 de propiedad y namespaces; no toca ens33 ni OpenTofu.
-Para operar: sudo -v; python3 scripts/observabilidad/s04-incidente-wan.py --check
-Luego: python3 scripts/observabilidad/s04-incidente-wan.py --execute --snapshot-confirmado
+Para operar: sudo -v; python3 scripts/observabilidad/s04_incidente_wan.py --check
+Luego: python3 scripts/observabilidad/s04_incidente_wan.py --execute --snapshot-confirmado
 La prueba mantiene s1p administrativamente DOWN al menos 32 s y restaura en finally.
 """
 from __future__ import annotations
@@ -20,7 +20,7 @@ from urllib.parse import urlencode
 from urllib.request import urlopen
 
 REPO = Path(__file__).resolve().parents[2]
-S02 = REPO / "scripts/laboratorio/s02-failover-wan.py"
+S02 = REPO / "scripts/laboratorio/s02_failover_wan.py"
 EXPORTER = "http://127.0.0.1:9110"
 PROM = "http://127.0.0.1:9091"
 NOC = "http://127.0.0.1:9120"
