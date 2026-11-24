@@ -8,10 +8,10 @@ Las cuatro primeras fases establecieron la infraestructura de NETLAB360, integra
 
 | Fase | Componentes validados | Evidencias gráficas |
 |---|---|---:|
-| S01 | Ubuntu/VMware, FRRouting/OSPF inicial, VLAN, ACL, enlace redundante experimental y acceso remoto | 83 |
-| S02 | HQ/S1/S2, cuatro WAN, nueve VLAN, OSPF FULL 4/2/2, rutas de respaldo y HTTP/ACL | 9 |
-| S03 | SoT candidata, auditoría Ansible sobre FRR, detección y reconciliación de drift, 17 objetos locales OpenTofu y GitOps | 8 |
-| S04 | Exportador WAN/VLAN, Prometheus, NOC multisede, incidente controlado, persistencia y medición de SLI | 22 |
+| Fase 01 | Ubuntu/VMware, FRRouting/OSPF inicial, VLAN, ACL, enlace redundante experimental y acceso remoto | 83 |
+| Fase 02 | HQ/S1/S2, cuatro WAN, nueve VLAN, OSPF FULL 4/2/2, rutas de respaldo y HTTP/ACL | 9 |
+| Fase 03 | SoT candidata, auditoría Ansible sobre FRR, detección y reconciliación de drift, 17 objetos locales OpenTofu y GitOps | 8 |
+| Fase 04 | Exportador WAN/VLAN, Prometheus, NOC multisede, incidente controlado, persistencia y medición de SLI | 22 |
 
 ## Validación de red
 
@@ -19,11 +19,11 @@ En la red de tres sedes comprobamos rutas preferidas y alternativas, conexión e
 
 ## Automatización
 
-La fuente de información S03 fue una configuración **candidata** para ensayos, no un sistema de control de producción. Ansible verificó el estado activo de FRRouting y permitió restaurar ajustes previamente modificados. Los recursos OpenTofu representaron **17 metadatos locales**; no se atribuye a OpenTofu la creación de routers o enlaces externos.
+La fuente de información de la fase 03 fue una configuración **candidata** para ensayos, no un sistema de control de producción. Ansible verificó el estado activo de FRRouting y permitió restaurar ajustes previamente modificados. Los recursos OpenTofu representaron **17 metadatos locales**; no se atribuye a OpenTofu la creación de routers o enlaces externos.
 
 ## Observabilidad
 
-S04 registró la interrupción y recuperación de un enlace WAN con transición de alerta `pending → firing → resolved`. Se comprobó la persistencia del historial SQLite y de las series del sistema de métricas después de reiniciar los servicios correspondientes.
+La fase 04 registró la interrupción y recuperación de un enlace WAN con transición de alerta `pending → firing → resolved`. Se comprobó la persistencia del historial SQLite y de las series del sistema de métricas después de reiniciar los servicios correspondientes.
 
 La recogida de métricas alcanzó el **100 %** en una ventana de 15 minutos y el **97,586 %** en una ventana de 60 minutos. Esta última medición quedó por debajo de la referencia experimental del **99 %**, lo cual se presenta como resultado medido y no como cumplimiento de ese objetivo.
 
@@ -58,14 +58,14 @@ El presupuesto discreto corresponde a la parte entera inferior del número de mu
 
 El denominador comprende muestras presentes. Las oportunidades nominales sin muestra no se clasifican automáticamente como interrupciones del servicio.
 
-La disponibilidad condicional de la fuente se distingue de la disponibilidad global del exporter. Las notificaciones de S04 fueron visuales y locales al NOC; no se acreditó entrega mediante Alertmanager ni canales externos.
+La disponibilidad condicional de la fuente se distingue de la disponibilidad global del exporter. Las notificaciones de la fase 04 fueron visuales y locales al NOC; no se acreditó entrega mediante Alertmanager ni canales externos.
 
 Estos resultados representan observabilidad del laboratorio y no un SLA contractual.
 
 ## Limitaciones
 
-Los ensayos se realizaron en redes y servicios virtualizados sobre una máquina anfitriona. Las pruebas no acreditan redundancia física, SLA de producción ni algoritmos de aprendizaje automático entrenados. Las fases siguientes amplían la plataforma sin modificar retroactivamente el alcance acreditado en S01–S04.
+Los ensayos se realizaron en redes y servicios virtualizados sobre una máquina anfitriona. Las pruebas no acreditan redundancia física, SLA de producción ni algoritmos de aprendizaje automático entrenados. Las fases siguientes amplían la plataforma sin modificar retroactivamente el alcance acreditado en las fases 01–04.
 
 ## Documentación relacionada
 
-[Arquitectura multisede](../arquitectura/arquitectura-multisede-implementada.md) · [Catálogo de evidencias gráficas](../../evidencias/capturas/README.md) · [Aceptación S05](s05-integracion-y-aceptacion.md).
+[Arquitectura multisede](../arquitectura/arquitectura-multisede-implementada.md) · [Catálogo de evidencias gráficas](../../evidencias/capturas/README.md) · [Aceptación de la fase 05](s05-integracion-y-aceptacion.md).

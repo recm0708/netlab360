@@ -22,4 +22,4 @@ El entorno utiliza `network_mode: none` para los routers, de manera que los enla
 
 ## Documentación relacionada
 
-[Validación S01–S04](../../docs/validacion/s01-s04-resultados.md) · [Ansible S03](../../ansible/s03/README.md) · [NOC S04](../../servicios/noc-s04/README.md).
+[Validación de las fases 01–04](../../docs/validacion/s01-s04-resultados.md) · [Ansible de la fase 03](../../ansible/s03/README.md) · [NOC de la fase 04](../../servicios/noc-s04/README.md).

@@ -32,6 +32,9 @@ def audit(prs):
         labels = {x["name"] for x in pr.get("labels", [])}
         milestone = pr.get("milestone") or {}
         phase = milestone.get("title", "")
+        # Admitimos títulos anteriores y vigentes durante la migración.
+        match = re.fullmatch(r"S0([1-8])|Fase ([1-8])", phase)
+        phase_number = int(match.group(1) or match.group(2)) if match else None
         title = TITLE.fullmatch(pr.get("title", ""))
         phase_labels = {label for label in labels if PHASE_LABEL.fullmatch(label)}
         if not title:
@@ -43,9 +46,12 @@ def audit(prs):
         # El hito es condicional; su pertinencia semántica requiere revisión humana.
         if not milestone:
             without_milestone.append(number)
-        elif not re.fullmatch(r"S0[1-8]", phase):
+        elif (
+            phase_number is None
+            or milestone.get("number", phase_number) != phase_number
+        ):
             reasons.append("MILESTONE_INVALIDO")
-        elif "fase:" + phase[1:] not in phase_labels:
+        elif f"fase:{phase_number:02d}" not in phase_labels:
             reasons.append("ETIQUETA_FASE_MILESTONE")
         elif len(phase_labels) > 1 or (title and title.group(1) == "GESTIÓN"):
             review_milestone.append(number)

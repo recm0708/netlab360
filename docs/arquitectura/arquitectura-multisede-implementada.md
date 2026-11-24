@@ -17,7 +17,7 @@ La VM `netlab360-lab` utiliza `ens33 192.168.47.40/24`, puerta de enlace `192.16
 | SDN | Dominio independiente Open vSwitch y Faucet, VLAN410 y VLAN420 |
 | NOC | API y vistas de topología, rutas FIB, estado HTTP, LACP y controlador OpenFlow |
 
-Las direcciones, interfaces y parámetros declarativos se encuentran en [IPAM](../../inventario/ipam/topologia-s02.yaml), y la configuración FRR versionada en [topología S02](../../topologias/s02-frr/README.md).
+Las direcciones, interfaces y parámetros declarativos se encuentran en [IPAM](../../inventario/ipam/topologia-s02.yaml), y la configuración FRR versionada en [topología de la fase 02](../../topologias/s02-frr/README.md).
 
 ## Encaminamiento y segmentación
 
@@ -31,14 +31,14 @@ Los servicios HTTP poseen dos backends lógicos: HQ (`10.70.20.21`) y S1 (`10.71
 
 ## Segmento definido por software
 
-El bridge OVS `br-s05-sdn` trabaja separado de los switches S02. Faucet instala reglas OpenFlow para permitir A↔B en VLAN410 y aislar el host C en VLAN420. Comprobamos conectividad y aislamiento con ICMP, además de la restauración del puerto virtual `sdna0`.
+El bridge OVS `br-s05-sdn` trabaja separado de los switches de la fase 02. Faucet instala reglas OpenFlow para permitir A↔B en VLAN410 y aislar el host C en VLAN420. Comprobamos conectividad y aislamiento con ICMP, además de la restauración del puerto virtual `sdna0`.
 
 ## Observabilidad
 
-El exportador S04, los registros Prometheus/SQLite y el NOC de S05 permiten consultar topología, salud de los servicios, rutas FIB, LACP y SDN. Los estados de fuente no disponible no se presentan como fallas de conectividad confirmadas.
+El exportador de la fase 04, los registros Prometheus/SQLite y el NOC de la fase 05 permiten consultar topología, salud de los servicios, rutas FIB, LACP y SDN. Los estados de fuente no disponible no se presentan como fallas de conectividad confirmadas.
 
 ## Alcance y limitaciones
 
 La arquitectura está implementada en una sola VM. Las conmutaciones probadas acreditan recuperación lógica de enlaces o backends, **no** tolerancia a la pérdida del host, del hypervisor ni del almacenamiento. La reconstrucción automatizada tras reiniciar Ubuntu sigue sin validarse.
 
-[Diseño HA](../diseno/s05-ha-servicios-multisede.md) · [LACP](../diseno/s05-lacp-8023ad-multisede.md) · [SDN](../diseno/s05-dominio-sdn-ovs-faucet.md) · [Acta S05](../gestion/s05-acta-aceptacion-tecnica.md).
+[Diseño HA](../diseno/s05-ha-servicios-multisede.md) · [LACP](../diseno/s05-lacp-8023ad-multisede.md) · [SDN](../diseno/s05-dominio-sdn-ovs-faucet.md) · [Acta de la fase 05](../gestion/s05-acta-aceptacion-tecnica.md).

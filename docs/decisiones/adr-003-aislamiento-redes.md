@@ -6,7 +6,7 @@ Los experimentos de WAN, VLAN y control SDN deben funcionar sin alterar la inter
 
 ## Decisión
 
-Implementamos los segmentos empresariales mediante namespaces Linux, contenedores FRRouting, enlaces virtuales, bridges y VLAN 802.1Q. El dominio SDN de S05 emplea un bridge dedicado de Open vSwitch controlado por Faucet.
+Implementamos los segmentos empresariales mediante namespaces Linux, contenedores FRRouting, enlaces virtuales, bridges y VLAN 802.1Q. El dominio SDN de la fase 05 emplea un bridge dedicado de Open vSwitch controlado por Faucet.
 
 La interfaz `ens33` conserva `192.168.47.40/24` con puerta de enlace `192.168.47.2` y no participa en las pruebas de conmutación WAN ni de pérdida de enlaces internos.
 

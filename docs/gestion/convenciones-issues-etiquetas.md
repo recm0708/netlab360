@@ -19,6 +19,9 @@ Cada PR, independientemente de su estado, debe tener al menos una etiqueta temá
 
 Antes de fusionar verificamos los metadatos y las comprobaciones CI; el mantenimiento histórico conserva títulos, estados, autores, cuerpo y criterios no afectados. Consultamos los valores vigentes en GitHub, no en contadores duplicados en documentos.
 
+
+Denominamos los hitos de GitHub «Fase 1» a «Fase 8», conservando sus identificadores numéricos y asignaciones. En la documentación técnica utilizamos «Fase 01» y sucesivas. Los códigos de los ensayos, prefijos técnicos, rutas y registros originales mantienen su nomenclatura.
+
 ## Validación y mantenimiento
 
 Las herramientas [normalización de issues](../../scripts/operacion/normalizar_issues_etiquetas.py), [auditoría de títulos PR](../../scripts/operacion/auditar_titulos_prs.py) y [auditoría de metadatos PR](../../scripts/operacion/auditar_metadatos_prs.py), además de [reconciliación de milestones](../../scripts/operacion/reconciliar_milestones_netlab360.py) permiten comprobar convenciones y diagnosticar inconsistencias. Los procedimientos de migración histórica no deben repetirse sobre un catálogo ya normalizado; antes de aplicar cambios se requiere revisar su alcance, inventario vigente y referencias.
