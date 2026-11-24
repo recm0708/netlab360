@@ -3,6 +3,7 @@ from html.parser import HTMLParser
 import importlib.util
 from pathlib import Path
 import os
+import re
 import sys
 import tempfile
 import unittest
@@ -111,6 +112,46 @@ class StructureTests(unittest.TestCase):
         self.assertIn("localStorage.setItem(themeKey, themePreference)", js)
         self.assertIn("localStorage.getItem(themeKey)", js)
         self.assertIn('systemTheme.addEventListener("change"', js)
+
+    def test_semantic_palette_contrast(self):
+        css = (UI / "static/styles.css").read_text(encoding="utf-8")
+
+        def palette(selector):
+            match = re.search(re.escape(selector) + r"\s*\{([^}]+)\}", css)
+            self.assertIsNotNone(match)
+            return dict(re.findall(r"--([\w-]+):\s*(#[0-9a-fA-F]{3,6})", match.group(1)))
+
+        def luminance(color):
+            value = color.lstrip("#")
+            if len(value) == 3:
+                value = "".join(channel * 2 for channel in value)
+            channels = [int(value[i:i+2], 16) / 255 for i in (0, 2, 4)]
+            linear = [v / 12.92 if v <= 0.04045 else ((v + 0.055) / 1.055) ** 2.4
+                      for v in channels]
+            return sum(a * b for a, b in zip(linear, (0.2126, 0.7152, 0.0722)))
+
+        def contrast(first, second):
+            low, high = sorted((luminance(first), luminance(second)))
+            return (high + 0.05) / (low + 0.05)
+
+        for selector in (":root", ':root[data-theme="light"]', ":root:not([data-theme])"):
+            colors = palette(selector)
+            for state in ("ok", "warn", "fault", "recovery", "unknown", "text", "muted"):
+                for background in ("bg", "surface", "sidebar"):
+                    with self.subTest(theme=selector, state=state, background=background):
+                        self.assertGreaterEqual(contrast(colors[state], colors[background]), 4.5)
+            self.assertGreaterEqual(contrast(colors["button-text"], colors["accent"]), 4.5)
+            self.assertGreaterEqual(contrast(colors["accent"], colors["sidebar"]), 3)
+
+    def test_solid_current_navigation(self):
+        css = (UI / "static/styles.css").read_text(encoding="utf-8")
+        self.assertNotIn("border-left:", css)
+        self.assertNotIn("border-left-color:", css)
+        self.assertIn('#navigation a.current, #navigation a[aria-current="page"]', css)
+        self.assertIn("background: var(--accent);\n  color: var(--button-text);", css)
+        self.assertIn("width: 48px; height: 48px;", css)
+        self.assertIn('[data-state="unknown"] { color: var(--unknown); }', css)
+        self.assertIn('[data-state="fault"] { color: var(--fault); }', css)
 
     def test_login_structure(self):
         html = (UI / "login.html").read_text(encoding="utf-8")

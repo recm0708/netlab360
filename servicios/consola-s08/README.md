@@ -89,6 +89,12 @@ seguimos las preferencias del sistema en modo automático. Recuperamos el
 icono de tres líneas y usamos transiciones breves, sin movimiento continuo,
 respetando la preferencia de movimiento reducido. Conservamos la marca
 tipográfica provisional; el logotipo definitivo queda para la etapa final.
+Diferenciamos estados normal, degradado, falla, recuperación y desconocido
+mediante colores semánticos por tema y etiquetas textuales. Verificamos
+contraste mínimo de 4,5:1 para texto sobre fondos de la paleta y de 3:1
+para distinguir el fondo activo del menú. La selección usa un fondo sólido
+con icono y texto de contraste; al contraer el menú queda un recuadro de
+48 píxeles. El contador de inactividad conserva el color de advertencia.
 Las vistas todavía no habilitadas indican su indisponibilidad, sin
 simular datos. Reservamos /administration para la gestión de identidad
 propia y futura administración de cuentas (#242), y /debug para el
