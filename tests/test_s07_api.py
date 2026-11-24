@@ -3,10 +3,14 @@ from contextlib import nullcontext
 from pathlib import Path
 import tempfile
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
+from copy import deepcopy
+from threading import Thread
 import sys
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts/s07"))
-from api_s07 import API,Replay,response
+from api_s07 import API,Replay,response,Server,Handler,call
+import api_s07
+import os
 
 class APITests(unittest.TestCase):
     def setUp(self):
@@ -56,4 +60,29 @@ class APITests(unittest.TestCase):
     def test_broker_denial(self):
         self.b.handle.return_value={"ok":False,"reason":"ACTION_OR_ARGUMENT_DENIED"}
         self.assertEqual(self.api.dispatch(1000,"POST",self.path,self.body,self.key)[0],409)
+    def test_unix_http_transport(self):
+        path=Path(self.tmp.name)/"api.sock"
+        with Server(str(path),Handler) as srv:
+            srv.api=self.api;self.b.uid=os.geteuid()
+            worker=Thread(target=srv.handle_request,daemon=True);worker.start()
+            with patch.object(api_s07,"SOCKET",path):
+                status,d=call("GET","/api/v1/health")
+            worker.join(3)
+            self.assertEqual(status,200)
+            self.assertEqual(d["result"]["authorization"],"SO_PEERCRED")
+    def test_intent_scoped_drift(self):
+        self.b.desired={"S1/s1b":100}
+        base={"costs":{"S1/s1b":100},"neighbors":[{"state":"Full"}],"routes":[{"selection":"PRIMARY"}],
+              "icmp":["HQ->S1"],"http":{"status":"available"}}
+        drift=deepcopy(base);drift["costs"]["S1/s1b"]=150
+        self.b.trial.return_value.load.return_value={"broker_rfc":{},"requester_uid":1000,"status":"DRIFT_VERIFIED","baseline":base,"drift_observation":drift}
+        self.b.b.snapshot.return_value=drift;self.b.b.timer_active.return_value=True
+        self.b.m.utc.return_value="2026-11-24T06:00:00+00:00"
+        status,d=self.api.dispatch(1000,"GET",self.path+"/"+self.rid+"/intent")
+        self.assertEqual(status,200)
+        self.assertEqual(d["result"]["configuration_compliance"],"NOT_MET")
+        self.assertEqual(d["result"]["recommendation"]["decision"],"REQUEST_HUMAN_RESTORE")
+        self.assertFalse(d["result"]["network_mutations_authorized"])
+        self.b.b.timer_active.return_value=False
+        self.assertEqual(self.api.dispatch(1000,"GET",self.path+"/"+self.rid+"/intent")[1]["result"]["recommendation"]["decision"],"ABSTAIN_NO_CHANGE")
 if __name__=="__main__": unittest.main()
