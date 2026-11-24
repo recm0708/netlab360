@@ -216,7 +216,8 @@ def main():
                 if os.geteuid()!=0 or not sys.stdin.isatty():
                     p.error("root interactive terminal required")
                 print(json.dumps(result,indent=2),file=sys.stderr)
-                msg["confirmation"]=input("Escriba APROBAR PREVIEW "+a.rfc_id+": ")
+                print("Escriba APROBAR PREVIEW "+a.rfc_id+": ",file=sys.stderr,end="",flush=True)
+                msg["confirmation"]=input()
             result=call(msg)
     print(json.dumps(result,indent=2))
     sys.exit(0 if result["ok"] else 3)

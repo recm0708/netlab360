@@ -1,11 +1,16 @@
 """Pruebas de persistencia y política preview sin privilegios."""
 import concurrent.futures
+import io
+import json
+from contextlib import redirect_stdout, redirect_stderr
+from unittest.mock import patch
 from pathlib import Path
 import sys
 import tempfile
 import unittest
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts/s07"))
 from rfc_protegido_preview import Store,ACTION,ARGS,TTL
+import rfc_protegido_preview as broker
 
 class ProtectedPreviewTests(unittest.TestCase):
     def setUp(self):
@@ -74,6 +79,30 @@ class ProtectedPreviewTests(unittest.TestCase):
         b=self.request()
         self.approve(b)
         self.assertFalse(self.op(0,"consume",b)["ok"])
+
+    def test_cli_confirmation_json_stdout(self):
+        body=self.request()
+        rid=body["rfc_id"]
+        out,err=io.StringIO(),io.StringIO()
+        def route(msg):
+            return self.s.handle(0,msg)
+        with patch.object(sys,"argv",["broker","approve",rid]), patch.object(sys.stdin,"isatty",return_value=True), patch.object(broker.os,"geteuid",return_value=0), patch.object(broker,"call",side_effect=route), patch("builtins.input",return_value="APROBAR PREVIEW "+rid) as typed, redirect_stdout(out), redirect_stderr(err):
+            with self.assertRaises(SystemExit) as exc:
+                broker.main()
+        self.assertEqual(exc.exception.code,0)
+        typed.assert_called_once_with()
+        self.assertEqual(json.loads(out.getvalue())["status"],"APPROVED_PREVIEW")
+        self.assertIn("Escriba APROBAR PREVIEW "+rid,err.getvalue())
+
+    def test_cli_rejection_json_stdout(self):
+        body=self.request()
+        rid=body["rfc_id"]
+        out,err=io.StringIO(),io.StringIO()
+        with patch.object(sys,"argv",["broker","approve",rid]), patch.object(sys.stdin,"isatty",return_value=True), patch.object(broker.os,"geteuid",return_value=0), patch.object(broker,"call",side_effect=lambda msg:self.s.handle(0,msg)), patch("builtins.input",return_value="incorrecto"), redirect_stdout(out), redirect_stderr(err):
+            with self.assertRaises(SystemExit) as exc:
+                broker.main()
+        self.assertEqual(exc.exception.code,3)
+        self.assertEqual(json.loads(out.getvalue())["reason"],"CONFIRMATION_REQUIRED")
 
 if __name__=="__main__":
     unittest.main()
