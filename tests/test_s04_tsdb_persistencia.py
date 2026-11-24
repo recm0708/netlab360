@@ -3,7 +3,7 @@ import importlib.util
 from pathlib import Path
 import unittest
 
-SOURCE = Path(__file__).resolve().parents[1] / "scripts/observabilidad/s04-verificar-persistencia-tsdb.py"
+SOURCE = Path(__file__).resolve().parents[1] / "scripts/observabilidad/s04_verificar_persistencia_tsdb.py"
 spec = importlib.util.spec_from_file_location("netlab360_s04_tsdb", SOURCE)
 assert spec and spec.loader
 mod = importlib.util.module_from_spec(spec)

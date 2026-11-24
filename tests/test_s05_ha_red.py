@@ -4,7 +4,7 @@ from pathlib import Path
 from unittest import TestCase
 from unittest.mock import patch
 
-SCRIPT = Path(__file__).resolve().parents[1] / "scripts/laboratorio/s05-ha-red-servicios.py"
+SCRIPT = Path(__file__).resolve().parents[1] / "scripts/laboratorio/s05_ha_red_servicios.py"
 spec = importlib.util.spec_from_file_location("s05_ha_red", SCRIPT)
 m = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(m)

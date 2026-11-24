@@ -5,7 +5,7 @@ from pathlib import Path
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPT = ROOT / "scripts/validacion/s05-ha-precheck.py"
+SCRIPT = ROOT / "scripts/validacion/s05_ha_precheck.py"
 spec = importlib.util.spec_from_file_location("s05_ha_precheck", SCRIPT)
 module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)

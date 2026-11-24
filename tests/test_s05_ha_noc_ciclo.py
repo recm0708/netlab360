@@ -7,7 +7,7 @@ import unittest
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPT = ROOT / "scripts/validacion/s05-ha-noc-ciclo.py"
+SCRIPT = ROOT / "scripts/validacion/s05_ha_noc_ciclo.py"
 spec = importlib.util.spec_from_file_location("s05_ha_noc_ciclo", SCRIPT)
 m = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(m)

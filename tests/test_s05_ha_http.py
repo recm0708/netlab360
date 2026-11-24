@@ -11,7 +11,7 @@ spec = importlib.util.spec_from_file_location("s05_ha_http", CODE)
 m = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(m)
 
-FAILOVER = ROOT / "scripts/laboratorio/s05-ha-http-failover.py"
+FAILOVER = ROOT / "scripts/laboratorio/s05_ha_http_failover.py"
 fspec = importlib.util.spec_from_file_location("s05_ha_http_failover", FAILOVER)
 fm = importlib.util.module_from_spec(fspec)
 fspec.loader.exec_module(fm)

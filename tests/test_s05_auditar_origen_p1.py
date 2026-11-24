@@ -8,7 +8,7 @@ from tempfile import TemporaryDirectory
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "scripts/validacion/s05-auditar-origen-p1.py"
+SRC = ROOT / "scripts/validacion/s05_auditar_origen_p1.py"
 spec = importlib.util.spec_from_file_location("s05_p1_origen", SRC)
 m = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(m)
