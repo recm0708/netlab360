@@ -59,23 +59,47 @@
           <div>
             <p class="eyebrow">Centro de operaciones</p>
             <h1>Inicio / Salud</h1>
-            <p class="muted">Estado del proceso y alcance de la consola.</p>
+            <p class="muted">Observaciones de infraestructura, servicios y fuentes de supervisión.</p>
           </div>
           <button id="refresh" type="button">Actualizar estado</button>
         </div>
-        <div class="status-grid" aria-label="Estado de arranque">
+        <div class="status-grid" aria-label="Disponibilidad y acceso">
           <section class="panel"><h2>Proceso FastAPI</h2><p id="api-state" class="metric" data-state="unknown">Sin consultar</p><p class="muted">Disponibilidad del proceso, no de toda la red.</p></section>
-          <section class="panel"><h2>Infraestructura</h2><p class="metric" data-state="unknown">UNKNOWN</p><p class="muted">No se ha consultado telemetría autenticada.</p></section>
+          <section class="panel"><h2>Infraestructura</h2><p class="metric" data-state="unknown">Desconocido</p><p class="muted">No inferimos salud global a partir de observaciones parciales.</p></section>
           <section class="panel"><h2>Acceso</h2><p id="access-state" class="metric" data-state="unknown">Sin sesión</p><p class="muted">Identidad HTTP; no concede privilegios de red.</p></section>
         </div>
-        <section class="panel summary">
-          <h2>Capacidades del backend</h2>
+        <div class="dashboard-toolbar">
+          <p id="dashboard-status" role="status" aria-live="polite" class="muted">Esperando observaciones autenticadas.</p>
+          <label><input id="dashboard-auto" type="checkbox" checked> Actualización automática (15 s)</label>
+        </div>
+        <div class="dashboard-grid" aria-label="Indicadores operacionales">
+          <section class="panel"><h2>Telemetría vigente</h2><p id="dash-coverage" class="metric" data-state="unknown">Sin datos</p><p id="dash-coverage-detail" class="muted">Observaciones operacionales vigentes.</p></section>
+          <section class="panel"><h2>Routers detectados</h2><p id="dash-routers" class="metric" data-state="unknown">Sin datos</p><p id="dash-routers-detail" class="muted">Existencia de contenedores; no acredita OSPF.</p></section>
+          <section class="panel"><h2>Interfaces WAN</h2><p id="dash-wan" class="metric" data-state="unknown">Sin datos</p><p id="dash-wan-detail" class="muted">Estado administrativo de los ocho extremos.</p></section>
+          <section class="panel"><h2>Interfaces VLAN</h2><p id="dash-vlan" class="metric" data-state="unknown">Sin datos</p><p id="dash-vlan-detail" class="muted">Estado administrativo; no valida ACL ni tráfico.</p></section>
+          <section class="panel"><h2>Servicio HTTP / HA</h2><p id="dash-ha" class="metric" data-state="unknown">Sin datos</p><p id="dash-ha-detail" class="muted">Observación del frontal desde S2.</p></section>
+          <section class="panel"><h2>Agregación LACP</h2><p id="dash-lacp" class="metric" data-state="unknown">Sin datos</p><p id="dash-lacp-detail" class="muted">Miembros de los enlaces en cada sede.</p></section>
+          <section class="panel"><h2>Controlador SDN</h2><p id="dash-sdn" class="metric" data-state="unknown">Sin datos</p><p id="dash-sdn-detail" class="muted">Conexión del controlador y flujos observados.</p></section>
+          <section class="panel"><h2>Diagnóstico inteligente</h2><p id="dash-inference" class="metric" data-state="unknown">Sin datos</p><p id="dash-inference-detail" class="muted">Inferencias exploratorias; no son incidentes confirmados.</p></section>
+          <section class="panel"><h2>Consulta asesora</h2><p id="dash-advisory" class="metric" data-state="unknown">Sin datos</p><p id="dash-advisory-detail" class="muted">Resúmenes históricos; no acreditan salud actual.</p></section>
+        </div>
+        <section class="panel">
+          <h2>Procedencia y vigencia de las observaciones</h2>
+          <p class="muted">Las muestras ausentes, vencidas o inválidas no se presentan como estados normales. Las fechas corresponden a la observación de cada fuente.</p>
+          <div class="dashboard-table-wrap" tabindex="0" aria-label="Tabla de observaciones">
+            <table class="dashboard-table">
+              <thead><tr><th scope="col">Fuente</th><th scope="col">Recurso</th><th scope="col">Vigencia</th><th scope="col">Estado</th><th scope="col">Observación</th><th scope="col">Fecha y hora</th></tr></thead>
+              <tbody id="dashboard-rows"></tbody>
+            </table>
+          </div>
+        </section>
+        <details class="panel summary">
+          <summary>Información técnica de la aplicación</summary>
           <p class="muted">Rutas habilitadas, no una garantía de vigencia de las fuentes.</p>
           <dl id="capabilities"><dt>Consulta</dt><dd>Sin consultar</dd></dl>
           <p id="observed" class="muted">Sin timestamp de respuesta.</p>
           <p id="notice" role="status" aria-live="polite">Esperando consulta local.</p>
-        </section>
-        <section class="panel"><h2>Funciones de supervisión</h2><p>Las vistas de topología, métricas y diagnóstico aún no están disponibles. Las intervenciones de red están deshabilitadas.</p></section>
+        </details>
         </section>
         <section id="module-view" hidden>
           <h1 id="module-title"></h1>

@@ -211,3 +211,18 @@ nav a { min-height: 42px; gap: 11px; border: 0; }
 .debug-catalog { overflow-wrap: anywhere; margin: 14px 0; }
 .debug-catalog p { margin: 6px 0; font-size: .88rem; }
 #debug-output { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 55vh; overflow: auto; background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 8px; padding: 16px; font-size: .85rem; }
+
+/* Dashboard de lectura: rejilla adaptable y tabla con cabecera visible. */
+.dashboard-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin: 12px 0; }
+.dashboard-toolbar label { font-size: .85rem; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.dashboard-toolbar input { accent-color: var(--accent); }
+.dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(240px,100%),1fr)); gap: 14px; margin-bottom: 14px; }
+.dashboard-grid .panel { margin: 0; }
+.dashboard-grid .metric { font-variant-numeric: tabular-nums; }
+.dashboard-table-wrap { max-height: 60vh; overflow: auto; overscroll-behavior: contain; }
+.dashboard-table { width: 100%; border-collapse: collapse; min-width: 790px; font-size: .85rem; }
+.dashboard-table th, .dashboard-table td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.dashboard-table th { position: sticky; top: 0; background: var(--surface); color: var(--text); z-index: 1; }
+.dashboard-table td:last-child { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.dashboard-table td[data-state] { font-weight: 600; }
+details.summary > summary { cursor: pointer; font-weight: 600; }

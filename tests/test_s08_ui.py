@@ -64,6 +64,20 @@ class StructureTests(unittest.TestCase):
             self.assertNotIn(value, js)
         self.assertIn('credentials: "omit"', js)
 
+    def test_dashboard_structure_and_read_only_polling(self):
+        html = (UI / "index.html").read_text(encoding="utf-8")
+        for key in ("coverage", "routers", "wan", "vlan", "ha", "lacp", "sdn", "inference", "advisory"):
+            self.assertIn(f'id="dash-{key}"', html)
+        self.assertIn('id="dashboard-auto" type="checkbox" checked', html)
+        self.assertIn('id="dashboard-rows"', html)
+        js = (UI / "static/app.js").read_text(encoding="utf-8")
+        self.assertIn("dashboardBatch(key,data,started)", js)
+        self.assertIn("dashboardEpoch++", js)
+        self.assertIn("dashboardAuto.checked&&!document.hidden&&dashboardAllowed()", js)
+        self.assertIn("},15000);", js)
+        self.assertIn("await debugRead(path)", js)
+        self.assertIn("clearDashboard();", js)
+
     def test_debug_structure_and_exports(self):
         html = (UI / "index.html").read_text(encoding="utf-8")
         self.assertIn('id="debug-view" hidden', html)
