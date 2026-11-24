@@ -58,6 +58,9 @@ jobs:
       - name: Ejecutar regresiones offline
         run: python -m unittest discover -s tests -p 'test_*.py' -v
 
+      - name: Auditar comentarios y estructura editorial
+        run: python scripts/validacion/auditar_estilo_repositorio.py
+
       - name: Validar sintaxis Bash
         shell: bash
         run: |
