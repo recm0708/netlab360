@@ -8,7 +8,7 @@ from urllib.parse import unquote
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE_WEB = "https://github.com/recm0708/netlab360/blob/main/"
-FASES = {1: 83, 2: 9, 3: 8, 4: 22, 5: 71, 6: 11}
+FASES = {1: 83, 2: 9, 3: 8, 4: 22, 5: 71, 6: 11, 7: 49}
 ENLACE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 
 

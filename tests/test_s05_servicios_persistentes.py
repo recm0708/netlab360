@@ -8,7 +8,7 @@ import unittest
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
-HELPER = ROOT / "scripts/operacion/s05-observador-privilegiado.py"
+HELPER = ROOT / "scripts/operacion/s05_observador_privilegiado.py"
 S04 = ROOT / "servicios/observabilidad/s04_exporter_multisede.py"
 NOC = ROOT / "servicios/topologia-s05/app.py"
 

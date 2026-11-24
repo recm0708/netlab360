@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPT = ROOT / "scripts/validacion/validar-capturas-unificadas.py"
+SCRIPT = ROOT / "scripts/validacion/validar_capturas_unificadas.py"
 spec = importlib.util.spec_from_file_location("netlab_capturas", SCRIPT)
 assert spec and spec.loader
 module = importlib.util.module_from_spec(spec)
