@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def load(site: str):
-    path = ROOT / f"scripts/laboratorio/s05-lacp-{site}-integracion.py"
+    path = ROOT / f"scripts/laboratorio/s05_lacp_{site}_integracion.py"
     spec = importlib.util.spec_from_file_location(f"test_s05_noc_{site}", path)
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)

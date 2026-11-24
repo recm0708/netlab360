@@ -22,7 +22,7 @@ SITES = {
 
 
 def load(site):
-    path = ROOT / f"scripts/laboratorio/s05-lacp-{site.lower()}-integracion.py"
+    path = ROOT / f"scripts/laboratorio/s05_lacp_{site.lower()}_integracion.py"
     spec = importlib.util.spec_from_file_location(f"s05_lacp_{site}", path)
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
@@ -98,7 +98,7 @@ class TestS05SucursalesLACP(unittest.TestCase):
 
     def test_acciones_mutantes_exigen_confirmacion(self):
         for site in SITES:
-            script = ROOT / f"scripts/laboratorio/s05-lacp-{site.lower()}-integracion.py"
+            script = ROOT / f"scripts/laboratorio/s05_lacp_{site.lower()}_integracion.py"
             for action in ("up", "down"):
                 with self.subTest(site=site, action=action):
                     p = subprocess.run([sys.executable, str(script), action],
@@ -109,7 +109,7 @@ class TestS05SucursalesLACP(unittest.TestCase):
     def test_puertos_y_vlan_aislados_en_codigo(self):
         for site in SITES:
             with self.subTest(site=site):
-                script = ROOT / f"scripts/laboratorio/s05-lacp-{site.lower()}-integracion.py"
+                script = ROOT / f"scripts/laboratorio/s05_lacp_{site.lower()}_integracion.py"
                 t = script.read_text(encoding="utf-8")
                 self.assertIn('"mode", "802.3ad"', t)
                 self.assertIn('"xmit_hash_policy", "layer3+4"', t)

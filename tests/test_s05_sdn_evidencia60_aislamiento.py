@@ -9,7 +9,7 @@ import unittest
 from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
-PATH = ROOT / "scripts/validacion/s05-sdn-evidencia60-aislamiento.py"
+PATH = ROOT / "scripts/validacion/s05_sdn_evidencia60_aislamiento.py"
 spec = importlib.util.spec_from_file_location("s05_evidencia60", PATH)
 assert spec and spec.loader
 module = importlib.util.module_from_spec(spec)

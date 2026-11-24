@@ -7,8 +7,8 @@ import unittest
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
-OBSERVER = ROOT / "scripts/validacion/s05-observar-conmutacion-noc.py"
-FAILOVER = ROOT / "scripts/laboratorio/s02-failover-wan.py"
+OBSERVER = ROOT / "scripts/validacion/s05_observar_conmutacion_noc.py"
+FAILOVER = ROOT / "scripts/laboratorio/s02_failover_wan.py"
 spec = importlib.util.spec_from_file_location("s05_observador", OBSERVER)
 module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
