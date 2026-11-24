@@ -1,5 +1,4 @@
-# NETLAB360 | Gestión de servicios del laboratorio
-# Configuración del componente correspondiente; conservar los recursos ajenos.
+# Observación HTTP desde VLAN320 de S2; persiste registros solo en el directorio HA autorizado.
 [Unit]
 Description=NETLAB360 S05 observador HTTP desde cliente VLAN320 S2 (solo lectura)
 After=network-online.target
@@ -21,6 +20,7 @@ NoNewPrivileges=yes
 CapabilityBoundingSet=
 AmbientCapabilities=
 PrivateTmp=yes
+# La protección limita la escritura del proceso, no la conectividad del namespace.
 ProtectSystem=strict
 ProtectHome=read-only
 ReadWritePaths=/home/rc-aa-ec/netlab360-bootstrap/s05/ha

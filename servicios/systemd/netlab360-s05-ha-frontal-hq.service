@@ -1,5 +1,4 @@
-# NETLAB360 | Gestión de servicios del laboratorio
-# Configuración del componente correspondiente; conservar los recursos ajenos.
+# Frontal HTTP en HQ; la selección del backend pertenece a la aplicación.
 [Unit]
 Description=NETLAB360 S05 HTTP HA frontend-hq (10.70.20.23:8080)
 After=network-online.target
@@ -21,6 +20,7 @@ NoNewPrivileges=yes
 CapabilityBoundingSet=
 AmbientCapabilities=
 PrivateTmp=yes
+# La protección limita la escritura del proceso, no la conectividad del namespace.
 ProtectSystem=strict
 ProtectHome=read-only
 ProtectKernelTunables=yes
