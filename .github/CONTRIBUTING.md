@@ -6,6 +6,12 @@ Cada documento técnico describe un asunto concreto mediante un título H1 únic
 
 La documentación vigente describe el sistema y sus resultados. Las instrucciones de continuidad de conversaciones, estimaciones intermedias y bitácoras administrativas de desarrollo no pertenecen a ella. Los registros históricos útiles se identifican como tales y se conservan sin alterar los datos originales. Los catálogos gráficos contienen la lista de imágenes y su alcance.
 
+### Alcance y voz editorial
+
+Redactamos como equipo académico, en primera persona del plural para nuestras decisiones, implementaciones y resultados (por ejemplo, «implementamos», «comprobamos» y «observamos»). Utilizamos la voz técnica impersonal para describir contratos, condiciones, requisitos y procedimientos. Diferenciamos los resultados comprobados, las limitaciones y el trabajo previsto. No atribuimos pruebas ni capacidades que no hayamos validado.
+
+Conservamos el nombre `README.md` en cada directorio que necesita una introducción propia. La ruta identifica su ámbito y el H1 identifica el componente. El README raíz presenta el proyecto; el de docs indexa la documentación; los de servicios, topologías, IaC y Ansible describen sus propios componentes; los de evidencias catalogan exclusivamente las imágenes de su ámbito. No copiamos descripciones ni resultados ajenos al directorio. Los catálogos utilizan Descripción, Capturas disponibles y Uso académico; los documentos técnicos utilizan las secciones pertinentes según su función, sin rellenar secciones vacías.
+
 ## Nomenclatura
 
 | Tipo | Convención |
@@ -22,10 +28,14 @@ Los archivos de herramientas con nombres convencionales, las rutas de systemd, l
 
 ## Código y pruebas
 
-Los módulos describen su responsabilidad, entradas y efectos. Los scripts explican alcance y precondiciones, especialmente antes de mutaciones. Los comentarios aportan contexto técnico, no reiteran comandos.
+Documentamos el propósito del archivo, los contratos de entrada/salida, las decisiones relevantes y los límites de seguridad. En Python preferimos docstrings de módulos, clases y funciones cuando aportan información; en Bash explicamos precondiciones, etapas y limpieza; en YAML, HCL, FRR, systemd, Jinja y HTML usamos comentarios compatibles con cada sintaxis. Explicamos bloques no triviales, casos límite y motivos, no cada instrucción evidente. Conservamos shebangs, directivas, delimitadores y los contratos del consumidor.
+
+No añadimos comentarios a JSON, JSONL, PNG, registros originales, archivos de citación o licencia, estados generados ni formatos que no los admiten o cuya identidad debe preservarse. No alteramos corpus congelados, configuraciones históricas ni copias privilegiadas instaladas para aplicar cambios cosméticos. Los cambios de comentarios en código protegido requieren revisión y comprobación de la equivalencia funcional antes de desplegar otra versión.
+
+La autoría académica corresponde al equipo. Centralizamos el aviso de derechos en [LICENSE](../LICENSE) y en el README raíz; los archivos originales de código pueden incluir `SPDX-License-Identifier: MIT` y el aviso de copyright con sintaxis válida. No repetimos la licencia en cada documento ni sustituimos avisos de terceros.
 
 Al cambiar nombres o rutas, actualizar referencias Markdown, importaciones, rutas declarativas, scripts, workflows y pruebas dependientes en la misma integración. Verificar sintaxis, regresión, enlaces y ausencia de secretos. Las pruebas offline no sustituyen las comprobaciones de red activa.
 
 ## Gestión de cambios
 
-Mantener ramas de trabajo acotadas, historial ordinario y commits descriptivos. No incluir estados privados, credenciales, material ajeno ni copias temporales. Consultar [convenciones de GitHub](../docs/gestion/convenciones-issues-etiquetas.md) y [política de seguridad](../SECURITY.md).
+Mantenemos ramas de trabajo acotadas, historial ordinario y commits descriptivos. Cada PR, abierto o cerrado, debe disponer de etiqueta de fase, etiqueta temática, milestone y al menos un responsable (assignee). La fase principal corresponde al hito de aceptación; los PR transversales se adscriben al hito en que se consolidaron, con etiquetas adicionales solo si corresponden al alcance real. Antes de fusionar verificamos esos campos y la CI aplicable; no modificamos estados ni criterios históricos para completar metadatos. No incluir estados privados, credenciales, material ajeno ni copias temporales. Consultar [convenciones de GitHub](../docs/gestion/convenciones-issues-etiquetas.md) y [política de seguridad](../SECURITY.md).

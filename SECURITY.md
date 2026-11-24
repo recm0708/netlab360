@@ -2,7 +2,7 @@
 
 ## Alcance
 
-NETLAB360 es una plataforma experimental. No debe utilizarse como infraestructura de producción ni exponerse a redes no autorizadas sin una evaluación independiente.
+Desarrollamos NETLAB360 como plataforma experimental. No debe utilizarse como infraestructura de producción ni exponerse a redes no autorizadas sin una evaluación independiente.
 
 ## Reporte de vulnerabilidades
 
@@ -10,7 +10,7 @@ Comunicar hallazgos de forma privada al equipo responsable del repositorio. Incl
 
 ## Controles operativos
 
-La red administrativa se mantiene separada de los recursos experimentales. Las actuaciones deben utilizar ejecutores de alcance fijo, precondiciones verificables, autorización explícita y mecanismos de retorno. Los modelos y las recomendaciones no conceden autorización. Los servicios privilegiados se restringen al entorno local y se revisan antes de su activación.
+Mantenemos la red administrativa separada de los recursos experimentales. Las actuaciones deben utilizar ejecutores de alcance fijo, precondiciones verificables, autorización explícita y mecanismos de retorno. Los modelos y las recomendaciones no conceden autorización. Los servicios privilegiados se restringen al entorno local y se revisan antes de su activación.
 
 ## Documentación relacionada
 

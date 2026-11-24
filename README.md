@@ -4,7 +4,7 @@
 
 ## Descripción
 
-NETLAB360 integra tres sedes (HQ, S1 y S2) en un laboratorio virtualizado que permite estudiar encaminamiento, segmentación, automatización, observabilidad, diagnóstico inteligente y recuperación supervisada. Las intervenciones se limitan a recursos experimentales y conservan separado el plano administrativo.
+Desarrollamos NETLAB360 para integrar tres sedes (HQ, S1 y S2) en un laboratorio virtualizado que permite estudiar encaminamiento, segmentación, automatización, observabilidad, diagnóstico inteligente y recuperación supervisada. Las intervenciones se limitan a recursos experimentales y conservan separado el plano administrativo.
 
 ## Arquitectura y tecnologías
 
@@ -38,7 +38,7 @@ S07 cuenta con las ocho issues técnicas cerradas, 49 capturas y regresión de 1
 
 ## Documentación
 
-El [índice completo de documentación técnica](docs/README.md) organiza todos los documentos por su responsabilidad.
+Organizamos la documentación por componente. El [índice completo de documentación técnica](docs/README.md) organiza todos los documentos por su responsabilidad.
 
 | Área | Referencia |
 |---|---|
@@ -69,6 +69,10 @@ Las regresiones de software no sustituyen las comprobaciones de la infraestructu
 
 El laboratorio funciona dentro de una única máquina virtual. La disponibilidad lógica no acredita redundancia física ni disponibilidad continua. Los modelos S06 se evaluaron bajo un protocolo ICMP controlado; el escenario HTTP es independiente. S07 conserva incertidumbre, autorización humana y alcance acotado, sin remediación autónoma. La reconstrucción automática tras apagado completo y la consola integrada corresponden a S08.
 
-## Contribuciones, seguridad y citación
+## Autoría, licencia y contribuciones
 
-Consultar las [convenciones del proyecto](.github/CONTRIBUTING.md), la [política de seguridad](SECURITY.md) y los [datos de citación](CITATION.cff). Los datos privados, credenciales y estados operativos quedan fuera del repositorio.
+Desarrollamos este proyecto como equipo académico de NETLAB360. El material original autorizado se distribuye bajo la [licencia MIT](LICENSE); las dependencias y los recursos de terceros conservan sus licencias respectivas.
+
+**Copyright © 2026 Rubén Enrique Cañizares Miranda.**
+
+Para contribuir, consultar las [convenciones del proyecto](.github/CONTRIBUTING.md), la [política de seguridad](SECURITY.md) y los [datos de citación](CITATION.cff). Los datos privados, credenciales y estados operativos quedan fuera del repositorio.

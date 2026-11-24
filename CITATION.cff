@@ -2,6 +2,7 @@ cff-version: 1.2.0
 message: "Si utilizas NETLAB360 en un trabajo académico, cita este proyecto."
 title: "NETLAB360: Redes Empresariales Multisede"
 type: software
+license: MIT
 authors:
   - name: "Equipo NETLAB360"
 repository-code: "https://github.com/recm0708/netlab360"

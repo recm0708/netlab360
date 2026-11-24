@@ -1,6 +1,6 @@
 # Índice de documentación técnica de NETLAB360
 
-La documentación vigente se organiza por responsabilidad. Cada documento describe su alcance, implementación, resultados y limitaciones pertinentes. Los catálogos de capturas y los registros experimentales se conservan separados.
+Organizamos la documentación vigente por responsabilidad. Cada documento describe su alcance, implementación, resultados y limitaciones pertinentes. Conservamos los catálogos de capturas y los registros experimentales separados. Este índice no reemplaza los README específicos de cada componente.
 
 ## Arquitectura
 
