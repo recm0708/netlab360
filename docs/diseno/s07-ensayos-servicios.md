@@ -1,39 +1,42 @@
-# Ensayos operacionales S07 — HTTP HA y LACP
+# Ensayos operacionales y escenarios compuestos — Fase 07
 
-[Orquestación experimental](../../scripts/s07/ensayos_servicios_s07.py) reutiliza los procedimientos S05 de HTTP y LACP S1, con aprobación explícita local y adquisición S07 real. Los experimentos son secuenciales: no se presentan como un escenario simultáneo. HTTP se limita a backend HQ (respaldo S1 y retorno HQ); el temporizador independiente ejecuta solamente start de la unidad original. LACP se limita a s5c1 del cliente S1 y reutiliza el rescate y comprobaciones de propiedad de S05. El supervisor no es el broker operacional de #193. Los scripts heredados se ejecutan por el administrador del laboratorio, no se exponen en API ni reciben órdenes desde RCA. No se crean nuevos enlaces ni se reconfigura WAN.
+## Descripción
 
-Se registran línea base, estímulo y recuperación con ventanas integradas de 58 observaciones, RCA y recomendaciones de solo lectura. Cada fase requiere una señal NOC elegible del recurso exacto; durante estímulo se exige hipótesis anclada a esa señal y runbook correspondiente. La recuperación exige estado normal, ausencia de la hipótesis objetivo y observación posterior al estímulo. La selección HTTP se valida también mediante solicitud desde S2; LACP mediante agregadores directos y sondas S05. Se conservan intentos no coincidentes; no se confunde falta de evidencia con normalidad ni se afirma causalidad automática. La auditoría preflight compara costos, FIB, OSPF y gestión. Las ventanas se guardan fuera de la base operacional, sin reajuste de modelos. Las métricas temporales son descriptivas, las muestras de disponibilidad son puntuales. Aceptación local pendiente; WAN, SDN y escenario simultáneo requieren pruebas específicas.
+La evaluación relaciona las degradaciones controladas de HTTP HA, LACP, WAN y SDN con observaciones normalizadas, hipótesis RCA y recomendaciones de lectura. Se diferencia la evidencia directa de la inferencia diagnóstica. Los estímulos requieren autorización explícita del administrador; los supervisores no conceden permisos desde RCA.
 
-## Aceptación parcial y corrección de compatibilidad (24/11/2026)
+## Procedimientos y alcance
 
-S07-007B obtuvo las tres fases HTTP y la hipótesis HTTP_BACKUP_SELECTED SCOPED. S07-007C se detuvo en la línea base antes de bajar s5c1: el procedimiento heredado comparaba literalmente toda la tabla de rutas histórica, mientras la integración S05 ya utilizaba una comprobación específica de gestión. Se unifica el guard de gestión sin alterar la línea base, se verifica el temporizador antes del estímulo y se admite su retirada previa tras recuperación. La opción --resume-http revalida los tres registros HTTP, RCA y recomendaciones, copia únicamente las ventanas aceptadas y ejecuta solo LACP con confirmación propia. El directorio original conserva todos los intentos. No se atribuye al ensayo abortado ninguna degradación LACP. Aceptación completa pendiente.
+| Escenario | Recurso experimental | Evidencia directa |
+|---|---|---|
+| HTTP HA | Backend HQ | Selección HQ → S1 → HQ y consulta HTTP desde S2 |
+| LACP | Miembro s5c1 del agregador S1 | Miembros activos 2 → 1 → 2, cuatro sondas ICMP y HTTP |
+| WAN | Interfaz HQ/s1p | Estado administrativo, FIB y retorno de las rutas preferidas |
+| SDN | Puerto aislado sdna0 | A → B permitido/denegado/permitido, B → C aislado, Faucet conectado |
+| Compuesto | WAN HQ/s1p y backend HTTP HQ | Degradaciones simultáneas y retorno de ambos recursos |
 
-## Aceptación S07-007BC-R (24/11/2026)
+Los [ensayos HTTP y LACP](../../scripts/s07/ensayos_servicios_s07.py) reutilizan los procedimientos S05. [La guarda WAN](../../scripts/s07/wan_trial_guard.py) fija la identidad del router, su sesión y la interfaz mediante pin, índice, dirección IPv4 y MAC. Se comprueba la identidad antes y después de la lectura. El temporizador independiente de retorno se arma antes del estímulo y el journal protegido registra sus estados. El [supervisor WAN/SDN](../../scripts/s07/ensayos_wan_sdn_s07.py) verifica las sondas y el alcance de los recursos. El [supervisor compuesto](../../scripts/s07/ensayo_compuesto_s07.py) exige dos retornos previamente armados y una ventana común a las dos degradaciones.
 
-HTTP histórico revalidado 3/3 sin repetir estímulo; LACP S1 2→1→2 real con tres ventanas nuevas, cuatro destinos ICMP y HTTP HQ verificados durante la degradación. Hipótesis HTTP_BACKUP_SELECTED y LACP_MEMBER_DEVIATION SCOPED, runbooks correctos 2/2, 348 observaciones en seis ventanas aceptadas; cobertura IA incompleta conservada. Gestión, WAN, 21 namespaces, cuatro contenedores, siete servicios y 116 registros históricos intactos; cero watchdogs pendientes. 1190 pruebas ejecutadas, una omitida y cero fallos; CI 45330503324.
+En cada escenario se adquieren tres ventanas: línea base, degradación y recuperación, con 58 observaciones por ventana. La aceptación exige señales elegibles del recurso, hipótesis y runbook correspondientes cuando la fuente tiene cobertura, y observación posterior al retorno. Se preservan los intentos no coincidentes. El preflight compara costos, FIB, OSPF y gestión; las ventanas se conservan separadas del historial operacional y de los datos de modelos S06.
 
-## S07-007D–E — WAN y SDN
+## Validación
 
-[Guarda WAN](../../scripts/s07/wan_trial_guard.py) fija el alcance HQ/s1p, pin protegido y sesión de router, dirección de interfaz y namespace distinto al host. Arma temporizador restore-only antes de bajar el enlace y mantiene journal protegido; el supervisor espera observaciones WAN admin-down, FIB de respaldo y seis vecinos no afectados FULL. Los vecinos ausentes de la primaria permanecen desconocidos si no hay estado explícito. El retorno exige preflight original. [Supervisor WAN/SDN](../../scripts/s07/ensayos_wan_sdn_s07.py) añade sondas directas y HTTP. En SDN se reutiliza el fallo aislado de sdna0; se comprueba A→B denegado durante el fallo, B→C aislado y Faucet conectado. El contrato S07 no observa el puerto A, por tanto no se exige ni inventa una hipótesis de caída de controlador; se registra evidencia directa separada y recomendación manual de lectura. No se afirma detección automática de fallo de puerto. Ensayos secuenciales, aceptación pendiente; no hay reajuste de modelos ni autorización autónoma. La guarda depende de host y Docker disponibles; el watchdog no protege contra sustitución del recurso fuera del protocolo cooperativo.
+| Escenario | Ventanas aceptadas | Hipótesis durante la degradación | Incertidumbre |
+|---|---:|---|---|
+| HTTP | 3 | HTTP_BACKUP_SELECTED | SCOPED |
+| LACP | 3 | LACP_MEMBER_DEVIATION | SCOPED |
+| WAN | 3 | Tres FIB_BACKUP_SELECTED y WAN_ADMIN_DEVIATION | LIMITED y AMBIGUOUS |
+| SDN | 3 | Ninguna hipótesis de fallo de puerto | Evidencia directa |
+| Compuesto | 3 | HTTP_BACKUP_SELECTED, tres FIB_BACKUP_SELECTED y WAN_ADMIN_DEVIATION | SCOPED, LIMITED y AMBIGUOUS |
+| Total | 15 | 11 | Según contexto |
 
-### Corrección de identidad WAN — S07-007DE-R1 (24/11/2026)
+En el ensayo WAN se verificaron selecciones de respaldo en HQ→S1, S1→HQ y S1→S2 y el retorno de las seis rutas preferidas. El escenario compuesto produjo cinco hipótesis, con dos brechas de cobertura en línea base/recuperación y seis durante la degradación. En los escenarios simples HTTP/LACP se verificó el retorno 3/3 de sus respectivas ventanas; la evaluación consolidada reprodujo las 15 ventanas seleccionadas y sus 870 observaciones. Las 11 hipótesis objetivo coincidieron y los 11 conjuntos de recomendaciones fueron correctos dentro de la selección evaluada, sin hipótesis inesperadas o faltantes.
 
-El diagnóstico confirmó interfaz HQ/s1p UP, IPv4 10.78.0.1/30, pin coincidente, cero journals y cero temporizadores WAN. El fallo previo ocurrió antes del estímulo: `ip -j -4 addr` no incluye la MAC. La guarda combina consultas IPv4 y enlace, exige mismo nombre, índice y estado administrativo, valida MAC y comprueba la sesión antes y después. La operación `check` permite probar esta identidad sin crear transacciones ni modificar la red. Se conservan los intentos originales; el diagnóstico sin unidades systemd no acredita ejecución de rescate. Aceptación local pendiente.
+El [evaluador histórico](../../scripts/s07/evaluar_ensayos_s07.py) contrasta contexto, argumentos, incertidumbre y ausencia de autorización. Una ventana derivada fuera de plazo produjo ABSTAIN_NO_CHANGE sin hipótesis; este control es offline, no un nuevo ensayo real. Se revalidó el rechazo real RESTORATION_APPROVAL_DENIED de OSPF y las pruebas aisladas de recuperación parcial. Los journals originales, siete servicios, gestión y 116 registros históricos se conservaron. La evaluación histórica terminó con 1226 pruebas ejecutadas, una omitida y cero fallos.
 
-## Aceptación S07-007DE-R2 (24/11/2026)
+## Limitaciones
 
-Identidad WAN verificada en lectura antes de intervenir. Tres ventanas WAN aceptadas: HQ→S1, S1→HQ y S1→S2 seleccionaron respaldo; las seis rutas retornaron a primaria. RCA: tres FIB_BACKUP_SELECTED LIMITED y WAN_ADMIN_DEVIATION AMBIGUOUS; no se afirma causa confirmada por RCA. Guarda VERIFIED. Tres ventanas SDN: puerto A UP→DOWN→UP, A→B permitido/denegado/permitido, B→C aislado y Faucet conectado durante las observaciones; evidencia directa del puerto, sin atribución falsa al controlador. Seis ventanas aceptadas adicionales, total 12 en HTTP/LACP/WAN/SDN (696 registros en ventanas, no independientes). Gestión, identidad, siete servicios, 21 namespaces, cuatro contenedores y 116 registros históricos conservados; cero watchdogs pendientes. 1215 pruebas ejecutadas, una omitida, CI 45331726844 satisfactoria.
+Las 870 observaciones de ventanas no son muestras estadísticamente independientes. La coincidencia de las hipótesis seleccionadas no permite estimar tasas poblacionales de falsas alarmas ni confirmar causalidad. El contrato S07 observa el controlador SDN, no cada puerto; la falla de sdna0 fue verificada por evidencia directa. Las sondas son puntuales y no demuestran disponibilidad continua. Los mecanismos de retorno dependen del host y del proceso de recuperación operativo; no acreditan tolerancia a la pérdida del host. No se reentrenaron los modelos S06 ni se autorizan acciones automáticamente.
 
-## S07-007F — Escenario compuesto
+## Documentación relacionada
 
-[Supervisor compuesto](../../scripts/s07/ensayo_compuesto_s07.py) reproduce las 12 ventanas históricas sin modificarlas y ejecuta un experimento nuevo: WAN HQ/s1p y backend HTTP HQ con degradaciones simultáneas, dos mecanismos de retorno previamente armados y una adquisición común. Se exige que ambas condiciones se mantengan antes y después de la ventana, que las hipótesis y runbooks correspondientes coincidan y que el RCA no conceda aprobación. Se verifica HTTP desde S2 y dos destinos ICMP desde HQ; el retorno de ambos recursos se comprueba antes de retirar los temporizadores. La confirmación local no equivale a autorización mediante broker. Las observaciones no prueban disponibilidad continua, independencia estadística ni detección causal universal. Aceptación pendiente.
-
-## Aceptación S07-007F (24/11/2026)
-
-Escenario WAN y HTTP simultáneo verificado con 3/3 ventanas comunes, cinco hipótesis en degradación (HTTP SCOPED, tres FIB LIMITED, WAN AMBIGUOUS), dos brechas en baseline/retorno y seis en degradación. Runbooks de lectura HTTP/FIB/costos/WAN, decisión REVIEW_HYPOTHESES_NO_CHANGE. Retorno de ambos recursos, preflight conforme, sin watchdogs pendientes. 15 ventanas aceptadas acumuladas y 870 observaciones no independientes; 1220 pruebas ejecutadas, una omitida, CI 45332611206. No se reentrenaron modelos S06. [Evaluador histórico](../../scripts/s07/evaluar_ensayos_s07.py) contrasta hipótesis por contexto y argumentos, conserva límites SDN, verifica abstención mediante ventana derivada fuera de plazo (no ensayo real) y revalida los dos ciclos OSPF y rechazo real. Aceptación local pendiente; no es estimación poblacional de falsas alarmas.
-
-## Aceptación S07-007G (24/11/2026)
-
-Reproducción de 15/15 ventanas aceptadas, 870 observaciones, 11/11 hipótesis objetivo y recomendaciones correspondientes, cero hipótesis inesperadas o faltantes en las ventanas seleccionadas. Abstención offline validada; rechazo real RESTORATION_APPROVAL_DENIED revalidado y controles negativos con backends aislados (incluida recuperación parcial). Dos journals OSPF coincidentes; siete servicios, gestión y 116 registros históricos conservados. 1226 pruebas ejecutadas, una omitida, cero fallos; CI 45336363934. No constituye estimación poblacional de falsos positivos ni cobertura automática de puertos SDN. La presentación ANSI se homogeneiza sin alterar el informe histórico; revisión de capturas pendiente.
-
-Revisión gráfica final de F37–F43: siete presentaciones ANSI legibles y coherentes con las ventanas históricas, incluyendo evaluación y límites. F37 corregida sustituye la versión sin color; catálogo S07 provisional 43 capturas, publicación única diferida al cierre de la fase. No se afirma disponibilidad continua, pronóstico ni generalización del modelo ICMP a HTTP.
+[Correlación RCA](s07-contexto-y-correlacion-rca.md) · [Recuperación OSPF](s07-plan-intervencion-y-watchdog.md) · [Evidencias S07](../../evidencias/capturas/fase7/README.md).
