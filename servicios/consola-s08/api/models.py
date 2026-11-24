@@ -1,0 +1,44 @@
+"""Esquemas públicos de arranque de la API S08; no representan telemetría."""
+from __future__ import annotations
+
+from datetime import datetime
+from typing import Literal
+
+from pydantic import BaseModel, ConfigDict
+
+
+class PublicModel(BaseModel):
+    """Contrato estricto, sin campos adicionales ni coerción silenciosa."""
+    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
+
+
+class Health(PublicModel):
+    """Disponibilidad del proceso, no salud de la infraestructura."""
+    project: Literal["NETLAB360"] = "NETLAB360"
+    schema_version: Literal[1] = 1
+    service: Literal["netlab360-s08-console"] = "netlab360-s08-console"
+    mode: Literal["BOOTSTRAP_READ_ONLY"] = "BOOTSTRAP_READ_ONLY"
+    healthy: Literal[True] = True
+    infrastructure_state: Literal["UNKNOWN"] = "UNKNOWN"
+    generated_at_utc: datetime
+    network_mutations_authorized: Literal[False] = False
+
+
+class Capabilities(PublicModel):
+    """Inventario de funciones disponibles y pendientes durante el arranque."""
+    project: Literal["NETLAB360"] = "NETLAB360"
+    schema_version: Literal[1] = 1
+    mode: Literal["BOOTSTRAP_READ_ONLY"] = "BOOTSTRAP_READ_ONLY"
+    health_available: Literal[True] = True
+    source_readers_enabled: Literal[False] = False
+    persistence_enabled: Literal[False] = False
+    authentication_enabled: Literal[False] = False
+    frontend_enabled: Literal[False] = False
+    diagnostics_enabled: Literal[False] = False
+    network_mutations_authorized: Literal[False] = False
+
+
+class ApiError(PublicModel):
+    """Error HTTP sin detalles internos, rutas locales ni credenciales."""
+    error: Literal["NOT_FOUND", "METHOD_NOT_ALLOWED", "HTTP_ERROR"]
+    network_mutations_authorized: Literal[False] = False

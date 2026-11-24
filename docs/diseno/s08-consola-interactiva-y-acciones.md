@@ -1,6 +1,6 @@
 # Consola interactiva y acciones — Fase 08
 
-**Estado:** diseño técnico aprobado como base de trabajo, **no código implementado**. El NOC de la fase 05 y la API protegida de la fase 07 son antecedentes comprobados; la consola aún no está implementada. Destino: demostración académica ejecutable sin escribir comandos frente a la profesora y funcionamiento reproducible en la VM.
+**Estado:** diseño técnico aprobado como base de trabajo; implementación incremental del contrato de fuentes y del servidor de arranque. El NOC de la fase 05 y la API protegida de la fase 07 son antecedentes comprobados; la consola completa aún no está implementada. Destino: demostración académica ejecutable sin escribir comandos frente a la profesora y funcionamiento reproducible en la VM.
 
 ## 1. Experiencia de usuario
 
@@ -164,6 +164,17 @@ La versión inicial del contrato es offline: no abre sockets,
 no crea bases, no inicia servicios y no concede permisos.
 La integración FastAPI, persistencia, controles de sesión
 y validación de fuentes reales requieren sus propias pruebas.
+
+### Servidor de arranque
+
+El [componente de consola](../../servicios/consola-s08/README.md)
+incorpora dos rutas GET de metadatos públicos, con modelos
+Pydantic estrictos y arranque sin root en loopback. La salud
+del proceso no representa salud de la red. Las operaciones
+de fuentes, persistencia, autenticación, frontend, pruebas
+de red y mutaciones permanecen deshabilitadas.
+No habilitamos CORS ni documentación OpenAPI pública.
+Las pruebas HTTP no requieren Docker ni acceso privilegiado.
 
 ## 4. Catálogo inicial de acciones (IDs estables)
 
