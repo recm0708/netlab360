@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 import os
+from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
@@ -15,8 +16,8 @@ HOST = "127.0.0.1"
 PORT = 9140
 
 
-def create_app() -> FastAPI:
-    """Crear una aplicación sin E/S de red, persistencia ni procesos auxiliares."""
+def create_app(directory: Path | None = None) -> FastAPI:
+    """Crear la API de arranque o habilitar identidades sobre una base v2 explícita."""
     if os.geteuid() == 0:
         raise RuntimeError("S08_ROOT_FORBIDDEN")
 
@@ -40,19 +41,28 @@ def create_app() -> FastAPI:
 
     @app.exception_handler(HTTPException)
     async def http_error(request: Request, exc: HTTPException):
-        code = {404: "NOT_FOUND", 405: "METHOD_NOT_ALLOWED"}.get(
+        code = {400: "BAD_REQUEST", 401: "UNAUTHENTICATED", 403: "FORBIDDEN",
+                404: "NOT_FOUND", 405: "METHOD_NOT_ALLOWED", 413: "BODY_TOO_LARGE",
+                415: "UNSUPPORTED_MEDIA_TYPE", 429: "RATE_LIMITED", 503: "UNAVAILABLE"}.get(
             exc.status_code, "HTTP_ERROR")
         payload = ApiError(error=code)
         return JSONResponse(payload.model_dump(mode="json"),
                             status_code=exc.status_code, headers=exc.headers)
 
+    mode = "AUTHENTICATED_READ_ONLY" if directory is not None else "BOOTSTRAP_READ_ONLY"
+
     @app.get("/healthz", response_model=Health)
     async def health() -> Health:
-        return Health(generated_at_utc=datetime.now(timezone.utc))
+        return Health(generated_at_utc=datetime.now(timezone.utc), mode=mode)
 
     @app.get("/api/v1/capabilities", response_model=Capabilities)
     async def capabilities() -> Capabilities:
-        return Capabilities()
+        return Capabilities(mode=mode, persistence_enabled=directory is not None,
+                            authentication_enabled=directory is not None)
+
+    if directory is not None:
+        from .auth_http import register
+        register(app, directory)
 
     return app
 
@@ -61,7 +71,13 @@ def main() -> None:
     """Iniciar solo en loopback, sin recarga ni cabeceras de proxy."""
     import uvicorn
 
-    uvicorn.run(create_app(), host=HOST, port=PORT, reload=False,
+    from .storage import default_dir
+
+    flag = os.environ.get("NETLAB360_S08_AUTH", "0")
+    if flag not in ("0", "1"):
+        raise ValueError("INVALID_AUTH_MODE")
+    directory = default_dir() if flag == "1" else None
+    uvicorn.run(create_app(directory), host=HOST, port=PORT, reload=False,
                 proxy_headers=False, server_header=False, access_log=False)
 
 

@@ -17,7 +17,7 @@ class Health(PublicModel):
     project: Literal["NETLAB360"] = "NETLAB360"
     schema_version: Literal[1] = 1
     service: Literal["netlab360-s08-console"] = "netlab360-s08-console"
-    mode: Literal["BOOTSTRAP_READ_ONLY"] = "BOOTSTRAP_READ_ONLY"
+    mode: Literal["BOOTSTRAP_READ_ONLY", "AUTHENTICATED_READ_ONLY"] = "BOOTSTRAP_READ_ONLY"
     healthy: Literal[True] = True
     infrastructure_state: Literal["UNKNOWN"] = "UNKNOWN"
     generated_at_utc: datetime
@@ -28,11 +28,11 @@ class Capabilities(PublicModel):
     """Inventario de funciones disponibles y pendientes durante el arranque."""
     project: Literal["NETLAB360"] = "NETLAB360"
     schema_version: Literal[1] = 1
-    mode: Literal["BOOTSTRAP_READ_ONLY"] = "BOOTSTRAP_READ_ONLY"
+    mode: Literal["BOOTSTRAP_READ_ONLY", "AUTHENTICATED_READ_ONLY"] = "BOOTSTRAP_READ_ONLY"
     health_available: Literal[True] = True
     source_readers_enabled: Literal[False] = False
-    persistence_enabled: Literal[False] = False
-    authentication_enabled: Literal[False] = False
+    persistence_enabled: bool = False
+    authentication_enabled: bool = False
     frontend_enabled: Literal[False] = False
     diagnostics_enabled: Literal[False] = False
     network_mutations_authorized: Literal[False] = False
@@ -40,5 +40,31 @@ class Capabilities(PublicModel):
 
 class ApiError(PublicModel):
     """Error HTTP sin detalles internos, rutas locales ni credenciales."""
-    error: Literal["NOT_FOUND", "METHOD_NOT_ALLOWED", "HTTP_ERROR"]
+    error: Literal["NOT_FOUND", "METHOD_NOT_ALLOWED", "HTTP_ERROR", "BAD_REQUEST",
+                   "UNAUTHENTICATED", "FORBIDDEN", "BODY_TOO_LARGE",
+                   "UNSUPPORTED_MEDIA_TYPE", "RATE_LIMITED", "UNAVAILABLE"]
+    network_mutations_authorized: Literal[False] = False
+
+class LoginInput(PublicModel):
+    """Credenciales recibidas sin coerción; nunca se devuelven al cliente."""
+    username: str
+    password: str
+
+
+class Identity(PublicModel):
+    """Identidad local autenticada, sin autorización administrativa."""
+    username: str
+    role: Literal["VIEWER", "OPERATOR"]
+    network_mutations_authorized: Literal[False] = False
+
+
+class LoginResult(Identity):
+    """El token de sesión viaja únicamente en la cookie HttpOnly."""
+    csrf_token: str
+    expires_at: int
+
+
+class LogoutResult(PublicModel):
+    """Confirmación de revocación local."""
+    logged_out: Literal[True] = True
     network_mutations_authorized: Literal[False] = False
