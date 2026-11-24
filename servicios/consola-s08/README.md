@@ -11,6 +11,8 @@ aceptados de las fases anteriores.
 | Componente | Función |
 |---|---|
 | [api/main.py](api/main.py) | Servidor HTTP de arranque y rutas públicas mínimas |
+| [api/security.py](api/security.py) | Identidades locales, roles y derivación scrypt |
+| [Pruebas de identidades](../../tests/test_s08_identity.py) | Migración y verificación de cuentas sintéticas |
 | [api/storage.py](api/storage.py) | Inicialización y comprobación de SQLite privado |
 | [Pruebas de persistencia](../../tests/test_s08_storage.py) | Migración, permisos y conservación de bases |
 | [api/models.py](api/models.py) | Esquemas Pydantic de metadatos públicos |
@@ -72,6 +74,21 @@ un coordinador autorizado. Una base desconocida o una migración
 interrumpida se rechaza sin borrar ni sobrescribir datos.
 El comando de comprobación utiliza SQLite en modo solo lectura.
 La API todavía no abre esta base ni expone su contenido.
+
+## Identidades locales
+
+La migración explícita `python -m api.storage migrate` amplía
+el esquema v1 a v2 sin reemplazar trabajos ni eventos anteriores.
+Añade usuarios y sesiones, inicialmente vacíos. Las cuentas
+locales admiten VIEWER y OPERATOR, ninguno autoriza mutaciones.
+El alta local mediante `python -m api.security create-user nombre VIEWER`
+lee la contraseña sin eco y exige al menos 15 caracteres.
+Guardamos únicamente sal aleatoria y verificador scrypt
+(N=131072, r=8, p=1), nunca la contraseña. La verificación
+rechaza cuentas deshabilitadas y credenciales incorrectas.
+No se habilita todavía el inicio de sesión HTTP ni la emisión
+de sesiones. Antes de esa integración se requieren límites de
+intentos y concurrencia, expiración y controles CSRF.
 
 ## Validación
 
