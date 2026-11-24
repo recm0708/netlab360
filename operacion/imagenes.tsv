@@ -1,0 +1,4 @@
+componente	imagen_observada	referencia_inmutable	arquitectura
+faucet	faucet/faucet:latest	faucet/faucet@sha256:34c5d8c1ce207de37abc7e4d9b1b60e020d43524d85e80449c637a7867e5ea32	amd64
+frr	quay.io/frrouting/frr:10.7.1	quay.io/frrouting/frr@sha256:e995beaa50fdc9edb35eadcfefa29b7f062cc06f2b812613789b68fa541554d2	amd64
+prometheus	quay.io/prometheus/prometheus:v3.7.0	quay.io/prometheus/prometheus@sha256:29c1e0b48ad816750245dea3d65ac3ce57dda30547e67b1e9a5176e2953cc4dc	amd64

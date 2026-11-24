@@ -1,0 +1,2 @@
+# NETLAB360: permiso exclusivo de consulta del observador.
+rc-aa-ec ALL=(root) NOPASSWD: /usr/local/libexec/netlab360-observer snapshot

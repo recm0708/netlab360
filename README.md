@@ -56,6 +56,18 @@ Organizamos la documentación por componente. El [índice completo de documentac
 | Evidencias | [Catálogo general](evidencias/capturas/README.md) |
 | Planificación | [Plan maestro](docs/diseno/s06-s08-plan-maestro-y-criterios.md) · [Consola de la fase 08](docs/diseno/s08-consola-interactiva-y-acciones.md) · [Cobertura académica](docs/gestion/cobertura-academica-netlab360.md) |
 
+## Instalación y operación
+
+Centralizamos los requisitos del sistema, las dependencias
+y los procedimientos reproducibles en el
+[directorio de operación](operacion/README.md).
+
+El [catálogo de comandos](operacion/comandos/README.md) organiza los procedimientos de las fases implementadas.
+
+La reconstrucción integral desde un sistema limpio y
+la compatibilidad con otras distribuciones Linux requieren
+validación independiente.
+
 ## Comprobaciones
 
 Desde la raíz del repositorio, con las dependencias del entorno técnico disponibles:
