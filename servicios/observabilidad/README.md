@@ -16,7 +16,7 @@ Desarrollamos un exportador inicial para el laboratorio S01 y posteriormente un 
 
 ## Resultados
 
-El colector S04 registró 25 series de métricas asociadas a tres sedes, ocho extremos WAN y nueve interfaces VLAN. Se comprobó la conservación de los registros temporales tras reiniciar Prometheus y la presentación de `UNKNOWN` cuando la fuente no estaba disponible.
+El colector S04 registró 25 series de métricas asociadas a tres sedes, ocho extremos WAN y nueve interfaces VLAN. Comprobamos la conservación de los registros temporales tras reiniciar Prometheus y la presentación de `UNKNOWN` cuando la fuente no estaba disponible.
 
 La recolección alcanzó **100 % en 15 minutos** y **97,586 % en 60 minutos**. La segunda ventana quedó por debajo de la referencia experimental del 99 %.
 

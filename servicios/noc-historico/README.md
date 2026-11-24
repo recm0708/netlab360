@@ -2,11 +2,11 @@
 
 ## Descripción
 
-Este componente corresponde al prototipo de observabilidad empleado durante la primera fase de NETLAB360. Permitió estudiar la presentación básica de estados y eventos de un laboratorio de red virtualizado.
+Desarrollamos este prototipo de observabilidad durante la primera fase de NETLAB360 para estudiar la presentación básica de estados y eventos de un laboratorio de red virtualizado.
 
 ## Implementación
 
-El prototipo utiliza una aplicación local y consultas a las fuentes de laboratorio disponibles durante S01. Sus resultados sirvieron de referencia para la evolución del centro de operaciones de red.
+El prototipo utiliza una [aplicación local](app.py) y consultas a las fuentes de laboratorio disponibles durante S01. Sus resultados sirvieron de referencia para la evolución del centro de operaciones de red.
 
 ## Evolución
 

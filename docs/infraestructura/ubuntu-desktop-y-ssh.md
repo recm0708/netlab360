@@ -1,6 +1,8 @@
 # Preparación reproducible de Ubuntu y acceso SSH
 
-Se instaló y validó **Ubuntu Desktop 26.04.1 LTS** como entorno único de laboratorio NETLAB360. VMware Workstation proporciona NAT de administración; los dominios FRRouting, VLAN y SDN permanecen aislados dentro del invitado.
+## Descripción
+
+Instalamos y validamos **Ubuntu Desktop 26.04.1 LTS** como entorno único de laboratorio NETLAB360. VMware Workstation proporciona NAT de administración; los dominios FRRouting, VLAN y SDN permanecen aislados dentro del invitado.
 
 ## Sistema y conectividad
 

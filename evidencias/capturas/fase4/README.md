@@ -2,11 +2,11 @@
 
 ## Descripción
 
-La cuarta fase recoge el funcionamiento del NOC, las métricas y los incidentes WAN, junto con la persistencia de sus registros.
+Registramos el funcionamiento del NOC, las métricas y los incidentes WAN, junto con la persistencia de sus registros.
 
 ## Capturas disponibles
 
-**Total: 22 imágenes PNG.** Los archivos se enumeran con su identificador normalizado para facilitar su consulta y la selección de figuras del informe.
+**Total: 22 imágenes PNG.**
 
 - [S04_F01_API_Telemetria_Real_Tres_Sedes_Offline.png](S04_F01_API_Telemetria_Real_Tres_Sedes_Offline.png)
 - [S04_F02_Prometheus_Scrape_Real_Sin_Falsas_Alertas.png](S04_F02_Prometheus_Scrape_Real_Sin_Falsas_Alertas.png)
@@ -33,6 +33,6 @@ La cuarta fase recoge el funcionamiento del NOC, las métricas y los incidentes 
 
 ## Uso académico
 
-Las capturas representan resultados del laboratorio. Para el informe final seleccionaremos las imágenes pertinentes, con numeración y explicación acordes con el documento académico. El catálogo no presupone que todas deban incluirse como figuras.
+Las capturas distinguen observabilidad activa y fuentes no disponibles, alertas WAN, recuperación y persistencia histórica. Los indicadores SLI/SLO corresponden a las ventanas experimentales observadas.
 
 [Volver al catálogo general](../README.md).

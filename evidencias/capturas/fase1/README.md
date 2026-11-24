@@ -2,11 +2,11 @@
 
 ## Descripción
 
-La primera fase documenta la preparación del entorno virtual, las redes iniciales, las pruebas de FRRouting y la automatización básica.
+Documentamos la preparación del entorno virtual, las redes iniciales, las pruebas de FRRouting y la automatización básica.
 
 ## Capturas disponibles
 
-**Total: 83 imágenes PNG.** Los archivos se enumeran con su identificador normalizado para facilitar su consulta y la selección de figuras del informe.
+**Total: 83 imágenes PNG.**
 
 - [S01_F01_B1_Validacion_IPAM_y_Redes.png](S01_F01_B1_Validacion_IPAM_y_Redes.png)
 - [S01_F02_B1_Compatibilidad_Capa2.png](S01_F02_B1_Compatibilidad_Capa2.png)
@@ -94,6 +94,6 @@ La primera fase documenta la preparación del entorno virtual, las redes inicial
 
 ## Uso académico
 
-Las capturas representan resultados del laboratorio. Para el informe final seleccionaremos las imágenes pertinentes, con numeración y explicación acordes con el documento académico. El catálogo no presupone que todas deban incluirse como figuras.
+Las capturas acreditan las comprobaciones de referencia del laboratorio inicial, incluidos los ensayos aislados de capa 2, encaminamiento, observabilidad y automatización. Las versiones históricas ilustran la evolución técnica, no un despliegue simultáneo de todos los prototipos.
 
 [Volver al catálogo general](../README.md).
