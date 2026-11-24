@@ -11,6 +11,8 @@ aceptados de las fases anteriores.
 | Componente | Función |
 |---|---|
 | [api/main.py](api/main.py) | Servidor HTTP de arranque y rutas públicas mínimas |
+| [api/storage.py](api/storage.py) | Inicialización y comprobación de SQLite privado |
+| [Pruebas de persistencia](../../tests/test_s08_storage.py) | Migración, permisos y conservación de bases |
 | [api/models.py](api/models.py) | Esquemas Pydantic de metadatos públicos |
 | [Pruebas de API](../../tests/test_s08_api.py) | Validación HTTP y restricciones de arranque |
 | [api/contracts.py](api/contracts.py) | Contrato puro de metadatos de fuentes |
@@ -21,8 +23,9 @@ aceptados de las fases anteriores.
 El contrato no ejecuta consultas ni concede privilegios.
 Incorporamos un servidor de arranque con dos rutas públicas
 de metadatos, sin datos operacionales ni autorización.
-La persistencia, autenticación, interfaz gráfica y adaptadores
-requieren implementación y validación independientes.
+Incorporamos una base SQLite privada de inicialización explícita.
+La conexión de la persistencia a la API, autenticación, interfaz
+gráfica y adaptadores requieren implementación independiente.
 
 ## Ejecución de desarrollo
 
@@ -46,6 +49,29 @@ La API no admite escrituras, documentación OpenAPI pública,
 consultas de fuentes ni acceso a datos privados.
 La ejecución sin autenticación solo corresponde a estos
 metadatos de arranque. No constituye una consola autenticada.
+
+## Persistencia local
+
+Desde el mismo directorio y sin root, con el directorio
+`~/netlab360-bootstrap/s08` ya preparado:
+
+```bash
+"$HOME/netlab360-bootstrap/entornos/netlab360-s06-s08/bin/python" -B -m api.storage init
+"$HOME/netlab360-bootstrap/entornos/netlab360-s06-s08/bin/python" -B -m api.storage check
+```
+
+La base se conserva en `~/netlab360-bootstrap/s08/estado/consola.sqlite3`,
+fuera de Git. Exigimos directorio privado 0700, archivo 0600,
+propietario actual y ausencia de enlaces en ambos recursos.
+El directorio padre inmediato debe pertenecer al usuario y no
+ser escribible por grupo u otros. Se presupone un árbol de runtime
+administrado por el mismo usuario; no protege frente a ese usuario
+ni frente a root. La migración inicial registra su versión y un evento
+de inicialización. Los trabajos permanecen vacíos hasta disponer de
+un coordinador autorizado. Una base desconocida o una migración
+interrumpida se rechaza sin borrar ni sobrescribir datos.
+El comando de comprobación utiliza SQLite en modo solo lectura.
+La API todavía no abre esta base ni expone su contenido.
 
 ## Validación
 
