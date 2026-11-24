@@ -129,3 +129,40 @@ nav a:hover, nav a.current { color: var(--accent); background: var(--surface); }
   .header-account { width: 100%; justify-content: flex-start; }
   .account-details { position: static; width: min(350px, 85vw); }
 }
+
+/* Iconos vectoriales locales, barras temáticas y regiones de scroll separadas. */
+:root { scrollbar-color: var(--scroll-thumb, #45617f) var(--scroll-track, #111c2a); scrollbar-width: thin; --scroll-thumb: #45617f; --scroll-track: #111c2a; --scroll-hover: #6588ab; }
+@media (prefers-color-scheme: light) {
+  :root { --scroll-thumb: #829fba; --scroll-track: #e3ebf4; --scroll-hover: #52799e; }
+}
+* { scrollbar-color: var(--scroll-thumb) var(--scroll-track); scrollbar-width: thin; }
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-track { background: var(--scroll-track); }
+::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border-radius: 8px; border: 2px solid var(--scroll-track); }
+::-webkit-scrollbar-thumb:hover { background: var(--scroll-hover); }
+nav a { min-height: 42px; gap: 11px; border-left: 3px solid transparent; }
+nav a.current { border-left-color: var(--accent); }
+.nav-symbol { display: block; width: 24px; height: 24px; flex: 0 0 24px; }
+.menu-symbol { display: block; width: 23px; height: 23px; }
+#menu-toggle { padding: 8px; }
+#navigation { min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; scrollbar-gutter: stable; padding: 0 5px 8px; }
+#navigation a { position: relative; }
+#navigation a:focus-visible { outline-offset: -3px; }
+@media (min-width: 701px) {
+  .shell { height: 100dvh; min-height: 0; overflow: hidden; grid-template-columns: 270px minmax(0, 1fr); }
+  .sidebar { position: static; height: auto; min-height: 0; align-self: stretch; overflow: hidden; display: flex; flex-direction: column; padding: 20px 8px 10px; }
+  .sidebar .brand { flex: 0 0 auto; padding: 0 8px 16px; }
+  .workspace { min-height: 0; overflow: hidden; }
+  .topbar, .workspace footer { flex: 0 0 auto; }
+  .topbar { position: relative; }
+  #main { min-height: 0; flex: 1 1 auto; margin: 0; max-width: none; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
+  .shell.menu-collapsed { grid-template-columns: 88px minmax(0, 1fr); }
+  .menu-collapsed .sidebar { padding: 20px 5px 10px; }
+  .menu-collapsed .brand { justify-content: center; padding: 0 0 16px; }
+  .menu-collapsed #navigation { padding: 0 2px 8px; }
+  .menu-collapsed nav a { min-height: 48px; padding: 8px 2px; }
+  .menu-collapsed .nav-symbol { width: 28px; height: 28px; flex-basis: 28px; }
+}
+@media (max-width: 700px) {
+  #navigation { max-height: 38dvh; }
+}
