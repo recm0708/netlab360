@@ -1,6 +1,6 @@
-# S06-038B — Demostración de restauración real en namespace aislado
+# Restauración de qdisc en namespace aislado — Fase 06
 
-## Antecedente comprobado
+## Antecedente
 
 S06-038A aprobó en Ubuntu 21 pruebas específicas y 499 globales, instalación root 0750 de guardia protegida, temporizador independiente `netlab360-s06-guard-cf7b78e1daea9747` y transición `EXPIRED_NOOP` a estado final `NONE`. `ens33 192.168.47.40/24`, gateway `192.168.47.2`, `nl360-s02-h-hq-120/eth0` con qdisc noqueue, 21 namespaces, cuatro contenedores y siete servicios permanecieron intactos.
 
@@ -34,9 +34,9 @@ Los archivos privados de estado y lock viven en `/run/netlab360-s06-isotest/`, p
 - No ejecutar `start` si el temporizador no pudo programarse y verificarse activo. El estado queda preparado para inspección.
 - Si el watchdog no confirma RESTORED, **NO ejecutar cleanup**, **NO borrar el namespace** y **NO intervenir manualmente qdiscs ajenas**; conservar bitácora y estado para diagnóstico.
 - El estado de ARMING/APPLY_UNKNOWN/ESCALATED requiere revisión. No apagar ni reiniciar la VM durante el experimento; el timer es transitorio.
-- Nunca ejecutar las opciones en un namespace que no sea el temporal aislado. No probar todavía en `nl360-s02-h-hq-120`.
+- Nunca ejecutar las opciones en un namespace que no sea el temporal aislado. El ejecutor aislado no debe utilizarse en el cliente HQ.
 
-## Validación requerida en VM
+## Procedimiento de validación
 
 1. Sincronización de `main`, prueba sintáctica, pruebas específicas y regresión global.
 2. Comprobar gestión, 21 namespaces y estado de qdisc noqueue en el cliente HQ; comparar servicios.
@@ -47,8 +47,6 @@ Los archivos privados de estado y lock viven en `/run/netlab360-s06-isotest/`, p
 7. `cleanup` y verificar que los namespaces vuelven a 21, sin residuos del namespace temporal, topología original intacta, 4 contenedores, 7 servicios, NOC, Prometheus y `ens33` intactos.
 8. Guardar bitácora y verificación privada, incluyendo datos del estado y del temporizador. Si no llega a RESTORED, abortar sin cleanup.
 
-## Gate posterior
+## Resultados y limitaciones
 
-La prueba de qdisc real en dummy0 validará únicamente que un temporizador externo puede restaurar una configuración propia **en un dominio aislado de prueba**. No acredita que la misma operación sea segura en el cliente real de HQ ni que los datos resultantes formen un dataset de entrenamiento. Para S06-039 harán falta una auditoría adicional de capacidad de rollback del cliente, pruebas de señal, experimentos cuidadosamente aprobados, supervisión y ground truth independiente.
-
-Ninguna issue de S06 se cierra hasta cumplir todos sus criterios con evidencias verificables.
+S06-038B confirmó 24/24 pruebas específicas y 523/523 offline. El temporizador de 20 s se armó antes de aplicar netem al dummy0, registró RESTORED y verificó noqueue. La limpieza devolvió el inventario a 21 namespaces, con cuatro contenedores y gestión intactos. La prueba aislada no autoriza una intervención en el cliente HQ ni genera etiquetas de entrenamiento. [Auditoría del cliente](s06-auditoria-preintervencion.md).

@@ -1,6 +1,6 @@
-# S06-037 — Simulación reproducible de seguridad y restauración
+# Simulación de seguridad y restauración — Fase 06
 
-## Contexto acreditado
+## Antecedente
 
 S06-036 completó en Ubuntu 16 pruebas específicas y 457 offline, validó un temporizador transitorio de systemd que ejecutó /usr/bin/touch y creó un marcador privado. Confirmó qdisc noqueue en el cliente HQ y conservación de ens33, gateway y NOC. La tarea de temporizador fue independiente del script que la programó, **pero no realizó rollback de red**.
 
@@ -8,7 +8,7 @@ S06-036 completó en Ubuntu 16 pruebas específicas y 457 offline, validó un te
 
 Validar antes de cualquier intervención real la lógica de protección de un procedimiento de degradación controlado sobre el cliente de HQ VLAN120. El nuevo script scripts/s06/simular_rollback.py es un **simulador puro** que no usa sudo, no ejecuta tc, no cambia rutas, no tiene acceso a la interfaz ni al temporizador real. Su reloj, qdisc, autorización y exclusión mutua son objetos simulados en memoria.
 
-## Política propuesta
+## Política de simulación
 
 - Target fijo: namespace nl360-s02-h-hq-120, interfaz eth0, IP 10.70.20.20/24 y gateway 10.70.20.1.
 - Gestión protegida: ens33 192.168.47.40/24, gateway 192.168.47.2.
@@ -20,7 +20,7 @@ Validar antes de cualquier intervención real la lógica de protección de un pr
 - Fallar al restaurar mantiene el lock y produce ESCALATED; no se simula recuperación exitosa.
 - Las etiquetas permanecen UNKNOWN porque son pruebas de lógica, no datos de entrenamiento.
 
-## Matriz inicial de fallos
+## Matriz de fallos
 
 | Caso | Estado final lógico | Comportamiento comprobado por simulación |
 |---|---|---|
@@ -41,7 +41,7 @@ Validar antes de cualquier intervención real la lógica de protección de un pr
 
 Estos son **estados lógicos simulados**, no resultados de red. El nombre de escenario no se usa como etiqueta de entrenamiento.
 
-## Ejecución prevista
+## Procedimiento de validación
 
 Desde el repositorio:
 
@@ -51,13 +51,6 @@ Salida privada en netlab360-bootstrap/s06/rollback-simulaciones/S06_037_*/simula
 
 Criterio de aprobación parcial: CI y pruebas en VM completadas, todos los casos con resultados esperados, integridad de reporte, directorio privado, infraestructura intacta.
 
-## Qué falta antes de un ensayo real
+## Validación y límites
 
-1. Implementar ejecutor del sistema instalado como archivo propiedad de root y no escribible por el usuario del NOC.
-2. Implementar reloj/TTL **real**, watchdog independiente que ejecute un procedimiento de restauración real, reintentos y alarmas.
-3. Armar el temporizador y verificarlo antes de modificar qdisc; conservar evidencia de propiedad y estado anterior.
-4. Probar protección de interfaces, concurrencia y fallos de arranque/restauración con un entorno aislado, sin provocar pérdida de acceso.
-5. Ejecutar el primer ensayo controlado solamente después de aprobar estos controles; medir baseline, intervención y recuperación.
-6. Etiquetar ground truth a partir de comprobación independiente del estímulo y de su retirada; no a partir del modelo o del nombre del caso.
-
-No se declarará un watchdog real ni se cerrará S06 por superar la simulación.
+S06-037 verificó 14 escenarios simulados: cuatro RESTORED, uno ABORTED, dos ESCALATED, cinco NEW y dos APPROVED; 21 pruebas específicas y 478 offline. No modificó la red, qdisc, servicios ni etiquetas. La simulación no acredita rollback real ni autorización privilegiada. [Guardia protegida](s06-guardia-root-y-watchdog-noop.md).

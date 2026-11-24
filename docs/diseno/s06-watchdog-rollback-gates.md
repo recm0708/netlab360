@@ -1,12 +1,12 @@
-# S06-036 — Validación del temporizador independiente y requisitos de rollback
+# Temporizador independiente y requisitos de rollback — Fase 06
 
-## Estado comprobado de la infraestructura
+## Precondiciones
 
 S06-035 confirmó en VM real: cliente HQ VLAN120 nl360-s02-h-hq-120, interfaz eth0 UP con dirección 10.70.20.20/24 y gateway 10.70.20.1. La disciplina de colas actual es noqueue 0: root, sin netem previo. La red administrativa ens33 192.168.47.40/24 y el gateway 192.168.47.2, NOC, HA/LACP/SDN y la topología están intactos. Hubo 441 tests offline correctos.
 
 **Advertencia:** que la interfaz tenga noqueue únicamente la hace candidata; no concede permiso para modificarla.
 
-## Objetivo de S06-036
+## Ensayo de temporizador
 
 Comprobar que un temporizador systemd puede ejecutar una tarea independiente del proceso de Python que lo programó. El único efecto permitido es crear un archivo marcador privado con /usr/bin/touch mediante una unidad transitoria de systemd. NO se aplicará tc netem, ni se alterarán qdiscs, rutas o servicios.
 
@@ -18,7 +18,7 @@ Programa: scripts/s06/verificar_watchdog.py.
 
 La aparición del marcador verifica la programación y ejecución fuera del proceso Python. **NO** acredita que un rollback real ya funcione, que sobreviva a reinicios, ni que se pueda revertir un namespace eliminado.
 
-## Criterios imprescindibles para el ejecutor de S06-037
+## Requisitos de seguridad
 
 1. **Permisos:** archivo ejecutor root-owned y no editable por el usuario de la aplicación; el usuario solo elige un ID de escenario allowlisted, no una ruta, comando ni shell libre.
 2. **Exclusión mutua:** solamente una intervención activa, lock y estado persistido con escritura atómica.
@@ -30,8 +30,6 @@ La aparición del marcador verifica la programación y ejecución fuera del proc
 8. **Ground truth:** registrar confirmación del estímulo independiente del predictor; no etiquetar datos UNKNOWN como NORMAL, DEGRADED o RECOVERY sin observación verificable.
 9. **Evidencias:** conservar bitácoras privadas, cambios aprobados, estado anterior/posterior y comprobación de red administrativa y topología.
 
-## Continuación
+## Validación y límites
 
-S06-036 es solamente una prueba inocua de temporizadores y guardas. S06-037 implementará el ejecutor y watchdog de rollback real pero no activará intervenciones hasta superar pruebas. El primer escenario de degradación medido vendrá después, con un procedimiento de abortar y recuperar comprobado.
-
-Para la interfaz S08, todas las acciones privilegiadas deberán pasar por un backend autorizado, catálogo fijo y registro de auditoría; nunca por ejecución libre desde el navegador.
+S06-036 verificó la creación independiente del marcador privado, 16 pruebas específicas y 457 offline. Conservó qdisc, gestión e infraestructura; no restauró una qdisc real. Las pruebas posteriores de [simulación](s06-rollback-simulacion.md), [guardia](s06-guardia-root-y-watchdog-noop.md) y [restauración aislada](s06-restauracion-aislada.md) acreditan capacidades distintas.

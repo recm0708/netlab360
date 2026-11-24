@@ -1,12 +1,12 @@
-# S06-039 — Auditoría de seguridad y dependencias antes de intervenir un cliente real
+# Auditoría preventiva del cliente HQ — Fase 06
 
-## Estado comprobado hasta S06-038B
+## Antecedente
 
 El usuario ejecutó S06-038B en Ubuntu y obtuvo `S06-038B_ROLLBACK_AISLADO_VALIDADO=OK`, RC 0; 24 tests específicos y 523 globales correctos. En el namespace temporal `nl360-s06-isotest`, la interfaz `dummy0` no recibió direcciones IP ni ruta default. Se comprobó que un temporizador systemd de 20 segundos, armado **antes** de netem 106:, eliminó esta qdisc de prueba y devolvió el estado `noqueue`. El estado `RESTORED` fue verificado; luego `cleanup` regresó el inventario a 21 namespaces. No se modificó el cliente HQ, el host VMware, FRR, HA, LACP, SDN ni los servicios de observabilidad. Bitácora privada: `~/netlab360-bootstrap/s06/rollback-aislado-20261123_004737/S06_038B_Rollback_Aislado.txt`.
 
 **Un dummy sin conectividad y un cliente veth integrado a la topología no tienen el mismo riesgo.** El resultado demuestra restitución de qdisc aislada, no seguridad automática de cambios en el cliente productivo ni etiquetas reales de degradación.
 
-## Propósito limitado de S06-039
+## Alcance
 
 Revisar por lectura la interfaz real candidata `nl360-s02-h-hq-120/eth0`, IP `10.70.20.20/24`, puerta de enlace `10.70.20.1`, y rutas hacia `10.71.20.20` (S1) y `10.72.20.20` (S2). El programa `scripts/s06/auditar_cliente_productivo.py` reutiliza las invariantes S06-035 y añade auditoría de:
 
@@ -29,7 +29,7 @@ Solo hace consultas con `ip`, `tc qdisc show`, `systemctl is-active` y APIs loca
 7. NOC, Prometheus y los siete servicios continúan activos; no hay errores systemd ni alteraciones de Git.
 8. La tarea **no ejecuta netem** y **no autoriza** cambios productivos.
 
-## Gates pendientes tras S06-039
+## Condiciones adicionales de seguridad
 
 - Implementar y revisar **separadamente** un ejecutor root-owned que funcione solo sobre el cliente fijado por catálogo, sin permitir inyección de comandos o interfaces arbitrarias.
 - Demostrar previamente con pruebas adversas que una muerte del controlador **no impide** al temporizador recuperar la qdisc; supervisar estado de rutas, tráfico y servicios en todos los desenlaces.
@@ -38,4 +38,8 @@ Solo hace consultas con `ip`, `tc qdisc show`, `systemctl is-active` y APIs loca
 - Diseñar mediciones antes, durante y después y un ground truth **independiente** de los datos predictivos. Nunca convertir el caso simulado S06-037 o dummy S06-038B en etiquetas supervisadas de una sede.
 - Preparar rollback manual y gate de aborto, sin tocar datos originales S06-032/033/034.
 
-**El resultado S06-039 será una auditoría de viabilidad, no autorización de intervención.** Milestone S06 e issues #6, #25, #26 permanecerán abiertos hasta completar los criterios correspondientes. Esta es también una dependencia de las acciones controladas S07 y futura GUI S08.
+La auditoría de viabilidad no constituye autorización de intervención.
+
+## Validación
+
+S06-039 aprobó 19/19 pruebas específicas y 542/542 offline. Se verificó el enlace veth al switch nl360-s02-sw-hq, las rutas a S1/S2 por eth0 y gateway 10.70.20.1, qdisc noqueue, siete servicios, 21 namespaces, cuatro contenedores y gestión. El reporte conserva production_change_authorized=false y ground_truth_verified=false. La auditoría es de lectura; no concede permiso. [Recuperación aislada de veth](s06-recuperacion-veth-aislada.md).
