@@ -65,3 +65,11 @@ S07-001C2 implementa [adaptador FRR S02](../../scripts/s07/adaptador_frr.py) y [
 Antes y después de la lectura por router se verifica la identidad del contenedor y su PID contra el estado de propiedad S02; se comprueba la red administrativa antes y después del lote. El registro de fecha corresponde a la finalización de cada consulta, no a una medición simultánea de todas las fuentes. La información no disponible o sin identidad verificable permanece UNKNOWN.
 
 OSPF Full confirma únicamente la adyacencia observada; una fila no Full es una desviación de la línea base. La ausencia de fila no se declara automáticamente FAULT. La FIB principal o de respaldo se clasifica respecto al diseño esperado, sin afirmar tráfico real. La aceptación operativa queda pendiente de prueba en la VM. No se alteran los servicios existentes.
+
+## Persistencia histórica SQLite
+
+S07-001D incorpora [almacén de eventos](../../scripts/s07/almacen_eventos.py) y [pruebas de persistencia](../../tests/test_s07_almacen_eventos.py). El almacenamiento mantiene la observación original normalizada, sus fechas, calidad y estado en recepción, la identidad de flujo y un indicador de llegada tardía. La validación reconstruye el contrato y el identificador antes de insertar. Cada lote es transaccional; las consultas SQL usan parámetros. La clave única permite reimportar sin duplicar ni reemplazar el registro original; discrepancias con identidades distintas se conservan.
+
+La llegada tardía se comprueba respecto a la máxima fecha de observación válida o vencida ya almacenada en el mismo flujo. Los datos futuros, ausentes o inválidos no desplazan esa frontera. El orden de consulta histórico es independiente del orden de inserción. El indicador representa orden de importación, no latencia de transporte. Los lotes normalizados previamente pueden haber descartado su orden de recepción interno; este almacén no lo reconstruye.
+
+La base local se conserva bajo el directorio de ejecución de S07 fuera de Git; los ensayos sintéticos usan bases temporales independientes. Los estados almacenados son históricos, nunca salud en tiempo real. La vigencia para RCA se evaluará nuevamente al consultar una ventana operacional. Las adquisiciones separadas de S07-001B/C1/C2 no se convierten en una ventana simultánea. La aceptación en VM queda pendiente al publicar este componente.
