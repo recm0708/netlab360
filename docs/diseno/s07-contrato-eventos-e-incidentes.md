@@ -2,7 +2,7 @@
 
 ## Objetivo y alcance
 
-La issue [#190](https://github.com/recm0708/netlab360/issues/190) establece la capa de normalización de observaciones para la correlación y el diagnóstico RCA. Esta primera implementación S07-001A es una biblioteca sin I/O y pruebas unitarias sintéticas. No incorpora todavía adquisición de fuentes reales ni confirma incidentes.
+La issue [#190](https://github.com/recm0708/netlab360/issues/190) establece la capa de normalización de observaciones para la correlación y el diagnóstico RCA. La implementación integra cuatro fuentes de solo lectura, persistencia histórica y candidatos a incidente no confirmados. La correlación y la priorización pertenecen a #191.
 
 ## Esquema de observación
 
@@ -30,11 +30,11 @@ Los adaptadores posteriores deberán validar cada contrato y conservar su timest
 
 ## Orden y duplicados
 
-La identidad determinista corresponde al contenido normalizado, excluyendo la hora de recepción y la edad cuando existe un timestamp de observación. Los duplicados se contabilizan; señales contradictorias con identidad diferente se conservan. Se detecta recepción fuera de orden por fuente y recurso, conservando los registros para análisis cronológico. El contrato de incidente se definirá después, sin inferir causalidad a partir de estas señales por sí solas.
+La identidad determinista corresponde al contenido normalizado, excluyendo la hora de recepción y la edad cuando existe un timestamp de observación. Los duplicados se contabilizan; señales contradictorias con identidad diferente se conservan. Se detecta recepción fuera de orden por fuente y recurso, conservando los registros para análisis cronológico. El contrato de candidato a incidente conserva las referencias sin inferir causalidad a partir de estas señales por sí solas.
 
 ## Aceptación incremental
 
-S07-001A implementa y prueba el contrato de observaciones en modo offline. S07-001B incorpora adaptadores de lectura NOC/IA, pendientes de aceptación en la VM al publicar el código. S07-001C incorporará Prometheus; la persistencia y el contrato de incidente se validarán por separado. La issue #190 permanece abierta hasta completar todas sus condiciones de aceptación. La correlación y el RCA pertenecen a #191.
+S07-001A–E se encuentran validados en la VM. Los criterios técnicos de #190 se completaron; la publicación del catálogo gráfico se consolida al cierre de la fase S07, conforme al criterio de gestión de evidencias.
 
 Código: [contrato de eventos](../../scripts/s07/contrato_eventos.py) y [pruebas unitarias](../../tests/test_s07_contrato_eventos.py).
 
@@ -56,7 +56,7 @@ Se normalizan 23 señales: dos de adquisición (scrape y lectura del colector), 
 
 El timestamp de Prometheus acredita el scrape, no la hora exacta de adquisición interna del exporter, que mantiene un snapshot cacheado. La calidad VALID en esta fuente indica un scrape vigente y utilizable, no vigencia independiente de la medición interna ni confirmación de forwarding. Las señales administrativas y de existencia conservan UNKNOWN operacional. El valor -1 representa desconocimiento, no DOWN. El estado FAULT del exporter se limita a su scrape fallido, no a la red.
 
-OSPF y FIB se incorporarán mediante lectura explícita de los routers en S07-001C2, porque el exporter S04 no publica estas métricas. No se modifican sus procesos ni reglas. La aceptación en la VM permanece pendiente al publicar este componente.
+OSPF y FIB se incorporarán mediante lectura explícita de los routers en S07-001C2, porque el exporter S04 no publica estas métricas. No se modifican sus procesos ni reglas. La aceptación en la VM confirmó 23 observaciones válidas de un mismo scrape.
 
 ## Lectura directa de OSPF y FIB
 
@@ -64,7 +64,7 @@ S07-001C2 implementa [adaptador FRR S02](../../scripts/s07/adaptador_frr.py) y [
 
 Antes y después de la lectura por router se verifica la identidad del contenedor y su PID contra el estado de propiedad S02; se comprueba la red administrativa antes y después del lote. El registro de fecha corresponde a la finalización de cada consulta, no a una medición simultánea de todas las fuentes. La información no disponible o sin identidad verificable permanece UNKNOWN.
 
-OSPF Full confirma únicamente la adyacencia observada; una fila no Full es una desviación de la línea base. La ausencia de fila no se declara automáticamente FAULT. La FIB principal o de respaldo se clasifica respecto al diseño esperado, sin afirmar tráfico real. La aceptación operativa queda pendiente de prueba en la VM. No se alteran los servicios existentes.
+OSPF Full confirma únicamente la adyacencia observada; una fila no Full es una desviación de la línea base. La ausencia de fila no se declara automáticamente FAULT. La FIB principal o de respaldo se clasifica respecto al diseño esperado, sin afirmar tráfico real. La aceptación operativa confirmó ocho extremos OSPF FULL y seis selecciones FIB principales. No se alteran los servicios existentes.
 
 ## Persistencia histórica SQLite
 
@@ -80,4 +80,4 @@ S07-001E incorpora [adquisición integrada](../../scripts/s07/adquisicion_integr
 
 La ventana se limita inicialmente a 30 segundos de adquisición y 60 segundos de separación máxima entre observaciones elegibles; además se reevalúa antigüedad por fuente al finalizar. Estos límites de diseño no equivalen a simultaneidad ni a un SLA. Una fuente ausente puede coexistir con otras elegibles. Una ventana temporal fuera de límites no genera candidatos. La calidad en recepción se conserva en SQLite y la elegibilidad al cierre se registra por separado.
 
-El contrato NETLAB360_S07_INCIDENT_V1 representa únicamente candidatos de alcance explícito, con identidad determinista, referencia a evento vigente y estado CANDIDATE. Una desviación observada o inferencia de degradación no confirmada puede originar un candidato. UNKNOWN sin indicio específico, ausencia de datos y observaciones normales no generan candidatos automáticamente. No se atribuyen causas, incidentes confirmados ni autorización de intervención. La correlación, priorización y confirmación de incidentes pertenecen a #191 y actividades posteriores. La aceptación en VM está pendiente al publicar esta implementación.
+El contrato NETLAB360_S07_INCIDENT_V1 representa únicamente candidatos de alcance explícito, con identidad determinista, referencia a evento vigente y estado CANDIDATE. Una desviación observada o inferencia de degradación no confirmada puede originar un candidato. UNKNOWN sin indicio específico, ausencia de datos y observaciones normales no generan candidatos automáticamente. No se atribuyen causas, incidentes confirmados ni autorización de intervención. La correlación, priorización y confirmación de incidentes pertenecen a #191 y actividades posteriores. La aceptación confirmó una ventana de 0,623917 s, separación de 3 s, 56 señales elegibles y dos inferencias ausentes; no se generaron candidatos. Se conservaron 116 registros históricos y se aprobaron 110 pruebas específicas de S07, con 1015 pruebas globales aprobadas, una omitida y cero fallos.

@@ -106,6 +106,10 @@ Se excluyen credenciales, llaves privadas, tokens, estados sensibles de infraest
 
 La demostración deberá acreditar el estado inicial, la intervención controlada, el resultado observado y la restauración. La reconstrucción automática después de apagar la VM continúa pendiente de validación.
 
+## Gestión de evidencias gráficas
+
+Las capturas se obtienen y validan durante las actividades técnicas. El catálogo, la transferencia definitiva y la publicación de imágenes se consolidan en un único lote al finalizar cada fase. Las issues técnicas se cierran al cumplir sus criterios comprobados; la consolidación gráfica pendiente se controla en la issue maestra de fase y #43. No se cierra la milestone antes de validar el catálogo y la sincronización final. Se conserva la nomenclatura uniforme y se comparan directamente los contenidos de las copias.
+
 ## Revisión y aceptación
 
 Cada tecnología se clasificará según su evidencia real: implementada y validada, parcial, experimental, limitada, condicionada o no demostrada.
