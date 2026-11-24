@@ -43,7 +43,7 @@ Organizamos la documentación vigente por responsabilidad. Cada documento descri
 - [Recuperación de veth aislada ante pérdida del controlador — Fase 06](diseno/s06-recuperacion-veth-aislada.md)
 - [Restauración de qdisc en namespace aislado — Fase 06](diseno/s06-restauracion-aislada.md)
 - [Simulación de seguridad y restauración — Fase 06](diseno/s06-rollback-simulacion.md)
-- [Plan maestro y criterios de aceptación — Fases 06–08](diseno/s06-s08-plan-maestro-y-criterios.md)
+- [Plan maestro y criterios de aceptación — Fases 06–10](diseno/s06-s08-plan-maestro-y-criterios.md)
 - [Telemetría reciente e inferencia exploratoria — Fase 06](diseno/s06-telemetria-reciente-inferencia-hq.md)
 - [Deriva descriptiva y oportunidad de detección V2 — Fase 06](diseno/s06-v2-deriva-deteccion-y-limitaciones-finales.md)
 - [Evaluación cronológica V2 con modelos congelados — Fase 06](diseno/s06-v2-evaluacion-cronologica-congelada.md)
@@ -73,7 +73,7 @@ Organizamos la documentación vigente por responsabilidad. Cada documento descri
 
 - [Cobertura académica y criterios de aceptación de NETLAB360](gestion/cobertura-academica-netlab360.md)
 - [Convenciones de issues, pull requests y metadatos de GitHub](gestion/convenciones-issues-etiquetas.md)
-- [Gestión y aceptación de hitos de las fases 01–08](gestion/gestion-milestones-s01-s08.md)
+- [Gestión y aceptación de hitos de las fases 01–10](gestion/gestion-milestones-s01-s08.md)
 - [Acta de aceptación técnica — Fase 05](gestion/s05-acta-aceptacion-tecnica.md)
 
 ## Catálogos y componentes

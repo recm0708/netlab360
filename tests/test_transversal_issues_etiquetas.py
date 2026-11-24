@@ -189,5 +189,50 @@ class IssuesSpanishTests(unittest.TestCase):
                 {"labels":["fase:05","tipo:infraestructura"]})
 
 
+    def test_current_catalogue_accepts_phase10(self):
+        row = {
+            "number": 218,
+            "state": "open",
+            "title": "[S10] Validación científica integral",
+            "milestone": {"number": 10},
+            "body": "- [ ] Validar criterios",
+            "labels": [
+                {"name": "fase:10"},
+                {"name": "tipo:pruebas"}
+            ]
+        }
+
+        labels = {
+            name: {"name": name, "color": color,
+                   "description": description}
+            for name, (color, description) in m.DEFINITIONS.items()
+        }
+
+        result = m.audit_current([row], labels)
+
+        self.assertEqual(result["total"], 1)
+        self.assertEqual(result["findings"], [])
+        self.assertEqual(result["missing_phase_labels"], [])
+        self.assertEqual(result["outdated_phase_descriptions"], [])
+
+    def test_current_apply_does_not_run_legacy_migration(self):
+        labels = {
+            name: {"name": name, "color": color,
+                   "description": description}
+            for name, (color, description) in m.DEFINITIONS.items()
+        }
+
+        with (
+            mock.patch.object(m, "all_items", return_value=[]),
+            mock.patch.object(m, "label_inventory", return_value=labels),
+            mock.patch.object(m, "set_issue_assignments") as assign,
+            mock.patch.object(m, "remove_aliases_safely") as remove,
+            mock.patch.object(m, "gh") as api
+        ):
+            m.run(True)
+            assign.assert_not_called()
+            remove.assert_not_called()
+            api.assert_not_called()
+
 if __name__=="__main__":
     unittest.main()

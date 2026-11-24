@@ -37,7 +37,7 @@ DESCRIPTIONS = {
 
 **Criterio de aceptación:** cambios Ansible verificables, plan idempotente OpenTofu, separación entre configuración candidata y red operativa y pruebas CI aprobadas.
 
-**Estado:** CERRADA y técnicamente aceptada. OpenTofu no administra proveedores/recursos externos reales en esta fase; esa ampliación opcional continúa separada en la fase 08 (#17). Referencias: issues #3, #16, #18, #19.""",
+**Estado:** CERRADA y técnicamente aceptada. OpenTofu no administra proveedores/recursos externos reales en esta fase; esa ampliación corresponde a la fase 09 (#17). Referencias: issues #3, #16, #18, #19.""",
 
   4: """## Fase 4 — Observabilidad, incidentes y calidad de servicio
 **Propósito:** obtener visibilidad reproducible de la red y registrar degradaciones e incidentes controlados.
@@ -55,7 +55,7 @@ DESCRIPTIONS = {
 
 **Criterio de aceptación:** conmutación y restauración reales documentadas, LACP/SDN observables, pruebas de seguridad sin afectar gestión, seis issues técnicas completadas (#5, #23, #31, #32, #64 y #105).
 
-**Estado:** CERRADA y técnicamente aceptada; seis issues asignadas, todas cerradas. No incluye HA física, cuarta sede ni WireGuard. Propuesta opcional de ampliación reubicada en la fase 08, issue #24. Si GitHub muestra un porcentaje menor, contrastar el contador con todas las issues y pull requests asignados.""",
+**Estado:** CERRADA y técnicamente aceptada; seis issues asignadas, todas cerradas. No incluye HA física, cuarta sede ni WireGuard. La ampliación WireGuard corresponde a la fase 09, issue #24; una cuarta sede permanece condicionada. Si GitHub muestra un porcentaje menor, contrastar el contador con todas las issues y pull requests asignados.""",
 
   6: """## Fase 6 — Ciencia de datos y diagnóstico inteligente en NETLAB360
 **Propósito:** convertir mediciones de red en diagnósticos explicables y contrastados con datos nuevos sin automatizar acciones sobre la infraestructura.
@@ -83,21 +83,42 @@ Regresión histórica: 1258 casos, uno omitido y cero fallos.
 La aceptación no demuestra pronóstico futuro ni remediación autónoma.
 """,
 
-  8: """## Fase 8 — Consola interactiva, regresión integral y entrega académica
-**Propósito:** consolidar NETLAB360 en una demostración web operativa y entregar los artefactos técnicos y académicos verificados.
+  8: """## Fase 8 — Integración y plataforma interactiva
 
-**Alcance y entregables:** menú único para topología, OSPF/WAN, HA, LACP, SDN, diagnóstico IA, copiloto RAG, métricas, pruebas seguras e incidentes; APIs y acciones controladas con autorización; arranque/reconstrucción desde VM apagada, regresión, catálogo de evidencias, informe académico, presentación y TAR técnico independiente autorizado.
+**Propósito:** consolidar las funcionalidades de NETLAB360 en una aplicación web operativa, segura y demostrable.
 
-**Criterio de aceptación:** interfaz funcional sin shell libre, escenarios demostrables con rollback y gestión intacta, documentación y evidencias revisadas, TAR íntegro y entregables que satisfacen guía docente.
+**Alcance y entregables:** consola integrada, FastAPI, interfaz gráfica, pruebas ICMP/HTTP/TCP/UDP, sondas Blackbox, SLI/SLO, error budget, burn rate, Alertmanager, evaluación de Grafana especializado, ML, RCA, RAG, RFC supervisadas y recuperación automática.
 
-**Estado:** ABIERTA. Opcionales condicionados y no implementados: cuarta sede/WireGuard (#24), data sources/recursos externos OpenTofu (#17) y OVA/OVF si lo exige la entrega (#29). No acreditarlos como realizados ni convertirlos automáticamente en requisitos del núcleo de la fase 08."""
+**Criterio de aceptación:** integración con datos reales, controles de seguridad, acciones delimitadas con retorno independiente, recuperación desde apagado completo, regresión y catálogo gráfico de la fase.
+
+**Estado:** ABIERTA. Implementación pendiente. Las ampliaciones tecnológicas corresponden a la fase 09 y la aceptación científica y entrega final a la fase 10.""",
+
+  9: """## Fase 9 — Ampliación tecnológica y automatización avanzada
+
+**Propósito:** extender la cobertura tecnológica de NETLAB360 mediante implementaciones reales, aisladas y reproducibles.
+
+**Alcance y entregables:** OpenTofu con proveedores y recursos reales, WireGuard, Ansible multivendor con VyOS, GitOps periódico, gNMI/OpenConfig, gRPC/Protobuf, Kubernetes, Cilium, Hubble, eBPF y OpenTelemetry.
+
+**Criterio de aceptación:** casos de uso verificables, recursos autorizados, protección de la red administrativa, interoperabilidad, observabilidad, integración con la consola y regresión.
+
+**Estado:** ABIERTA. Ampliación aprobada dentro de la planificación del equipo, pendiente de implementación. La arquitectura concreta de cada tecnología depende de su viabilidad y de sus requisitos de seguridad.""",
+
+  10: """## Fase 10 — Validación científica, aceptación integral y entrega
+
+**Propósito:** ampliar la evaluación experimental de NETLAB360 y consolidar su aceptación técnica y académica.
+
+**Alcance y entregables:** datasets independientes, evaluación ML, predicción temporal, MAE, capacidad TCP/UDP, QoS/QoE, explicabilidad, concept drift, RCA, regresión integral, informe PDF, presentación y TAR técnico.
+
+**Criterio de aceptación:** resultados reproducibles, separación cronológica de datos, evaluación independiente, limitaciones explícitas, seguridad, demostración integrada y entregables verificados.
+
+**Estado:** ABIERTA. Planificación aprobada por el equipo; experimentos y entrega pendientes. La exportación OVA/OVF permanece condicionada a confirmación docente."""
 }
 
 
 # Los estados se corresponden con la aceptación al cierre de la fase 07.
 EXPECTED_STATES = {
     n: "closed" if n <= 7 else "open"
-    for n in range(1, 9)
+    for n in range(1, 11)
 }
 
 
@@ -158,28 +179,47 @@ def milestone(number):
     return result
 
 
-def inventory(number):
-    """Cuenta issues y PR sin confiar en los contadores agregados."""
-    entries = gh(
-        f"{ENDPOINT}/issues?milestone={number}&state=all&per_page=100",
+def global_entries():
+    """Recupera un inventario global independiente de los títulos."""
+    rows = gh(
+        f"{ENDPOINT}/issues?state=all&per_page=100",
         paginate=True
     )
 
-    items = {}
+    seen = set()
 
-    for entry in entries:
-        identifier = entry["number"]
-        state = entry.get("state")
+    for row in rows:
+        number = row["number"]
+        membership = (row.get("milestone") or {}).get("number")
 
-        if identifier in items or state not in {"open", "closed"}:
+        if number in seen or row.get("state") not in {"open", "closed"}:
             raise RuntimeError("invalid_inventory")
 
+        if membership is not None and membership not in EXPECTED_STATES:
+            raise RuntimeError("unknown_milestone_membership")
+
+        seen.add(number)
+
+    return rows
+
+def inventory(number, *, entries=None):
+    """Cuenta las asignaciones reales de issues y pull requests."""
+    rows = global_entries() if entries is None else entries
+
+    items = {}
+
+    for entry in rows:
         if (entry.get("milestone") or {}).get("number") != number:
-            raise RuntimeError("membership_mismatch")
+            continue
+
+        identifier = entry["number"]
+
+        if identifier in items:
+            raise RuntimeError("invalid_inventory")
 
         items[identifier] = (
             "pr" if "pull_request" in entry else "issue",
-            state
+            entry["state"]
         )
 
     issues = {
@@ -208,6 +248,17 @@ def inventory(number):
     return {"items": items, "open": opened, "closed": closed}
 
 
+
+def all_inventories():
+    """Contrasta todos los hitos mediante una misma consulta global."""
+    rows = global_entries()
+
+    return {
+        number: inventory(number, entries=rows)
+        for number in EXPECTED_STATES
+    }
+
+
 def counts_ok(hito, observed):
     """Distingue el inventario real del contador remoto."""
     return (
@@ -219,7 +270,7 @@ def counts_ok(hito, observed):
 def run(apply):
     """La aplicación solo modifica títulos y descripciones."""
     before = {n: milestone(n) for n in EXPECTED_STATES}
-    inventories = {n: inventory(n) for n in EXPECTED_STATES}
+    inventories = all_inventories()
 
     for n, current in before.items():
         inv = inventories[n]
@@ -229,7 +280,8 @@ def run(apply):
             f"ESTADO={current['state']} "
             f"ABIERTOS_REALES={inv['open']} "
             f"CERRADOS_REALES={inv['closed']} "
-            f"CONTADOR={'OK' if counts_ok(current, inv) else 'DISCREPANCIA'}"
+            f"CONTADOR={'OK' if counts_ok(current, inv) else 'DISCREPANCIA'} "
+            f"DESCRIPCION={'OK' if current.get('description') == DESCRIPTIONS[n].strip() else 'ACTUALIZAR'}"
         )
 
     if not apply:
@@ -254,11 +306,14 @@ def run(apply):
         if verified.get("due_on") != current.get("due_on"):
             raise RuntimeError(f"phase_{n}_due_date_changed")
 
-        if inventory(n)["items"] != inventories[n]["items"]:
-            raise RuntimeError(f"phase_{n}_membership_changed")
-
         print(f"FASE_{n:02d}_METADATOS=VERIFICADOS")
 
+    final_inventories = all_inventories()
+
+    if final_inventories != inventories:
+        raise RuntimeError("global_milestone_membership_changed")
+
+    print("ASIGNACIONES_ORIGINALES=CONSERVADAS")
     print("MILESTONES_NETLAB360=ACTUALIZADAS")
 
 

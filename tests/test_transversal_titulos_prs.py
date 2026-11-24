@@ -65,5 +65,19 @@ class PullRequestTitleTests(unittest.TestCase):
         self.assertEqual(m.check(items)["normalized"],129)
 
 
+    def test_new_phase_prefixes(self):
+        for phase in (9, 10):
+            rows = make()
+            rows[0]["title"] = (
+                f"[S{phase:02d}] Validar capacidad planificada"
+            )
+            self.assertEqual(m.check(rows)["normalized"], 129)
+
+    def test_reject_unapproved_phase(self):
+        rows = make()
+        rows[0]["title"] = "[S11] Capacidad no planificada"
+        with self.assertRaisesRegex(ValueError, "non_normalized"):
+            m.check(rows)
+
 if __name__=="__main__":
     unittest.main()

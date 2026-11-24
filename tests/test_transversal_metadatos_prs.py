@@ -20,7 +20,7 @@ class MetadatosPRTests(unittest.TestCase):
 
     def test_cada_campo(self):
         for field, value, reason in [
-            ("milestone", {"title": "S09"}, "MILESTONE_INVALIDO"), ("assignees", [], "ASSIGNEE"),
+            ("milestone", {"title": "S11"}, "MILESTONE_INVALIDO"), ("assignees", [], "ASSIGNEE"),
             ("labels", [{"name": "tipo:documentación"}], "ETIQUETA_FASE_MILESTONE"),
             ("labels", [{"name": "fase:08"}], "ETIQUETA_TEMATICA"),
             ("title", "Título sin fase", "TITULO"),
@@ -64,7 +64,7 @@ class MetadatosPRTests(unittest.TestCase):
 
 
     def test_nuevos_titulos_de_hitos(self):
-        for n in range(1, 9):
+        for n in range(1, 11):
             with self.subTest(fase=n):
                 self.pr["milestone"] = {
                     "title": f"Fase {n}", "number": n
@@ -83,8 +83,21 @@ class MetadatosPRTests(unittest.TestCase):
         )
 
     def test_fase_no_aprobada(self):
-        self.pr["milestone"] = {"title": "Fase 9"}
+        self.pr["milestone"] = {"title": "Fase 11"}
         self.assertIn(
             "MILESTONE_INVALIDO",
             audit([self.pr])["defects"][0]["reasons"]
         )
+
+
+    def test_fases_09_y_10_con_prefijo_tecnico(self):
+        for n in (9, 10):
+            self.pr["title"] = f"[S{n:02d}] Validar capacidad técnica"
+            self.pr["milestone"] = {
+                "title": f"Fase {n}", "number": n
+            }
+            self.pr["labels"] = [
+                {"name": f"fase:{n:02d}"},
+                {"name": "tipo:pruebas"}
+            ]
+            self.assertEqual(audit([self.pr])["defects"], [])

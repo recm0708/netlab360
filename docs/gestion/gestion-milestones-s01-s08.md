@@ -1,8 +1,8 @@
-# Gestión y aceptación de hitos de las fases 01–08
+# Gestión y aceptación de hitos de las fases 01–10
 
 ## Estado vigente
 
-Las fases 01 a 07 están cerradas. La fase 08 permanece abierta para su implementación y aceptación integral.
+Las fases 01–07 están cerradas. Las fases 08–10 están abiertas y disponen de alcance, issues y criterios de aceptación propios.
 
 Utilizamos la denominación «Fase 01», «Fase 02» y sucesivas en la documentación técnica. Los títulos de los hitos de GitHub utilizan «Fase 1», «Fase 2» y sucesivos, como convención administrativa. Conservamos los códigos S01, S02 y sucesivos exclusivamente como identificadores técnicos cuando forman parte de rutas, archivos, esquemas, ensayos, prefijos de issues y pull requests o evidencias originales.
 
@@ -15,11 +15,20 @@ Utilizamos la denominación «Fase 01», «Fase 02» y sucesivas en la documenta
 | Fase 05 | Cerrada | HTTP HA, LACP multisede, SDN y NOC integrado |
 | Fase 06 | Cerrada | Diagnóstico experimental V2, modelos congelados, FAULT HTTP independiente y recuperación |
 | Fase 07 | Cerrada | AIOps supervisado, aprobación, reversión segura y API validadas |
-| Fase 08 | Abierta | Consola interactiva, regresión y entrega académica |
+| Fase 08 | Abierta | Plataforma interactiva, RAG, observabilidad avanzada y recuperación |
+| Fase 09 | Abierta | Ampliación tecnológica y automatización avanzada |
+| Fase 10 | Abierta | Validación científica, aceptación integral y entrega |
 
 ## Reconciliación de GitHub
 
-La fase 07 comprende la issue maestra #7 y las ocho issues técnicas #190–#197. La fase 08 incorpora el copiloto RAG #198 además de sus issues vigentes. #17 (OpenTofu externo) y #24 (cuarta sede/WireGuard) permanecen condicionadas; su destino se decidirá al reevaluar las fases 07 y 08. La fase 09 no dispone de milestone aprobada.
+La fase 07 comprende la issue maestra #7 y las ocho issues
+técnicas #190–#197. El PR #202 permanece asignado y fusionado.
+
+Las issues maestras de las fases restantes son #8, #212 y #218.
+OpenTofu avanzado (#17) y WireGuard (#24) corresponden a la
+fase 09. Los entregables académicos finales se consolidan en
+la fase 10; la documentación y las evidencias se actualizan
+al cerrar cada fase.
 
 Asignamos un pull request a un milestone únicamente cuando existe un hito de aceptación inequívoco. Los PR transversales conservan sus etiquetas temáticas y de fase pertinentes; cuando no existe un hito principal, permanecen sin milestone. Revisamos las asignaciones históricas según el alcance y la evidencia de aceptación de cada cambio. Esta clasificación no acredita funcionalidades adicionales ni altera por sí sola la aceptación académica.
 
