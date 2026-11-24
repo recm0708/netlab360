@@ -54,6 +54,20 @@ Integramos los lectores de exporter, NOC, Prometheus, inferencia S06 y
 asesor S07. Incorporamos la estructura visual y el acceso gráfico; la navegación
 de detalle y las acciones requieren implementación independiente. La disponibilidad de una ruta no garantiza la de su fuente.
 
+## Panel operacional
+
+Integramos /home con las cuatro rutas autenticadas de observaciones.
+Mostramos nueve indicadores y una tabla de procedencia, alcance y vigencia
+a partir del inventario fijo de 35 registros (30 operacionales, dos
+inferencias y tres resúmenes históricos). Las consultas son independientes,
+con actualización manual y automática cada 15 segundos mientras la
+página es visible y la sesión está vigente, sin renovar la inactividad.
+La vigencia caduca también entre consultas; descartamos detalles vencidos.
+No interpretamos disponibilidad administrativa como conectividad, ni
+inferencias como incidentes confirmados. Conservamos el estado global
+desconocido hasta contar con criterios operacionales específicos.
+Las capacidades técnicas quedan en un panel desplegable.
+
 ## Explorador técnico
 
 Habilitamos /debug para OPERATOR. El catálogo incluye seis rutas GET

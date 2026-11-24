@@ -59,6 +59,164 @@ document.addEventListener("DOMContentLoaded", () => {
   if (document.getElementById("console-shell")) initializeConsole();
 });
 
+/* Proyección del dashboard: inventario explícito y vigencia conservadora. */
+const dashboardInventory = {
+  sources: [
+    ["EXPORTER_S04","MULTISEDE","Exportador","Inventario de routers",60],
+    ["NOC_S05","MULTISEDE","Supervisión","Topología observada",60],
+    ...["HQ","S1","S2"].map(s => ["NOC_S05","LACP-"+s,"Supervisión","LACP "+s,60]),
+    ["NOC_S05","FAUCET","Supervisión","Faucet",60],
+    ["NOC_S05","FRONTAL_HQ","Supervisión","Frontal HTTP HQ",60]
+  ],
+  metrics: [
+    ["PROMETHEUS_S04","S04-EXPORTER","Prometheus","Exportador",60],
+    ["PROMETHEUS_S04","S04-COLLECTOR","Prometheus","Colector",60],
+    ["PROMETHEUS_S04","MULTISEDE","Prometheus","Inventario multisede",60],
+    ...["HQ","S1","S2"].flatMap((s,i) => [
+      ["PROMETHEUS_S04","R-"+s,"Prometheus","Router "+s,60],
+      ...(i===0?["s1p","s1b","s2p","s2b"]:i===1?["s1p","s1b"]:["s2p","s2b"])
+        .map(n => ["PROMETHEUS_S04","WAN-END-"+s+"-"+n,"Prometheus","WAN "+s+" / "+n,60]),
+      ...[110,120,130].map(n => ["PROMETHEUS_S04","VLAN-"+(n+i*100),"Prometheus","VLAN "+(n+i*100),60])
+    ])
+  ],
+  diagnostics: ["S1","S2"].map(s => ["IA_S06","HQ_A_"+s,"Inferencia","HQ → "+s,30]),
+  advisory: ["INCIDENTS","HYPOTHESES","RUNBOOKS"].map((r,i) =>
+    ["ADVISORY_S07",r,"Asesor",["Incidentes candidatos","Hipótesis","Runbooks"][i],60])
+};
+
+function dashboardBatch(key, payload, started) {
+  const inventory = dashboardInventory[key];
+  if (!inventory || payload?.project !== "NETLAB360" || payload.schema_version !== 1 ||
+      payload.network_mutations_authorized !== false || payload.infrastructure_state !== "UNKNOWN" ||
+      !Array.isArray(payload.observations) || payload.observations.length !== inventory.length) {
+    throw new Error("INVALID_BATCH");
+  }
+  const map = new Map();
+  for (const row of payload.observations) {
+    const id = row?.source + "/" + row?.resource;
+    const expected = inventory.find(x => x[0]+"/"+x[1]===id);
+    if (!expected || map.has(id) || row.schema !== "NETLAB360_S08_SOURCE_V1" ||
+        row.network_mutations_authorized !== false || row.max_age_seconds !== expected[4] ||
+        !["OK","UNAVAILABLE","NOT_STARTED","INVALID"].includes(row.transport) ||
+        !["VALID","MISSING","INVALID","FUTURE","STALE"].includes(row.quality) ||
+        !["NORMAL","DEGRADED","FAULT","RECOVERY","UNKNOWN"].includes(row.state)) {
+      throw new Error("INVALID_OBSERVATION");
+    }
+    const expectedKind = key === "diagnostics" ? "INFERENCE" : key === "advisory" ? "ADVISORY_SNAPSHOT" : "OBSERVATION";
+    const scope = row.resource === "FRONTAL_HQ" ? "HTTP_FROM_S2" :
+      row.resource === "FAUCET" ? "CONTROLLER_ONLY" :
+      row.resource.startsWith("LACP-") ? "BOND_MEMBER_STATE" :
+      row.resource.startsWith("WAN-END-") || row.resource.startsWith("VLAN-") ? "ADMIN_STATE_ONLY" :
+      row.source === "EXPORTER_S04" ? "ROUTER_EXISTENCE_ONLY" :
+      row.source === "NOC_S05" ? "TOPOLOGY_OBSERVATION" :
+      row.resource === "S04-EXPORTER" ? "SCRAPE_AVAILABILITY" :
+      row.resource === "S04-COLLECTOR" ? "COLLECTOR_READ" :
+      row.source === "PROMETHEUS_S04" ? (row.resource === "MULTISEDE" ?
+        "ROUTER_EXISTENCE_ONLY" : "CONTAINER_RUNNING_ONLY") :
+      key === "diagnostics" ? "HQ_CLIENT_EGRESS_NETWORK_STATE" : null;
+    if (row.kind !== expectedKind || (scope && row.scope !== scope)) throw new Error("INVALID_SCOPE");
+    const valid = row.quality === "VALID";
+    if (valid && (row.transport !== "OK" || typeof row.age_seconds !== "number" ||
+        !Number.isFinite(row.age_seconds) || row.age_seconds < 0 || row.age_seconds > expected[4] ||
+        typeof row.observed_at_utc !== "string" ||
+        !Number.isFinite(Date.parse(row.observed_at_utc)) ||
+        !row.details || typeof row.details !== "object" || Array.isArray(row.details))) {
+      throw new Error("INVALID_FRESHNESS");
+    }
+    const state = valid && key !== "advisory" &&
+      (key !== "diagnostics" || row.state === "NORMAL") &&
+      !["ADMIN_STATE_ONLY","CONTAINER_RUNNING_ONLY","ROUTER_EXISTENCE_ONLY","TOPOLOGY_OBSERVATION"].includes(row.scope) ? row.state : "UNKNOWN";
+    map.set(id, {source:expected[0],resource:expected[1],label:expected[2],
+      name:expected[3],maxAge:expected[4],started,transport:row.transport,
+      quality:row.quality,state,stamp:valid?row.observed_at_utc:null,
+      age:valid?row.age_seconds:null,details:valid?row.details:{}});
+  }
+  return inventory.map(x => map.get(x[0]+"/"+x[1]));
+}
+
+function dashboardRows(batches, now) {
+  return Object.entries(dashboardInventory).flatMap(([key, inventory]) => {
+    const batch = batches[key];
+    if (!batch || !Array.isArray(batch.rows)) {
+      return inventory.map(x => ({source:x[0],resource:x[1],label:x[2],name:x[3],
+        quality:batch?.error || "PENDING",state:"UNKNOWN",stamp:null,details:{}}));
+    }
+    return batch.rows.map(row => {
+      // Sumamos el tiempo de ida y vuelta completo para no ampliar la vigencia.
+      if (row.quality === "VALID" && row.age + Math.max(0,now-row.started)/1000 > row.maxAge) {
+        return {...row, quality:"STALE",state:"UNKNOWN",details:{},stamp:row.stamp};
+      }
+      return row;
+    });
+  });
+}
+
+function dashboardSummary(rows) {
+  const get = (source, resource) => rows.find(r => r.source===source && r.resource===resource);
+  const valid = r => r?.quality==="VALID";
+  const items = (source,prefix) => rows.filter(r => r.source===source && r.resource.startsWith(prefix));
+  const count = (subset,predicate) => subset.filter(r => valid(r)&&predicate(r)).length;
+  const result = {};
+  const item = (id,text,state,detail) => {result[id]={text,state,detail};};
+  const operational = rows.filter(r => !["IA_S06","ADVISORY_S07"].includes(r.source));
+  const live = operational.filter(valid).length;
+  item("coverage",live+" / "+operational.length,live===operational.length?"ok":live?"warn":"unknown",
+    "Cobertura de observaciones; no equivale a disponibilidad de red.");
+  const routers = get("EXPORTER_S04","MULTISEDE");
+  const sites = ["R-HQ","R-S1","R-S2"];
+  const values = sites.map(k=>routers?.details[k]);
+  const present = valid(routers) && values.every(v=>v===0||v===1);
+  const running = present ? values.reduce((a,b)=>a+b,0):null;
+  item("routers",present?running+" / 3":"Sin datos","unknown","Contenedores detectados; no acredita OSPF ni forwarding.");
+  for (const [id,prefix,total] of [["wan","WAN-END-",8],["vlan","VLAN-",9]]) {
+    const subset = items("PROMETHEUS_S04",prefix);
+    const known = count(subset,r=>[0,1].includes(r.details.admin_up));
+    const up = count(subset,r=>r.details.admin_up===1);
+    item(id,known?up+" / "+known+" activas":"Sin datos","unknown",
+      known+" de "+total+" interfaces con muestra administrativa vigente; no acredita conectividad.");
+  }
+  const ha = get("NOC_S05","FRONTAL_HQ");
+  const backend = {BACKEND_HQ:"HQ · principal",BACKEND_S1:"S1 · respaldo"};
+  item("ha",valid(ha)?({NORMAL:"Normal",DEGRADED:"Degradado",FAULT:"Falla",UNKNOWN:"Desconocido",RECOVERY:"Recuperación"}[ha.state]):"Sin datos",
+    valid(ha)?ha.state.toLowerCase():"unknown",
+    valid(ha)&&backend[ha.details.active_backend]?backend[ha.details.active_backend]+" · desde S2":"Observación del frontal desde S2.");
+  const lacp = items("NOC_S05","LACP-");
+  const n = count(lacp,r=>r.state==="NORMAL"), k=lacp.filter(valid).length;
+  const bondState = lacp.some(r=>valid(r)&&r.state==="FAULT")?"fault":
+    lacp.some(r=>valid(r)&&r.state==="DEGRADED")?"degraded":n===3?"normal":"unknown";
+  item("lacp",k?n+" / 3 normales":"Sin datos",bondState,k+" de 3 sedes con observación vigente de miembros.");
+  const sdn=get("NOC_S05","FAUCET");
+  const connected=valid(sdn)&&typeof sdn.details.connected==="boolean";
+  item("sdn",connected?(sdn.details.connected?"Conectado":"Desconectado"):"Sin datos",
+    connected?sdn.state.toLowerCase():"unknown",
+    connected&&Number.isSafeInteger(sdn.details.flow_count)?sdn.details.flow_count+" flujos observados; no acredita forwarding.":"Estado del controlador, no de la red completa.");
+  for (const [id,source,detail] of [["inference","IA_S06","Inferencias exploratorias; no confirman incidentes."],["advisory","ADVISORY_S07","Resúmenes históricos; no acreditan salud actual."]]) {
+    const subset=rows.filter(r=>r.source===source);
+    const available=subset.filter(valid).length;
+    item(id,available?available+" / "+subset.length+" vigentes":"Sin datos","unknown",detail);
+  }
+  return result;
+}
+
+function dashboardDetail(row) {
+  if(row.quality!=="VALID") return "—";
+  const d=row.details;
+  if (row.resource.startsWith("LACP-") && Number.isInteger(d.switch_members) && Number.isInteger(d.client_members))
+    return "Switch "+d.switch_members+" / cliente "+d.client_members+" miembros";
+  if (row.resource==="FAUCET" && typeof d.connected==="boolean")
+    return d.connected?"Conectado · "+(Number.isSafeInteger(d.flow_count)?d.flow_count+" flujos":"flujos no disponibles"):"Desconectado";
+  if (row.resource==="FRONTAL_HQ") return {BACKEND_HQ:"HQ · principal",BACKEND_S1:"S1 · respaldo"}[d.active_backend] || "Sin backend confirmado";
+  if ([0,1].includes(d.admin_up)) return d.admin_up===1?"Admin. activa":"Admin. inactiva";
+  if ([0,1].includes(d.running)) return d.running===1?"Contenedor activo":"Contenedor inactivo";
+  if ([0,1].includes(d.up)) return d.up===1?"Scrape disponible":"Scrape fallido";
+  if ([0,1].includes(d.source_up)) return d.source_up===1?"Lectura disponible":"Lectura fallida";
+  if (["active","partial","offline"].includes(d.reported_topology))
+    return {active:"Inventario activo",partial:"Inventario parcial",offline:"Inventario inactivo"}[d.reported_topology];
+  return row.source==="IA_S06"?"Inferencia exploratoria":row.source==="ADVISORY_S07"?"Resumen histórico":"Observación delimitada";
+}
+
+/* Fin de la proyección pura del dashboard. */
+
 /* La consola solo se inicializa en su documento autenticado. */
 function initializeConsole() {
   const refresh = document.getElementById("refresh");
@@ -112,8 +270,6 @@ function initializeConsole() {
   }
 
   async function update() {
-    if (refresh.disabled) return;
-    refresh.disabled = true;
     notice.textContent = "Consultando metadatos locales…";
     apiState.textContent = "Consultando";
     apiState.dataset.state = "unknown";
@@ -143,12 +299,8 @@ function initializeConsole() {
       apiState.dataset.state = "unknown";
       showCapabilities({});
       notice.textContent = "No se pudieron validar los metadatos. No se conservan valores previos.";
-    } finally {
-      refresh.disabled = false;
     }
   }
-
-  refresh.addEventListener("click", update);
 
   /* La sesión se recupera con cookie HttpOnly; la autoridad reside en el servidor. */
   const shell = document.getElementById("console-shell");
@@ -189,6 +341,7 @@ function initializeConsole() {
     lastActivitySent = -Infinity;
     session = null;
     resetDebug();
+    clearDashboard();
     if (idleDialog.open) idleDialog.close();
     shell.hidden = true;
     recoveryPanel.hidden = false;
@@ -253,7 +406,7 @@ function initializeConsole() {
     if (first) {
       restorePresentation();
       if (location.pathname === "/home") {
-        update().then(() => restoreContentIfUnchanged());
+        updateDashboard().then(() => restoreContentIfUnchanged());
       } else if (location.pathname === "/debug") {
         loadDebug().then(() => restoreContentIfUnchanged());
       }
@@ -290,6 +443,7 @@ function initializeConsole() {
     if (!session) return;
     const remaining = Math.ceil(session.expiresAt - serverNow());
     if (remaining <= 0) {
+      clearDashboard();
       // Otra pestaña puede haber renovado la misma sesión. Consultamos una vez
       // sin extender el plazo; una respuesta no válida retira la identidad.
       if (!busy) recover();
@@ -595,6 +749,114 @@ function initializeConsole() {
   });
   exportButtons[1].addEventListener("click", () => saveDebug("json"));
   exportButtons[2].addEventListener("click", () => saveDebug("csv"));
+
+  // Las consultas son independientes; no se conserva telemetría en almacenamiento web.
+  const dashboardStatus = document.getElementById("dashboard-status");
+  const dashboardAuto = document.getElementById("dashboard-auto");
+  const dashboardTable = document.getElementById("dashboard-rows");
+  const dashboardPaths = {
+    sources:"/api/v1/sources",metrics:"/api/v1/metrics",
+    diagnostics:"/api/v1/diagnostics",advisory:"/api/v1/advisory"
+  };
+  const qualityLabels = {VALID:"Vigente",STALE:"Vencida",MISSING:"Ausente",INVALID:"Inválida",
+    FUTURE:"Fecha futura",PENDING:"Sin consultar",ERROR:"No disponible",LIMITED:"Ocupada"};
+  const stateLabels = {NORMAL:"Normal",DEGRADED:"Degradado",FAULT:"Falla",RECOVERY:"Recuperación",UNKNOWN:"Desconocido"};
+  let dashboardBatches = {};
+  let dashboardEpoch = 0, dashboardBusy = false, dashboardSignature = "";
+
+  function dashboardAllowed() {
+    return location.pathname === "/home" && session !== null && serverNow() < session.expiresAt;
+  }
+
+  function renderDashboard(force=false) {
+    const rows=dashboardRows(dashboardBatches,performance.now());
+    const signature=rows.map(r=>r.quality+":"+r.state).join("|");
+    if(!force && signature===dashboardSignature) return;
+    dashboardSignature=signature;
+    const summary=dashboardSummary(rows);
+    for(const [id,value] of Object.entries(summary)) {
+      const node=document.getElementById("dash-"+id);
+      node.textContent=value.text;
+      node.dataset.state=value.state;
+      document.getElementById("dash-"+id+"-detail").textContent=value.detail;
+    }
+    const fragment=document.createDocumentFragment();
+    for(const row of rows) {
+      const tr=document.createElement("tr");
+      const date=row.stamp?formatPanama(new Date(row.stamp)):"—";
+      for(const [i,value] of [row.label,row.name,qualityLabels[row.quality],stateLabels[row.state],
+                              dashboardDetail(row),date].entries()) {
+        const td=document.createElement("td");
+        td.textContent=value;
+        if(i===2) td.dataset.state=row.quality==="VALID"?"ok":row.quality==="STALE"?"warn":"unknown";
+        if(i===3) td.dataset.state=row.state.toLowerCase();
+        tr.append(td);
+      }
+      fragment.append(tr);
+    }
+    dashboardTable.replaceChildren(fragment);
+  }
+
+  function clearDashboard() {
+    dashboardEpoch++;
+    dashboardBatches={};
+    dashboardBusy=false;
+    refresh.disabled=false;
+    dashboardSignature="";
+    dashboardStatus.textContent="Sin observaciones autenticadas.";
+    renderDashboard(true);
+  }
+
+  async function updateDashboard() {
+    if(!dashboardAllowed()||dashboardBusy||serverNow()>=session.warningAt) return;
+    const epoch=dashboardEpoch;
+    dashboardBusy=true;
+    refresh.disabled=true;
+    dashboardStatus.textContent="Consultando fuentes independientes…";
+    const requests=Object.entries(dashboardPaths).map(async ([key,path])=>{
+      const started=performance.now();
+      let batch;
+      try {
+        const {status,data}=await debugRead(path);
+        if(status===401||status===403) {
+          if(epoch===dashboardEpoch) {
+            clearDashboard();
+            recover();
+          }
+          return;
+        }
+        batch=status===200?{rows:dashboardBatch(key,data,started)}:{error:status===429?"LIMITED":"ERROR"};
+      } catch {
+        batch={error:"ERROR"};
+      }
+      if(epoch!==dashboardEpoch||!dashboardAllowed()) return;
+      dashboardBatches[key]=batch;
+      renderDashboard(true);
+    });
+    try {
+      await Promise.allSettled([update(),...requests]);
+      if(epoch===dashboardEpoch&&dashboardAllowed()) {
+        dashboardStatus.textContent="Última consulta: "+formatPanama(new Date(serverNow()*1000))+
+          " · La vigencia se calcula por muestra.";
+      }
+    } finally {
+      if(epoch===dashboardEpoch) {
+        dashboardBusy=false;
+        refresh.disabled=false;
+      }
+    }
+  }
+
+  refresh.addEventListener("click", updateDashboard);
+  setInterval(() => {
+    if(dashboardAllowed()) renderDashboard();
+  },1000);
+  setInterval(() => {
+    if(dashboardAuto.checked&&!document.hidden&&dashboardAllowed()) updateDashboard();
+  },15000);
+  document.addEventListener("visibilitychange",()=>{
+    if(!document.hidden&&dashboardAuto.checked&&dashboardAllowed()) updateDashboard();
+  });
 
   // Guardamos exclusivamente preferencias visuales por pestaña, nunca identidad ni CSRF.
   const menuToggle = document.getElementById("menu-toggle");
