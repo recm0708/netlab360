@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""NETLAB360: normalizar las 53 issues y TODAS las etiquetas del repositorio.
+"""Audita las issues y etiquetas vigentes de NETLAB360.
 
---check: lectura de inventario, estados, casillas, títulos, etiquetas.
---apply: migrar nombres/descripciones de etiquetas, asignaciones semánticas,
-         sin modificar cuerpo, estado, milestones ni campos de PR.
-Las issues duplicadas o no planificadas conservan su motivo nativo en GitHub.
+El modo --check consulta el inventario actual de las diez fases.
+El modo --apply normaliza exclusivamente las descripciones de las
+etiquetas de fase, conservando nombres, colores y asignaciones.
+
+Las funciones del inventario original de 53 issues se conservan
+para regresión histórica; no se ejecutan desde la interfaz CLI.
 """
 from __future__ import annotations
 
@@ -73,8 +75,8 @@ TYPE_INFO = {
     "accesibilidad": ("C5DEF5", "Accesibilidad de interfaces, navegación y usabilidad para diferentes capacidades."),
 }
 DEFINITIONS = {
-    **{f"fase:{n:02d}": ("E4EAF1", f"Actividades correspondientes a la fase S{n:02d} de NETLAB360.")
-       for n in range(1, 9)},
+    **{f"fase:{n:02d}": ("E4EAF1", f"Actividades correspondientes a la fase {n:02d} de NETLAB360.")
+       for n in range(1, 11)},
     **{f"tipo:{name}": values for name, values in TYPE_INFO.items()},
     "prioridad:alta": ("B60205", "Trabajo prioritario que condiciona un resultado central o la entrega."),
     "prioridad:media": ("FBCA04", "Trabajo relevante sin bloqueo crítico inmediato."),
@@ -90,7 +92,7 @@ DEFINITIONS = {
     "estado:bloqueado": ("B60205", "Actividad detenida por una dependencia documentada; no implica cierre."),
 }
 ALIASES = {
-    **{f"semana:{n:02d}": f"fase:{n:02d}" for n in range(1, 9)},
+    **{f"semana:{n:02d}": f"fase:{n:02d}" for n in range(1, 11)},
     "tipo:infra": "tipo:infraestructura",
     "tipo:docs": "tipo:documentación",
     "tipo:dashboard": "tipo:visualización",
@@ -320,42 +322,140 @@ def remove_aliases_safely(items: list[dict]) -> None:
         print(f"ETIQUETA_OBSOLETA_ELIMINADA={old}")
 
 
+def current_signature(items):
+    """Conserva los campos que una auditoría no debe modificar."""
+    result = {}
+
+    for item in items:
+        n = item["number"]
+
+        if n in result:
+            raise ValueError("duplicate_issue_or_pr")
+
+        result[n] = (
+            item.get("title"),
+            item.get("body"),
+            item.get("state"),
+            (item.get("milestone") or {}).get("number"),
+            tuple(sorted(label["name"] for label in item.get("labels", []))),
+            tuple(sorted(user["login"] for user in item.get("assignees", [])))
+        )
+
+    return result
+
+def audit_current(items, labels):
+    """Audita el inventario vigente sin imponer estados históricos."""
+    current_signature(items)
+
+    issues = [
+        item for item in items
+        if "pull_request" not in item
+    ]
+
+    findings = []
+
+    for item in issues:
+        n = item["number"]
+
+        match = TITLE_PATTERN.fullmatch(item.get("title", ""))
+
+        if not match or not 1 <= int(match.group(1)) <= 10:
+            findings.append((n, "TITULO"))
+            continue
+
+        phase = int(match.group(1))
+        names = {label["name"] for label in item.get("labels", [])}
+
+        if f"fase:{phase:02d}" not in names:
+            findings.append((n, "ETIQUETA_FASE"))
+
+        if (item.get("milestone") or {}).get("number") != phase:
+            findings.append((n, "MILESTONE"))
+
+        if not any(name.startswith("tipo:") for name in names):
+            findings.append((n, "ETIQUETA_TEMATICA"))
+
+        if UNWANTED_TITLE_STATUS.search(item["title"]):
+            findings.append((n, "ESTADO_EN_TITULO"))
+
+        if item.get("state") == "open" and not CHECKBOX_UNDONE.search(
+            item.get("body") or ""
+        ):
+            findings.append((n, "SIN_CRITERIOS_PENDIENTES"))
+
+    missing = []
+    outdated = []
+
+    for phase in range(1, 11):
+        name = f"fase:{phase:02d}"
+
+        if name not in labels:
+            missing.append(name)
+
+        elif labels[name].get("description") != DEFINITIONS[name][1]:
+            outdated.append(name)
+
+    return {
+        "total": len(issues),
+        "open": sum(item["state"] == "open" for item in issues),
+        "closed": sum(item["state"] == "closed" for item in issues),
+        "findings": findings,
+        "missing_phase_labels": missing,
+        "outdated_phase_descriptions": outdated,
+        "unknown_labels": sorted(set(labels) - OLD_OR_CANONICAL)
+    }
+
 def run(apply: bool) -> None:
+    """Opera sobre el catálogo vigente, no sobre la migración inicial."""
     validate_definitions()
-    if len(ALL_IDS) != 53 or sum(len(x) for x in PHASES.values()) != 53:
-        raise ValueError("phase_inventory_size_invalid")
-    issues = check_baseline(all_items())
-    before = inspect(all_items(), label_inventory())
-    print("========== NETLAB360 ISSUES Y ETIQUETAS ==========")
-    print(f"ISSUES_REALES={before['issue_count']} ABIERTAS={before['open_count']} CERRADAS={before['closed_count']}")
-    print("TITULOS_UNIFORMES=53_DE_53")
-    print("CERRADAS_CON_CASILLAS_PENDIENTES=0")
-    for key in ("issue_label_mismatch", "canonical_labels_missing",
-                "canonical_descriptions_outdated", "legacy_labels", "unknown_labels"):
-        print(f"DIAGNOSTICO_{key.upper()}={before[key]}")
+
+    items = all_items()
+    labels = label_inventory()
+
+    report = audit_current(items, labels)
+
+    for key, value in report.items():
+        print(f"AUDITORIA_{key.upper()}={value}")
+
     if not apply:
         print("MODO=SOLO_LECTURA")
+        print("MIGRACION_HISTORICA=NO_EJECUTADA")
         return
-    if before["unknown_labels"]:
-        raise ValueError("etiquetas_desconocidas_revisar_antes: "+
-                         repr(before["unknown_labels"]))
-    migrate_definitions(all_items(), label_inventory())
-    set_issue_assignments(issues)
-    remove_aliases_safely(all_items())
-    after = inspect(all_items(), label_inventory())
-    if any(after[k] for k in (
-            "issue_label_mismatch","canonical_labels_missing",
-            "canonical_descriptions_outdated","legacy_labels","unknown_labels")):
-        raise RuntimeError("normalization_not_converged: "+repr(after))
-    if after["issue_count"] != 53 or after["closed_count"] != before["closed_count"]:
-        raise RuntimeError("issue_states_changed")
-    print("TITULOS=53_UNIFORMES")
-    print("ETIQUETAS_ISSUES=ASIGNADAS_POR_ALCANCE")
-    print("ETIQUETAS_REPOSITORIO=TODAS_EN_ESPANOL_CON_DESCRIPCION")
-    print("ESTADOS_Y_CHECKBOX=CONSERVADOS")
-    print("MILESTONES=CONSERVADAS")
-    print("S05_ISSUES=6_CERRADAS")
-    print("========== NORMALIZACION_ISSUES_COMPLETA=OK ==========")
+
+    if report["missing_phase_labels"]:
+        raise RuntimeError("missing_phase_labels")
+
+    before = current_signature(items)
+
+    for name in report["outdated_phase_descriptions"]:
+        description = DEFINITIONS[name][1]
+
+        gh(url_label(name), "PATCH", {
+            "description": description
+        })
+
+        current = gh(url_label(name))
+
+        if (
+            current.get("name") != name
+            or current.get("description") != description
+            or current.get("color") != labels[name].get("color")
+        ):
+            raise RuntimeError("label_metadata_not_preserved_" + name)
+
+        print(f"DESCRIPCION_ACTUALIZADA={name}")
+
+    if current_signature(all_items()) != before:
+        raise RuntimeError("issue_or_pr_metadata_changed")
+
+    final = audit_current(all_items(), label_inventory())
+
+    if final["outdated_phase_descriptions"]:
+        raise RuntimeError("phase_description_normalization_failed")
+
+    print("DESCRIPCIONES_FASES=10/10")
+    print("ASIGNACIONES_ISSUES_Y_PR=CONSERVADAS")
+    print("MIGRACION_HISTORICA=NO_EJECUTADA")
 
 
 if __name__ == "__main__":

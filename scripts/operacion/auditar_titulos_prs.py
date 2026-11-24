@@ -8,7 +8,7 @@ import subprocess
 import sys
 
 REPO = "recm0708/netlab360"
-PATTERN = re.compile(r"^\[(S0[1-8]|GESTIÓN)\] .{12,}$")
+PATTERN = re.compile(r"^\[(S0[1-9]|S10|GESTIÓN)\] .{12,}$")
 BAD_STATUS = re.compile(r"\s*[—–-]\s*(cerrad[oa]|pendiente|concluid[oa]|completad[oa])\s*$",re.I)
 
 

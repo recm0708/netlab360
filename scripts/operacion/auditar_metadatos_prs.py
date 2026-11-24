@@ -10,9 +10,9 @@ import subprocess
 import sys
 
 REPO = "recm0708/netlab360"
-TITLE = re.compile(r"^\[(S0[1-8]|GESTIÓN)\] .{12,}$")
+TITLE = re.compile(r"^\[(S0[1-9]|S10|GESTIÓN)\] .{12,}$")
 TOPIC = re.compile(r"^tipo:.+$")
-PHASE_LABEL = re.compile(r"^fase:0[1-8]$")
+PHASE_LABEL = re.compile(r"^fase:(?:0[1-9]|10)$")
 
 
 def audit(prs):
@@ -33,7 +33,7 @@ def audit(prs):
         milestone = pr.get("milestone") or {}
         phase = milestone.get("title", "")
         # Admitimos títulos anteriores y vigentes durante la migración.
-        match = re.fullmatch(r"S0([1-8])|Fase ([1-8])", phase)
+        match = re.fullmatch(r"S(0[1-9]|10)|Fase ([1-9]|10)", phase)
         phase_number = int(match.group(1) or match.group(2)) if match else None
         title = TITLE.fullmatch(pr.get("title", ""))
         phase_labels = {label for label in labels if PHASE_LABEL.fullmatch(label)}

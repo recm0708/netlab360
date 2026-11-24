@@ -48,7 +48,7 @@ def entries7():
 class MilestoneTests(unittest.TestCase):
 
     def test_description_sections(self):
-        self.assertEqual(set(m.DESCRIPTIONS), set(range(1, 9)))
+        self.assertEqual(set(m.DESCRIPTIONS), set(range(1, 11)))
 
         for description in m.DESCRIPTIONS.values():
             for label in (
@@ -61,10 +61,11 @@ class MilestoneTests(unittest.TestCase):
         for n in range(1, 8):
             self.assertEqual(m.EXPECTED_STATES[n], "closed")
 
-        self.assertEqual(m.EXPECTED_STATES[8], "open")
+        for n in (8, 9, 10):
+            self.assertEqual(m.EXPECTED_STATES[n], "open")
 
     def test_legacy_and_current_identity(self):
-        for n in range(1, 9):
+        for n in range(1, 11):
             for title in (f"S{n:02d}", f"Fase {n}"):
                 with patch.object(
                     m, "gh", return_value=milestone(n, title)
@@ -133,8 +134,42 @@ class MilestoneTests(unittest.TestCase):
         rows[0]["milestone"] = {"number": 8}
 
         with patch.object(m, "gh", return_value=rows):
-            with self.assertRaisesRegex(RuntimeError, "membership"):
+            with self.assertRaisesRegex(RuntimeError, "inventory_changed"):
                 m.inventory(7)
+
+    def test_global_inventory_filters_other_phases(self):
+        rows = entries7() + [{
+            "number": 204,
+            "state": "open",
+            "milestone": {"number": 8}
+        }]
+
+        with patch.object(
+            m, "gh", side_effect=[
+                rows, {"state": "closed", "merged": True}
+            ]
+        ) as api:
+            result = m.inventory(7)
+
+        self.assertEqual(result["closed"], 10)
+        self.assertNotIn(204, result["items"])
+        self.assertIn(
+            "/issues?state=all",
+            api.call_args_list[0].args[0]
+        )
+
+    def test_phase10_inventory(self):
+        rows = [{
+            "number": 218,
+            "state": "open",
+            "milestone": {"number": 10}
+        }]
+
+        with patch.object(m, "gh", return_value=rows):
+            result = m.inventory(10)
+
+        self.assertEqual(result["open"], 1)
+        self.assertEqual(result["closed"], 0)
 
     def test_stale_counter_detected(self):
         observed = {"open": 0, "closed": 10}
@@ -150,7 +185,7 @@ class MilestoneTests(unittest.TestCase):
 
         with (
             patch.object(m, "milestone", side_effect=milestone),
-            patch.object(m, "inventory", return_value=observed),
+            patch.object(m, "all_inventories", return_value={n: observed for n in range(1, 11)}),
             patch.object(m, "gh") as api
         ):
             m.run(False)
@@ -163,17 +198,17 @@ class MilestoneTests(unittest.TestCase):
             patch.object(
                 m, "milestone",
                 side_effect=[
-                    milestone(n, f"S{n:02d}") for n in range(1, 9)
+                    milestone(n, f"S{n:02d}") for n in range(1, 11)
                 ] + [
-                    milestone(n) for n in range(1, 9)
+                    milestone(n) for n in range(1, 11)
                 ]
             ),
-            patch.object(m, "inventory", return_value=observed),
+            patch.object(m, "all_inventories", return_value={n: observed for n in range(1, 11)}),
             patch.object(m, "gh") as api
         ):
             m.run(True)
 
-        self.assertEqual(api.call_count, 8)
+        self.assertEqual(api.call_count, 10)
 
         for call in api.call_args_list:
             self.assertEqual(

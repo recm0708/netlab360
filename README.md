@@ -23,7 +23,7 @@ Desarrollamos NETLAB360 para integrar tres sedes (HQ, S1 y S2) en un laboratorio
 
 ## Estado de implementación
 
-| Fase | Alcance validado |
+| Fase | Alcance validado o planificado |
 |---|---|
 | Fase 01 | Preparación del entorno y línea base |
 | Fase 02 | Tres sedes, cuatro enlaces WAN y nueve VLAN |
@@ -32,9 +32,11 @@ Desarrollamos NETLAB360 para integrar tres sedes (HQ, S1 y S2) en un laboratorio
 | Fase 05 | HTTP HA, LACP, SDN y NOC integrado |
 | Fase 06 | Detección experimental de anomalías y diagnóstico inteligente |
 | Fase 07 | AIOps supervisado, RCA, Intent Assurance, RFC, watchdog y API controlada |
-| Fase 08 | Consola, copiloto RAG, recuperación integral y entrega: pendientes de aceptación |
+| Fase 08 | Plataforma interactiva, observabilidad avanzada, RAG y recuperación: pendiente de implementación |
+| Fase 09 | Ampliación tecnológica, automatización multivendor y observabilidad cloud-native: planificada |
+| Fase 10 | Validación científica, predicción, QoS/QoE, aceptación integral y entrega: planificada |
 
-La fase 07 cuenta con las ocho issues técnicas cerradas, 49 capturas y regresión de 1258 pruebas (una omitida y ninguna fallida). El informe acumulativo 7.3 (184 páginas) documenta las siete primeras fases; su aceptación documental interna y el cierre se registran en la [issue maestra #7](https://github.com/recm0708/netlab360/issues/7). La [matriz de cobertura](docs/gestion/cobertura-academica-netlab360.md) distingue los resultados validados de las brechas y las demostraciones previstas. La ampliación de la fase 09 está condicionada y no dispone de milestone aprobada.
+La fase 07 cuenta con las ocho issues técnicas cerradas, 49 capturas y regresión de 1258 pruebas (una omitida y ninguna fallida). El informe acumulativo 7.3 (184 páginas) documenta las siete primeras fases; su aceptación documental interna y el cierre se registran en la [issue maestra #7](https://github.com/recm0708/netlab360/issues/7). La [matriz de cobertura](docs/gestion/cobertura-academica-netlab360.md) distingue los resultados validados de las brechas y las demostraciones previstas. Las fases 08, 09 y 10 disponen de hitos y criterios de aceptación propios. Su alcance está aprobado dentro de nuestra planificación; sus funcionalidades permanecen pendientes de implementación y validación.
 
 ## Documentación
 

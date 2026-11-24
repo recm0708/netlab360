@@ -20,7 +20,7 @@ Cada PR, independientemente de su estado, debe tener al menos una etiqueta temá
 Antes de fusionar verificamos los metadatos y las comprobaciones CI; el mantenimiento histórico conserva títulos, estados, autores, cuerpo y criterios no afectados. Consultamos los valores vigentes en GitHub, no en contadores duplicados en documentos.
 
 
-Denominamos los hitos de GitHub «Fase 1» a «Fase 8», conservando sus identificadores numéricos y asignaciones. En la documentación técnica utilizamos «Fase 01» y sucesivas. Los códigos de los ensayos, prefijos técnicos, rutas y registros originales mantienen su nomenclatura.
+Denominamos los hitos de GitHub «Fase 1» a «Fase 10», conservando sus identificadores numéricos y asignaciones. En la documentación técnica utilizamos «Fase 01» y sucesivas. Los códigos de los ensayos, prefijos técnicos, rutas y registros originales mantienen su nomenclatura.
 
 ## Validación y mantenimiento
 
@@ -28,9 +28,20 @@ Las herramientas [normalización de issues](../../scripts/operacion/normalizar_i
 
 Una etiqueta desconocida requiere revisión; no se borra por inferencia ni por falta de uso aparente. Una migración debe conservar las asignaciones de issues y PR y los campos no afectados. No cerrar una issue con criterios pendientes.
 
+El normalizador vigente admite las diez fases. Su modo
+`--check` audita el inventario actual; `--apply` modifica
+exclusivamente las descripciones de las etiquetas de fase.
+No reasigna issues, elimina etiquetas ni repite la migración
+histórica de 53 elementos.
+
+El reconciliador de hitos consulta un inventario global paginado
+de issues y PR, agrupado por número de milestone. Sus cambios
+se limitan a títulos y descripciones, conservando estados,
+fechas y asignaciones.
+
 ## Estado de aceptación
 
-La normalización de títulos, etiquetas y tipos nativos fue verificada. El último inventario de clasificación registrado comprende 62 issues reales (34 Feature, 27 Task, una Bug), sin tipos faltantes. Los estados, criterios y milestones se consultan directamente en GitHub.
+La normalización de títulos, etiquetas y tipos nativos fue verificada. El inventario histórico de clasificación comprendió 62 issues reales (34 Feature, 27 Task y una Bug). Las issues incorporadas a las fases 08–10 requieren comprobar también su clasificación nativa. Los estados, criterios y milestones se consultan directamente en GitHub.
 
 ## Documentación relacionada
 
