@@ -44,9 +44,9 @@ def finite_float(value):
     return result
 
 
-def decode(raw):
+def decode(raw, max_bytes=None):
     """Validar tamaño, estructura y números antes de proyectar."""
-    if len(raw) > MAX_BYTES:
+    if len(raw) > (MAX_BYTES if max_bytes is None else max_bytes):
         raise ValueError("BODY_TOO_LARGE")
     value = json.loads(raw, object_pairs_hook=unique_pairs,
                        parse_constant=reject_constant, parse_float=finite_float)
@@ -60,6 +60,11 @@ def fetch(source):
     if source not in ENDPOINTS:
         raise ValueError("INVALID_SOURCE")
     port, path = ENDPOINTS[source]
+    return _fetch_fixed(port, path, MAX_BYTES)
+
+
+def _fetch_fixed(port, path, max_bytes):
+    """Transporte interno para destinos definidos por el código, no por HTTP."""
     conn = http.client.HTTPConnection("127.0.0.1", port, timeout=TIMEOUT)
     try:
         conn.request("GET", path, headers={"Accept": "application/json",
@@ -73,7 +78,7 @@ def fetch(source):
                 return None, now_utc(), "INVALID"
             if response.getheader("Content-Encoding", "identity").lower() != "identity":
                 return None, now_utc(), "INVALID"
-            payload = decode(response.read(MAX_BYTES + 1))
+            payload = decode(response.read(max_bytes + 1), max_bytes)
         return payload, now_utc(), "OK"
     except (OSError, http.client.HTTPException):
         return None, now_utc(), "UNAVAILABLE"

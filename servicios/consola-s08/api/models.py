@@ -4,7 +4,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class PublicModel(BaseModel):
@@ -72,8 +72,8 @@ class LogoutResult(PublicModel):
 
 class SourceObservation(PublicModel):
     """Observación delimitada; los detalles no vigentes se omiten."""
-    schema: Literal["NETLAB360_S08_SOURCE_V1"]
-    source: Literal["EXPORTER_S04", "NOC_S05"]
+    schema_id: Literal["NETLAB360_S08_SOURCE_V1"] = Field(alias="schema")
+    source: Literal["EXPORTER_S04", "NOC_S05", "PROMETHEUS_S04"]
     kind: Literal["OBSERVATION"]
     transport: Literal["OK", "UNAVAILABLE", "NOT_STARTED", "INVALID"]
     quality: Literal["VALID", "MISSING", "INVALID", "FUTURE", "STALE"]
