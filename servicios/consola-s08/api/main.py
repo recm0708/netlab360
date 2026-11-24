@@ -70,7 +70,7 @@ def create_app(directory: Path | None = None) -> FastAPI:
         from .source_http import register_sources
         register_sources(app, directory)
         from .ui_http import register_ui
-        register_ui(app)
+        register_ui(app, directory)
 
     return app
 
