@@ -58,11 +58,14 @@ def create_app(directory: Path | None = None) -> FastAPI:
     @app.get("/api/v1/capabilities", response_model=Capabilities)
     async def capabilities() -> Capabilities:
         return Capabilities(mode=mode, persistence_enabled=directory is not None,
-                            authentication_enabled=directory is not None)
+                            authentication_enabled=directory is not None,
+                            source_readers_enabled=directory is not None)
 
     if directory is not None:
         from .auth_http import register
         register(app, directory)
+        from .source_http import register_sources
+        register_sources(app, directory)
 
     return app
 
