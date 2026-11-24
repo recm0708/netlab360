@@ -10,6 +10,8 @@ aceptados de las fases anteriores.
 
 | Componente | Función |
 |---|---|
+| [api/advisory_reader.py](api/advisory_reader.py) | Resúmenes históricos de la API Unix S07 |
+| [Pruebas del asesor](../../tests/test_s08_advisory.py) | Identidad del servidor, vigencia y límites de lectura |
 | [api/inference_reader.py](api/inference_reader.py) | Inferencia exploratoria S06 mediante NOC |
 | [Pruebas de inferencia](../../tests/test_s08_inference.py) | Abstención, vigencia y acceso HTTP |
 | [api/prometheus_reader.py](api/prometheus_reader.py) | Métricas de scrapes mediante el adaptador S07 |
@@ -160,7 +162,21 @@ o discrepancia de modelos no equivale a un incidente confirmado.
 Si no existe una muestra utilizable se omiten los detalles y se
 devuelve UNKNOWN; el resto de fuentes permanece independiente.
 No se autoriza el despliegue productivo ni cambios de red.
-La consulta asesora S07 se integra por separado.
+La consulta asesora S07 permanece independiente de la inferencia.
+
+## Consulta asesora S07
+
+GET /api/v1/advisory requiere sesión vigente y no admite parámetros.
+Consultamos exclusivamente incidents, hypotheses y runbooks mediante
+el socket Unix protegido existente, verificando propietario root y
+credenciales del servidor con SO_PEERCRED. No iniciamos el servicio
+ni enviamos escrituras. Un socket ausente se representa como NOT_STARTED.
+Proyectamos cantidades de candidatos, hipótesis, recomendaciones,
+brechas y runbooks declarativos, no contenido bruto ni comandos.
+El snapshot es histórico y nunca autoriza acciones ni acredita salud.
+Si supera 60 segundos, omitimos los detalles y conservamos su fecha.
+La presentación detallada y el acceso operacional con identidad
+dedicada quedan pendientes. No ampliamos permisos del socket.
 
 ## Validación
 

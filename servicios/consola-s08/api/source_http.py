@@ -6,7 +6,7 @@ import asyncio
 from fastapi import FastAPI, HTTPException, Request
 from starlette.concurrency import run_in_threadpool
 
-from . import readers, sessions, prometheus_reader, inference_reader
+from . import readers, sessions, prometheus_reader, inference_reader, advisory_reader
 from .auth_http import COOKIE
 from .models import SourceBatch, SourceObservation
 
@@ -38,3 +38,7 @@ def register_sources(app: FastAPI, directory) -> None:
     @app.get("/api/v1/diagnostics", response_model=SourceBatch)
     async def diagnostics(request: Request) -> SourceBatch:
         return await acquire(request, inference_reader.collect)
+
+    @app.get("/api/v1/advisory", response_model=SourceBatch)
+    async def advisory(request: Request) -> SourceBatch:
+        return await acquire(request, advisory_reader.collect)
