@@ -19,7 +19,7 @@ Las fases S01–S06 están cerradas. S07 tiene sus ocho issues técnicas cerrada
 
 S07 comprende la issue maestra #7 y las ocho issues técnicas #190–#197. S08 incorpora el copiloto RAG #198 además de sus issues vigentes. #17 (OpenTofu externo) y #24 (cuarta sede/WireGuard) permanecen condicionadas; su destino se decidirá al reevaluar S07 y S08. S09 no dispone de milestone aprobada.
 
-Asignamos cada pull request a la milestone en la que se valida o consolida su alcance. Los PR transversales históricos conservan su clasificación temática y reciben el hito de aceptación correspondiente. Esta asignación no acredita funcionalidades adicionales ni altera por sí sola la aceptación académica.
+Asignamos un pull request a un milestone únicamente cuando existe un hito de aceptación inequívoco. Los PR transversales conservan sus etiquetas temáticas y de fase pertinentes; cuando no existe un hito principal, permanecen sin milestone. Revisamos las asignaciones históricas según el alcance y la evidencia de aceptación de cada cambio. Esta clasificación no acredita funcionalidades adicionales ni altera por sí sola la aceptación académica.
 
 El cierre de una milestone exige comprobar el estado y los criterios de aceptación de sus issues. El porcentaje de GitHub no representa por sí solo el avance técnico ni una calificación académica.
 
