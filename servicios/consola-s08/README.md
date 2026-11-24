@@ -10,6 +10,8 @@ aceptados de las fases anteriores.
 
 | Componente | Función |
 |---|---|
+| [api/inference_reader.py](api/inference_reader.py) | Inferencia exploratoria S06 mediante NOC |
+| [Pruebas de inferencia](../../tests/test_s08_inference.py) | Abstención, vigencia y acceso HTTP |
 | [api/prometheus_reader.py](api/prometheus_reader.py) | Métricas de scrapes mediante el adaptador S07 |
 | [Pruebas de métricas](../../tests/test_s08_metrics.py) | Reutilización, vigencia y acceso HTTP |
 | [api/readers.py](api/readers.py) | Lectura fija de exporter S04 y NOC S05 |
@@ -146,6 +148,19 @@ comparte con la exclusión de adquisiciones del lector S04/S05.
 El estado administrativo de WAN/VLAN no demuestra forwarding u OSPF.
 No exponemos PromQL arbitrario ni series históricas completas.
 La clave JSON schema conserva su nombre mediante un alias Pydantic.
+
+## Diagnóstico exploratorio
+
+GET /api/v1/diagnostics requiere sesión vigente y no admite parámetros.
+Reutilizamos el adaptador de inferencia S07 sobre el gateway NOC S05,
+sin iniciar el servicio S06 ni ejecutar mediciones. Conservamos dos
+rutas HQ_A_S1 y HQ_A_S2, vigencia de 30 segundos, procedencia de
+inferencia y ground truth UNKNOWN. Una indicación de degradación
+o discrepancia de modelos no equivale a un incidente confirmado.
+Si no existe una muestra utilizable se omiten los detalles y se
+devuelve UNKNOWN; el resto de fuentes permanece independiente.
+No se autoriza el despliegue productivo ni cambios de red.
+La consulta asesora S07 se integra por separado.
 
 ## Validación
 
