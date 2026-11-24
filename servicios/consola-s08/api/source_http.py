@@ -11,7 +11,7 @@ from .auth_http import COOKIE
 from .models import SourceBatch, SourceObservation
 
 
-def register_sources(app: FastAPI, directory) -> None:
+def register_sources(app: FastAPI, directory):
     """Exponer solo observaciones normalizadas; sin URL ni comandos del cliente."""
     # Un lector lento no impide adquirir otra fuente; máximo cuatro lecturas.
     gates = {name: asyncio.Lock() for name in ("sources", "metrics", "diagnostics", "advisory")}
@@ -44,3 +44,6 @@ def register_sources(app: FastAPI, directory) -> None:
     @app.get("/api/v1/advisory", response_model=SourceBatch)
     async def advisory(request: Request) -> SourceBatch:
         return await acquire(request, "advisory", advisory_reader.collect)
+
+    # Reutilizamos los mismos límites y lectores en el diagnóstico técnico.
+    return acquire

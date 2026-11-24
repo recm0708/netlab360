@@ -68,9 +68,9 @@ footer { color: var(--muted); padding: 16px 28px; border-top: 1px solid var(--li
   main, .topbar, footer { padding: 18px; }
 }
 /* El tema explícito tiene prioridad sobre la preferencia del sistema. */
-:root[data-theme="light"] { color-scheme: light; --button-text: #fff; --bg: #eef2f7; --surface: #fff; --sidebar: #f7f9fc; --line: #c9d4e2; --text: #17283b; --muted: #485c73; --accent: #176ba3; --ok: #08743d; --warn: #a34508; --fault: #b91c1c; --recovery: #1559ad; --unknown: #555d6b; }
+:root[data-theme="light"] { color-scheme: light; --button-text: #fff; --bg: #eef2f7; --surface: #fff; --sidebar: #f7f9fc; --line: #c9d4e2; --text: #17283b; --muted: #485c73; --accent: #176ba3; --ok: #006f24; --warn: #a34508; --fault: #b91c1c; --recovery: #1559ad; --unknown: #555d6b; }
 @media (prefers-color-scheme: light) {
-  :root:not([data-theme]) { color-scheme: light; --button-text: #fff; --bg: #eef2f7; --surface: #fff; --sidebar: #f7f9fc; --line: #c9d4e2; --text: #17283b; --muted: #485c73; --accent: #176ba3; --ok: #08743d; --warn: #a34508; --fault: #b91c1c; --recovery: #1559ad; --unknown: #555d6b; }
+  :root:not([data-theme]) { color-scheme: light; --button-text: #fff; --bg: #eef2f7; --surface: #fff; --sidebar: #f7f9fc; --line: #c9d4e2; --text: #17283b; --muted: #485c73; --accent: #176ba3; --ok: #006f24; --warn: #a34508; --fault: #b91c1c; --recovery: #1559ad; --unknown: #555d6b; }
 }
 
 /* El panel de acceso mantiene el foco visible y se adapta al ancho disponible. */
@@ -204,3 +204,10 @@ nav a { min-height: 42px; gap: 11px; border: 0; }
   #navigation a, #navigation .nav-symbol, #menu-toggle .menu-line,
   .shell .nav-text { transition: none !important; animation: none !important; transform: none !important; }
 }
+
+/* El explorador usa la paleta común y limita el desbordamiento de respuestas. */
+.debug-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 12px 0; }
+.debug-actions select { max-width: 100%; font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 9px; }
+.debug-catalog { overflow-wrap: anywhere; margin: 14px 0; }
+.debug-catalog p { margin: 6px 0; font-size: .88rem; }
+#debug-output { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 55vh; overflow: auto; background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 8px; padding: 16px; font-size: .85rem; }
