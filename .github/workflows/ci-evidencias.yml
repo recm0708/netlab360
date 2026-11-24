@@ -1,5 +1,5 @@
-# NETLAB360 | Automatización de pruebas y tareas del repositorio
-# Configuración del componente correspondiente; conservar los recursos ajenos.
+# Comprueba la numeración, nombres y catálogos de las capturas versionadas.
+# No genera ni modifica imágenes.
 name: NETLAB360 - Catalogo de capturas
 
 on:

@@ -1,5 +1,5 @@
-# NETLAB360 | Automatización de pruebas y tareas del repositorio
-# Configuración del componente correspondiente; conservar los recursos ajenos.
+# Retira la rama de origen únicamente después de una fusión válida.
+# Conserva la rama principal y las referencias ajenas al PR.
 name: NETLAB360 - Eliminar rama fusionada
 
 on:

@@ -1,5 +1,5 @@
-# NETLAB360 | Automatización de pruebas y tareas del repositorio
-# Configuración del componente correspondiente; conservar los recursos ajenos.
+# Comprueba el exportador multisede, historial NOC y reglas de observabilidad.
+# Las pruebas offline no acreditan disponibilidad de una red activa.
 name: NETLAB360 - S04 exporter multisede pruebas offline
 
 on:

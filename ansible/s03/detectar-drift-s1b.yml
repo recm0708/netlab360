@@ -1,5 +1,3 @@
-# NETLAB360 | Configuración de FRRouting mediante Ansible
-# Configuración del componente correspondiente; conservar los recursos ajenos.
 ---
 # NETLAB360 S03 — Detecta exclusivamente desviación esperada R-S1/s1b
 # 100 -> 150 sin cambios sobre FRR. Acepta rc2 del auditor como resultado

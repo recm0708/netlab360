@@ -1,5 +1,5 @@
-# NETLAB360 | Segmentación SDN del laboratorio
-# Configuración del componente correspondiente; conservar los recursos ajenos.
+# Dominio SDN aislado: puertos A y B pertenecen a VLAN 410; C a VLAN 420.
+# No conecta este datapath al plano de administración ni a las WAN FRR.
 version: 2
 vlans:
   s05_experimento:

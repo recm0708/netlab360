@@ -1,5 +1,5 @@
-# NETLAB360 | Automatización de pruebas y tareas del repositorio
-# Configuración del componente correspondiente; conservar los recursos ajenos.
+# Valida el modelo declarativo S03, sus recursos locales y pruebas.
+# El workflow no autoriza cambios sobre FRRouting activo.
 name: NETLAB360 - S03 SoT OpenTofu CI declarativa
 
 on:
@@ -9,8 +9,8 @@ on:
       - 'iac/s03/**'
       - 'inventario/ipam/topologia-s02.yaml'
       - 'scripts/automatizacion/s03_generar_sot.py'
-      - 'scripts/validacion/s03-*.py'
-      - 'scripts/laboratorio/s03-*.py'
+      - 'scripts/validacion/s03_*.py'
+      - 'scripts/laboratorio/s03_*.py'
       - 'ansible/s03/**'
       - 'tests/test_s03_*.py'
       - '.github/workflows/ci-s03-sot-opentofu.yml'
@@ -20,8 +20,8 @@ on:
       - 'iac/s03/**'
       - 'inventario/ipam/topologia-s02.yaml'
       - 'scripts/automatizacion/s03_generar_sot.py'
-      - 'scripts/validacion/s03-*.py'
-      - 'scripts/laboratorio/s03-*.py'
+      - 'scripts/validacion/s03_*.py'
+      - 'scripts/laboratorio/s03_*.py'
       - 'ansible/s03/**'
       - 'tests/test_s03_*.py'
       - '.github/workflows/ci-s03-sot-opentofu.yml'
