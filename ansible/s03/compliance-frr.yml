@@ -13,7 +13,7 @@
   connection: local
   strategy: linear
   vars:
-    s03_script: "{{ playbook_dir }}/../../scripts/validacion/s03-frr-compliance.py"
+    s03_script: "{{ playbook_dir }}/../../scripts/validacion/s03_frr_compliance.py"
     ansible_python_interpreter: /usr/bin/python3
   tasks:
     - name: Verificar identidad de inventario y alcance

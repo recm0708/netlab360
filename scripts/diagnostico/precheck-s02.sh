@@ -45,7 +45,7 @@ echo "S02_NUEVA_SESION_SSH=VALIDAR_EXTERNAMENTE"
 
 echo "========== IPAM S02 =========="
 sudo -v
-python3 scripts/validacion/validar-ipam-s02.py
+python3 scripts/validacion/validar_ipam_s02.py
 
 echo "========== FRR RENDER =========="
 sudo docker image inspect "$IMAGE" --format 'FRR_LOCAL={{.Id}} {{.Architecture}}' ||

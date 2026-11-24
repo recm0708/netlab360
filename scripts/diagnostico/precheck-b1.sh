@@ -47,7 +47,7 @@ echo "========== ESTADO GIT =========="
 cd "$HOME/proyectos/netlab360"
 git status --short --branch
 echo "========== VALIDAR IPAM PRELIMINAR =========="
-python3 scripts/validacion/validar-ipam.py inventario/ipam/topologia-b1.yaml
+python3 scripts/validacion/validar_ipam.py inventario/ipam/topologia-b1.yaml
 echo "========== COMPROBAR COLISIONES DE SUBREDES (HOST + DOCKER) =========="
 python3 - <<'PY'
 import ipaddress

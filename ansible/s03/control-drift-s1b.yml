@@ -11,7 +11,7 @@
   connection: local
   vars:
     ansible_python_interpreter: /usr/bin/python3
-    script_control: "{{ playbook_dir }}/../../scripts/laboratorio/s03-drift-s1b.py"
+    script_control: "{{ playbook_dir }}/../../scripts/laboratorio/s03_drift_s1b.py"
     operacion_validada: "{{ operacion_s03 | default('') }}"
     snapshot_validado: "{{ snapshot_s03 | default(false) | bool }}"
   tasks:
