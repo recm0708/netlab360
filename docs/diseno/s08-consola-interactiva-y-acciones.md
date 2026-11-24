@@ -112,6 +112,59 @@ tests/
 
 **Crítico:** NO pasar cadenas libres a `bash -c`, `shell=True`, `sudo` con rutas de scripts editables por el usuario o interpolaciones del navegador. Los scripts que requieran privilegios deben instalarse como ejecutores **propiedad root, no editables por usuario web**, y recibir únicamente acciones/argumentos autorizados; el observador de la fase 05 permanece read-only. Verificar política de ejecución y pruebas de intrusión antes de conectar botones que produzcan fallos.
 
+### Contrato de integración y fronteras de confianza
+
+Separamos el transporte, la calidad temporal y el estado observado.
+Una respuesta HTTP correcta no acredita el estado de un servicio;
+una fuente ausente, inválida, futura u obsoleta se representa como
+UNKNOWN. No sustituimos la fecha de la muestra por la hora de recepción.
+
+| Fuente | Interfaz existente | Alcance |
+|---|---|---|
+| Exporter S04 | 127.0.0.1:9110/api/v1/state | Existencia de routers y flags administrativos |
+| NOC S05 | 127.0.0.1:9130/api/v1/graph | Grafo y observaciones de WAN, VLAN, FIB, LACP, SDN y HA |
+| Prometheus S04 | 127.0.0.1:9091/api/v1/query | Scrapes y métricas; reutilizamos el adaptador fijo S07 |
+| IA S06 | 127.0.0.1:9130/api/v1/s06/diagnostics | Inferencias ICMP; depende de la API 9145 |
+| AIOps S07 | Socket Unix /run/netlab360-s07-api/api.sock | Snapshot asesor y RFC; autorización administrativa separada |
+
+El [contrato de fuentes S08](../../servicios/consola-s08/api/contracts.py)
+define metadatos de recepción, fecha de observación, antigüedad,
+calidad y estado. Reutilizamos la semántica temporal de S07
+(60 segundos para observaciones y 30 para inferencias).
+El límite de 60 segundos del snapshot asesor es una política
+inicial de S08, no una garantía de adquisición periódica.
+El timestamp global del grafo indica su generación, no la
+vigencia de cada observación: los adaptadores deben comprobar
+las fechas individuales de telemetría, LACP, SDN y HA.
+Los eventos S07 conservan su contrato original; no los
+reescribimos como eventos S08.
+
+El backend se ejecutará sin root, con identidad de servicio
+dedicada y sin acceso al grupo Docker ni sudo genérico.
+La integración privilegiada se limita a los mecanismos
+revisados de S07, con identidad Unix y autorización
+administrativa independiente. No habilitamos esas capacidades
+en el backend inicial. Los adaptadores resolverán fuentes
+por identificador fijo, sin URLs, rutas o PromQL arbitrarios
+suministrados por el cliente. Se rechazarán redirecciones,
+proxies externos, respuestas excesivas y estructuras inválidas.
+
+La persistencia S08 será independiente de las bases históricas,
+con directorio privado 0700 y archivos 0600, inicialización
+explícita, consultas parametrizadas y migraciones versionadas.
+No se almacenarán contraseñas en texto plano ni tokens de
+sesión en logs. La UI y la API compartirán origen y tendrán
+sesiones opacas con expiración, cookies HttpOnly y SameSite,
+control de origen y CSRF para escrituras, y roles de espectador
+y operador. La autenticación local no equivale a autorización
+root. HTTPS será requisito para exposición no local; la demo
+inicial utilizará loopback y túnel SSH.
+
+La versión inicial del contrato es offline: no abre sockets,
+no crea bases, no inicia servicios y no concede permisos.
+La integración FastAPI, persistencia, controles de sesión
+y validación de fuentes reales requieren sus propias pruebas.
+
 ## 4. Catálogo inicial de acciones (IDs estables)
 
 | ID | Tipo | Parámetros límite | Resultado esperado |

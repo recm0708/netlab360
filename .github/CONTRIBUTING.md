@@ -17,7 +17,7 @@ Conservamos el nombre `README.md` en cada directorio que necesita una introducci
 | Tipo | Convención |
 |---|---|
 | Markdown técnico | minúsculas ASCII y palabras separadas por guiones; prefijo sNN cuando corresponde |
-| Módulos Python | snake_case; identificador válido de Python |
+| Módulos Python | snake_case; identificador válido de Python; conservar `__init__.py` para inicializar paquetes |
 | Pruebas Python | test_sNN_componente.py o test_transversal_componente.py para comprobaciones transversales |
 | Ejecutables Bash | minúsculas ASCII separadas por guiones; prefijo de fase cuando corresponde |
 | Configuración y datos | nombre descriptivo estable, según formato y consumidor |

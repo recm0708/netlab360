@@ -17,6 +17,11 @@ from auditar_repositorio import markdown_lines, proposed_name
 ENLACE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 
 
+def nombre_modulo_python_valido(nombre):
+    """Conservar el nombre reservado de inicialización de paquetes Python."""
+    return nombre == "__init__.py" or bool(re.fullmatch(r"[a-z][a-z0-9_]*\.py", nombre))
+
+
 def documentos_tecnicos():
     """Retorna los documentos incluidos en el proyecto."""
     for documento in ROOT.rglob("*.md"):
@@ -58,13 +63,21 @@ class DocumentacionProyectoTests(unittest.TestCase):
             nombre = Path(ruta).name
             if proposed_name(ruta) != ruta:
                 errores.append(ruta)
-            elif ruta.endswith(".py") and not re.fullmatch(r"[a-z][a-z0-9_]*\.py", nombre):
+            elif ruta.endswith(".py") and not nombre_modulo_python_valido(nombre):
                 errores.append(ruta)
             elif ruta.startswith("tests/") and ruta.endswith(".py") and not re.fullmatch(r"test_(s\d{2}|transversal)_[a-z0-9_]+\.py", nombre):
                 errores.append(ruta)
             elif ruta.startswith("docs/") and ruta.endswith(".md") and nombre != "README.md" and not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*\.md", nombre):
                 errores.append(ruta)
         self.assertEqual(errores, [])
+
+    def test_nombre_reservado_paquetes_python(self):
+        for nombre in ("__init__.py", "contracts.py", "source_reader.py"):
+            with self.subTest(nombre=nombre):
+                self.assertTrue(nombre_modulo_python_valido(nombre))
+        for nombre in ("_oculto.py", "__arbitrario__.py", "MiModulo.py", "source-reader.py"):
+            with self.subTest(nombre=nombre):
+                self.assertFalse(nombre_modulo_python_valido(nombre))
 
     def test_catalogos_de_capturas(self):
         carpeta = ROOT / "evidencias/capturas"
