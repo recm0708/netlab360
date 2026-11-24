@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# Aceptación S07-008A-C; no cancelar watchdogs ante error.
+# NETLAB360 S07: aceptación de la API local y ciclo RFC supervisado.
+# Comprueba la identidad del cliente Unix, las aprobaciones administrativas,
+# la restauración y el retorno al estado inicial. No cancelar watchdogs ante error.
 set -Eeuo pipefail
 trap 'echo "ERROR_LINEA=$LINENO CODIGO=$?"; echo "No repetir ni cancelar watchdogs; conservar resultados."' ERR
 export GIT_PAGER=cat PAGER=cat GH_PAGER=cat SYSTEMD_PAGER=cat

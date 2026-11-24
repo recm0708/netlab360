@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-# NETLAB360 | Laboratorio: s05 lacp multistream piloto
-# Alcance: recursos propios del módulo, sin alterar la red administrativa.
-
 # NETLAB360 S05/P1: LACP multistream acotado, aislado de ens33/VMnet8.
 # --precheck solo inspecciona; --run crea y retira dos namespaces propios.
 set -Eeuo pipefail

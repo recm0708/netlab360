@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
-# NETLAB360 | Operación: s05 lote 145a instalar observador
-# Alcance: recursos propios del módulo, sin alterar la red administrativa.
-
-# NETLAB360 S05: procedimiento versionado, ejecutar como usuario rc-aa-ec.
+# NETLAB360 S05: instalación del observador privilegiado de solo lectura.
+# Verifica la copia, propietario, permisos y acceso autorizado antes de integrar el NOC.
 bash <<'BASH'
 set -Eeuo pipefail
 cd ~/proyectos/netlab360

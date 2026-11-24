@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-# NETLAB360 | Observabilidad: s04 iniciar prometheus local
-# Alcance: recursos propios del módulo, sin alterar la red administrativa.
-
 # NETLAB360 S04: Prometheus independiente, solo localhost 9091, sin alterar B3.
 set -Eeuo pipefail
 
