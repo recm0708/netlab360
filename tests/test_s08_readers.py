@@ -153,6 +153,7 @@ class ReaderHttpTests(unittest.TestCase):
                     response = client.get("/api/v1/sources")
                     self.assertEqual(response.status_code,200)
                     self.assertEqual(len(response.json()["observations"]),6)
+                    self.assertEqual(response.json()["observations"][0]["schema"],"NETLAB360_S08_SOURCE_V1")
                     self.assertEqual(response.json()["infrastructure_state"],"UNKNOWN")
                     self.assertEqual(client.post("/api/v1/sources").status_code,405)
                     collect.assert_called_once()

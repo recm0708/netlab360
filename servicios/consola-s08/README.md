@@ -10,6 +10,8 @@ aceptados de las fases anteriores.
 
 | Componente | Función |
 |---|---|
+| [api/prometheus_reader.py](api/prometheus_reader.py) | Métricas de scrapes mediante el adaptador S07 |
+| [Pruebas de métricas](../../tests/test_s08_metrics.py) | Reutilización, vigencia y acceso HTTP |
 | [api/readers.py](api/readers.py) | Lectura fija de exporter S04 y NOC S05 |
 | [api/source_http.py](api/source_http.py) | Consulta de observaciones autenticada |
 | [Pruebas de lectores](../../tests/test_s08_readers.py) | Transporte, vigencia y alcance de fuentes |
@@ -33,7 +35,7 @@ Incorporamos un servidor de arranque con dos rutas públicas
 de metadatos, sin datos operacionales ni autorización.
 Incorporamos una base SQLite privada de inicialización explícita.
 Integramos la autenticación HTTP como modo explícito sobre SQLite v2.
-Integramos los primeros lectores de exporter y NOC; las demás fuentes,
+Integramos los lectores de exporter, NOC y Prometheus; las demás fuentes,
 la interfaz gráfica y las acciones requieren implementación independiente.
 
 ## Ejecución de desarrollo
@@ -130,8 +132,20 @@ loopback fijos, sin redirecciones ni proxies, con cuerpo máximo de
 256 KiB y timeout de socket de tres segundos. Una sola adquisición
 concurrente por proceso; los errores de una fuente no reemplazan
 los datos de otra. No se aceptan parámetros de consulta.
-La topología gráfica, WAN/VLAN detalladas, Prometheus, IA y AIOps
+La topología gráfica, WAN/VLAN detalladas, IA y AIOps
 requieren integración posterior. No se expone el grafo bruto.
+
+## Métricas Prometheus
+
+GET /api/v1/metrics requiere sesión vigente y no admite parámetros.
+Reutilizamos el [adaptador Prometheus S07](../../scripts/s07/adaptador_prometheus.py)
+para la consulta fija de 120 segundos y la proyección de 23 observaciones
+con fecha del scrape real. El transporte S08 conserva el límite de
+512 KiB de esta fuente, sin proxy ni redirecciones. El acceso se
+comparte con la exclusión de adquisiciones del lector S04/S05.
+El estado administrativo de WAN/VLAN no demuestra forwarding u OSPF.
+No exponemos PromQL arbitrario ni series históricas completas.
+La clave JSON schema conserva su nombre mediante un alias Pydantic.
 
 ## Validación
 
