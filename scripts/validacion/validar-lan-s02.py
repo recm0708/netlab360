@@ -12,7 +12,7 @@ import re
 import subprocess
 import sys
 
-ROOT = Path.home() / "proyectos/netlab360"
+ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location("s02lan", ROOT / "scripts/laboratorio/s02-lan-vlan.py")
 assert SPEC and SPEC.loader
 mod = importlib.util.module_from_spec(SPEC)
@@ -71,7 +71,7 @@ def main() -> None:
             raise RuntimeError(f"ICMP {a}:{va}->{b}:{vb} falló")
         print(f"S02_ICMP_VLAN_{a}{va}_A_{b}{vb}=OK")
     print("S02_LAN_COMUNICACION=6/6")
-    if mod.host_state() != state["host"]:
+    if not mod.management_snapshot_equal(mod.host_state(), state["host"]):
         raise RuntimeError("Cambio en la ruta/IP de gestión")
     print("S02_HOST_GESTION_INTACTO=SI")
     print("S02_LAN_VALIDADA=OK")

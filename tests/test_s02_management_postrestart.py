@@ -7,6 +7,9 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 import unittest
+import json
+import tempfile
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 WAN = "s02-wan-links.py"
@@ -129,6 +132,96 @@ class ManagementPostRestartTests(unittest.TestCase):
     def test_falla_estructura_incorrecta(self):
         self.check(snapshot(), {}, False)
         self.check({}, snapshot(), False)
+
+
+
+
+class LanValidatorManagementTests(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+
+        target = (
+            ROOT / "scripts/validacion/validar-lan-s02.py"
+        )
+
+        spec = importlib.util.spec_from_file_location(
+            "test_lan_validator_management", target
+        )
+
+        assert spec is not None and spec.loader is not None
+
+        cls.validator = importlib.util.module_from_spec(spec)
+
+        spec.loader.exec_module(cls.validator)
+
+    def run_validator(self, previous, current):
+
+        v = self.validator
+
+        with tempfile.TemporaryDirectory() as directory:
+
+            state = Path(directory) / "lan-state.json"
+
+            state.write_text(
+                json.dumps({"host": previous}),
+                encoding="utf-8",
+            )
+
+            with (
+                patch.object(v.mod, "STATE", state),
+                patch.object(v.mod, "router_state", return_value={}),
+                patch.object(v.mod, "owns"),
+                patch.object(v.mod, "host_state", return_value=current),
+                patch.object(v, "cmd", return_value=(
+                    "110 120 130 210 220 230 310 320 330"
+                )),
+                patch.object(v, "ping", return_value=True),
+                patch("builtins.print"),
+            ):
+                v.main()
+
+    def test_validator_accepts_identical_state(self):
+
+        state = snapshot()
+
+        self.run_validator(state, state)
+
+    def test_validator_accepts_docker0_transient_linkdown(self):
+
+        self.run_validator(
+            snapshot(docker=DOCKER + " linkdown"),
+            snapshot(),
+        )
+
+    def test_validator_rejects_management_gateway_change(self):
+
+        with self.assertRaisesRegex(
+            RuntimeError, "Cambio en la ruta/IP"
+        ):
+            self.run_validator(
+                snapshot(),
+                snapshot(
+                    default=DEFAULT.replace(
+                        "192.168.47.2", "192.168.47.3"
+                    )
+                ),
+            )
+
+    def test_validator_rejects_management_address_change(self):
+
+        with self.assertRaisesRegex(
+            RuntimeError, "Cambio en la ruta/IP"
+        ):
+            self.run_validator(
+                snapshot(),
+                snapshot(
+                    ens33=MGMT_ADDR.replace(
+                        "192.168.47.40/24",
+                        "192.168.47.41/24",
+                    )
+                ),
+            )
 
 
 if __name__ == "__main__":
