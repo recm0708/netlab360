@@ -37,64 +37,94 @@ Se mantiene un único informe académico acumulativo. La numeración de figuras 
 
 Los documentos técnicos se organizan por función, evitando duplicar cronologías, estados de avance y procedimientos.
 
-## Matriz de cobertura académica — línea base S06
+## Matriz de cobertura académica — cierre de la fase 7
 
-La planificación semestral del 17 de agosto de 2026 comprende cuatro módulos y dieciséis capítulos. Se contrastaron los materiales individuales disponibles I–XII, las guías publicadas de laboratorios 1–4 y 6–8, el parcial 1 y la guía de proyecto final. Para XIII–XVI se utiliza el programa oficial: sus documentos individuales y la guía del laboratorio 5 no se localizaron en esta revisión. La numeración de las actividades publicadas no coincide necesariamente con el cronograma inicial.
+Corte: 24 de noviembre de 2026. Contrastamos la planificación semestral de cuatro módulos y dieciséis capítulos, los materiales individuales I–XII disponibles, las guías 1–4 y 6–8, el parcial 1 y la guía final. XIII–XVI se clasifican según el programa oficial: no se localizaron sus documentos individuales ni la guía del laboratorio 5. La matriz distingue alcance técnico acreditado, brechas y destino propuesto; no certifica cumplimiento de todos los contenidos del semestre. El informe acumulativo 7.3 (184 páginas, 42 figuras, 19 tablas y 19 referencias) incorpora los resultados hasta la fase 7; la revisión final de paginación se reserva para la entrega. No se publica el PDF con datos personales.
 
-| Capítulo | Competencias | Estado acreditado al cierre S06 | Destino |
-|---|---|---|---|
-| I | SoT, estado deseado, drift, convergencia e intención | OSPF y reconciliación FRR comprobados; intención integral parcial | S07 |
-| II | OpenTofu, HCL, módulos, providers, state, locking y lifecycle | Metadatos locales; recursos externos, backend remoto y WireGuard no demostrados | S09 condicionada (#17, #24) |
-| III | Ansible, roles, idempotencia, compliance y multivendor | FRR validado; VyOS y multivendor no demostrados | S07/S09 |
-| IV | NetDevOps, CI/CD, GitOps, Policy as Code | Git y CI comprobados; reconciliación continua GitOps y autorización integral pendientes | S07/S08; ampliación S09 |
-| V | gNMI, OpenConfig, gRPC, Protobuf, suscripciones | Adquisición periódica comprobada; streaming real no demostrado | S09 |
-| VI | Prometheus, señales, SLI/SLO, error budget y burn rate | Exporter, NOC, TSDB, SQLite y SLI experimental comprobados; ampliar observación del servicio | S08/S09 |
-| VII | Dependencias híbridas, Kubernetes, Cilium, Hubble y eBPF | WAN/servicios multisede comprobados; cloud-native no demostrado | S09 |
-| VIII | Fuentes, esquemas, timestamps, calidad, ventanas y leakage | Estudio ICMP V2 experimental; fuentes heterogéneas y nuevas características ampliables | S07/S09 |
-| IX | Reglas, ML supervisado/no supervisado y evaluación | P95, Isolation Forest y regresión logística en ICMP; alcance experimental | S07 |
-| X | Anomalías, contexto y errores de detección | Detección controlada y análisis retrospectivo; no toda anomalía confirma incidente | S07/S09 |
-| XI | Predicción, capacidad, QoE, incertidumbre | Pronóstico futuro y MAE prospectivo no demostrados | S09 |
-| XII | Generalización, explicabilidad y deriva | Separación cronológica y análisis descriptivo; explicabilidad y concept drift inferencial limitados/no demostrados | S07/S09 |
-| XIII | Correlación temporal/topológica/contextual y RCA | Señales disponibles; correlación sistemática y priorización pendientes | S07 |
-| XIV | LLM, RAG, grounding y copilotos | No demostrado; recuperación documental y generación evaluada pendientes | S07/S08 |
-| XV | AIOps, orquestación, agentes y human-in-the-loop | Guardas y rollback acotados existentes; ciclo integral pendiente | S07/S08 |
-| XVI | Integración, aceptación, confiabilidad y riesgo | S01–S06 cerradas; ciclo extremo a extremo y arranque frío pendientes | S08, o aceptación final tras S09 si se aprueba |
+| Capítulo | Competencias | Estado acreditado al cierre de la fase 7 | Brecha o destino | Demostración prevista en fase 8 |
+|---|---|---|---|---|
+| I | Redes automatizadas, SoT, intención, drift y convergencia | Validado en alcance delimitado: IPAM, OSPF, reconciliación, ocho costos y RFC protegido | Ampliable a otras intenciones | Inventario, FIB, vecinos, comparación deseado/observado y restauración |
+| II | OpenTofu/Terraform, HCL, módulos, providers, state, locking, lifecycle | Limitado: 17 recursos locales terraform_data e idempotencia; no aprovisionamiento externo | Provider, módulos, backend remoto, locking compartido y WireGuard: candidatos #17/#24 | Evidencia de plan sin cambios y estado declarativo; despliegue fuera del navegador |
+| III | Ansible, roles, compliance, idempotencia, multivendor | Validado para FRR; auditoría y reconciliación selectiva | VyOS/multivendor no demostrados | Informe de cumplimiento y evidencia de reconciliación; no playbook arbitrario |
+| IV | NetDevOps, CI/CD, GitOps, Policy as Code | Parcial: Git, CI, política RFC, autorización y auditoría verificados | GitOps de reconciliación continua no demostrado | Historial de validaciones, política y solicitudes; CI en segundo plano |
+| V | Streaming Telemetry, gNMI, OpenConfig, gRPC, Protobuf | Limitado a adquisición periódica, contrato normalizado y control de vigencia | Streaming y modelos de datos específicos no demostrados | Series y calidad de fuentes; no rotular polling como streaming |
+| VI | Observabilidad, Prometheus, SLI/SLO, error budget, burn rate | Parcial: exportador, TSDB, alertas, NOC, SQLite y SLI de recopilación (97,586 % en 60 min frente a 99 % candidato) | SLI de servicio, burn rate, notificaciones y fuentes adicionales por validar | Panel de métricas e incidentes, fuente UNKNOWN y ventana histórica |
+| VII | Observabilidad híbrida y cloud-native | Parcial: servicios multisede virtualizados; Docker no equivale a Kubernetes | Kubernetes, Cilium, Hubble y eBPF no demostrados | Topología y servicios existentes; no mostrar clúster ficticio |
+| VIII | Ingeniería de datos, esquemas, calidad, ventanas, leakage | Experimental validado: ICMP V2 cronológico; contrato de 58 señales, persistencia y vigencia en fase 7 | Más sesiones independientes y características | Dataset, particiones, procedencia y brechas de cobertura |
+| IX | Fundamentos IA/ML, reglas, aprendizaje supervisado y no supervisado | Experimental validado: P95, Isolation Forest y regresión logística, cuatro modelos congelados | Generalización no demostrada | Comparación TEST histórica e inferencia actual de solo lectura |
+| X | Detección de anomalías y contexto | Experimental: degradaciones ICMP, contexto RCA, abstención y controles negativos | Más fallas y evaluación independiente; no extrapolar tasa de error | Diagnóstico, score, evidencia y UNKNOWN; HTTP independiente de ML ICMP |
+| XI | Predicción de degradación, capacidad y QoE | No demostrada prospectivamente | Pronóstico temporal, MAE y QoS/QoE candidatos | Solo mediciones actuales e históricas; pronóstico no disponible |
+| XII | Evaluación, explicabilidad y concept drift | Parcial: evaluación cronológica, límites, evidencia RCA e incertidumbre | Explicabilidad ML y deriva inferencial con etiquetas independientes | Métricas TEST, explicación de reglas y evidencia RCA; no confundir drift OSPF con concept drift |
+| XIII | Correlación temporal, topológica y contextual; RCA | Validado experimentalmente: 18 contextos, cinco escenarios, 15 ventanas seleccionadas, 870 observaciones no independientes, 11 hipótesis y recomendaciones coincidentes | Cobertura individual de puertos SDN y escenarios independientes | Línea de tiempo, evidencias favorables/contradictorias/desconocidas, hipótesis, runbooks y abstención |
+| XIV | LLM, RAG, grounding y copilotos | Parcial: recuperación léxica de corpus propio; no RAG generativo validado | Fase 8 #198 | Consulta con citas, evidencia insuficiente, evaluación y controles de inyección; sin privilegios |
+| XV | AIOps, orquestación, agentes y human-in-the-loop | Validado en alcance supervisado: ciclo RFC real, API Unix, aprobación, idempotencia, watchdog y postcondiciones | Integrar consola; no autonomía ni shell libre | Solicitud, aprobación administrativa separada, ejecución acotada, retorno y auditoría |
+| XVI | Integración extremo a extremo, aceptación, confiabilidad y riesgo | Parcial: ciclo técnico integrado y 1258 casos (uno omitido, cero fallos); reconstrucción manual demostrada | Consola, RAG, arranque frío automático, regresión y entrega fase 8 | Secuencia de extremo a extremo, evidencia y recuperación comprobada |
 
 ### Guías prácticas contrastadas
 
-Laboratorio 1: intención y diferenciación de drift/falla. Laboratorio 2: recursos reales, WireGuard y locking. Laboratorio 3: FRR/VyOS e idempotencia. Laboratorio 4: Blackbox, Grafana, SLI/SLO y burn rate. Laboratorio 6: incidentes, RFC, separación de responsabilidades y runbooks; reserva de TEST. Laboratorio 7: Isolation Forest y contexto histórico. Laboratorio 8: pronóstico a diez minutos, MAE, costo y cambio QoS. Parcial 1: integración OSPF con Kubernetes/Cilium/Hubble. Los resultados de esas prácticas no se atribuyen a NETLAB360.
+Laboratorio 1: intención y diferenciación de drift/falla. Laboratorio 2: recursos reales, WireGuard y locking. Laboratorio 3: FRR/VyOS e idempotencia. Laboratorio 4: Blackbox, Grafana, SLI/SLO y burn rate. Laboratorio 6: incidentes, RFC, separación de responsabilidades y runbooks; reserva de TEST. Laboratorio 7: Isolation Forest y contexto histórico. Laboratorio 8: pronóstico a diez minutos, MAE, costo y cambio QoS. Parcial 1: OSPF con Kubernetes/Cilium/Hubble. No atribuimos resultados de esas prácticas al proyecto.
 
-## Estado técnico de referencia
+## Matriz tecnológica y ampliaciones
 
-Las fases S01–S06 se encuentran cerradas; S07 tiene aceptación técnica completa. La plataforma dispone de enrutamiento multisede, segmentación VLAN, automatización declarativa, observabilidad, LACP, disponibilidad lógica HTTP, SDN y detección experimental de anomalías.
+Prioridad propuesta: alta = brecha académica relevante o dependencia de la demostración; media = extensión útil condicionada. No implica aprobación ni obligación de instalar herramientas. Validado significa evidencia previa, no comprobación en vivo de la VM suspendida.
 
-El estudio V2 utiliza particiones cronológicas independientes, modelos congelados y un protocolo uniforme de medición ICMP. La falla HTTP fue evaluada como escenario independiente. No se atribuye a los resultados capacidad de pronóstico futuro, generalización automática entre protocolos ni remediación autónoma.
+| Tecnología o capacidad | Estado al cierre de fase 7 | Ampliación o criterio de aceptación | Destino propuesto | Prioridad |
+|---|---|---|---|---|
+| OpenTofu | Limitado a metadatos locales | Provider real, módulos, data sources, lifecycle, locking y recursos aislados | #17 / eventual fase 9 | Alta |
+| WireGuard | No demostrado | Túnel multisede aislado, alcance y conectividad comprobados | #24 / eventual fase 9 | Alta |
+| Ansible multivendor | FRR validado | VyOS, auditoría e idempotencia multivendor | Eventual fase 9 | Media |
+| GitOps | CI y reconciliación controlada | Reconciliación periódica autorizada y auditada | Eventual fase 9 | Alta |
+| gNMI/OpenConfig | No demostrado | Suscripción real con calidad, timestamps y trazabilidad | Eventual fase 9 | Alta |
+| gRPC/Protocol Buffers | No demostrado | Adquisición estructurada real y validación de esquema | Eventual fase 9 | Media |
+| Blackbox Exporter | No acreditado | Sondas HTTP/TCP/ICMP independientes | Evaluar en fase 8; ampliación condicionada | Alta |
+| Grafana | No acreditado | Dashboard especializado con datos reales; evitar duplicar NOC | Ampliación condicionada | Media |
+| Alertmanager | No demostrado | Agrupación, distribución y recepción comprobadas | Ampliación condicionada | Alta |
+| OpenTelemetry | No demostrado | Correlación de métricas y trazas HTTP | Eventual fase 9 | Media |
+| Kubernetes | No demostrado | Servicios cloud-native en dominio aislado | Eventual fase 9 | Media |
+| Cilium/Hubble/eBPF | No demostrado | Flujos reales y NetworkPolicy comprobada | Eventual fase 9 | Media |
+| ML | Experimental ICMP | Nuevas características, etiquetas y sesiones independientes | Mostrar fase 8; ampliar condicionalmente | Alta |
+| Predicción temporal | No demostrada | Horizonte explícito y evaluación prospectiva sin leakage | Eventual fase 9 | Alta |
+| MAE | No evaluado prospectivamente | Comparar pronósticos congelados con observaciones futuras | Eventual fase 9 | Alta |
+| QoS/QoE | Limitado | Priorización controlada y métricas de experiencia del servicio | Eventual fase 9 | Alta |
+| Concept drift | No demostrado inferencialmente | Cambios de contexto y etiquetas independientes | Eventual fase 9 | Alta |
+| Explicabilidad ML | Parcial; RCA explicable no equivale a explicar modelos | Contribución de variables y justificación verificable | Mostrar límites fase 8; ampliar condicionalmente | Alta |
+| Evaluación TCP/UDP | Parcial; ensayos TCP previos | Pruebas acotadas iperf3 TCP/UDP, pérdida, jitter y tasa observada | Fase 8 #8/#44 | Alta |
+| RCA y runbooks | Validados experimentalmente | Integración visual y cobertura SDN adicional si se valida | Fase 8; ampliación condicionada | Alta |
+| RAG generativo | Pendiente | Citas fieles, abstención, relevancia, seguridad y evaluación real | Fase 8 #198 | Alta |
+| Intent/RFC/API/watchdog | Validados en alcance fijo | Integración con aprobación externa y pruebas de regresión | Fase 8 #8 | Alta |
+| Reconstrucción automática | Manual comprobada; automática pendiente | Arranque frío y postcondiciones integrales verificadas | Fase 8 #106 | Alta |
 
-## Planificación de las fases restantes
+## Integración y demostración mediante la consola
 
-S07 validó la operación inteligente supervisada mediante correlación, diagnóstico, recomendación, aprobación, ejecución, comprobación y rollback.
+La aplicación presentará resultados reales sin exigir que todas las herramientas tengan botones propios. Distinguimos visualización en vivo, pruebas interactivas controladas, evidencia histórica y funciones de segundo plano. Las funciones pendientes no se muestran como operativas.
 
-S08 consolidará la aplicación interactiva, las pruebas reproducibles, el copiloto generativo RAG (#198), la recuperación operativa y la preparación de la entrega según el alcance aprobado. S07 se controla mediante #7 y #190–#197.
+| Bloque | Visible en la consola | Segundo plano / evidencia | Criterio de demostración |
+|---|---|---|---|
+| Infraestructura | Salud, sedes, inventario y topología | VMware, Ubuntu, Docker, namespaces, veth, bridges | Inventario actual y conectividad administrativa intacta |
+| WAN/OSPF/FIB | Vecinos, costos, ruta principal/respaldo | FRR y protocolos de enrutamiento | Cambio de ruta real y retorno, sin confundir FIB con tráfico medido |
+| LAN/VLAN/ACL | Segmentos, origen/destino y resultados de pruebas | Linux bridge, nftables y subinterfaces | Comunicación permitida/denegada; recrear ACL temporal solo con procedimiento aceptado |
+| HTTP HA | Backend activo, estado, latencia y errores | Frontal, dos backends y monitor | HQ → S1 → HQ con solicitudes reales |
+| LACP | Miembros por extremo y estado | Bonding Linux | 2 → 1 → 2, conectividad y restauración |
+| SDN | Controlador, puertos cuando medidos, aislamiento | OVS/Faucet/OpenFlow | A–B permitido, A–C restringido, recuperación; no inventar cobertura RCA de puertos |
+| Automatización | Inventario, cumplimiento y resultados declarativos | Ansible, OpenTofu, Git y CI | Comparar estado deseado/observado, plan/no cambios y registros reales |
+| Observabilidad | Métricas, alertas, historial, vigencia y SLI | Exportadores, Prometheus, SQLite | Cambio observado y fuente UNKNOWN distinguible de falla |
+| Pruebas de red | Ping, traceroute, HTTP, TCP/UDP acotados | Ejecutores permitidos y límites de carga | Medidas originales, origen/destino, ventana y resultado |
+| ML | Inferencia, score, método y evaluación histórica | Modelos congelados y datos versionados por procedencia | Distinguir inferencia actual de TEST histórico y abstenerse si falta información |
+| RCA/RFC | Incidentes, hipótesis, runbooks, solicitudes y auditoría | API local, broker root, políticas y watchdog | Detectar → explicar → recomendar → aprobar por canal administrativo → ejecutar → verificar → restaurar |
+| Copiloto | Consulta documental con citas | Recuperación y LLM evaluado, sin permisos | Consulta fundada, caso sin evidencia y resistencia a instrucciones maliciosas |
+| Evidencias y recuperación | Registros, catálogo, estado y resultados de reconstrucción | systemd, dependencias, CI, TAR y documentación | Validar recuperación integral y exportación de resultados sin datos privados |
 
-La eventual S09 constituye una ampliación condicionada, no una fase aprobada ni implementada. Su necesidad se determinará después de revisar esta matriz al cierre de S07 y S08.
+Los escenarios de cambio del menú son propuestas hasta que cada ejecutor, política y retorno se acepte de manera específica. La fase 7 solo acredita intervención protegida sobre el costo OSPF identificado; no habilita por extensión cambios WAN, HTTP, LACP, SDN o netem desde el navegador. La aprobación administrativa se mantiene fuera del navegador salvo un mecanismo posterior expresamente validado, nunca mediante el LLM.
 
-Las tecnologías adicionales deberán responder a un caso de uso propio, contar con recursos suficientes y conservar el aislamiento de la red administrativa.
+## Auditoría de inicio de la fase 8
 
-## Decisión condicionada de ampliación S09
+Antes de modificar infraestructura, reanudar la VM y sincronizar main mediante fast-forward con árbol limpio. Verificar identidad y red administrativa, namespaces, contenedores, servicios, OSPF/FIB, HA/LACP/SDN/NOC, Prometheus, frescura de datos, integridad de SQLite, RFC no concluidas, reservas de idempotencia, watchdogs y timers. Registrar versiones, dependencias, recursos, servicios activos/inactivos y componentes instalados sin evidencia de uso. Contrastar cada brecha de esta matriz con código, configuración y prueba verificable. No reiniciar, desinstalar ni desplegar para una auditoría de solo lectura.
 
-Reevaluar esta matriz al cierre de S07 y S08. No se crea milestone S09 ni se trasladan #17/#24 hasta aprobar alcance, recursos, calendario y valor académico. S08 sigue siendo la entrega comprometida; si S09 se incorpora formalmente al proyecto, la aceptación y empaquetado finales se programarán después de su validación. De lo contrario, S09 será una ampliación posterior.
+## Estado técnico y planificación
 
-| Grupo candidato | Prueba requerida |
-|---|---|
-| IaC y multivendor | Provider real, módulos, data source, ownership, lifecycle, locking, WireGuard y VyOS en recursos aislados |
-| GitOps | Reconciliación periódica del estado deseado con autorización y control de cambios |
-| Streaming | Suscripciones gNMI/OpenConfig con timestamps, calidad y trazabilidad |
-| Observabilidad | Sondas Blackbox, Grafana, Alertmanager, burn rate de servicio y trazas OpenTelemetry cuando proceda |
-| Cloud-native | Kubernetes, Cilium, Hubble, eBPF y políticas de flujo verificadas en dominio separado |
-| Analítica | Nuevos escenarios y características, pronóstico temporal con MAE, evaluación de QoS/QoE, deriva con etiquetas independientes y explicabilidad |
-| Rendimiento | TCP/UDP, pérdida, jitter y capacidad experimental con límites de carga |
+Las fases 1–7 están aceptadas en su alcance técnico y el informe hasta la fase 7 se revisó. La fase 8 permanece pendiente. Se conservan 253 capturas oficiales, 49 de fase 7, y la regresión de aceptación histórica de 1258 casos (uno omitido, cero fallos). La fase 7 acredita recuperación documental léxica, no generación RAG; tampoco acredita autonomía, predicción futura, generalización entre protocolos, separación organizacional de personas o tolerancia a pérdida de la VM. La recuperación manual tras reinicio no acredita reconstrucción automática.
 
-Estas capacidades son candidatas, no compromisos de implementación ni resultados demostrados. No es obligatorio incorporar cada herramienta del programa si no resuelve el problema del proyecto.
+La fase 8 integra consola, RAG, pruebas acotadas, recuperación y entregables. La fase 9 es una ampliación condicionada: no crear milestone ni trasladar #17/#24 sin decisión expresa basada en la auditoría de inicio, valor académico, recursos, calendario y aceptación de fase 8. Si se aprueba, adaptar el alcance y cronograma; si no, mantener las brechas explícitas. No atribuir a la docente aprobación no confirmada. No instalar tecnologías solo para marcar casillas.
 
 ## Preparación del paquete técnico y demostración
 
@@ -117,13 +147,3 @@ Cada tecnología se clasificará según su evidencia real: implementada y valida
 La ampliación de funcionalidades exige pruebas independientes y no modifica retroactivamente los resultados alcanzados.
 
 [Plan maestro y criterios técnicos](../diseno/s06-s08-plan-maestro-y-criterios.md).
-
-## Cobertura acreditada en S07
-
-- I, III y IV: conformidad e intención separadas, drift real de costo OSPF, autorización y políticas protegidas, retorno verificado; no multivendor ni reconciliación GitOps continua demostrados.
-- VIII, IX, X, XII y XIII: 58 observaciones normalizadas por adquisición, correlación temporal/topológica, hipótesis con incertidumbre y runbooks. 15 ventanas seleccionadas de cinco escenarios, 870 registros de ventana no independientes, 11 hipótesis y recomendaciones coincidentes; abstención offline y controles negativos comprobados. Sin estimación poblacional de falsas alarmas, pronóstico o deriva inferencial. SDN puerto aislado verificado por evidencia directa, no detección automática de puerto.
-- XIV: recuperación documental léxica de corpus propio; RAG generativo y evaluación de grounding permanecen en #198/S08.
-- XV y XVI: ciclo supervisado integrado por API local Unix, dos aprobaciones, idempotencia persistente, watchdog y postcondiciones reales. Regresión de 1258 pruebas, una omitida, cero fallos. Separación de privilegios, no de personas; disponibilidad continua y arranque frío no acreditados.
-- II, V, VII y XI: persisten las brechas de IaC con recursos reales/backend remoto, streaming gNMI, cloud-native y predicción prospectiva. VI: observabilidad experimental previa; S08 integra visualización y pruebas, sin extender automáticamente SLI/SLO.
-
-S08 sigue siendo la fase comprometida: consola, RAG, pruebas acotadas y recuperación/entrega. No se aprueba S09 en esta revisión; reevaluar después de S08 con alcance y tiempo disponibles. La aceptación técnica y el catálogo S07 están completos; la actualización del informe se controla en #7.
