@@ -61,7 +61,7 @@ class StructureTests(unittest.TestCase):
         self.assertNotRegex(html.lower(), r"\bfase\s*\d+|\bs0[1-9]\b|laboratorio académico")
         self.assertIn("Supervisión multisede", html)
         self.assertIn("<dt>Fecha y hora</dt>", html)
-        self.assertIn("Vencimiento de la sesión.", html)
+        self.assertIn("Vencimiento de la sesión por inactividad o límite máximo.", html)
         self.assertNotIn("Expiración (Panamá)", html)
         self.assertEqual(html.count('aria-disabled="true"'), 12)
         js = (UI / "static/app.js").read_text(encoding="utf-8")
@@ -74,13 +74,25 @@ class StructureTests(unittest.TestCase):
 
     def test_auth_client_fixed_routes(self):
         js = (UI / "static/app.js").read_text(encoding="utf-8")
-        for route in ("/api/v1/auth/login", "/api/v1/auth/me", "/api/v1/auth/logout"):
+        for route in ("/api/v1/auth/login", "/api/v1/auth/resume", "/api/v1/auth/logout",
+                      "/api/v1/auth/activity", "/api/v1/auth/continue"):
             self.assertIn(route, js)
         self.assertIn('"X-CSRF-Token": session.csrf', js)
         self.assertIn('credentials: "same-origin"', js)
         self.assertNotIn("document.cookie", js)
         self.assertNotIn("console.log", js)
         self.assertNotIn("/api/v1/actions", js)
+
+    def test_idle_dialog_and_resume(self):
+        html = (UI / "index.html").read_text(encoding="utf-8")
+        self.assertIn('<dialog id="idle-dialog"', html)
+        self.assertIn('id="idle-continue"', html)
+        self.assertIn('id="idle-logout"', html)
+        js = (UI / "static/app.js").read_text(encoding="utf-8")
+        self.assertIn('"X-Netlab360-Resume": "1"', js)
+        self.assertIn("event.isTrusted", js)
+        self.assertIn("performance.now()", js)
+        self.assertIn("setInterval(tick, 1000)", js)
 
 
 if AVAILABLE:
