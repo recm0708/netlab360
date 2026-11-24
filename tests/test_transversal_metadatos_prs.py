@@ -20,8 +20,8 @@ class MetadatosPRTests(unittest.TestCase):
 
     def test_cada_campo(self):
         for field, value, reason in [
-            ("milestone", None, "MILESTONE"), ("assignees", [], "ASSIGNEE"),
-            ("labels", [{"name": "tipo:documentación"}], "ETIQUETA_FASE"),
+            ("milestone", {"title": "S09"}, "MILESTONE_INVALIDO"), ("assignees", [], "ASSIGNEE"),
+            ("labels", [{"name": "tipo:documentación"}], "ETIQUETA_FASE_MILESTONE"),
             ("labels", [{"name": "fase:08"}], "ETIQUETA_TEMATICA"),
             ("title", "Título sin fase", "TITULO"),
         ]:
@@ -33,6 +33,29 @@ class MetadatosPRTests(unittest.TestCase):
     def test_transversal_con_fase_adicional(self):
         self.pr["labels"].append({"name": "fase:02"})
         self.assertEqual(audit([self.pr])["defects"], [])
+
+    def test_transversal_sin_milestone(self):
+        self.pr["milestone"] = None
+        self.pr["labels"].append({"name": "fase:02"})
+        report = audit([self.pr])
+        self.assertEqual(report["defects"], [])
+        self.assertEqual(report["without_milestone"], [1])
+
+    def test_gestion_general_sin_fase_ni_milestone(self):
+        self.pr["milestone"] = None
+        self.pr["labels"] = [{"name": "tipo:documentación"}]
+        self.assertEqual(audit([self.pr])["defects"], [])
+
+    def test_titulo_de_fase_exige_etiqueta_aun_sin_milestone(self):
+        self.pr["title"] = "[S02] Consolidar documentación técnica"
+        self.pr["milestone"] = None
+        self.assertIn("ETIQUETA_FASE_TITULO", audit([self.pr])["defects"][0]["reasons"])
+
+    def test_milestone_transversal_requiere_revision_no_es_defecto(self):
+        self.pr["labels"].append({"name": "fase:02"})
+        report = audit([self.pr])
+        self.assertEqual(report["defects"], [])
+        self.assertEqual(report["review_milestone"], [1])
 
     def test_inventario_duplicado_o_vacio(self):
         for rows in ([], [self.pr, self.pr]):
