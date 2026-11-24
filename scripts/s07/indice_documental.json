@@ -1,0 +1,148 @@
+{
+  "schema": "NETLAB360_S07_DOCUMENT_INDEX_V1",
+  "source_revision": "6ec5feba65e9ab2f1d26fc142eb73cd0b1089e19",
+  "entries": [
+    {
+      "id": "ARCH",
+      "path": "docs/arquitectura/arquitectura-multisede-implementada.md",
+      "line_start": 9,
+      "line_end": 9,
+      "terms": [
+        "gestion",
+        "ens33",
+        "administracion",
+        "vmnet8"
+      ],
+      "excerpt": "La VM `netlab360-lab` utiliza `ens33 192.168.47.40/24`, puerta de enlace `192.168.47.2` y la red NAT VMnet8 exclusivamente para administración. Los segmentos del laboratorio no utilizan `ens33` como enlace WAN ni exponen directamente los dominios SDN experimentales a esa red."
+    },
+    {
+      "id": "WAN",
+      "path": "docs/arquitectura/arquitectura-multisede-implementada.md",
+      "line_start": 24,
+      "line_end": 24,
+      "terms": [
+        "wan",
+        "ospf",
+        "fib",
+        "vlan",
+        "enrutamiento",
+        "adyacencia",
+        "full"
+      ],
+      "excerpt": "FRRouting distribuye rutas entre HQ, S1 y S2 mediante OSPF. Comprobamos cuatro adyacencias FULL en HQ y dos en cada sucursal, con preferencia por los enlaces primarios y conmutación a enlaces de respaldo bajo falla controlada. Tres conmutadores Linux y nueve VLAN ofrecen segmentación por sede y servicio."
+    },
+    {
+      "id": "HA",
+      "path": "docs/diseno/s05-ha-servicios-multisede.md",
+      "line_start": 36,
+      "line_end": 36,
+      "terms": [
+        "http",
+        "ha",
+        "backend",
+        "frontal",
+        "respaldo"
+      ],
+      "excerpt": "La conmutación se produce entre instancias de aplicación dentro de una misma VM. No constituye redundancia del frontal, de Ubuntu, de VMware ni del hardware físico. Tampoco debe confundirse con la recuperación de un miembro LACP o con la conmutación de un enlace WAN."
+    },
+    {
+      "id": "LACP",
+      "path": "docs/diseno/s05-lacp-8023ad-multisede.md",
+      "line_start": 15,
+      "line_end": 15,
+      "terms": [
+        "lacp",
+        "bond",
+        "agregacion",
+        "miembros"
+      ],
+      "excerpt": "Los bonds pertenecen a las redes de servicio y no reemplazan los enlaces WAN de FRRouting/OSPF."
+    },
+    {
+      "id": "SDN",
+      "path": "docs/diseno/s05-ovs-faucet-vs-bridge-frr-y-limpieza-segura.md",
+      "line_start": 19,
+      "line_end": 19,
+      "terms": [
+        "sdn",
+        "faucet",
+        "ovs",
+        "openflow"
+      ],
+      "excerpt": "Faucet establece reglas de conmutación en OVS. FRRouting conserva su función independiente de encaminamiento entre las tres sedes."
+    },
+    {
+      "id": "IA",
+      "path": "docs/diseno/s06-v2-deriva-deteccion-y-limitaciones-finales.md",
+      "line_start": 20,
+      "line_end": 20,
+      "terms": [
+        "ia",
+        "icmp",
+        "drift",
+        "modelo",
+        "inferencial"
+      ],
+      "excerpt": "- **Concept drift:** dos eventos positivos por cada split de prueba aportan baja potencia; puede describirse estabilidad de los errores, pero **no hay prueba confiable de un cambio de relación entre telemetría y verdad de terreno**. Estado `NO_EVALUABLE` como conclusión inferencial."
+    },
+    {
+      "id": "TELEMETRY",
+      "path": "docs/validacion/s01-s04-resultados.md",
+      "line_start": 36,
+      "line_end": 36,
+      "terms": [
+        "prometheus",
+        "exporter",
+        "noc",
+        "telemetria",
+        "colector"
+      ],
+      "excerpt": "| G2 | Exporter, Prometheus, NOC, ocho extremos WAN y nueve VLAN |"
+    },
+    {
+      "id": "POLICY",
+      "path": "docs/diseno/s06-s08-plan-maestro-y-criterios.md",
+      "line_start": 63,
+      "line_end": 63,
+      "terms": [
+        "politica",
+        "autorizacion",
+        "aprobacion",
+        "rollback",
+        "llm",
+        "unknown"
+      ],
+      "excerpt": "Implementar primero componentes de solo lectura y pruebas offline; habilitar cambios únicamente tras aprobar catálogo, políticas y ejecutores. El motor de autorización es determinista y no concede privilegios al LLM. El diagnóstico UNKNOWN no autoriza cambios. El gate exige ciclo real detectar → explicar → recomendar → aprobar → ejecutar → verificar → restaurar, evidencia reproducible, regresión y red administrativa intacta. Reevaluar la matriz académica al cierre."
+    },
+    {
+      "id": "COST",
+      "path": "docs/diseno/s07-contexto-y-correlacion-rca.md",
+      "line_start": 29,
+      "line_end": 29,
+      "terms": [
+        "costo",
+        "costos",
+        "ospf",
+        "sot",
+        "configuracion",
+        "drift"
+      ],
+      "excerpt": "La auditoría separada verifica los ocho costos WAN explícitos contra el SoT candidato S03 y el perfil S02 (10 principal, 100 respaldo), con comprobación de identidad antes y después de cada lectura. Solo registra campos de costo y no exporta la configuración completa. Una desviación explícita puede clasificarse NON_COMPLIANT; un costo ausente o no verificable se mantiene UNKNOWN. Esta auditoría tiene su propia fecha y no se utiliza retrospectivamente para atribuir causa a la ventana histórica. Los casos sintéticos no modifican la base operacional ni inducen fallas. La aceptación en VM y los ensayos físicos compuestos posteriores siguen diferenciados."
+    },
+    {
+      "id": "SCOPE",
+      "path": "docs/diseno/s07-contexto-y-correlacion-rca.md",
+      "line_start": 11,
+      "line_end": 11,
+      "terms": [
+        "dependencia",
+        "correlacion",
+        "fib",
+        "http",
+        "icmp",
+        "causalidad"
+      ],
+      "excerpt": "NOC y Prometheus pueden depender del mismo colector S04: la coincidencia no es evidencia estadísticamente independiente. La observación FIB no prueba tráfico. El plano de control SDN, el servicio HTTP y la inferencia ICMP conservan ámbitos separados. La adquisición se evalúa en su cierre histórico, no como estado actual. Si la ventana no cumple los límites, ninguna referencia se considera utilizable."
+    }
+  ]
+}

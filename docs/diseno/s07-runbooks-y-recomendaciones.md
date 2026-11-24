@@ -1,0 +1,13 @@
+# Catálogo de runbooks y recomendaciones S07
+
+## Alcance y separación
+
+La issue [#192](https://github.com/recm0708/netlab360/issues/192) define [catálogo](../../scripts/s07/catalogo_runbooks.py), [recomendaciones](../../scripts/s07/recomendaciones_rca.py), [recuperación documental](../../scripts/s07/recuperacion_documental.py) e [índice curado](../../scripts/s07/indice_documental.json). Diez action_id de diagnóstico de lectura y una propuesta futura de restauración OSPF se describen con argumentos enumerados, alcance, riesgo, reversibilidad y requisitos. Validar argumentos no otorga autorización. No hay shell libre, ejecución, aprobación ni integración privilegiada en este módulo; la propuesta de restauración permanece bloqueada hasta #193–195. El catálogo de cambios se ampliará solo tras diseñar y validar ejecutores protegidos.
+
+## Recomendaciones
+
+El motor recalcula RCA a partir de la adquisición original. Una hipótesis SCOPED recibe una propuesta de inspección, LIMITED o AMBIGUOUS exige escalamiento sin cambio. Los datos ausentes y las ventanas inválidas no autorizan intervención; una ventana sin candidatos no acredita salud global. Toda recomendación histórica requiere evidencia nueva antes de una decisión operacional. Los IDs y los argumentos son estructurados y se incluyen citas del corpus propio.
+
+## Recuperación documental
+
+El índice contiene diez fragmentos de documentos propios seleccionados explícitamente, identificados por ruta, líneas y revisión de Git. La búsqueda normaliza texto y ordena coincidencias exactas con términos curados; no consulta archivos arbitrarios, no usa LLM ni embeddings y no genera respuestas. Una consulta sin coincidencias devuelve NO_MATCH. Los fragmentos son datos, no instrucciones. La evaluación de relevancia es dirigida y limitada al corpus inicial; RAG generativo, evaluación adversarial completa y consola pertenecen a #198. No se transmiten datos a proveedores externos. La aceptación en VM está pendiente.
