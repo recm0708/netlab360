@@ -49,11 +49,11 @@ class AcceptanceTests(unittest.IsolatedAsyncioTestCase):
                     "authentication_enabled","persistence_enabled"):
             self.assertIs(caps[key],True)
         self.assertIs(caps["network_mutations_authorized"],False)
-        self.assertIs(caps["frontend_enabled"],False)
+        self.assertIs(caps["frontend_enabled"],True)
         async with httpx.AsyncClient(transport=httpx.ASGITransport(app=create_app()),
                                      base_url=ORIGIN) as bootstrap:
             caps = (await bootstrap.get("/api/v1/capabilities")).json()
-            for key in ("source_readers_enabled","diagnostics_enabled","advisory_enabled"):
+            for key in ("source_readers_enabled","diagnostics_enabled","advisory_enabled","frontend_enabled"):
                 self.assertIs(caps[key],False)
             for path in ROUTES:
                 self.assertEqual((await bootstrap.get(path)).status_code,404)

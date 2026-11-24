@@ -31,7 +31,7 @@ def create_app(directory: Path | None = None) -> FastAPI:
         response.headers["Cache-Control"] = "no-store"
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["Referrer-Policy"] = "no-referrer"
-        response.headers["Content-Security-Policy"] = "default-src 'none'; frame-ancestors 'none'"
+        response.headers.setdefault("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none'")
         return response
 
     # Rechazar Host arbitrario; no confiar en cabeceras de proxy.
@@ -61,13 +61,16 @@ def create_app(directory: Path | None = None) -> FastAPI:
                             authentication_enabled=directory is not None,
                             source_readers_enabled=directory is not None,
                             diagnostics_enabled=directory is not None,
-                            advisory_enabled=directory is not None)
+                            advisory_enabled=directory is not None,
+                            frontend_enabled=directory is not None)
 
     if directory is not None:
         from .auth_http import register
         register(app, directory)
         from .source_http import register_sources
         register_sources(app, directory)
+        from .ui_http import register_ui
+        register_ui(app)
 
     return app
 

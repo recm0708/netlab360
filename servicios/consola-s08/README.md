@@ -10,6 +10,8 @@ aceptados de las fases anteriores.
 
 | Componente | Función |
 |---|---|
+| [api/ui_http.py](api/ui_http.py) | Publicación de HTML y recursos visuales fijos |
+| [ui/index.html](ui/index.html) | Estructura visual inicial y metadatos públicos |
 | [api/advisory_reader.py](api/advisory_reader.py) | Resúmenes históricos de la API Unix S07 |
 | [Pruebas del asesor](../../tests/test_s08_advisory.py) | Identidad del servidor, vigencia y límites de lectura |
 | [api/inference_reader.py](api/inference_reader.py) | Inferencia exploratoria S06 mediante NOC |
@@ -40,8 +42,8 @@ de metadatos, sin datos operacionales ni autorización.
 Incorporamos una base SQLite privada de inicialización explícita.
 Integramos la autenticación HTTP como modo explícito sobre SQLite v2.
 Integramos los lectores de exporter, NOC, Prometheus, inferencia S06 y
-asesor S07. La interfaz gráfica y las acciones requieren implementación
-independiente. La disponibilidad de una ruta no garantiza la de su fuente.
+asesor S07. Incorporamos la estructura visual inicial; el acceso gráfico,
+navegación de detalle y acciones requieren implementación independiente. La disponibilidad de una ruta no garantiza la de su fuente.
 
 ## Ejecución de desarrollo
 
@@ -65,6 +67,17 @@ El modo de arranque no admite escrituras, documentación OpenAPI pública,
 consultas de fuentes ni acceso a datos privados.
 La ejecución sin autenticación solo corresponde a estos
 metadatos de arranque. No constituye una consola autenticada.
+
+## Interfaz gráfica inicial
+
+En modo autenticado servimos la estructura HTML, CSS y JavaScript
+en la raíz del mismo origen. No publicamos el árbol de archivos,
+no utilizamos CDN ni abrimos rutas privadas sin sesión.
+La pantalla inicial consulta exclusivamente healthz y capabilities,
+sin credenciales; los estados operacionales no consultados permanecen
+UNKNOWN. El menú de detalle, el formulario de acceso y Plotly se
+integrarán por separado. La política CSP permite solo scripts, estilos
+y consultas del mismo origen, sin código inline.
 
 ## Persistencia local
 
