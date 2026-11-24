@@ -71,6 +71,8 @@ def source_metadata(*, source: str, transport: str,
 
     # El snapshot asesor y las fuentes no vigentes no acreditan salud.
     projected = state if quality == "VALID" and kind != "ADVISORY_SNAPSHOT" else "UNKNOWN"
+    if kind == "INFERENCE" and projected != "NORMAL":
+        projected = "UNKNOWN"
     return {
         "schema": SCHEMA,
         "source": source,

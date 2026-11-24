@@ -73,8 +73,8 @@ class LogoutResult(PublicModel):
 class SourceObservation(PublicModel):
     """Observación delimitada; los detalles no vigentes se omiten."""
     schema_id: Literal["NETLAB360_S08_SOURCE_V1"] = Field(alias="schema")
-    source: Literal["EXPORTER_S04", "NOC_S05", "PROMETHEUS_S04"]
-    kind: Literal["OBSERVATION"]
+    source: Literal["EXPORTER_S04", "NOC_S05", "PROMETHEUS_S04", "IA_S06"]
+    kind: Literal["OBSERVATION", "INFERENCE"]
     transport: Literal["OK", "UNAVAILABLE", "NOT_STARTED", "INVALID"]
     quality: Literal["VALID", "MISSING", "INVALID", "FUTURE", "STALE"]
     state: Literal["NORMAL", "DEGRADED", "FAULT", "RECOVERY", "UNKNOWN"]
@@ -84,7 +84,7 @@ class SourceObservation(PublicModel):
     max_age_seconds: int
     resource: str
     scope: str
-    details: dict[str, str | int | bool | None]
+    details: dict[str, str | int | float | bool | None]
     network_mutations_authorized: Literal[False] = False
 
 
