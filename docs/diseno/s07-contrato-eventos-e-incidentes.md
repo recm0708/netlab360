@@ -1,4 +1,4 @@
-# Contrato de eventos e incidentes multisede S07
+# Contrato de eventos e incidentes multisede — Fase 07
 
 ## Objetivo y alcance
 

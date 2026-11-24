@@ -1,4 +1,4 @@
-# NETLAB360 — Especificación de la consola interactiva S08
+# Consola interactiva y acciones — Fase 08
 
 **Estado:** diseño técnico aprobado como base de trabajo, **no código implementado**. El NOC S05 actual es el antecedente comprobado. Destino: demostración académica ejecutable sin escribir comandos frente a la profesora y funcionamiento reproducible en la VM.
 
