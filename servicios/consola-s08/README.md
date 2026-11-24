@@ -39,8 +39,9 @@ Incorporamos un servidor de arranque con dos rutas públicas
 de metadatos, sin datos operacionales ni autorización.
 Incorporamos una base SQLite privada de inicialización explícita.
 Integramos la autenticación HTTP como modo explícito sobre SQLite v2.
-Integramos los lectores de exporter, NOC y Prometheus; las demás fuentes,
-la interfaz gráfica y las acciones requieren implementación independiente.
+Integramos los lectores de exporter, NOC, Prometheus, inferencia S06 y
+asesor S07. La interfaz gráfica y las acciones requieren implementación
+independiente. La disponibilidad de una ruta no garantiza la de su fuente.
 
 ## Ejecución de desarrollo
 
@@ -133,11 +134,10 @@ normalizadas del exporter S04 (existencia de routers) y NOC S05
 El estado general permanece UNKNOWN. Conservamos fechas individuales;
 los detalles no vigentes se omiten. Las lecturas utilizan destinos
 loopback fijos, sin redirecciones ni proxies, con cuerpo máximo de
-256 KiB y timeout de socket de tres segundos. Una sola adquisición
-concurrente por proceso; los errores de una fuente no reemplazan
-los datos de otra. No se aceptan parámetros de consulta.
-La topología gráfica, WAN/VLAN detalladas, IA y AIOps
-requieren integración posterior. No se expone el grafo bruto.
+256 KiB y timeout de socket de tres segundos. Una adquisición concurrente por endpoint (hasta cuatro en el proceso);
+los errores de una fuente no reemplazan los datos de otra. No se aceptan parámetros de consulta.
+La topología gráfica, WAN/VLAN detalladas y la presentación científica
+y asesora de detalle requieren integración posterior. No se expone el grafo bruto.
 
 ## Métricas Prometheus
 
@@ -145,8 +145,7 @@ GET /api/v1/metrics requiere sesión vigente y no admite parámetros.
 Reutilizamos el [adaptador Prometheus S07](../../scripts/s07/adaptador_prometheus.py)
 para la consulta fija de 120 segundos y la proyección de 23 observaciones
 con fecha del scrape real. El transporte S08 conserva el límite de
-512 KiB de esta fuente, sin proxy ni redirecciones. El acceso se
-comparte con la exclusión de adquisiciones del lector S04/S05.
+512 KiB de esta fuente, sin proxy ni redirecciones. El endpoint tiene su propio límite de una adquisición concurrente.
 El estado administrativo de WAN/VLAN no demuestra forwarding u OSPF.
 No exponemos PromQL arbitrario ni series históricas completas.
 La clave JSON schema conserva su nombre mediante un alias Pydantic.
@@ -177,6 +176,18 @@ El snapshot es histórico y nunca autoriza acciones ni acredita salud.
 Si supera 60 segundos, omitimos los detalles y conservamos su fecha.
 La presentación detallada y el acceso operacional con identidad
 dedicada quedan pendientes. No ampliamos permisos del socket.
+
+## Frontera de ejecución
+
+La identidad de desarrollo no constituye la identidad del servicio.
+La ejecución aislada deberá usar un UID sin privilegios, sin sudo,
+sin grupo Docker y sin acceso al socket mutador S07. No concedemos
+el UID del operador histórico a un servicio web para facilitar una
+consulta. Cuando la identidad dedicada no pueda consultar S07,
+la aplicación conservará UNAVAILABLE/MISSING/UNKNOWN; la futura
+interfaz asesora separada y el ejecutor autorizado requieren validación.
+Los indicadores de capacidades señalan rutas habilitadas, no fuentes
+vigentes ni autorización administrativa.
 
 ## Validación
 

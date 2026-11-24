@@ -1,4 +1,4 @@
-"""Esquemas públicos de arranque de la API S08; no representan telemetría."""
+"""Esquemas públicos S08: metadatos, identidad y observaciones delimitadas."""
 from __future__ import annotations
 
 from datetime import datetime
@@ -34,7 +34,8 @@ class Capabilities(PublicModel):
     persistence_enabled: bool = False
     authentication_enabled: bool = False
     frontend_enabled: Literal[False] = False
-    diagnostics_enabled: Literal[False] = False
+    diagnostics_enabled: bool = False
+    advisory_enabled: bool = False
     network_mutations_authorized: Literal[False] = False
 
 

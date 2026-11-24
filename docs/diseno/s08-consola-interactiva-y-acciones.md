@@ -1,6 +1,6 @@
 # Consola interactiva y acciones — Fase 08
 
-**Estado:** diseño técnico aprobado como base de trabajo; implementación incremental del contrato de fuentes y del servidor de arranque. El NOC de la fase 05 y la API protegida de la fase 07 son antecedentes comprobados; la consola completa aún no está implementada. Destino: demostración académica ejecutable sin escribir comandos frente a la profesora y funcionamiento reproducible en la VM.
+**Estado:** diseño técnico aprobado como base de trabajo; backend inicial implementado con persistencia, autenticación y lectores; aceptación y aislamiento de servicio en curso. El NOC de la fase 05 y la API protegida de la fase 07 son antecedentes comprobados; la consola completa aún no está implementada. Destino: demostración académica ejecutable sin escribir comandos frente a la profesora y funcionamiento reproducible en la VM.
 
 ## 1. Experiencia de usuario
 
@@ -20,7 +20,7 @@ Una sola aplicación local, con barra lateral, encabezado de estado general y pa
 | **8. Pruebas de red** | Ping corto/extendido, traceroute, HTTP, iperf3 TCP/UDP con origen/destino permitido, pérdidas, RTT, tasa, jitter si se observa | Lanzar ensayo **acotado**, guardar resultado y compararlo |
 | **9. Observabilidad** | Prometheus, Blackbox, SLI/SLO de servicio, error budget, burn rate, Alertmanager, históricos, latencia P50/P95, pérdida y calidad de fuente | Seleccionar ventana/servicio y exportar gráfica o evidencia |
 | **10. Diagnóstico IA** | Detección, scores, explicación, confianza/UNKNOWN, baseline de reglas, pronóstico y deriva **pendientes de validación en la fase 10** | Inferencia solo lectura; consulta de evidencia |
-| **11. Incidentes y AIOps** | Correlación de fuente, línea de tiempo, recomendación, riesgo y postcondición mediante la API de la fase 07 validada, con integración de la fase 08 pendiente | Crear solicitud, consultar estado y resultado; aprobación administrativa separada, ejecución protegida y retorno |
+| **11. Incidentes y AIOps** | Correlación de fuente, línea de tiempo, recomendación, riesgo y postcondición mediante la API de la fase 07 validada, con lector de resúmenes de fase 08 y presentación detallada pendiente | Crear solicitud, consultar estado y resultado; aprobación administrativa separada, ejecución protegida y retorno |
 | **12. Copiloto RAG** | Respuestas con fuentes propias, incertidumbre y citas | Consultas de solo lectura; sin autorización de cambios (#198) |
 | **13. Evidencias y sistema** | Historial de trabajos, logs sanitizados, versiones, tests, métricas y catálogo | Descargar resultados JSON/CSV, generar inventario técnico y comprobar salud |
 
@@ -88,7 +88,14 @@ servicios/consola-s08/
     api/
         main.py              # FastAPI y rutas publicas controladas
         models.py            # Esquemas de entrada/salida
-        readers/             # Adaptadores S04/S05/Prometheus/SQLite
+        readers.py           # Adaptadores S04/S05
+        prometheus_reader.py # Scrapes de Prometheus
+        inference_reader.py  # Inferencia S06
+        advisory_reader.py   # Consulta asesora S07
+        storage.py           # SQLite privado
+        auth_http.py         # Autenticación HTTP
+        sessions.py          # Sesiones opacas
+        source_http.py       # Endpoints de lectura
         jobs.py              # Estado, colas y auditoria
         security.py          # Acceso, roles y confirmaciones
     ui/
@@ -163,7 +170,9 @@ inicial utilizará loopback y túnel SSH.
 La versión inicial del contrato es offline: no abre sockets,
 no crea bases, no inicia servicios y no concede permisos.
 La integración FastAPI, persistencia, controles de sesión
-y validación de fuentes reales requieren sus propias pruebas.
+y lectores se validan mediante pruebas independientes de la infraestructura.
+La identidad de servicio se mantiene separada del operador S07;
+no se amplían permisos de su socket mutador para permitir consultas.
 
 ### Servidor de arranque
 
@@ -171,8 +180,11 @@ El [componente de consola](../../servicios/consola-s08/README.md)
 incorpora dos rutas GET de metadatos públicos, con modelos
 Pydantic estrictos y arranque sin root en loopback. La salud
 del proceso no representa salud de la red. Las operaciones
-de fuentes, persistencia, autenticación, frontend, pruebas
-de red y mutaciones permanecen deshabilitadas.
+de fuentes, persistencia y autenticación se habilitan únicamente
+mediante el modo autenticado sobre SQLite v2. Frontend, pruebas de red
+y mutaciones permanecen deshabilitados. Los endpoints de lectura tienen
+límites de concurrencia independientes. La disponibilidad de las rutas
+no acredita la vigencia de sus fuentes.
 No habilitamos CORS ni documentación OpenAPI pública.
 Las pruebas HTTP no requieren Docker ni acceso privilegiado.
 
