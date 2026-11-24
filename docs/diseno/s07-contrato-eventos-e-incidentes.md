@@ -47,3 +47,13 @@ La marca temporal de la telemetría se utiliza para las señales administrativas
 La pérdida de una fuente no invalida otra fuente independiente. Una respuesta fuera de contrato se excluye de la proyección útil (MISSING/UNKNOWN); fechas inválidas, futuras o vencidas se clasifican mediante el contrato. Los identificadores no previstos o duplicados no se eligen arbitrariamente. Una respuesta HTTP correcta no prueba vigencia ni disponibilidad de las señales que contiene.
 
 El estado DEGRADED del frontal con backend de respaldo indica selección alternativa, no interrupción HTTP. La desconexión de Faucet representa el plano de control y no prueba pérdida de tráfico. El consenso IA se verifica frente a los tres métodos y no autoriza intervención.
+
+## Adaptador Prometheus S04
+
+S07-001C1 implementa [adquisición Prometheus](../../scripts/s07/adaptador_prometheus.py) y [pruebas sintéticas](../../tests/test_s07_adaptador_prometheus.py). Una consulta fija de rango de 120 segundos contra el endpoint local permite seleccionar el último scrape de cada serie esperada del target S04. No utiliza la hora de evaluación de una consulta instantánea como fecha del scrape.
+
+Se normalizan 23 señales: dos de adquisición (scrape y lectura del colector), una de topología, tres de existencia de routers, ocho extremos WAN y nueve VLAN. Los valores de los recursos solo se proyectan cuando corresponden al mismo scrape exitoso y el colector reporta lectura correcta. No se recuperan valores de scrapes anteriores para aparentar disponibilidad. Las series duplicadas o ajenas no se seleccionan.
+
+El timestamp de Prometheus acredita el scrape, no la hora exacta de adquisición interna del exporter, que mantiene un snapshot cacheado. La calidad VALID en esta fuente indica un scrape vigente y utilizable, no vigencia independiente de la medición interna ni confirmación de forwarding. Las señales administrativas y de existencia conservan UNKNOWN operacional. El valor -1 representa desconocimiento, no DOWN. El estado FAULT del exporter se limita a su scrape fallido, no a la red.
+
+OSPF y FIB se incorporarán mediante lectura explícita de los routers en S07-001C2, porque el exporter S04 no publica estas métricas. No se modifican sus procesos ni reglas. La aceptación en la VM permanece pendiente al publicar este componente.
