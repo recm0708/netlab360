@@ -1,6 +1,6 @@
 # Consola interactiva y acciones — Fase 08
 
-**Estado:** diseño técnico aprobado como base de trabajo, **no código implementado**. El NOC S05 actual es el antecedente comprobado. Destino: demostración académica ejecutable sin escribir comandos frente a la profesora y funcionamiento reproducible en la VM.
+**Estado:** diseño técnico aprobado como base de trabajo, **no código implementado**. El NOC S05 y la API protegida S07 son antecedentes comprobados; la consola aún no está implementada. Destino: demostración académica ejecutable sin escribir comandos frente a la profesora y funcionamiento reproducible en la VM.
 
 ## 1. Experiencia de usuario
 
@@ -20,7 +20,7 @@ Una sola aplicación local, con barra lateral, encabezado de estado general y pa
 | **8. Pruebas de red** | Ping corto/extendido, traceroute, HTTP, iperf3 TCP/UDP con origen/destino permitido, pérdidas, RTT, tasa, jitter si se observa | Lanzar ensayo **acotado**, guardar resultado y compararlo |
 | **9. Observabilidad** | Prometheus/S04, SLI/SLO experimental, históricos, latencia P50/P95, pérdida, incidentes, alertas, calidad/edad de fuente | Seleccionar ventana/servicio y exportar gráfica o evidencia |
 | **10. Diagnóstico IA** | Detección, scores, explicación, confianza/UNKNOWN, baseline de reglas, pronóstico y deriva **solo si futuras ampliaciones los validan** | Inferencia solo lectura; consulta de evidencia |
-| **11. Incidentes y AIOps** | Correlación de fuente, línea de tiempo, recomendación, riesgo y postcondición **solo cuando S07 se implemente** | Solicitar aprobación, aplicar runbook autorizado, verificar, revertir |
+| **11. Incidentes y AIOps** | Correlación de fuente, línea de tiempo, recomendación, riesgo y postcondición mediante la API S07 validada, con integración S08 pendiente | Crear solicitud, consultar estado y resultado; aprobación administrativa separada, ejecución protegida y retorno |
 | **12. Copiloto RAG** | Respuestas con fuentes propias, incertidumbre y citas | Consultas de solo lectura; sin autorización de cambios (#198) |
 | **13. Evidencias y sistema** | Historial de trabajos, logs sanitizados, versiones, tests, métricas y catálogo | Descargar resultados JSON/CSV, generar inventario técnico y comprobar salud |
 
@@ -112,5 +112,9 @@ Los límites son **propuestas de diseño**, no capacidades ya desplegadas. `iper
 5. **Copiloto RAG (#198)**: corpus autorizado, generación con citas y abstención, evaluación de fidelidad, relevancia y seguridad; sin autorización ni ejecución de cambios.
 6. **Demostración/aceptación**: escenarios de inicio sano → degradación → mediciones → detección/recomendación → autorización → cambio → verificación/retorno; contraste de métricas reales y evidencia.
 7. **Entrega**: test limpio de restauración, documentación de versiones, informe PDF sin anexos por instrucción docente, TAR externo sanitizado, PowerPoint y guion.
+
+## 8. Cobertura académica y auditoría de inicio
+
+La [matriz de cobertura académica](../gestion/cobertura-academica-netlab360.md) establece las capacidades visibles, los componentes de segundo plano, la evidencia histórica y las brechas. Antes de implementar, reanudar y auditar la VM sin modificar la infraestructura. Los escenarios mutadores del catálogo son propuestas: la API S07 acredita únicamente el costo OSPF delimitado de R-S1/s1b; WAN, HTTP, LACP, SDN y netem requieren aceptación individual de ejecutores y rollback. El navegador y el copiloto no adquieren privilegios de aprobación administrativa. La fase 9 sigue condicionada y no se incorpora al alcance por defecto.
 
 **Principio UX:** el usuario elige **qué comprobar o simular**; la aplicación decide **qué procedimiento autorizado ejecutar** y registra **qué ocurrió realmente**. Nunca se presenta como una consola de comandos arbitrarios.

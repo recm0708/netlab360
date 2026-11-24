@@ -11,7 +11,7 @@ NETLAB360 estudia redes empresariales multisede dentro de una única VM Ubuntu s
 | S01–S04 | Cerradas | [Validación de infraestructura, automatización y observabilidad](../validacion/s01-s04-resultados.md) |
 | S05 | Cerrada | [Integración HA, LACP y SDN](../validacion/s05-integracion-y-aceptacion.md) |
 | S06 | Cerrada | [Protocolo uniforme V2](s06-protocolo-uniforme-v2.md) |
-| S07 | Implementación y aceptación técnica completas; informe pendiente | [API controlada](s07-api-controlada.md) · [Ensayos](s07-ensayos-operacionales.md) |
+| S07 | Aceptación técnica y revisión documental interna completas | [API controlada](s07-api-controlada.md) · [Ensayos](s07-ensayos-operacionales.md) |
 | S08 | Pendiente de implementación y aceptación integral | [Consola interactiva](s08-consola-interactiva-y-acciones.md) |
 | S09 | Ampliación condicionada, sin milestone aprobada | [Cobertura académica](../gestion/cobertura-academica-netlab360.md) |
 
@@ -48,7 +48,7 @@ La autorización es determinista y no concede privilegios a un modelo generativo
 - Integración de la API S07 y pruebas acotadas ICMP, traceroute, HTTP e iperf3 TCP/UDP. Catálogo estable; sin shell libre ni privilegios del navegador.
 - Copiloto RAG (#198) con corpus propio autorizado, citas verificables, evaluación de fundamentación, abstención y controles frente a instrucciones maliciosas. No autoriza cambios.
 - Recuperación desde apagado completo (#106), compatibilidad (#34), regresión, demostración e informe/TAR/PPT (#27, #43, #44 y #45). OVA condicionada a #29.
-- Reevaluación académica y decisión de #17/#24 conforme a evidencia y viabilidad.
+- Auditoría de inicio con VM reanudada, matriz de cobertura consolidada al cierre de fase 7 y decisión de #17/#24 conforme a evidencia y viabilidad. No habilitar cambios adicionales sin aceptación individual de sus ejecutores.
 
 Criterio de aceptación: integración comprobada, recuperación integral, regresión y entregables reproducibles. Consultar el [diseño de consola](s08-consola-interactiva-y-acciones.md).
 

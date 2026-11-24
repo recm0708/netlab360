@@ -34,7 +34,7 @@ Desarrollamos NETLAB360 para integrar tres sedes (HQ, S1 y S2) en un laboratorio
 | S07 | AIOps supervisado, RCA, Intent Assurance, RFC, watchdog y API controlada |
 | S08 | Consola, copiloto RAG, recuperación integral y entrega: pendientes de aceptación |
 
-S07 cuenta con las ocho issues técnicas cerradas, 49 capturas y regresión de 1258 pruebas (una omitida y ninguna fallida). El cierre académico de la fase se controla por separado en la [issue maestra #7](https://github.com/recm0708/netlab360/issues/7). La ampliación S09 es condicionada y no dispone de milestone aprobada.
+S07 cuenta con las ocho issues técnicas cerradas, 49 capturas y regresión de 1258 pruebas (una omitida y ninguna fallida). El informe acumulativo 7.3 (184 páginas) documenta las siete primeras fases; su aceptación documental interna y el cierre se registran en la [issue maestra #7](https://github.com/recm0708/netlab360/issues/7). La [matriz de cobertura](docs/gestion/cobertura-academica-netlab360.md) distingue los resultados validados de las brechas y las demostraciones previstas. La ampliación S09 es condicionada y no dispone de milestone aprobada.
 
 ## Documentación
 

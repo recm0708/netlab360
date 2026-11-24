@@ -2,7 +2,7 @@
 
 ## Estado vigente
 
-Las fases S01–S06 están cerradas. S07 tiene sus ocho issues técnicas cerradas y el catálogo validado; su issue maestra permanece abierta por la actualización del informe. S08 conserva sus criterios de implementación y aceptación.
+Las fases S01–S06 están cerradas. La fase 7 tiene sus ocho issues técnicas cerradas, catálogo validado e informe 7.3 revisado; el cierre administrativo se verifica en GitHub. La fase 8 conserva sus criterios de implementación y aceptación.
 
 | Milestone | Estado | Criterio central |
 |---|---|---|
@@ -12,7 +12,7 @@ Las fases S01–S06 están cerradas. S07 tiene sus ocho issues técnicas cerrada
 | S04 | Cerrada | Observabilidad, incidentes, persistencia y SLI/SLO experimentales |
 | S05 | Cerrada | HTTP HA, LACP multisede, SDN y NOC integrado |
 | S06 | Cerrada | Diagnóstico experimental V2, modelos congelados, FAULT HTTP independiente y recuperación |
-| S07 | Abierta (cierre académico) | AIOps supervisado, aprobación, reversión segura y API validadas |
+| S07 | Aceptada técnica y documentalmente; cierre administrativo en GitHub | AIOps supervisado, aprobación, reversión segura y API validadas |
 | S08 | Abierta | Consola interactiva, regresión y entrega académica |
 
 ## Reconciliación de GitHub
