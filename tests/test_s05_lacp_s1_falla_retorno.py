@@ -115,6 +115,30 @@ class TestS05LACPS1Failover(unittest.TestCase):
         ))
         http.assert_called_once()
 
+    def test_check_baseline_uses_management_guard(self):
+        data={"before":{"mgmt":{"ens33":"baseline","routes":"baseline"},"switch":{}}}
+        with mock.patch.object(module.lab,"assert_management_preserved") as guard, \
+             mock.patch.object(module.lab,"assert_protected") as ports, \
+             mock.patch.object(module.lab,"assert_services") as services:
+            module.check_baseline(data)
+            guard.assert_called_once_with(data["before"]["mgmt"])
+            ports.assert_called_once_with({})
+            services.assert_called_once()
+
+    def test_check_baseline_rejects_management_change(self):
+        data={"before":{"mgmt":{},"switch":{}}}
+        with mock.patch.object(module.lab,"assert_management_preserved",side_effect=RuntimeError("Rutas de ens33")), \
+             mock.patch.object(module.lab,"assert_protected") as ports:
+            with self.assertRaisesRegex(RuntimeError,"Rutas de ens33"):
+                module.check_baseline(data)
+            ports.assert_not_called()
+
+    def test_timer_already_unloaded(self):
+        with mock.patch.object(module.lab,"cmd",side_effect=["not-found","inactive"]) as cmd:
+            module.failsafe_cancel("rescate-prueba")
+            self.assertEqual(cmd.call_count,2)
+            self.assertFalse(any("stop" in call.args for call in cmd.call_args_list))
+
     def test_identity_checks_ownership(self):
         with mock.patch.object(module.lab, "identity"), \
              mock.patch.object(module.lab, "read_state", return_value={

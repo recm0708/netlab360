@@ -1,9 +1,12 @@
 """Validación de aceptación de ventanas; fixtures aislados."""
 from pathlib import Path
 import sys
+import json
+import tempfile
+from unittest import mock
 import unittest
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts/s07"))
-from ensayos_servicios_s07 import assess,CASES
+from ensayos_servicios_s07 import assess,CASES,reuse_http
 
 class AcceptanceTests(unittest.TestCase):
     def fixture(self,case,stage):
@@ -53,5 +56,30 @@ class AcceptanceTests(unittest.TestCase):
         rec["approval_granted"]=True
         with self.assertRaisesRegex(ValueError,"ADVISORY_SCOPE_VIOLATED"):
             assess("HTTP","FAULT",a,r,rec)
+
+class ResumeTests(unittest.TestCase):
+    def test_reuse_rejects_unaccepted_http(self):
+        with tempfile.TemporaryDirectory() as td:
+            p=Path(td)
+            src=p/"old"; dst=p/"new"
+            src.mkdir(); dst.mkdir()
+            (src/"http-summary.json").write_text(json.dumps({"restored":False}))
+            (src/"approval.json").write_text("{}")
+            with self.assertRaisesRegex(ValueError,"HTTP_ACCEPTANCE_INVALID"):
+                reuse_http(src,dst)
+            self.assertEqual(list(dst.iterdir()),[])
+
+    def test_reuse_rejects_path_escape(self):
+        with tempfile.TemporaryDirectory() as td:
+            p=Path(td)
+            src=p/"old"; dst=p/"new"
+            src.mkdir(); dst.mkdir()
+            (src/"http-summary.json").write_text(json.dumps({"restored":True,
+                "scope":"BACKEND_HQ_ONLY","baseline":{"file":"../other.json"}}))
+            (src/"approval.json").write_text(json.dumps({"scope":["HTTP_BACKEND_HQ"],
+                "broker_operational_approval":False,"approved_at_utc":"2026-11-24T04:00:00+00:00"}))
+            with self.assertRaisesRegex(ValueError,"HTTP_RECORD_PATH_INVALID"):
+                reuse_http(src,dst)
+            self.assertEqual(list(dst.iterdir()),[])
 
 if __name__=="__main__": unittest.main()

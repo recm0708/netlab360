@@ -65,8 +65,7 @@ def availability() -> None:
 
 
 def check_baseline(data: dict) -> None:
-    if lab.management() != data["before"]["mgmt"]:
-        raise RuntimeError("Gestión no coincide con baseline")
+    lab.assert_management_preserved(data["before"]["mgmt"])
     lab.assert_protected(data["before"]["switch"])
     lab.assert_services()
 
@@ -75,6 +74,7 @@ def precheck() -> dict:
     data = identity()
     lab.status(data, ping=True)
     check_http()
+    check_baseline(data)
     if shutil.which("systemd-run") is None:
         raise RuntimeError("systemd-run no disponible; no arriesgar enlace")
     lab.cmd("systemd-run", "--version")
@@ -96,12 +96,24 @@ def failsafe_arm() -> str:
         ip, "-n", lab.CLIENT, "link", "set", "dev", MEMBER, "up",
         root=True, timeout=14,
     )
+    if lab.cmd("systemctl", "is-active", f"{unit}.timer").strip() != "active":
+        raise RuntimeError("Temporizador de rescate no activo")
     print(f"S05_LACP_S1_RESCATE_SYSTEMD={unit}.timer", flush=True)
     return unit
 
 
 def failsafe_cancel(unit: str) -> None:
-    lab.cmd("systemctl", "stop", f"{unit}.timer", root=True, timeout=14)
+    timer = f"{unit}.timer"
+    load = lab.cmd("systemctl", "show", timer, "-p", "LoadState", "--value", check=False).strip()
+    if load != "not-found":
+        try:
+            lab.cmd("systemctl", "stop", timer, root=True, timeout=14)
+        except RuntimeError:
+            if lab.cmd("systemctl", "show", timer, "-p", "LoadState", "--value", check=False).strip() != "not-found":
+                raise
+    state = lab.cmd("systemctl", "is-active", timer, check=False).strip()
+    if state not in ("inactive", "failed", "unknown"):
+        raise RuntimeError("Estado de temporizador no confirmado como inactivo")
     print("S05_LACP_S1_RESCATE_CANCELADO=SI", flush=True)
 
 

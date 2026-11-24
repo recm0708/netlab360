@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 import importlib.util
 import json
 import os
+import re
 from pathlib import Path
 import signal
 import subprocess
@@ -215,9 +216,59 @@ def lacp_case(directory):
     return results
 
 
+def reuse_http(source,directory):
+    """Revalidar y copiar solo ventanas aceptadas; no volver a detener HQ."""
+    if source.resolve()==directory.resolve() or not source.is_dir():
+        raise ValueError("SOURCE_DIRECTORY_INVALID")
+    old=json.loads((source/"http-summary.json").read_text())
+    approval=json.loads((source/"approval.json").read_text())
+    if (old.get("restored") is not True or old.get("scope")!="BACKEND_HQ_ONLY"
+            or "HTTP_BACKEND_HQ" not in approval.get("scope",[])
+            or approval.get("broker_operational_approval") is not False):
+        raise ValueError("HTTP_ACCEPTANCE_INVALID")
+    records=[]
+    previous=approval["approved_at_utc"]
+    for stage in ("baseline","fault","recovery"):
+        meta=old[stage]
+        name=meta["file"]
+        if not re.fullmatch(r"http-"+stage+r"-[0-9]{2,}\.json",name):
+            raise ValueError("HTTP_RECORD_PATH_INVALID")
+        path=source/name
+        if not path.is_file() or path.is_symlink():
+            raise ValueError("HTTP_RECORD_INVALID")
+        d=json.loads(path.read_text())
+        if (d["case"]!="HTTP" or d["stage"]!=stage.upper()
+                or d["mode"]!="REAL_OBSERVATION" or d["matched"] is not True
+                or d["network_mutations_authorized"] is not False
+                or d["captured_at_utc"]!=meta["captured_at_utc"]
+                or utc(d["captured_at_utc"])<utc(previous)):
+            raise ValueError("HTTP_RECORD_INVALID")
+        a=d["acquisition"]
+        if len(a["batch"]["events"])!=58:
+            raise ValueError("HTTP_EVENT_COUNT_INVALID")
+        r=diagnose(a)
+        rec=recommend(a)
+        if r!=d["diagnosis"] or rec!=d["recommendation"]:
+            raise ValueError("HTTP_REPRODUCTION_MISMATCH")
+        ok,reason=assess("HTTP",stage.upper(),a,r,rec,previous if stage!="baseline" else None)
+        if not ok:
+            raise ValueError("HTTP_REVALIDATION_FAILED:"+reason)
+        records.append(path)
+        previous=d["captured_at_utc"]
+    records.append(source/"http-summary.json")
+    for path in records:
+        with (directory/path.name).open("xb") as f:
+            f.write(path.read_bytes())
+    save(directory,"http-origin",{"mode":"HISTORICAL_REUSE","source":str(source.resolve()),
+         "files":[p.name for p in records],"new_http_stimuli":0})
+    print("HTTP_HISTORICO_REVALIDADO=3/3 | NUEVOS_ESTIMULOS_HTTP=0",flush=True)
+    return old
+
+
 def main():
     p=argparse.ArgumentParser()
     p.add_argument("directory",type=Path)
+    p.add_argument("--resume-http",type=Path,help="Reutilizar HTTP aceptado y ejecutar solo LACP")
     args=p.parse_args()
     if os.geteuid()==0 or not sys.stdin.isatty():
         p.error("usuario normal y TTY requeridos")
@@ -231,17 +282,27 @@ def main():
         raise InterruptedError(f"INTERRUPTED_{signum}")
     for s in (signal.SIGHUP,signal.SIGTERM,signal.SIGINT):
         signal.signal(s,interrupt)
-    print("Alcance: detener/restaurar backend HTTP HQ y reducir/restaurar s5c1 LACP S1, secuencialmente.",file=sys.stderr)
-    print("Escriba APROBAR HTTP LACP S07: ",end="",flush=True,file=sys.stderr)
-    if input()!="APROBAR HTTP LACP S07":
+    if args.resume_http:
+        a=reuse_http(args.resume_http,args.directory)
+        phrase="APROBAR LACP S07"
+        scope=["LACP_S1_S5C1"]
+        print("Alcance: solo reducir/restaurar s5c1 LACP S1; HTTP historico conservado.",file=sys.stderr)
+    else:
+        phrase="APROBAR HTTP LACP S07"
+        scope=["HTTP_BACKEND_HQ","LACP_S1_S5C1"]
+        print("Alcance: detener/restaurar backend HTTP HQ y reducir/restaurar s5c1 LACP S1, secuencialmente.",file=sys.stderr)
+    print("Escriba "+phrase+": ",end="",flush=True,file=sys.stderr)
+    if input()!=phrase:
         p.error("confirmacion denegada")
-    save(args.directory,"approval",{"scope":["HTTP_BACKEND_HQ","LACP_S1_S5C1"],
+    save(args.directory,"approval",{"scope":scope,
         "approved_at_utc":now(),"uid":os.getuid(),"mode":"LOCAL_ADMIN_EXPERIMENT",
         "broker_operational_approval":False})
-    a=http_case(args.directory)
+    if not args.resume_http:
+        a=http_case(args.directory)
     b=lacp_case(args.directory)
     save(args.directory,"summary",{"schema":"NETLAB360_S07_SERVICE_TRIALS_V1",
         "mode":"REAL_SEQUENTIAL_CONTROLLED_EXPERIMENTS","http":a,"lacp":b,
+        "http_reused":bool(args.resume_http),
         "synthetic":False,"simultaneous":False,"continuous_availability_measured":False,
         "automatic_remediation":False,"operational_events_imported":0})
     print("HTTP_LACP_REAL=2/2 | RCA_RUNBOOKS=2/2 | RESTAURACION=2/2",flush=True)
