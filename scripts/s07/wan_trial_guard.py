@@ -65,20 +65,52 @@ def read(p,pf):
         raise ValueError("JOURNAL_INVALID")
     return d
 
+def parse_interface(addr,link):
+    """ip -4 addr omite la MAC; unir exclusivamente la misma interfaz."""
+    if not isinstance(addr,list) or not isinstance(link,list) or len(addr)!=1 or len(link)!=1:
+        raise ValueError("WAN_IDENTITY")
+    a,l=addr[0],link[0]
+    if (not isinstance(a,dict) or not isinstance(l,dict)
+        or a.get("ifname")!=IFACE or l.get("ifname")!=IFACE
+        or type(a.get("ifindex")) is not int or a["ifindex"]<=0
+        or a["ifindex"]!=l.get("ifindex")
+        or type(l.get("ifindex")) is not int):
+        raise ValueError("WAN_INTERFACE_MISMATCH")
+    addresses=a.get("addr_info",[])
+    if not any(x.get("family")=="inet" and x.get("local")=="10.78.0.1" and x.get("prefixlen")==30
+               for x in addresses):
+        raise ValueError("WAN_IDENTITY")
+    mac=l.get("address")
+    if not isinstance(mac,str) or not re.fullmatch(r"(?:[0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}",mac):
+        raise ValueError("WAN_MAC_INVALID")
+    if mac.lower()=="00:00:00:00:00:00" or int(mac[:2],16)&1:
+        raise ValueError("WAN_MAC_INVALID")
+    if not isinstance(a.get("flags"),list) or not isinstance(l.get("flags"),list):
+        raise ValueError("WAN_FLAGS_INVALID")
+    up="UP" in a["flags"]
+    if up!=("UP" in l["flags"]):
+        raise ValueError("WAN_ADMIN_STATE_CHANGED")
+    return {"ifindex":a["ifindex"],"mac":mac.lower()},up
+
+def process_identity(pid):
+    return {"netns":Path("/proc",pid,"ns/net").stat().st_ino,
+            "boot":Path("/proc/sys/kernel/random/boot_id").read_text().strip(),
+            "start_ticks":Path("/proc",pid,"stat").read_text().rsplit(")",1)[1].split()[19]}
+
 def identity(pf,ids):
     r=pf.inspect("HQ")
     if r["id"]!=ids["HQ"]: raise ValueError("PIN_MISMATCH")
     pid=str(r["pid"])
-    if Path("/proc",pid,"ns/net").stat().st_ino==Path("/proc/self/ns/net").stat().st_ino:
+    session=process_identity(pid)
+    if session["netns"]==Path("/proc/self/ns/net").stat().st_ino:
         raise ValueError("HOST_NAMESPACE_DENIED")
-    d=json.loads(run("/usr/bin/nsenter","-t",pid,"-n","/usr/sbin/ip","-j","-4","addr","show","dev",IFACE))
-    if len(d)!=1 or d[0]["ifname"]!=IFACE or not any(x.get("local")=="10.78.0.1" and x.get("prefixlen")==30 for x in d[0]["addr_info"]):
-        raise ValueError("WAN_IDENTITY")
-    if pf.inspect("HQ")!=r: raise ValueError("SESSION_CHANGED")
-    return {**r,"netns":Path("/proc",pid,"ns/net").stat().st_ino,
-            "boot":Path("/proc/sys/kernel/random/boot_id").read_text().strip(),
-            "start_ticks":Path("/proc",pid,"stat").read_text().rsplit(")",1)[1].split()[19],
-            "ifindex":d[0]["ifindex"],"mac":d[0]["address"]},"UP" in d[0]["flags"]
+    prefix=("/usr/bin/nsenter","-t",pid,"-n","/usr/sbin/ip")
+    addr=json.loads(run(*prefix,"-j","-4","addr","show","dev",IFACE))
+    link=json.loads(run(*prefix,"-j","link","show","dev",IFACE))
+    interface,up=parse_interface(addr,link)
+    if pf.inspect("HQ")!=r or process_identity(pid)!=session:
+        raise ValueError("SESSION_CHANGED")
+    return {**r,**session,**interface},up
 
 def set_link(pf,ids,expected,up):
     current,state=identity(pf,ids)
@@ -90,7 +122,7 @@ def set_link(pf,ids,expected,up):
 
 def main():
     p=argparse.ArgumentParser()
-    p.add_argument("op",choices=["start","restore","finish"])
+    p.add_argument("op",choices=["check","start","restore","finish"])
     p.add_argument("id",nargs="?")
     a=p.parse_args()
     if os.geteuid()!=0: p.error("root required")
@@ -99,6 +131,12 @@ def main():
         pf=load_pf()
         ids=pf.read_pin(PSTATE/"router-pin.json")
         with pf.exclusive(PSTATE/"preflight.lock"):
+            if a.op=="check":
+                if a.id: raise ValueError("UNEXPECTED_ID")
+                target,up=identity(pf,ids)
+                print(json.dumps({"ok":True,"mode":"READ_ONLY","target":"HQ/s1p",
+                                  "identity":target,"admin_up":up},indent=2))
+                return
             if a.op=="start":
                 if a.id: raise ValueError("UNEXPECTED_ID")
                 for prev in STATE.glob("*.json"):

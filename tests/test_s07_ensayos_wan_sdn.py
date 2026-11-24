@@ -106,6 +106,33 @@ class GuardTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,"LINK_POSTCONDITION_FAILED"):
                 guard.set_link(None,{},expected,True)
 
+class InterfaceIdentityTests(unittest.TestCase):
+    def fixture(self,up=True):
+        flags=["BROADCAST","MULTICAST"]+(["UP","LOWER_UP"] if up else [])
+        addr=[{"ifindex":5,"ifname":"s1p","flags":list(flags),
+               "addr_info":[{"family":"inet","local":"10.78.0.1","prefixlen":30}]}]
+        link=[{"ifindex":5,"ifname":"s1p","flags":list(flags),"address":"d2:27:c1:ff:9b:87"}]
+        return addr,link
+    def test_ipv4_without_mac(self):
+        self.assertEqual(guard.parse_interface(*self.fixture()),({"ifindex":5,"mac":"d2:27:c1:ff:9b:87"},True))
+    def test_admin_down_still_identified(self):
+        self.assertEqual(guard.parse_interface(*self.fixture(False))[1],False)
+    def test_wrong_index(self):
+        a,l=self.fixture(); l[0]["ifindex"]=6
+        with self.assertRaisesRegex(ValueError,"WAN_INTERFACE_MISMATCH"): guard.parse_interface(a,l)
+    def test_wrong_name(self):
+        a,l=self.fixture(); l[0]["ifname"]="ens33"
+        with self.assertRaisesRegex(ValueError,"WAN_INTERFACE_MISMATCH"): guard.parse_interface(a,l)
+    def test_missing_mac(self):
+        a,l=self.fixture(); del l[0]["address"]
+        with self.assertRaisesRegex(ValueError,"WAN_MAC_INVALID"): guard.parse_interface(a,l)
+    def test_wrong_ipv4(self):
+        a,l=self.fixture(); a[0]["addr_info"][0]["local"]="192.168.47.40"
+        with self.assertRaisesRegex(ValueError,"WAN_IDENTITY"): guard.parse_interface(a,l)
+    def test_state_changed_between_reads(self):
+        a,l=self.fixture(); l[0]["flags"].remove("UP")
+        with self.assertRaisesRegex(ValueError,"WAN_ADMIN_STATE_CHANGED"): guard.parse_interface(a,l)
+
 class GuardResponseTests(unittest.TestCase):
     def test_denial_preserves_json(self):
         with tempfile.TemporaryDirectory() as td:
