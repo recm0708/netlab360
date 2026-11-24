@@ -1,0 +1,170 @@
+"""Persistencia privada S08: inicialización explícita y comprobación solo lectura."""
+from __future__ import annotations
+
+import argparse
+from contextlib import closing
+from datetime import datetime, timezone
+import json
+import os
+from pathlib import Path
+import sqlite3
+import stat
+
+APPLICATION_ID = 0x4E4C5338
+SCHEMA_VERSION = 1
+DB_NAME = "consola.sqlite3"
+TABLES = frozenset({"schema_migrations", "jobs", "audit_events"})
+
+# Los trabajos se reservan para una fase posterior: no se crean
+# registros de ejecución ficticios ni se interpretan como RFC S07.
+DDL = (
+    """CREATE TABLE schema_migrations (
+        version INTEGER PRIMARY KEY CHECK(version = 1),
+        applied_at_utc TEXT NOT NULL
+    )""",
+    """CREATE TABLE jobs (
+        job_id TEXT PRIMARY KEY NOT NULL,
+        action_id TEXT NOT NULL,
+        actor_id TEXT NOT NULL,
+        created_at_utc TEXT NOT NULL,
+        status TEXT NOT NULL CHECK(status IN
+            ('QUEUED','RUNNING','SUCCEEDED','FAILED','CANCELLED')),
+        finished_at_utc TEXT,
+        result_json TEXT
+    )""",
+    """CREATE TABLE audit_events (
+        event_id INTEGER PRIMARY KEY,
+        event_type TEXT NOT NULL,
+        observed_at_utc TEXT NOT NULL,
+        details_json TEXT NOT NULL
+    )""",
+)
+
+
+def default_dir() -> Path:
+    """Ruta de desarrollo privada, independiente de las bases S06/S07."""
+    return Path.home() / "netlab360-bootstrap/s08/estado"
+
+
+def _owned_directory(path: Path, *, private: bool) -> None:
+    """Rechazar enlaces y directorios con permisos o propietario inseguros."""
+    info = path.lstat()
+    mode = stat.S_IMODE(info.st_mode)
+    if (not stat.S_ISDIR(info.st_mode) or info.st_uid != os.geteuid()
+            or (mode != 0o700 if private else bool(mode & 0o022))):
+        raise ValueError("UNSAFE_STORAGE_DIRECTORY")
+
+
+def _directory(directory: Path, *, create: bool) -> Path:
+    if os.geteuid() == 0:
+        raise RuntimeError("S08_ROOT_FORBIDDEN")
+    if not directory.is_absolute() or ".." in directory.parts:
+        raise ValueError("INVALID_STORAGE_PATH")
+    _owned_directory(directory.parent, private=False)
+    if create:
+        try:
+            directory.mkdir(mode=0o700)
+        except FileExistsError:
+            pass
+    _owned_directory(directory, private=True)
+    return directory / DB_NAME
+
+
+def _owned_database(path: Path) -> None:
+    info = path.lstat()
+    if (not stat.S_ISREG(info.st_mode) or info.st_uid != os.geteuid()
+            or stat.S_IMODE(info.st_mode) != 0o600 or info.st_nlink != 1):
+        raise ValueError("UNSAFE_STORAGE_DATABASE")
+
+
+def _connect(path: Path, *, readonly: bool) -> sqlite3.Connection:
+    _owned_database(path)
+    mode = "ro" if readonly else "rw"
+    connection = sqlite3.connect(path.as_uri() + "?mode=" + mode,
+                                 uri=True, timeout=5, isolation_level=None)
+    try:
+        connection.execute("PRAGMA foreign_keys=ON")
+        if readonly:
+            connection.execute("PRAGMA query_only=ON")
+    except BaseException:
+        connection.close()
+        raise
+    return connection
+
+
+def inspect(directory: Path) -> dict:
+    """Comprobar identidad, versión, integridad y cantidades sin escribir."""
+    path = _directory(directory, create=False)
+    with closing(_connect(path, readonly=True)) as db:
+        app_id = db.execute("PRAGMA application_id").fetchone()[0]
+        version = db.execute("PRAGMA user_version").fetchone()[0]
+        if app_id != APPLICATION_ID or version != SCHEMA_VERSION:
+            raise ValueError("UNSUPPORTED_STORAGE_SCHEMA")
+        tables = {row[0] for row in db.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")}
+        if tables != TABLES:
+            raise ValueError("UNEXPECTED_STORAGE_TABLES")
+        if db.execute("PRAGMA integrity_check").fetchall() != [("ok",)]:
+            raise ValueError("STORAGE_INTEGRITY_ERROR")
+        migrations = db.execute("SELECT version FROM schema_migrations").fetchall()
+        if migrations != [(SCHEMA_VERSION,)]:
+            raise ValueError("INVALID_MIGRATION_HISTORY")
+        jobs = db.execute("SELECT COUNT(*) FROM jobs").fetchone()[0]
+        events = db.execute("SELECT COUNT(*) FROM audit_events").fetchone()[0]
+    return {
+        "schema": "NETLAB360_S08_STORAGE_V1",
+        "schema_version": version,
+        "integrity": "OK",
+        "jobs": jobs,
+        "audit_events": events,
+        "network_mutations_authorized": False,
+    }
+
+
+def initialize(directory: Path) -> dict:
+    """Crear una base nueva; nunca migrar ni sobrescribir una base desconocida."""
+    path = _directory(directory, create=True)
+    try:
+        # El descriptor exclusivo impide sustituir bases existentes o enlaces.
+        fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
+    except FileExistsError:
+        return inspect(directory)
+    try:
+        os.fchmod(fd, 0o600)
+    finally:
+        os.close(fd)
+
+    # La transacción incluye DDL, versión y evidencia de inicialización.
+    # Ante una interrupción conservamos la base para diagnóstico; no la borramos.
+    with closing(_connect(path, readonly=False)) as db:
+        db.execute("BEGIN IMMEDIATE")
+        try:
+            for statement in DDL:
+                db.execute(statement)
+            stamp = datetime.now(timezone.utc).isoformat()
+            db.execute("INSERT INTO schema_migrations VALUES (?, ?)",
+                       (SCHEMA_VERSION, stamp))
+            db.execute(
+                "INSERT INTO audit_events(event_type, observed_at_utc, details_json) VALUES (?, ?, ?)",
+                ("STORAGE_INITIALIZED", stamp,
+                 json.dumps({"schema_version": SCHEMA_VERSION}, separators=(",", ":"))))
+            db.execute(f"PRAGMA application_id={APPLICATION_ID}")
+            db.execute(f"PRAGMA user_version={SCHEMA_VERSION}")
+            db.execute("COMMIT")
+        except BaseException:
+            db.execute("ROLLBACK")
+            raise
+    return inspect(directory)
+
+
+def main() -> None:
+    """CLI local de administración de almacenamiento, sin opciones de ruta web."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("operation", choices=("init", "check"))
+    args = parser.parse_args()
+    action = initialize if args.operation == "init" else inspect
+    print(json.dumps(action(default_dir()), sort_keys=True, allow_nan=False))
+
+
+if __name__ == "__main__":
+    main()
