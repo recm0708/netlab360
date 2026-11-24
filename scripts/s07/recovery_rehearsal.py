@@ -57,6 +57,7 @@ def read_json(path,protected=False):
     return json.loads(path.read_text())
 
 
+# Persistimos cada estado mediante archivo temporal exclusivo antes de sustituir el registro.
 def save(path,data):
     tmp=path.with_name("."+path.name+"."+uuid4().hex)
     fd=os.open(tmp,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600)
@@ -105,6 +106,7 @@ def plan():
             "no_write_memory":True,"network_mutations_authorized":False}
 
 
+# La máquina de estados trabaja únicamente sobre el fixture de archivo y el identificador de este ensayo.
 class Trial:
     def __init__(self,root,rid,boot_id,clock=time.monotonic,protected=False):
         unit_name(rid)

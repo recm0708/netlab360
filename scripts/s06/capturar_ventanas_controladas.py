@@ -77,6 +77,7 @@ def route_check() -> dict:
     return values
 
 
+# La qdisc y las rutas se observan independientemente de las características ICMP.
 def snapshot() -> dict:
     state = read_guard()
     routes = route_check()
@@ -88,6 +89,7 @@ def snapshot() -> dict:
     }
 
 
+# Asignamos etiqueta solo con estados y controles consistentes antes y después de medir; ante ambigüedad conservamos UNKNOWN.
 def classify(expected: str, before: dict, after: dict,
              measures: list[dict]) -> dict:
     if expected not in ("DEGRADED", "RECOVERY"):

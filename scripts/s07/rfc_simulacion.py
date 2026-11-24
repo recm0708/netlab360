@@ -14,6 +14,7 @@ TTL=60
 MAX_EVIDENCE_AGE=30
 
 
+# Los roles y registros de este ledger son datos simulados, no identidades autenticadas.
 class Ledger:
     def __init__(self):
         self._records={}
@@ -73,6 +74,7 @@ class Ledger:
         self._log(rid,actor,"REQUESTED",now)
         return deepcopy(body)
 
+    # Se verifica el cuerpo original y el estado esperado antes de aprobar o consumir una solicitud.
     def _check(self,body,now,status):
         record=self._records.get(body.get("rfc_id"))
         if record is None or body!=record["request"]:

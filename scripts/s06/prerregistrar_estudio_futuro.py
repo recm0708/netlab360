@@ -33,6 +33,7 @@ def read_regular(path: Path, limit: int = 150000) -> bytes:
     return path.read_bytes()
 
 
+# El número de paquetes es una condición de comparabilidad, no una característica para asignar etiquetas.
 def packet_count(session: str, controlled: bool) -> int:
     data = json.loads(read_regular(RAW / session / "metadata.json"))
     if data.get("session_id") != session or data.get("status") != "complete":
@@ -116,6 +117,7 @@ def build(now: datetime | None = None) -> dict:
     }
 
 
+# La comparación exige preservar el prerregistro y la identidad de los modelos originales.
 def compare_frozen(old: dict, current: dict) -> None:
     if not isinstance(old, dict) or old.get("schema") != SCHEMA:
         raise ValueError("freeze_schema_invalid")

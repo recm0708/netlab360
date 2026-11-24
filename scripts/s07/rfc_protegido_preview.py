@@ -31,6 +31,7 @@ class Denied(ValueError):
     pass
 
 
+# El almacén protege el registro de solicitudes de demostración; las acciones no tienen un ejecutor de red.
 class Store:
     def __init__(self,path,requester_uid,clock=time.time):
         if type(requester_uid) is not int or requester_uid<=0:
@@ -161,6 +162,7 @@ def secure_path(p,mode,kind):
         raise RuntimeError("UNSAFE_PATH "+str(p))
 
 
+# El servidor identifica al cliente del socket Unix y reserva el proceso privilegiado al administrador.
 def serve():
     if os.geteuid()!=0:
         raise RuntimeError("ROOT_REQUIRED")
