@@ -10,7 +10,7 @@ TRAIN V2 real: 40 NORMAL, 8 DEGRADED, 12 RECOVERY por ruta con tres ICMP; dos ev
 
 Califica los mismos métodos P95 RTT, IsolationForest y LogisticRegression, **sin llamar `fit` ni cambiar umbrales**. Por ruta y método registra TP/FP/TN/FN, precision, recall, F1, especificidad, falsas alarmas RECOVERY y cantidad de ventanas detectadas por cada uno de los **dos eventos**. Incluye promedio/mediana RTT NORMAL por etapa como insumo para análisis descriptivo posterior de data drift, no como validación automática de concept drift. Prohíbe atribuir al sistema pronóstico anterior al evento, cobertura real de FAULT/OSPF, despliegue productivo o generalización fuera del estímulo artificial de latencia fija 40 ms.
 
-La evaluación se conserva una sola vez: `~/netlab360-bootstrap/s06/estudio-uniforme-v2/evaluaciones-v2/validation.json` o `test.json`; no sobreescribir/recalificar para mejorar métricas. Si una evaluación falla, se conserva intacto el freeze, el corpus y la red. No se exige captura académica adicional antes de disponer de resultados comparables de TEST.
+La evaluación se conserva una sola vez: `~/netlab360-bootstrap/s06/estudio-uniforme-v2/evaluaciones-v2/validation.json` o `test.json`; no sobreescribir/recalificar para mejorar métricas. Si una evaluación falla, se conserva intacto el freeze, el corpus y la red.
 
 ## Procedimiento de evaluación
 
@@ -36,7 +36,7 @@ La evaluación se conserva una sola vez: `~/netlab360-bootstrap/s06/estudio-unif
 
 Los tres métodos tuvieron **0 FN en TEST** y detectaron al menos una ventana en cada uno de los dos eventos por ruta. Cada TEST tiene 20 negativos y solo ocho positivos por ruta; ambos destinos comparten estímulo y no son eventos independientes entre rutas. Los resultados son válidos para retardo artificial HQ de 40 ms, no prueban pronóstico, fallas OSPF/WAN/HA/LACP/SDN ni generalización a otros tipos de perturbación.
 
-**RTT NORMAL medio (ms):** HQ→S1 TRAIN `0.0780`, VALIDATION `0.0798`, TEST `0.0799` (+0.0018 desde TRAIN); HQ→S2 TRAIN `0.0796`, VALIDATION `0.0849`, TEST `0.0752` (−0.0044 desde TRAIN). Estos cambios son observaciones descriptivas, no evidencia de concept drift ni deterioro demostrado.
+La comparación descriptiva de RTT NORMAL y la oportunidad temporal se desarrollan en la [auditoría científica](s06-v2-deriva-deteccion-y-limitaciones-finales.md).
 
 **Seguridad:** watchdog restauró dos ciclos TEST (RTT degradado/recuperado 40.476/0.075 ms y 40.469/0.073 ms), controlador `NONE/BASELINE`, qdisc `noqueue`, 21 namespaces, 4 Docker, NOC saludable y cero mutaciones permanentes. Salidas privadas `~/netlab360-bootstrap/s06/estudio-uniforme-v2/evaluaciones-v2/validation.json` y `test.json`. Bitácora `~/netlab360-bootstrap/s06/estudio-uniforme-v2/validacion-test-20261123_103455/S06_V2_Evaluacion_Test_Completa.txt`. No recapturar ni reajustar tras TEST.
 

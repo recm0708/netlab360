@@ -32,7 +32,7 @@ Las observaciones contienen features de RTT, pérdidas y variación independient
 1. **Auditoría sin cambio** de restos de los laboratorios antiguos: buscar `nl360-s06-*` y tipos dummy en host y 21 namespaces; si hay elementos inesperados, detenerse antes de cualquier borrado, identificar propietario y dependencias. No eliminar recursos legítimos.
 2. Verificar `main`, sintaxis, pruebas CI y pruebas específicas, red management, qdisc HQ y salud de servicios.
 3. Instalar el controlador y comprobar propietario/mode/digest, ejecutar `audit` de solo lectura. Si falla, detener la intervención.
-4. Tomar captura académica de S06-041 (60 ventanas y tasas de FP) desde su bitácora ya guardada.
+4. Confirmar las ventanas NORMAL verificadas de referencia.
 5. Ejecutar **una primera intervención autorizada**, capturar 3 a 5 ventanas DEGRADED mientras el timer de 35 s continúa activo. No repetir automáticamente la prueba si existe anomalía.
 6. Verificar transiciones `APPLIED`→`RESTORED`, qdisc `noqueue`, rutas y Prometheus, capturar ventanas RECOVERY, archivar reporte root y bitácora.
 7. Solo al comprobar restauración real, ejecutar `cleanup` y validar gestión, 21 namespaces, 4 Docker y NOC 18 nodos/21 enlaces.
@@ -44,7 +44,7 @@ El cambio actúa sobre un cliente de la topología de laboratorio; **no es una r
 
 La qdisc de Linux no almacena propietario de la aplicación. La comprobación del handle y del retardo es una restricción del entorno, no defensa frente a modificaciones concurrentes arbitrarias de root. Es imprescindible no usar simultáneamente otras herramientas tc sobre el mismo dispositivo. Frente a `ESCALATED`, conservar estado y diagnosticar; no lanzar `tc qdisc del` a ciegas.
 
-Las primeras sesiones servirán para observar **DEGRADED/RECOVERY reales del cliente de laboratorio**. Para entrenar y medir generalización se requieren varias sesiones independientes por clase, split por sesión/tiempo y TEST no visto; no calcular F1/recall sobre un solo experimento. La eventual API de inferencia será inicialmente de solo lectura; controles mutantes futuros de S07/S08 requieren aprobación individual y catálogos allowlisted.
+Las primeras sesiones permitieron observar **DEGRADED/RECOVERY reales del cliente de laboratorio**. Para entrenar y medir generalización se requieren varias sesiones independientes por clase, split por sesión/tiempo y TEST no visto; no calcular F1/recall sobre un solo experimento. La inferencia se mantiene de solo lectura; la actuación supervisada requiere aprobación individual y catálogos de acciones autorizadas.
 
 ## Validación
 

@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import re
+import sys
+import subprocess
 import unittest
 from pathlib import Path
 from urllib.parse import unquote
@@ -9,6 +11,9 @@ from urllib.parse import unquote
 ROOT = Path(__file__).resolve().parents[1]
 BASE_WEB = "https://github.com/recm0708/netlab360/blob/main/"
 FASES = {1: 83, 2: 9, 3: 8, 4: 22, 5: 71, 6: 11, 7: 49}
+sys.path.insert(0, str(ROOT / "scripts/validacion"))
+from auditar_repositorio import markdown_lines, proposed_name
+
 ENLACE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 
 
@@ -26,8 +31,8 @@ class DocumentacionProyectoTests(unittest.TestCase):
         for doc in documentos_tecnicos():
             texto = doc.read_text(encoding="utf-8")
             relativos = doc.relative_to(ROOT).as_posix()
-            if not re.search(r"(?m)^# \S", texto):
-                fallos.append(f"Falta título: {relativos}")
+            if sum(bool(re.match(r"^#\s+\S", linea)) for _, linea in markdown_lines(texto)) != 1:
+                fallos.append(f"Título H1 no único: {relativos}")
             if re.search(r"sha[-_ ]?256|\.sha256|evidencias/manifiestos|\bmanifiestos?\b",
                          texto, flags=re.IGNORECASE):
                 fallos.append(f"Referencia administrativa: {relativos}")
@@ -45,6 +50,21 @@ class DocumentacionProyectoTests(unittest.TestCase):
                 if not ruta.exists():
                     fallos.append(f"Enlace ausente: {relativos} → {destino}")
         self.assertEqual(fallos, [])
+
+    def test_nomenclatura_versionada(self):
+        rutas = subprocess.check_output(["git", "ls-files", "-z"], cwd=ROOT).decode().split("\0")
+        errores = []
+        for ruta in filter(None, rutas):
+            nombre = Path(ruta).name
+            if proposed_name(ruta) != ruta:
+                errores.append(ruta)
+            elif ruta.endswith(".py") and not re.fullmatch(r"[a-z][a-z0-9_]*\.py", nombre):
+                errores.append(ruta)
+            elif ruta.startswith("tests/") and ruta.endswith(".py") and not re.fullmatch(r"test_(s\d{2}|transversal)_[a-z0-9_]+\.py", nombre):
+                errores.append(ruta)
+            elif ruta.startswith("docs/") and ruta.endswith(".md") and nombre != "README.md" and not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*\.md", nombre):
+                errores.append(ruta)
+        self.assertEqual(errores, [])
 
     def test_catalogos_de_capturas(self):
         carpeta = ROOT / "evidencias/capturas"

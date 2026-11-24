@@ -2,9 +2,9 @@
 
 ## Descripción y fuentes
 
-Conservar la aplicación visual de topología S05, sus 18 nodos/21 enlaces, FIB WAN, HTTP HA, LACP, SDN y estado administrativo. Añadir **un panel independiente** con diagnóstico IA exploratorio de las dos rutas de egreso del cliente HQ, aprovechando la API read-only de S06-046 en `127.0.0.1:9145`. No se crean namespaces, interfaces, contenedores, reglas, servicios productivos ni una consola NOC paralela permanente.
+El panel conserva la aplicación visual de topología S05, sus 18 nodos/21 enlaces, FIB WAN, HTTP HA, LACP, SDN y estado administrativo. Integra **un panel independiente** con diagnóstico IA exploratorio de las dos rutas de egreso del cliente HQ, aprovechando la API read-only de S06-046 en `127.0.0.1:9145`. No se crean namespaces, interfaces, contenedores, reglas, servicios productivos ni una consola NOC paralela permanente.
 
-S06-046 ya produjo **una sola adquisición reciente** verificada con RTT 0.089 ms HQ→S1 y 0.100 ms HQ→S2, 0 % de pérdida, consenso NORMAL de tres métodos. Captura F08 aceptada. Es una observación de laboratorio con `ground_truth=UNKNOWN` que **caduca a los 30 s**; sus valores no pueden pintarse como "vivos" horas después.
+S06-046 ya produjo **una sola adquisición reciente** verificada con RTT 0.089 ms HQ→S1 y 0.100 ms HQ→S2, 0 % de pérdida, consenso NORMAL de tres métodos. Es una observación de laboratorio con `ground_truth=UNKNOWN` que **caduca a los 30 s**; sus valores no pueden pintarse como "vivos" horas después.
 
 ## Arquitectura
 

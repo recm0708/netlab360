@@ -18,7 +18,7 @@ La documentación vigente describe el sistema y sus resultados. Las instruccione
 | Evidencia PNG | SNN_FNN_Descripcion_Tecnica.png |
 | Archivos institucionales | nombres reconocidos por GitHub y el ecosistema (README.md, LICENSE, CITATION.cff, SECURITY.md, etc.) |
 
-Los archivos de herramientas con nombres convencionales, las rutas de systemd, las interfaces de importación, los recursos de runtime y las referencias fijadas a revisiones históricas requieren un análisis de compatibilidad antes de modificarse. No renombrar indiscriminadamente por extensión.
+Los archivos de herramientas con nombres convencionales, las rutas de systemd, las interfaces de importación, los recursos de runtime y las referencias fijadas a revisiones históricas requieren un análisis de compatibilidad antes de modificarse. Los identificadores históricos B1–B4, versiones de ensayos y nombres de registros originales se conservan cuando identifican procedimientos o procedencia experimental. Los archivos .yml y .yaml son válidos según su consumidor; las unidades .service, plantillas .j2, configuraciones .conf, main.tf y nombres reservados conservan su contrato. No renombrar indiscriminadamente por extensión. Las referencias a revisiones históricas permanecen vinculadas a la revisión original.
 
 ## Código y pruebas
 

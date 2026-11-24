@@ -38,6 +38,8 @@ S07 cuenta con las ocho issues técnicas cerradas, 49 capturas y regresión de 1
 
 ## Documentación
 
+El [índice completo de documentación técnica](docs/README.md) organiza todos los documentos por su responsabilidad.
+
 | Área | Referencia |
 |---|---|
 | Arquitectura | [Red multisede](docs/arquitectura/arquitectura-multisede-implementada.md) |
