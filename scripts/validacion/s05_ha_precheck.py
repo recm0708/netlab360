@@ -69,6 +69,7 @@ def addresses(raw: str) -> set[str]:
     return out
 
 
+# El marcador de propiedad evita interpretar estados ajenos como recursos HA del laboratorio.
 def read_json(path: Path, expected_owner: str) -> dict:
     if not path.is_file() or path.is_symlink():
         raise RuntimeError(f"Estado ausente o enlace simbólico: {path}")
@@ -78,6 +79,7 @@ def read_json(path: Path, expected_owner: str) -> dict:
     return value
 
 
+# Corroboramos las fuentes de observabilidad antes de habilitar otra comprobación HA.
 def api_state() -> None:
     with urlopen("http://127.0.0.1:9110/api/v1/state", timeout=7) as r:
         s04 = json.load(r)

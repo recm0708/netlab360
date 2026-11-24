@@ -38,6 +38,7 @@ def sudo(*args: str, **kwargs) -> str:
     return run("sudo", "-n", *args, **kwargs)
 
 
+# La lectura de namespaces utiliza los PID de los routers Docker inspeccionados.
 def inspect() -> dict[str, str]:
     pids = {}
     for logical, name in C.items():
@@ -59,6 +60,7 @@ def full_count(logical: str) -> tuple[int, str]:
     return sum("Full" in line for line in output.splitlines()), output
 
 
+# La selección del siguiente salto se comprueba por separado de las adyacencias OSPF.
 def check_fib(pids: dict[str, str]) -> tuple[bool, list[str]]:
     rows = []
     result = True

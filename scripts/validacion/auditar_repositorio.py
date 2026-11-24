@@ -89,6 +89,7 @@ def anchors(content):
         result.add(slug if n == 0 else f"{slug}-{n}")
     return result
 
+# Las rutas fijadas a una revisión histórica no se resuelven contra los archivos vigentes de main.
 def resolve_link(source, link):
     raw = unquote(link.strip())
     for base in ("https://github.com/recm0708/netlab360/blob/main/",
@@ -105,6 +106,7 @@ def resolve_link(source, link):
         return None
     return posixpath.normpath(posixpath.join(posixpath.dirname(source), target)), anchor
 
+# Inventariamos las rutas versionadas antes de verificar enlaces y consumidores de nombres.
 def audit(root):
     paths = subprocess.check_output(["git", "ls-files", "-z"], cwd=root).decode().split("\0")
     paths = sorted(p for p in paths if p)

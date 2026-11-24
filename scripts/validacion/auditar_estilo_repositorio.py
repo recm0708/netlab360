@@ -39,6 +39,8 @@ def classify(path, source):
         tree = ast.parse(source)
         doc = ast.get_docstring(tree) or ""
         nodes = [n for n in ast.walk(tree) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))]
+        all_comments = [t.string for t in tokenize.generate_tokens(io.StringIO(source).readline)
+                        if t.type == tokenize.COMMENT]
         comments = [t for t in tokenize.generate_tokens(io.StringIO(source).readline)
                     if t.type == tokenize.COMMENT and useful(t.string)]
         purpose = doc.splitlines()[0] if doc else (comments[0].string if comments else "")
@@ -48,10 +50,11 @@ def classify(path, source):
             flags.append("BLOQUES_A_REVISAR")
     else:
         comments = re.findall(r"(?m)^\s*(?:#|!|//|<!--|/\*|\{#)([^\n]*)", source)
+        all_comments = comments
         purpose = next((x.strip() for x in comments if useful(x)), "")
     if not purpose:
         flags.append("PROPOSITO_A_REVISAR")
-    if GENERIC.search(source):
+    if any(GENERIC.search(comment) for comment in all_comments):
         flags.append("COMENTARIO_GENERICO")
     return "CODIGO_CONFIGURACION", purpose, flags
 

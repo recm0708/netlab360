@@ -40,6 +40,7 @@ def addr_map(ip_json: list[dict]) -> dict[str, set[str]]:
     return out
 
 
+# Derivamos las direcciones esperadas de la fuente declarativa sin aplicar configuración.
 def expected_ips(device: dict) -> dict[str, set[str]]:
     out = {"lo": {str(ipaddress.ip_interface(device["loopback"]))}}
     for v in device["vlans"]:
@@ -50,6 +51,7 @@ def expected_ips(device: dict) -> dict[str, set[str]]:
     return out
 
 
+# Contrastamos el inventario candidato con la identidad y estado real de los routers.
 def audit() -> dict:
     if os.geteuid() == 0:
         raise RuntimeError("Ejecutar como usuario normal; validar sudo -v antes")

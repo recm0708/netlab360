@@ -35,6 +35,7 @@ def load(path: Path) -> dict:
     return data
 
 
+# La procedencia corresponde a registros experimentales originales; no a controles de imágenes.
 def manifest_check(folder: Path) -> bool:
     path = folder / MANIFEST
     if not path.is_file():
@@ -71,6 +72,7 @@ def manifest_check(folder: Path) -> bool:
     return failures == 0
 
 
+# La comparación usa el número esperado de flujos y los resultados reportados por iperf3.
 def show(label: str, data: dict, expected_flows: int) -> None:
     start = data.get("start") or {}
     end = data.get("end") or {}

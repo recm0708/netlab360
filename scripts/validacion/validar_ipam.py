@@ -16,6 +16,7 @@ def check(condition: bool, message: str) -> None:
     if not condition:
         raise ValueError(message)
 
+# Rechazamos redes no canónicas para que las comparaciones de prefijos sean deterministas.
 def network(value: str, context: str) -> ipaddress.IPv4Network:
     try:
         n = ipaddress.ip_network(value, strict=True)
@@ -32,6 +33,7 @@ def address(value: str, context: str) -> ipaddress.IPv4Address:
     check(isinstance(a, ipaddress.IPv4Address), f"{context}: solo se admite IPv4")
     return a
 
+# Una dirección de host debe pertenecer a la red y no ser red ni broadcast.
 def host_inside(value: str, n: ipaddress.IPv4Network, context: str) -> None:
     a = address(value, context)
     check(a in n, f"{context}: {a} está fuera de {n}")
@@ -40,7 +42,7 @@ def host_inside(value: str, n: ipaddress.IPv4Network, context: str) -> None:
 
 def main() -> None:
     if len(sys.argv) != 2:
-        sys.exit("Uso: python3 scripts/validacion/validar-ipam.py inventario/ipam/topologia-b1.yaml")
+        sys.exit("Uso: python3 scripts/validacion/validar_ipam.py inventario/ipam/topologia-b1.yaml")
 
     path = Path(sys.argv[1])
     data = yaml.safe_load(path.read_text(encoding="utf-8"))
