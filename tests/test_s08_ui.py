@@ -73,7 +73,8 @@ class StructureTests(unittest.TestCase):
         css = (UI / "static/styles.css").read_text(encoding="utf-8")
         for rule in ("scrollbar-color:", "--scroll-thumb", "height: 100dvh",
                      "overflow-y: auto", "overscroll-behavior: contain",
-                     "width: 24px; height: 24px", "width: 28px; height: 28px"):
+                     "width: 24px; height: 24px",
+                     ".menu-collapsed .nav-symbol { width: 24px; height: 24px; flex-basis: 24px; }"):
             self.assertIn(rule, css)
 
     def test_presentation_storage_is_limited(self):

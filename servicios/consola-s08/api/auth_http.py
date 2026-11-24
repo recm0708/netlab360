@@ -43,7 +43,7 @@ async def credentials(request: Request) -> LoginInput:
 
 def register(app: FastAPI, directory) -> None:
     """Registrar autenticación solo si existe una base v2 íntegra."""
-    if storage.inspect(directory)["schema_version"] != 2:
+    if storage.inspect(directory)["schema_version"] not in (2, 3):
         raise ValueError("SECURITY_SCHEMA_REQUIRED")
     attempts = deque()
     gate = asyncio.Lock()

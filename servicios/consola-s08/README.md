@@ -26,6 +26,8 @@ aceptados de las fases anteriores.
 | [api/auth_http.py](api/auth_http.py) | Login, identidad, roles y cierre de sesión HTTP |
 | [api/sessions.py](api/sessions.py) | Sesiones opacas, expiración y revocación |
 | [Pruebas HTTP de autenticación](../../tests/test_s08_auth.py) | Validación con cuentas sintéticas |
+| [api/profiles.py](api/profiles.py) | Persistencia de perfiles y permisos funcionales iniciales |
+| [Pruebas de perfiles](../../tests/test_s08_profiles.py) | Migración v3, aislamiento de perfiles y permisos |
 | [api/security.py](api/security.py) | Identidades locales, roles y derivación scrypt |
 | [Pruebas de identidades](../../tests/test_s08_identity.py) | Migración y verificación de cuentas sintéticas |
 | [api/storage.py](api/storage.py) | Inicialización y comprobación de SQLite privado |
@@ -41,7 +43,11 @@ El contrato no ejecuta consultas ni concede privilegios.
 Incorporamos un servidor de arranque con dos rutas públicas
 de metadatos, sin datos operacionales ni autorización.
 Incorporamos una base SQLite privada de inicialización explícita.
-Integramos la autenticación HTTP como modo explícito sobre SQLite v2.
+Integramos la autenticación HTTP como modo explícito sobre SQLite v2
+y v3. La migración v3 explícita añade perfiles opcionales, sin alterar
+las cuentas ni sesiones. No habilitamos administración de terceros ni
+MFA hasta validar sus controles por separado. Conservamos el esquema v2
+para instalaciones anteriores; la restauración requiere la copia previa.
 Integramos los lectores de exporter, NOC, Prometheus, inferencia S06 y
 asesor S07. Incorporamos la estructura visual y el acceso gráfico; la navegación
 de detalle y las acciones requieren implementación independiente. La disponibilidad de una ruta no garantiza la de su fuente.
@@ -78,7 +84,7 @@ La raíz redirige a /login o /home según la sesión. Servimos un documento
 independiente para el acceso y otro para las quince rutas de consola,
 protegidas en el servidor. La marca enlaza a /home; la cabecera reúne
 identidad, vencimiento y cierre de sesión. El menú se puede contraer.
-Usamos iconos SVG propios de 24 y 28 píxeles y barras de desplazamiento
+Usamos iconos SVG propios de 24 píxeles en ambos modos y barras de desplazamiento
 adaptadas al tema. En escritorio separamos el scroll de navegación del
 contenido. Recordamos por pestaña únicamente la posición numérica del
 menú, su estado contraído y el desplazamiento por ruta autorizada;

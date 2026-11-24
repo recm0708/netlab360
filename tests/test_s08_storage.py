@@ -70,7 +70,7 @@ class StorageTests(unittest.TestCase):
     def test_future_version_refused(self):
         m.initialize(self.directory)
         with closing(sqlite3.connect(self.db)) as db:
-            db.execute("PRAGMA user_version=3")
+            db.execute("PRAGMA user_version=4")
         before = self.db.read_bytes()
         with self.assertRaisesRegex(ValueError, "UNSUPPORTED_STORAGE_SCHEMA"):
             m.initialize(self.directory)
