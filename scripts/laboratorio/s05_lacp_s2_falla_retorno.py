@@ -20,7 +20,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location(
-    "s05_lacp_s2", ROOT / "scripts/laboratorio/s05-lacp-s2-integracion.py"
+    "s05_lacp_s2", ROOT / "scripts/laboratorio/s05_lacp_s2_integracion.py"
 )
 assert SPEC is not None and SPEC.loader is not None
 lab = importlib.util.module_from_spec(SPEC)

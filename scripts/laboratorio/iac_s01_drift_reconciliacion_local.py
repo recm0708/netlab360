@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[2]
 ART = Path.home() / "netlab360-bootstrap/iac/s01"
 ORIGINAL = ART / "rendered"
 DEST = ART / "drift-demo-2026-10-13"
-VALIDADOR = ROOT / "scripts/validacion/validar-iac-frr.py"
+VALIDADOR = ROOT / "scripts/validacion/validar_iac_frr.py"
 PLAY = ROOT / "ansible/s01/render-frr.yml"
 MANIFEST = ART / "manifest.json"
 
@@ -54,7 +54,7 @@ def admin():
 
 
 def main():
-    assert sys.argv[1:] == [], "Uso: python3 scripts/laboratorio/iac-s01-drift-reconciliacion-local.py"
+    assert sys.argv[1:] == [], "Uso: python3 scripts/laboratorio/iac_s01_drift_reconciliacion_local.py"
     before = admin()
     assert ORIGINAL.is_dir() and MANIFEST.is_file()
     assert not DEST.exists(), f"Directorio ya existe: {DEST}. No repetir sin revisar."

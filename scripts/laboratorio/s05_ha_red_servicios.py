@@ -19,7 +19,7 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[2]
 BASE = Path.home() / "netlab360-bootstrap/s05/ha"
 STATE = BASE / "state.json"
-PRECHECK = ROOT / "scripts/validacion/s05-ha-precheck.py"
+PRECHECK = ROOT / "scripts/validacion/s05_ha_precheck.py"
 OWNER = "NETLAB360_S05_HA_RED_V1"
 
 # Exclusivos de S05, distintos de tr-sw, a120, a220 y de interfaces WAN.

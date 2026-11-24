@@ -30,7 +30,7 @@ STATE = HOME / "netlab360-bootstrap/s03/drift-s1b-state.json"
 SOT = HOME / "netlab360-bootstrap/s03/rendered/sot-s03.json"
 WAN_STATE = HOME / "netlab360-bootstrap/s02/wan-links-state.json"
 LAN_STATE = HOME / "netlab360-bootstrap/s02/lan-vlan-state.json"
-MODULE = ROOT / "scripts/validacion/s03-frr-compliance.py"
+MODULE = ROOT / "scripts/validacion/s03_frr_compliance.py"
 MARKER = "NETLAB360_S03_DRIFT_R-S1_S1B_V1"
 ROUTERS = {"R-HQ":"nl360-s02-r-hq", "R-S1":"nl360-s02-r-s1",
            "R-S2":"nl360-s02-r-s2"}

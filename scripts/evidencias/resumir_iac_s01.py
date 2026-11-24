@@ -2,7 +2,7 @@
 """Evidencias resumidas de IaC S01 a partir de logs reales: NO reejecuta apply.
 Cada bloque tiene limites precisos INICIO/FIN CAPTURA; evita pantallazos
 truncados y no muestra terraform.tfstate ni credenciales.
-Uso: python3 scripts/evidencias/resumir-iac-s01.py 01|03|04|05|06
+Uso: python3 scripts/evidencias/resumir_iac_s01.py 01|03|04|05|06
 """
 from __future__ import annotations
 
@@ -39,8 +39,8 @@ def log(filename):
 
 
 def resumen01():
-    print("COMANDOS SOLO LECTURA: validar-ipam.py, tofu version, ansible --version, ip, git status")
-    print(ejecutar("python3", "scripts/validacion/validar-ipam.py", "inventario/ipam/topologia-b1.yaml"))
+    print("COMANDOS SOLO LECTURA: validar_ipam.py, tofu version, ansible --version, ip, git status")
+    print(ejecutar("python3", "scripts/validacion/validar_ipam.py", "inventario/ipam/topologia-b1.yaml"))
     print("TOFU:", ejecutar("tofu", "version").splitlines()[0])
     print("ANSIBLE:", ejecutar("ansible", "--version").splitlines()[0])
     direccion = ejecutar("ip", "-4", "-br", "address", "show", "ens33")
@@ -104,8 +104,8 @@ def resumen04():
 
 
 def resumen05():
-    print("COMANDO: python3 scripts/validacion/validar-iac-frr.py " + str(ART / "rendered"))
-    print(ejecutar("python3", "scripts/validacion/validar-iac-frr.py", str(ART / "rendered")))
+    print("COMANDO: python3 scripts/validacion/validar_iac_frr.py " + str(ART / "rendered"))
+    print(ejecutar("python3", "scripts/validacion/validar_iac_frr.py", str(ART / "rendered")))
     print("RESULTADO_COMPLIANCE_IAC=0")
 
 
@@ -124,7 +124,7 @@ def resumen06():
 
 def main():
     if len(sys.argv) != 2 or sys.argv[1] not in NOMBRES:
-        sys.exit("Uso: python3 scripts/evidencias/resumir-iac-s01.py 01|03|04|05|06")
+        sys.exit("Uso: python3 scripts/evidencias/resumir_iac_s01.py 01|03|04|05|06")
     n = sys.argv[1]
     marca = f"IAC_S01_{n}_{NOMBRES[n]}"
     print(f"========== INICIO CAPTURA {marca} ==========", flush=True)
