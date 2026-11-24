@@ -19,7 +19,7 @@ sudo -v
 for tool in ip bridge nft python3 curl sysctl git sudo; do
   command -v "$tool" >/dev/null || { echo "HERRAMIENTA_FALTANTE=$tool"; exit 2; }
 done
-python3 scripts/validacion/validar-ipam.py inventario/ipam/topologia-b1.yaml
+python3 scripts/validacion/validar_ipam.py inventario/ipam/topologia-b1.yaml
 ip -4 -br address show ens33 | grep -Fq "192.168.47.40/24" || { echo "ERROR_IP_GESTION"; exit 3; }
 ip -4 route show default | grep -Fq "default via 192.168.47.2 dev ens33" || { echo "ERROR_GATEWAY"; exit 3; }
 

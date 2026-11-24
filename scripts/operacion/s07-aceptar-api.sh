@@ -168,7 +168,7 @@ with closing(sqlite3.connect(db.as_uri()+"?mode=ro",uri=True)) as c:
     assert d["total"]==116 and d["integrity"]=="ok"
 print("REGISTROS_HISTORICOS=116")
 PY
-python3 scripts/validacion/validar-capturas-unificadas.py
+python3 scripts/validacion/validar_capturas_unificadas.py
 test -z "$(git status --porcelain)"
 git --no-pager status --short --branch
 gh run list --commit "$(git rev-parse HEAD)" --limit 10 --json databaseId,workflowName,status,conclusion --jq '.[] | [.databaseId,.workflowName,.status,.conclusion] | @tsv'

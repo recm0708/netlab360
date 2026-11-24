@@ -17,7 +17,7 @@ FAIL=0
 for x in ip bridge nsenter python3 ping sudo git; do
   if command -v "$x" >/dev/null; then echo "REQUERIDO_OK=$x"; else echo "REQUERIDO_FALTA=$x"; FAIL=$((FAIL+1)); fi
 done
-python3 scripts/validacion/validar-ipam.py inventario/ipam/topologia-b1.yaml || FAIL=$((FAIL+1))
+python3 scripts/validacion/validar_ipam.py inventario/ipam/topologia-b1.yaml || FAIL=$((FAIL+1))
 bash -n scripts/laboratorio/b2-l2-aislado.sh
 ip -4 -br address show ens33
 ip -4 route show default

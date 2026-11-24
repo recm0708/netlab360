@@ -36,7 +36,7 @@ preflight() {
   test -f "$HOME/netlab360-bootstrap/s05/evidencias/ha-instancia/17_Auditoria_Procedencia_TAR_P1_y_P1B.txt"
   grep -Fq "LOTE147A_DIAGNOSTICO=COMPLETADO" \
     "$HOME/netlab360-bootstrap/s05/evidencias/ha-instancia/17_Auditoria_Procedencia_TAR_P1_y_P1B.txt"
-  python3 scripts/validacion/s05-ha-noc-ciclo.py --precheck
+  python3 scripts/validacion/s05_ha_noc_ciclo.py --precheck
   sudo -n /usr/bin/true
   command -v systemd-run >/dev/null
   echo "S05_HA_INSTANCIA_PREFLIGHT=OK_SOLO_LECTURA"
@@ -57,7 +57,7 @@ echo "S05_HA_RESCATE_PLAZO=120s"
 
 echo "========== S05 HA CICLO CONTROLADO =========="
 set +e
-python3 scripts/validacion/s05-ha-noc-ciclo.py --run --hold-seconds 8
+python3 scripts/validacion/s05_ha_noc_ciclo.py --run --hold-seconds 8
 CYCLE_RC=$?
 set -e
 echo "S05_HA_CICLO_RC=$CYCLE_RC"
@@ -71,7 +71,7 @@ fi
 
 echo "========== S05 HA RECUPERACION Y REGRESION =========="
 test "$(systemctl is-active "$BACKEND")" = active
-python3 scripts/validacion/s05-ha-noc-ciclo.py --precheck
+python3 scripts/validacion/s05_ha_noc_ciclo.py --precheck
 for u in netlab360-s04-exporter netlab360-s05-noc \
   netlab360-s05-ha-backend-hq netlab360-s05-ha-backend-s1 \
   netlab360-s05-ha-frontal-hq netlab360-s05-ha-monitor-s2; do

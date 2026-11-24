@@ -29,7 +29,7 @@ AUDIT = HOME_BASE / "inventario-fuentes-reales.json"
 OUTPUT = HOME_BASE / "diagnostico-reglas-real.json"
 
 spec = importlib.util.spec_from_file_location(
-    "netlab360_b4_profile", ROOT / "scripts/analitica/b4-perfil-estadistico-real.py"
+    "netlab360_b4_profile", ROOT / "scripts/analitica/b4_perfil_estadistico_real.py"
 )
 if spec is None or spec.loader is None:
     raise RuntimeError("No se pudo cargar analizador estadistico B4")
