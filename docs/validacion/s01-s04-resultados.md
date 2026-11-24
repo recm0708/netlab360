@@ -33,4 +33,4 @@ Los ensayos se realizaron en redes y servicios virtualizados sobre una máquina 
 
 ## Documentación relacionada
 
-[Arquitectura multisede](../arquitectura/arquitectura-multisede-implementada.md) · [Capturas S01–S05](../../evidencias/capturas/README.md) · [Aceptación S05](s05-integracion-y-aceptacion.md).
+[Arquitectura multisede](../arquitectura/arquitectura-multisede-implementada.md) · [Catálogo de evidencias gráficas](../../evidencias/capturas/README.md) · [Aceptación S05](s05-integracion-y-aceptacion.md).

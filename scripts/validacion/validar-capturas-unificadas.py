@@ -6,12 +6,13 @@ No modifica archivos ni depende de inventarios de procedencia externos.
 """
 from __future__ import annotations
 
+import re
 import struct
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 CAPTURAS = ROOT / "evidencias" / "capturas"
-FASES_COMPLETADAS = {1: 83, 2: 9, 3: 8, 4: 22, 5: 71}
+FASES_COMPLETADAS = {1: 83, 2: 9, 3: 8, 4: 22, 5: 71, 6: 11}
 PNG_MAGIC = b"\x89PNG\r\n\x1a\n"
 
 
@@ -43,10 +44,22 @@ def validar_catalogo() -> dict[int, int]:
         nombres = [item.name for item in imagenes]
         if len(nombres) != len(set(nombres)):
             raise ValueError(f"Nombres duplicados en fase {fase}")
+        identificadores = []
+        patron = re.compile(
+            rf"S{fase:02d}_F(\d{{2,}})_"
+            r"[A-Za-z0-9]+(?:_[A-Za-z0-9]+)*\.png"
+        )
         for archivo in imagenes:
-            if not archivo.name.startswith(f"S{fase:02d}_"):
-                raise ValueError(f"Prefijo incorrecto: {archivo.name}")
+            coincidencia = patron.fullmatch(archivo.name)
+            if not coincidencia:
+                raise ValueError(f"Nombre incorrecto: {archivo.name}")
+            identificador = int(coincidencia.group(1))
+            if coincidencia.group(1) != f"{identificador:02d}":
+                raise ValueError(f"Numeración incorrecta: {archivo.name}")
+            identificadores.append(identificador)
             inspeccionar_png(archivo)
+        if sorted(identificadores) != list(range(1, len(imagenes) + 1)):
+            raise ValueError(f"Numeración no consecutiva en fase {fase}")
         esperado = FASES_COMPLETADAS.get(fase)
         if esperado is not None and len(imagenes) != esperado:
             raise ValueError(f"Fase {fase}: {len(imagenes)} capturas; se esperaban {esperado}")

@@ -6,16 +6,16 @@ La tercera fase documenta la fuente de información de red, Ansible, OpenTofu, c
 
 ## Capturas disponibles
 
-**Total: 8 imágenes PNG.** Los archivos se enumeran con su nombre de registro para facilitar su consulta y la selección de figuras del informe.
+**Total: 8 imágenes PNG.** Los archivos se enumeran con su identificador normalizado para facilitar su consulta y la selección de figuras del informe.
 
-- `S03_01_SoT_Inventario_Declarativo_Tres_Sedes.png`
-- `S03_02_SoT_Contra_Estado_Real_Tres_Sedes.png`
-- `S03_03_Ansible_Compliance_FRR_Tres_Sedes.png`
-- `S03_04_Drift_OSPF_Respaldo_S1_Detectado.png`
-- `S03_05_Reconciliacion_Selectiva_Ansible_Idempotencia.png`
-- `S03_06_OpenTofu_Plan_17_Metadatos.png`
-- `S03_07_OpenTofu_Apply_Manifest_17_Metadatos.png`
-- `S03_08_OpenTofu_Segundo_Plan_Sin_Cambios.png`
+- [S03_F01_SoT_Inventario_Declarativo_Tres_Sedes.png](S03_F01_SoT_Inventario_Declarativo_Tres_Sedes.png)
+- [S03_F02_SoT_Contra_Estado_Real_Tres_Sedes.png](S03_F02_SoT_Contra_Estado_Real_Tres_Sedes.png)
+- [S03_F03_Ansible_Compliance_FRR_Tres_Sedes.png](S03_F03_Ansible_Compliance_FRR_Tres_Sedes.png)
+- [S03_F04_Drift_OSPF_Respaldo_S1_Detectado.png](S03_F04_Drift_OSPF_Respaldo_S1_Detectado.png)
+- [S03_F05_Reconciliacion_Selectiva_Ansible_Idempotencia.png](S03_F05_Reconciliacion_Selectiva_Ansible_Idempotencia.png)
+- [S03_F06_OpenTofu_Plan_17_Metadatos.png](S03_F06_OpenTofu_Plan_17_Metadatos.png)
+- [S03_F07_OpenTofu_Apply_Manifest_17_Metadatos.png](S03_F07_OpenTofu_Apply_Manifest_17_Metadatos.png)
+- [S03_F08_OpenTofu_Segundo_Plan_Sin_Cambios.png](S03_F08_OpenTofu_Segundo_Plan_Sin_Cambios.png)
 
 ## Uso académico
 
