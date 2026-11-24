@@ -7,7 +7,7 @@ Implementamos auditoría y reconciliación con Ansible sobre los routers FRRouti
 ## Componentes
 
 - [Playbook de cumplimiento](compliance-frr.yml).
-- [Verificación del estado FRR](../../scripts/validacion/s03-frr-compliance.py).
+- [Verificación del estado FRR](../../scripts/validacion/s03_frr_compliance.py).
 - [Pruebas automatizadas](../../tests/test_s03_frr_compliance.py).
 - [Topología declarativa](../../inventario/ipam/topologia-s02.yaml).
 

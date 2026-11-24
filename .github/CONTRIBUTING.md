@@ -28,4 +28,4 @@ Al cambiar nombres o rutas, actualizar referencias Markdown, importaciones, ruta
 
 ## Gestión de cambios
 
-Mantener ramas de trabajo acotadas, historial ordinario y commits descriptivos. No incluir estados privados, credenciales, material ajeno ni copias temporales. Consultar [convenciones de GitHub](../docs/gestion/normalizacion-issues-y-etiquetas-es.md) y [política de seguridad](../SECURITY.md).
+Mantener ramas de trabajo acotadas, historial ordinario y commits descriptivos. No incluir estados privados, credenciales, material ajeno ni copias temporales. Consultar [convenciones de GitHub](../docs/gestion/convenciones-issues-etiquetas.md) y [política de seguridad](../SECURITY.md).

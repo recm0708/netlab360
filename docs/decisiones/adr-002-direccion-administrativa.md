@@ -22,4 +22,4 @@ La reserva IPv4 corresponde al segmento local de laboratorio. No constituye una 
 
 ## Documentación relacionada
 
-[Infraestructura VMware](../infraestructura/01-inventario-host-y-vmware.md) · [Preparación de Ubuntu](../infraestructura/02-ubuntu-desktop-instalacion-ssh.md).
+[Infraestructura VMware](../infraestructura/inventario-host-y-vmware.md) · [Preparación de Ubuntu](../infraestructura/ubuntu-desktop-y-ssh.md).

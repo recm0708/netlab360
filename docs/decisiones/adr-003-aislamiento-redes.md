@@ -20,4 +20,4 @@ El aislamiento corresponde a recursos virtuales dentro de una VM. Su recuperaci�
 
 ## Documentación relacionada
 
-[Arquitectura multisede](../arquitectura/arquitectura-multisede-implementada.md) · [Implementación SDN](../diseno/s05-ovs-faucet-vs-bridge-frr-y-limpieza-segura.md).
+[Arquitectura multisede](../arquitectura/arquitectura-multisede-implementada.md) · [Implementación SDN](../diseno/s05-dominio-sdn-ovs-faucet.md).

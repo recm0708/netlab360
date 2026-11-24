@@ -1,4 +1,4 @@
-# Diseño SDN — Open vSwitch y Faucet
+# Dominio SDN con Open vSwitch y Faucet — Fase 05
 
 ## Descripción
 
@@ -32,7 +32,7 @@ La recuperación selectiva comprobó la propiedad de los recursos, el estado del
 
 La aceptación posterior exigió conexión OpenFlow, comunicación bidireccional permitida entre A y B, aislamiento bidireccional entre A y C y conservación de la infraestructura multisede.
 
-El procedimiento de recuperación está implementado en [s05-sdn-recuperar-faucet-logs.py](../../scripts/laboratorio/s05-sdn-recuperar-faucet-logs.py). La intervención requiere precheck y confirmación explícita; no constituye una reparación autónoma general.
+El procedimiento de recuperación está implementado en [s05_sdn_recuperar_faucet_logs.py](../../scripts/laboratorio/s05_sdn_recuperar_faucet_logs.py). La intervención requiere precheck y confirmación explícita; no constituye una reparación autónoma general.
 
 ## Limitaciones
 

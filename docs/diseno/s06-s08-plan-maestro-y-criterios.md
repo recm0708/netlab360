@@ -10,8 +10,8 @@ NETLAB360 estudia redes empresariales multisede dentro de una única VM Ubuntu s
 |---|---|---|
 | S01–S04 | Cerradas | [Validación de infraestructura, automatización y observabilidad](../validacion/s01-s04-resultados.md) |
 | S05 | Cerrada | [Integración HA, LACP y SDN](../validacion/s05-integracion-y-aceptacion.md) |
-| S06 | Cerrada | [Protocolo uniforme V2](s06-estudio-prospectivo-uniforme-y-cierre-consolidado.md) |
-| S07 | Implementación y aceptación técnica completas; informe pendiente | [API controlada](s07-api-controlada.md) · [Ensayos](s07-ensayos-servicios.md) |
+| S06 | Cerrada | [Protocolo uniforme V2](s06-protocolo-uniforme-v2.md) |
+| S07 | Implementación y aceptación técnica completas; informe pendiente | [API controlada](s07-api-controlada.md) · [Ensayos](s07-ensayos-operacionales.md) |
 | S08 | Pendiente de implementación y aceptación integral | [Consola interactiva](s08-consola-interactiva-y-acciones.md) |
 | S09 | Ampliación condicionada, sin milestone aprobada | [Cobertura académica](../gestion/cobertura-academica-netlab360.md) |
 
@@ -34,8 +34,8 @@ Criterios: adquisición verificable, etiquetas independientes, separación crono
 | Recomendaciones | [#192](https://github.com/recm0708/netlab360/issues/192) | [Runbooks y recuperación documental](s07-runbooks-y-recomendaciones.md) |
 | Políticas | [#193](https://github.com/recm0708/netlab360/issues/193) | [Intención y aprobación](s07-intent-assurance-y-rfc.md) |
 | Orquestación | [#194](https://github.com/recm0708/netlab360/issues/194) | [Preflight protegido](s07-preflight-orquestador.md) |
-| Recuperación | [#195](https://github.com/recm0708/netlab360/issues/195) | [Watchdog y rollback](s07-plan-intervencion-y-watchdog.md) |
-| Evaluación | [#196](https://github.com/recm0708/netlab360/issues/196) | [Escenarios y métricas](s07-ensayos-servicios.md) |
+| Recuperación | [#195](https://github.com/recm0708/netlab360/issues/195) | [Watchdog y rollback](s07-intervencion-ospf-y-watchdog.md) |
+| Evaluación | [#196](https://github.com/recm0708/netlab360/issues/196) | [Escenarios y métricas](s07-ensayos-operacionales.md) |
 | API | [#197](https://github.com/recm0708/netlab360/issues/197) | [Interfaz local controlada](s07-api-controlada.md) |
 
 Los ocho componentes están aceptados técnicamente. Se verificaron 15 ventanas seleccionadas, 870 observaciones no independientes, 11 hipótesis y recomendaciones coincidentes y un ciclo RFC integrado por API. Se conservaron 116 registros históricos y la red administrativa. Las 49 imágenes están en el [catálogo S07](../../evidencias/capturas/fase7/README.md).
@@ -60,4 +60,4 @@ La ampliación se decidirá después de S08 conforme a la [matriz académica](..
 
 La entrega contempla un informe PDF acumulativo, un TAR técnico independiente en sustitución de anexos técnicos y una presentación con demostración mediante la consola. El mínimo del informe es de 40 páginas según los criterios académicos registrados. Excluir credenciales, datos privados, estados de ejecución, respaldos y materiales docentes ajenos. Auditar contenido y extracción del TAR y comprobar reproducibilidad.
 
-Los registros originales, datasets y entornos Python se mantienen fuera de Git en el área de ejecución de la VM. Los antecedentes de desarrollo se conservan en el historial ordinario de Git. Ninguna issue se cierra sin comprobar sus criterios; la milestone requiere todas sus issues y los entregables correspondientes. [Gestión de hitos](../gestion/s01-s08-hitos-descripciones-y-contador-s05.md) · [Cobertura académica](../gestion/cobertura-academica-netlab360.md).
+Los registros originales, datasets y entornos Python se mantienen fuera de Git en el área de ejecución de la VM. Los antecedentes de desarrollo se conservan en el historial ordinario de Git. Ninguna issue se cierra sin comprobar sus criterios; la milestone requiere todas sus issues y los entregables correspondientes. [Gestión de hitos](../gestion/gestion-milestones-s01-s08.md) · [Cobertura académica](../gestion/cobertura-academica-netlab360.md).

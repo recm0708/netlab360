@@ -20,4 +20,4 @@ La infraestructura se ejecuta sobre un único host y una única VM. Los escenari
 
 ## Documentación relacionada
 
-[Infraestructura virtual](../infraestructura/01-inventario-host-y-vmware.md) · [Preparación de Ubuntu](../infraestructura/02-ubuntu-desktop-instalacion-ssh.md).
+[Infraestructura virtual](../infraestructura/inventario-host-y-vmware.md) · [Preparación de Ubuntu](../infraestructura/ubuntu-desktop-y-ssh.md).
