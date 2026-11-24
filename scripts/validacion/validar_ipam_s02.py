@@ -185,7 +185,7 @@ def check_live(candidates: list[tuple[str, ipaddress.IPv4Network]]) -> None:
 
 def main() -> None:
     require(sys.argv[1:] in ([], ["--static-only"]),
-            "Uso: python3 scripts/validacion/validar-ipam-s02.py [--static-only]")
+            "Uso: python3 scripts/validacion/validar_ipam_s02.py [--static-only]")
     candidates = check_static()
     if sys.argv[1:] == ["--static-only"]:
         print("S02_SOLO_ESTATICO=SI")

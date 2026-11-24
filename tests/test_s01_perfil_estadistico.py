@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-SOURCE = Path(__file__).resolve().parents[1] / "scripts/analitica/b4-perfil-estadistico-real.py"
+SOURCE = Path(__file__).resolve().parents[1] / "scripts/analitica/b4_perfil_estadistico_real.py"
 spec = importlib.util.spec_from_file_location("b4_profile", SOURCE)
 module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)

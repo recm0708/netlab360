@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-TARGET = Path(__file__).resolve().parents[1] / "scripts/analitica/b4-auditar-fuentes-reales.py"
+TARGET = Path(__file__).resolve().parents[1] / "scripts/analitica/b4_auditar_fuentes_reales.py"
 spec = importlib.util.spec_from_file_location("b4_audit", TARGET)
 mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)

@@ -8,7 +8,7 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-VALIDADOR = ROOT / "scripts/validacion/validar-iac-frr.py"
+VALIDADOR = ROOT / "scripts/validacion/validar_iac_frr.py"
 BASE = ROOT / "topologias/b2-frr/configs"
 
 

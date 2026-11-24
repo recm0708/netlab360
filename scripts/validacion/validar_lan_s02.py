@@ -13,7 +13,7 @@ import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[2]
-SPEC = importlib.util.spec_from_file_location("s02lan", ROOT / "scripts/laboratorio/s02-lan-vlan.py")
+SPEC = importlib.util.spec_from_file_location("s02lan", ROOT / "scripts/laboratorio/s02_lan_vlan.py")
 assert SPEC and SPEC.loader
 mod = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(mod)

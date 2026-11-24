@@ -11,7 +11,7 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPT = ROOT / "scripts/laboratorio/s02-http-acl-demo.py"
+SCRIPT = ROOT / "scripts/laboratorio/s02_http_acl_demo.py"
 SPEC = importlib.util.spec_from_file_location("s02_http", SCRIPT)
 assert SPEC and SPEC.loader
 mod = importlib.util.module_from_spec(SPEC)
