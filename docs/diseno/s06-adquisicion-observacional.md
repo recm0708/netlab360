@@ -2,7 +2,7 @@
 
 ## Descripción
 
-La fase S06 utilizará mediciones **originadas en NETLAB360** para evaluar detección de anomalías, clasificación y predicción sin reutilizar cifras de ejercicios docentes como si se hubieran observado en la plataforma. El primer capturador es **solo lectura**, no genera fallas ni cambia interfaces y no produce etiquetas de entrenamiento.
+Utilizamos mediciones **originadas en NETLAB360** para evaluar detección de anomalías y clasificación; la predicción permanece fuera de los resultados acreditados sin reutilizar cifras de ejercicios docentes como si se hubieran observado en la plataforma. El primer capturador es **solo lectura**, no genera fallas ni cambia interfaces y no produce etiquetas de entrenamiento.
 
 Fuente técnica: S04 exporter (`127.0.0.1:9110`), topología NOC S05 (`127.0.0.1:9130`), Prometheus S04 (`127.0.0.1:9091`) y contador de eventos SQLite en modo de solo lectura. El acceso a estas fuentes está restringido a `127.0.0.1` y las rutas de API están fijadas en el programa.
 
@@ -24,10 +24,10 @@ Fuente técnica: S04 exporter (`127.0.0.1:9110`), topología NOC S05 (`127.0.0.1
 
 La calidad se marca `UNKNOWN` si falta una fuente, no hay scrape, la topología discrepa o el estado de HA/LACP/SDN difiere del escenario de referencia. No convertir `UNKNOWN` en falla de red ni en ejemplo válido de clasificación.
 
-La adquisición complementaria de RTT, pérdida ICMP y HTTP desde namespaces se describe en [Mediciones de rendimiento S06](s06-mediciones-rendimiento.md). Es un desarrollo incremental independiente, sin fallas inducidas ni etiquetas supervisadas.
+La adquisición complementaria de RTT, pérdida ICMP y HTTP desde namespaces se describe en [Mediciones de rendimiento S06](s06-mediciones-rendimiento.md). Es un procedimiento de observación independiente, sin fallas inducidas ni etiquetas supervisadas.
 
 La normalización posterior de ambas sesiones se especifica en [S06 normalización y calidad](s06-normalizacion-y-calidad.md), validada sobre las sesiones originales.
 
 ## Validación y limitaciones
 
-La sesión S06-032 registró 12/12 observaciones válidas, 25 series por consulta y cinco familias, con ground_truth_label=UNKNOWN. Los registros se conservaron sin modificaciones y no se incorporaron al entrenamiento supervisado. Se verificó la topología, 21 namespaces, cuatro contenedores y siete servicios. [Normalización](s06-normalizacion-y-calidad.md) · [Mediciones](s06-mediciones-rendimiento.md).
+Registramos en S06-032 12/12 observaciones válidas, 25 series por consulta y cinco familias, con ground_truth_label=UNKNOWN. Los registros se conservaron sin modificaciones y no se incorporaron al entrenamiento supervisado. Verificamos la topología, 21 namespaces, cuatro contenedores y siete servicios. [Normalización](s06-normalizacion-y-calidad.md) · [Mediciones](s06-mediciones-rendimiento.md).

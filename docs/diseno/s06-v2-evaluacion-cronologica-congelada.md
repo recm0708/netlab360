@@ -2,7 +2,7 @@
 
 ## Entradas y separación cronológica
 
-TRAIN V2 real: 40 NORMAL, 8 DEGRADED, 12 RECOVERY por ruta con tres ICMP; dos eventos recuperados autónomamente. Cuatro modelos V2 congelados, reportados por `~/netlab360-bootstrap/s06/estudio-uniforme-v2/modelos-v2/S06_V2_Training_Freeze.json`, umbrales P95 RTT HQ→S1 0.10405 ms y HQ→S2 0.11055 ms. La VALIDATION se capturó **después** de la congelación: NORMAL `S06_WINDOW_NORMAL_20261123T151633Z_973a31` y batch `~/netlab360-bootstrap/s06/experimentos/S06_043_20261123T151706Z_e1ca29/manifest.json` con 20 NORMAL, 8 DEGRADED y 12 RECOVERY por ruta, nuevamente tres paquetes. Test V2 futuro sigue **sin adquirir**.
+TRAIN V2 real: 40 NORMAL, 8 DEGRADED, 12 RECOVERY por ruta con tres ICMP; dos eventos recuperados autónomamente. Cuatro modelos V2 congelados, reportados por `~/netlab360-bootstrap/s06/estudio-uniforme-v2/modelos-v2/S06_V2_Training_Freeze.json`, umbrales P95 RTT HQ→S1 0.10405 ms y HQ→S2 0.11055 ms. La VALIDATION se capturó **después** de la congelación: NORMAL `S06_WINDOW_NORMAL_20261123T151633Z_973a31` y batch `~/netlab360-bootstrap/s06/experimentos/S06_043_20261123T151706Z_e1ca29/manifest.json` con 20 NORMAL, 8 DEGRADED y 12 RECOVERY por ruta, nuevamente tres paquetes. Adquirimos TEST después de VALIDATION, sin modificar los modelos congelados; los resultados se indican en la sección correspondiente.
 
 ## Evaluador de solo lectura
 

@@ -2,9 +2,9 @@
 
 ## Descripción y alcance
 
-S06-041 está **ejecutado y aprobado en Ubuntu**: `S06-041_DATASET_Y_ML_VALIDADO=OK`, RC 0, 60 ventanas NORMAL de egreso HQ verificadas (120 mediciones ICMP reales), dos IsolationForest (HQ→S1/S2) entrenados en sesiones A/B con 40 observaciones por destino y evaluados en sesión TEST distinta con 20 observaciones por destino. FPR normal HQ→S1: IF 5 % vs regla P95 15 %; HQ→S2 ambos 5 %. No existe recall/F1 válido hasta tener degradaciones reales.
+Comprobamos S06-041 en Ubuntu: `S06-041_DATASET_Y_ML_VALIDADO=OK`, RC 0, 60 ventanas NORMAL de egreso HQ verificadas (120 mediciones ICMP reales), dos IsolationForest (HQ→S1/S2) entrenados en sesiones A/B con 40 observaciones por destino y evaluados en sesión TEST distinta con 20 observaciones por destino. FPR normal HQ→S1: IF 5 % vs regla P95 15 %; HQ→S2 ambos 5 %. La línea base NORMAL no permite estimar recall/F1 para DEGRADED.
 
-El experimento S06-040B probó un watchdog tras caída SIGKILL en una veth **aislada** y sus recursos ya fueron eliminados. La infraestructura real del proyecto es la topología S02–S05 formada por 21 namespaces, routers FRR, VLANs, WAN, HA/LACP/SDN y clientes con comunicación multisede. La petición actual es **NO crear interfaces dummy, namespaces nuevos, veth ficticias ni más redes de prueba**. S06-042 actúa sobre un **único cliente ya existente** de esa topología: `nl360-s02-h-hq-120/eth0`, IPv4 `10.70.20.20/24`, gateway `10.70.20.1`, peer switch `nl360-s02-sw-hq`. No interviene `ens33`, routers, switches ni otros clientes.
+El experimento S06-040B probó un watchdog tras caída SIGKILL en una veth **aislada** y sus recursos ya fueron eliminados. La infraestructura real del proyecto es la topología S02–S05 formada por 21 namespaces, routers FRR, VLANs, WAN, HA/LACP/SDN y clientes con comunicación multisede. Delimitamos el ensayo a la topología existente, sin crear interfaces dummy, namespaces ni enlaces adicionales. S06-042 actúa sobre un **único cliente ya existente** de esa topología: `nl360-s02-h-hq-120/eth0`, IPv4 `10.70.20.20/24`, gateway `10.70.20.1`, peer switch `nl360-s02-sw-hq`. No interviene `ens33`, routers, switches ni otros clientes.
 
 ## Política de intervención
 

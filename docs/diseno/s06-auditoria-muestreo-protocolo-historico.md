@@ -2,7 +2,7 @@
 
 ## Descripción y alcance
 
-La VM ejecutó S06-050 correctamente (12 pruebas, `S06-050_PRERREGISTRO_VALIDADO=OK`, RC=0), pero el preregistro identificó **dos protocolos ICMP, de 2 y 3 paquetes por ventana**, y mantuvo `BLOCKED_INCOMPATIBLE_SAMPLING`. No es una falla de la topología ni un resultado negativo de rendimiento. El acta privada `~/netlab360-bootstrap/s06/preregistros/S06_050_Prerregistro_Prospectivo.json` **no debe reemplazarse ni editarse**.
+Ejecutamos S06-050 correctamente en la VM (12 pruebas, `S06-050_PRERREGISTRO_VALIDADO=OK`, RC=0), pero el preregistro identificó **dos protocolos ICMP, de 2 y 3 paquetes por ventana**, y mantuvo `BLOCKED_INCOMPATIBLE_SAMPLING`. No es una falla de la topología ni un resultado negativo de rendimiento. El acta privada `~/netlab360-bootstrap/s06/preregistros/S06_050_Prerregistro_Prospectivo.json` **no debe reemplazarse ni editarse**.
 
 Como el número de paquetes puede influir en `rtt_avg_ms`, `rtt_p95_ms`, `rtt_mdev_ms` y pérdida, necesitamos saber si se relaciona con la clase NORMAL/DEGRADED y el rol TRAIN/TEST. No corresponde atribuirle de antemano el resultado F1=1.000.
 
@@ -17,7 +17,7 @@ Como el número de paquetes puede influir en `rtt_avg_ms`, `rtt_p95_ms`, `rtt_md
 
 Si NORMAL y DEGRADED usan tamaños de muestra disjuntos, se marca `HIGH_IF_PACKET_SIZES_DISJOINT`: posible confusión fuerte entre protocolo de medición y etiqueta, **sin afirmar que esté probada su causalidad sobre las predicciones**. Si hay tamaños compartidos, se marca `POSSIBLE_SAMPLING_BIAS_REQUIRES_CONTROL`. En ambos casos se mantiene el preregistro bloqueado.
 
-La solución no consiste en reetiquetar sesiones antiguas ni modificar el archivo congelado. Se deberá diseñar un estudio separado con muestreo uniforme y justificación experimental. Los nuevos modelos, si fueran necesarios, tendrían que registrarse como una versión distinta, sin sustituir los modelos originales ni presentar las observaciones ya vistas como TEST nuevo. Cualquier perturbación de red futura requerirá autorización específica y watchdog.
+La solución no consiste en reetiquetar sesiones antiguas ni modificar el archivo congelado. Diseñamos un estudio separado con muestreo uniforme y justificación experimental. Los nuevos modelos se registraron como una versión distinta, sin sustituir los modelos originales ni presentar las observaciones ya vistas como TEST nuevo. Cualquier perturbación de red futura requerirá autorización específica y watchdog.
 
 ## Resultados
 

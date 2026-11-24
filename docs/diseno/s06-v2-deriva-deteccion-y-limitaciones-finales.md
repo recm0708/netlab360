@@ -2,7 +2,7 @@
 
 ## Alcance del análisis
 
-El TEST V2 ya fue ejecutado y calificado con modelos congelados y protocolo común de tres paquetes ICMP. VALIDATION y TEST contienen **20 NORMAL, 8 DEGRADED y 12 RECOVERY por ruta**, con dos eventos de retardo 40 ms cada uno, capturados después de TRAIN. Los tres métodos reconocieron las ocho ventanas positivas de cada ruta en TEST; FP=0 para LogisticRegression, FP=0/1 para P95 según ruta y FP=1 por ruta para IsolationForest; FN=0 en los seis resultados de TEST. No hubo falsas alarmas en las 12 ventanas RECOVERY de TEST de cada ruta. La validez experimental se limita al egreso HQ sometido al mismo tipo de retardo artificial.
+Evaluamos TEST V2 con modelos congelados y protocolo común de tres paquetes ICMP. VALIDATION y TEST contienen **20 NORMAL, 8 DEGRADED y 12 RECOVERY por ruta**, con dos eventos de retardo 40 ms cada uno, capturados después de TRAIN. Los tres métodos reconocieron las ocho ventanas positivas de cada ruta en TEST; FP=0 para LogisticRegression, FP=0/1 para P95 según ruta y FP=1 por ruta para IsolationForest; FN=0 en los seis resultados de TEST. No hubo falsas alarmas en las 12 ventanas RECOVERY de TEST de cada ruta. La validez experimental se limita al egreso HQ sometido al mismo tipo de retardo artificial.
 
 TRAIN por ruta: 40 NORMAL, 8 DEGRADED, 12 RECOVERY; los 4 modelos V2 se congelaron antes de VALIDATION y TEST. Se comprobó que el TEST es cronológicamente posterior a VALIDATION y usa nuevos tokens. Los 6 tokens son eventos diferentes en el tiempo, pero ambas rutas comparten cada perturbación; no representan 12 fallas independientes.
 

@@ -2,7 +2,7 @@
 
 ## Descripción y alcance
 
-S06-043 tiene tres experimentos nuevos completos en el **cliente real existente HQ**; la corrección de lectura validó el registro de ciclos y el dataset. El acumulado S06-041–043 es de **60 ventanas NORMAL**, **16 DEGRADED** y **24 RECOVERY**. La captura académica F05 ya fue entregada, revisada y aprobada, con delimitadores INICIO/FIN. Se conservaron 21 namespaces originales, 4 contenedores, ruta de administración y `eth0` del cliente HQ con qdisc `noqueue`. Fuente de los eventos: `~/netlab360-bootstrap/s06/experimentos/S06_043_20261123T073108Z_344e1e/manifest.json`.
+S06-043 tiene tres experimentos nuevos completos en el **cliente real existente HQ**; la corrección de lectura validó el registro de ciclos y el dataset. El acumulado S06-041–043 es de **60 ventanas NORMAL**, **16 DEGRADED** y **24 RECOVERY**. Se conservaron 21 namespaces originales, 4 contenedores, ruta de administración y `eth0` del cliente HQ con qdisc `noqueue`. Fuente de los eventos: `~/netlab360-bootstrap/s06/experimentos/S06_043_20261123T073108Z_344e1e/manifest.json`.
 
 El nuevo `scripts/s06/evaluar_deteccion_binaria.py` **no ejecuta tc ni cambia interfaces**: lee exclusivamente los datasets privados ya capturados, valida estado root registrado, tokens por evento, rutas, controles antes/después, etiquetas y checksum de cada sesión, entrena y calcula métricas.
 
@@ -35,7 +35,7 @@ La evaluación guarda `evaluacion.json`, modelos privados y un TXT para evidenci
 
 ## Resultados
 
-El evaluador se ejecutó sobre los datasets originales, con 23 pruebas específicas aprobadas. Se verificó separación por sesión entre TRAIN y TEST y se recalcularon matrices de confusión.
+Ejecutamos el evaluador sobre los datasets originales y aprobamos 23 pruebas específicas. Verificamos la separación por sesión entre TRAIN y TEST y recalculamos las matrices de confusión.
 
 | Ruta | Método | TP | FP | TN | FN | Precisión | Recall | F1 | FP sobre RECOVERY (6) |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|

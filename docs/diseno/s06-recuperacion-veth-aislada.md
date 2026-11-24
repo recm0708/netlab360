@@ -2,7 +2,7 @@
 
 ## Antecedente
 
-S06-039 se ejecutó en Ubuntu con `S06-039_AUDITORIA_VALIDADA=OK`, RC 0, 19 pruebas propias y **542 globales** aprobadas. El cliente real `nl360-s02-h-hq-120` usa `eth0`, tipo **veth**, peer en `nl360-s02-sw-hq`, IPv4 `10.70.20.20/24`, gateway `10.70.20.1`; las rutas a S1 `10.71.20.20` y S2 `10.72.20.20` utilizan ese gateway. Qdisc noqueue, NOC, Prometheus y administración intactos. Seis controles de seguridad siguen pendientes y el auditor **no autorizó** intervenciones productivas.
+Ejecutamos S06-039 en Ubuntu y obtuvimos `S06-039_AUDITORIA_VALIDADA=OK`, RC 0, 19 pruebas propias y **542 globales** aprobadas. El cliente real `nl360-s02-h-hq-120` usa `eth0`, tipo **veth**, peer en `nl360-s02-sw-hq`, IPv4 `10.70.20.20/24`, gateway `10.70.20.1`; las rutas a S1 `10.71.20.20` y S2 `10.72.20.20` utilizan ese gateway. Qdisc noqueue, NOC, Prometheus y administración intactos. En esa auditoría quedaron seis controles de seguridad por comprobar antes de intervenir el cliente conectado; el auditor no concedió autorización.
 
 En S06-038B el watchdog devolvió una qdisc netem real a noqueue en una interfaz dummy sin conectividad. Dado que el cliente real es veth, el siguiente gate requiere ensayar veth, con pérdida del proceso principal, sin tocar el cliente productivo.
 
