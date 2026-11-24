@@ -11,6 +11,9 @@ aceptados de las fases anteriores.
 | Componente | Función |
 |---|---|
 | [api/main.py](api/main.py) | Servidor HTTP de arranque y rutas públicas mínimas |
+| [api/auth_http.py](api/auth_http.py) | Login, identidad, roles y cierre de sesión HTTP |
+| [api/sessions.py](api/sessions.py) | Sesiones opacas, expiración y revocación |
+| [Pruebas HTTP de autenticación](../../tests/test_s08_auth.py) | Validación con cuentas sintéticas |
 | [api/security.py](api/security.py) | Identidades locales, roles y derivación scrypt |
 | [Pruebas de identidades](../../tests/test_s08_identity.py) | Migración y verificación de cuentas sintéticas |
 | [api/storage.py](api/storage.py) | Inicialización y comprobación de SQLite privado |
@@ -26,8 +29,8 @@ El contrato no ejecuta consultas ni concede privilegios.
 Incorporamos un servidor de arranque con dos rutas públicas
 de metadatos, sin datos operacionales ni autorización.
 Incorporamos una base SQLite privada de inicialización explícita.
-La conexión de la persistencia a la API, autenticación, interfaz
-gráfica y adaptadores requieren implementación independiente.
+Integramos la autenticación HTTP como modo explícito sobre SQLite v2.
+La interfaz gráfica, los lectores y las acciones requieren implementación independiente.
 
 ## Ejecución de desarrollo
 
@@ -73,7 +76,7 @@ de inicialización. Los trabajos permanecen vacíos hasta disponer de
 un coordinador autorizado. Una base desconocida o una migración
 interrumpida se rechaza sin borrar ni sobrescribir datos.
 El comando de comprobación utiliza SQLite en modo solo lectura.
-La API todavía no abre esta base ni expone su contenido.
+El modo autenticado utiliza esta base para identidades y sesiones; no expone su contenido íntegro.
 
 ## Identidades locales
 
@@ -86,9 +89,31 @@ lee la contraseña sin eco y exige al menos 15 caracteres.
 Guardamos únicamente sal aleatoria y verificador scrypt
 (N=131072, r=8, p=1), nunca la contraseña. La verificación
 rechaza cuentas deshabilitadas y credenciales incorrectas.
-No se habilita todavía el inicio de sesión HTTP ni la emisión
-de sesiones. Antes de esa integración se requieren límites de
-intentos y concurrencia, expiración y controles CSRF.
+## Autenticación HTTP local
+
+El modo de arranque anterior conserva sus dos rutas públicas.
+Para habilitar identidades sobre la base v2, iniciamos el servidor con
+`NETLAB360_S08_AUTH=1` antes del comando de ejecución.
+La aplicación no crea cuentas por HTTP.
+
+| Ruta | Control |
+|---|---|
+| POST /api/v1/auth/login | Origen local exacto, JSON acotado y credenciales |
+| GET /api/v1/auth/me | Cookie de sesión vigente |
+| GET /api/v1/auth/operator-check | Sesión con rol OPERATOR |
+| POST /api/v1/auth/logout | Origen exacto, sesión y token CSRF |
+
+Emitimos tokens opacos de 256 bits con verificadores almacenados,
+una sesión por cuenta y expiración absoluta de 30 minutos.
+La cookie es HttpOnly y SameSite Strict; la bandera Secure queda
+pendiente de HTTPS, pues el modo de desarrollo utiliza HTTP local
+sobre túnel SSH. El token CSRF se devuelve al iniciar sesión y no
+se registra. La UI deberá conservarlo en memoria; al perderlo
+se inicia sesión nuevamente. Las escrituras operacionales siguen
+deshabilitadas. Limitamos el login a ocho intentos por minuto
+por proceso y una derivación scrypt concurrente, sin cola.
+Este límite local se reinicia con el proceso y no constituye
+protección distribuida. No habilitamos acceso externo.
 
 ## Validación
 
