@@ -1,0 +1,66 @@
+/* Sistema visual base: colores semánticos, disposición adaptable y foco visible. */
+:root {
+  color-scheme: dark;
+  --bg: #101722;
+  --surface: #172232;
+  --sidebar: #111c2a;
+  --line: #304158;
+  --text: #e8eef6;
+  --muted: #aab9cc;
+  --accent: #7cc4ff;
+  --ok: #7be0b6;
+  --warn: #f6cf84;
+  font-family: system-ui, "Segoe UI", sans-serif;
+  font-size: 15px;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); line-height: 1.5; }
+.shell { display: grid; grid-template-columns: 260px minmax(0, 1fr); min-height: 100vh; }
+.sidebar { padding: 24px 16px; background: var(--sidebar); border-right: 1px solid var(--line); }
+.brand { display: flex; gap: 12px; align-items: center; padding: 0 6px 20px; }
+.brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 8px; background: var(--accent); color: #102137; font-weight: 800; font-size: 24px; }
+.brand small { display: block; color: var(--muted); font-size: .75rem; }
+.nav-label { margin: 20px 8px 6px; color: var(--muted); font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; }
+nav a, nav .pending { display: block; padding: 8px 10px; margin: 2px 0; border-radius: 6px; font-size: .88rem; }
+nav a { text-decoration: none; color: var(--accent); }
+nav .current { background: var(--surface); border-left: 3px solid var(--accent); }
+nav .pending { color: var(--muted); }
+.sidebar-note { margin: 22px 8px; font-size: .8rem; color: var(--muted); }
+.workspace { min-width: 0; display: flex; flex-direction: column; }
+.topbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); padding: 16px 28px; }
+.mode { border: 1px solid var(--line); border-radius: 6px; padding: 4px 10px; color: var(--muted); font-size: .8rem; }
+main { flex: 1; padding: 28px; max-width: 1440px; width: 100%; margin: auto; }
+.heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+.eyebrow { color: var(--accent); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; margin: 0; }
+h1 { font-size: clamp(1.6rem, 3vw, 2.1rem); margin: 4px 0; }
+h2 { font-size: 1rem; font-weight: 600; margin: 0 0 10px; }
+p { margin: 8px 0; }
+.muted { color: var(--muted); font-size: .86rem; }
+button { font: inherit; padding: 9px 15px; color: #102137; background: var(--accent); border: 0; border-radius: 6px; font-weight: 600; cursor: pointer; }
+button:disabled { opacity: .6; cursor: wait; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+.status-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 14px; }
+.panel { min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 9px; padding: 20px; margin-bottom: 14px; }
+.status-grid .panel { margin: 0; }
+.metric { font-size: 1.35rem; font-weight: 700; overflow-wrap: anywhere; }
+[data-state="ok"] { color: var(--ok); }
+[data-state="unknown"] { color: var(--warn); }
+dl { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 16px; }
+dt, dd { margin: 0; overflow-wrap: anywhere; }
+dd { text-align: right; color: var(--muted); }
+#notice { font-size: .85rem; }
+footer { color: var(--muted); padding: 16px 28px; border-top: 1px solid var(--line); font-size: .8rem; }
+.skip { position: absolute; left: 12px; top: -60px; background: var(--surface); color: var(--text); padding: 8px; z-index: 5; }
+.skip:focus { top: 8px; }
+@media (max-width: 1000px) { .status-grid { grid-template-columns: 1fr; } }
+@media (max-width: 700px) {
+  .shell { grid-template-columns: minmax(0, 1fr); }
+  .sidebar { border-right: 0; border-bottom: 1px solid var(--line); }
+  nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px; }
+  .nav-label { grid-column: 1 / -1; }
+  main, .topbar, footer { padding: 18px; }
+}
+@media (prefers-color-scheme: light) {
+  :root { color-scheme: light; --bg: #eef2f7; --surface: #fff; --sidebar: #f7f9fc; --line: #c9d4e2; --text: #17283b; --muted: #485c73; --accent: #176ba3; --ok: #146345; --warn: #80560d; }
+  button, .brand-mark { color: #fff; }
+}

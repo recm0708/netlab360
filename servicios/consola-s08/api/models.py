@@ -33,7 +33,7 @@ class Capabilities(PublicModel):
     source_readers_enabled: bool = False
     persistence_enabled: bool = False
     authentication_enabled: bool = False
-    frontend_enabled: Literal[False] = False
+    frontend_enabled: bool = False
     diagnostics_enabled: bool = False
     advisory_enabled: bool = False
     network_mutations_authorized: Literal[False] = False
