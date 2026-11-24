@@ -46,7 +46,7 @@ class StructureTests(unittest.TestCase):
         parser = PageParser()
         html = (UI / "login.html").read_text(encoding="utf-8")
         parser.feed(html)
-        self.assertEqual(set(parser.resources),{"/ui/static/styles.css","/ui/static/login.js"})
+        self.assertEqual(set(parser.resources),{"/ui/static/styles.css","/ui/static/app.js","/ui/static/login.js"})
         self.assertEqual(len(parser.ids),len(set(parser.ids)))
         self.assertFalse(parser.inline)
         self.assertNotIn("data-view=",html)
@@ -58,7 +58,7 @@ class StructureTests(unittest.TestCase):
 
     def test_no_operational_fetch_or_secret_storage(self):
         js = (UI / "static/app.js").read_text(encoding="utf-8")
-        for value in ("localStorage", "innerHTML",
+        for value in ("innerHTML",
                       "/api/v1/sources", "/api/v1/metrics", "/api/v1/advisory"):
             self.assertNotIn(value, js)
         self.assertIn('credentials: "omit"', js)
@@ -84,6 +84,33 @@ class StructureTests(unittest.TestCase):
         self.assertIn("for (const path of allowedPages)", js)
         self.assertIn('window.addEventListener("pagehide", savePresentation)', js)
         self.assertIn("restorePresentation()", js)
+
+    def test_shared_theme_and_hamburger(self):
+        for name in ("index.html", "login.html"):
+            html = (UI / name).read_text(encoding="utf-8")
+            self.assertEqual(html.count('id="theme-select"'), 1)
+            for value in ("auto", "light", "dark"):
+                self.assertIn(f'value="{value}"', html)
+            self.assertIn('<script src="/ui/static/app.js"></script>', html)
+        html = (UI / "index.html").read_text(encoding="utf-8")
+        self.assertEqual(html.count('class="menu-line'), 3)
+        js = (UI / "static/app.js").read_text(encoding="utf-8")
+        self.assertIn('if (document.getElementById("console-shell")) initializeConsole()', js)
+        css = (UI / "static/styles.css").read_text(encoding="utf-8")
+        self.assertIn(':root[data-theme="light"]', css)
+        self.assertIn(':root:not([data-theme])', css)
+        self.assertIn("prefers-reduced-motion: reduce", css)
+        self.assertIn("animation: selected-icon", css)
+
+    def test_theme_storage_is_enum_only(self):
+        js = (UI / "static/app.js").read_text(encoding="utf-8")
+        self.assertEqual(js.count("localStorage."), 2)
+        self.assertIn('const themeKey = "netlab360.theme.v1"', js)
+        self.assertIn('const themes = ["auto", "light", "dark"]', js)
+        self.assertIn("themePreference = validTheme(value)", js)
+        self.assertIn("localStorage.setItem(themeKey, themePreference)", js)
+        self.assertIn("localStorage.getItem(themeKey)", js)
+        self.assertIn('systemTheme.addEventListener("change"', js)
 
     def test_login_structure(self):
         html = (UI / "login.html").read_text(encoding="utf-8")

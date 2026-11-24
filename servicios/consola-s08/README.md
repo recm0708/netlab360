@@ -83,6 +83,12 @@ adaptadas al tema. En escritorio separamos el scroll de navegación del
 contenido. Recordamos por pestaña únicamente la posición numérica del
 menú, su estado contraído y el desplazamiento por ruta autorizada;
 no guardamos identidad, credenciales, cookies, CSRF ni respuestas.
+Compartimos la apariencia claro, oscuro y automático entre acceso y
+consola. Persistimos únicamente el valor permitido de tema en localStorage;
+seguimos las preferencias del sistema en modo automático. Recuperamos el
+icono de tres líneas y usamos transiciones breves, sin movimiento continuo,
+respetando la preferencia de movimiento reducido. Conservamos la marca
+tipográfica provisional; el logotipo definitivo queda para la etapa final.
 Las vistas todavía no habilitadas indican su indisponibilidad, sin
 simular datos. Reservamos /administration para la gestión de identidad
 propia y futura administración de cuentas (#242), y /debug para el
