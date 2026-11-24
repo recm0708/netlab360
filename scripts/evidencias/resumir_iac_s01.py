@@ -52,6 +52,7 @@ def resumen01():
     print("IAC_PRECHECK_RESUMEN=OK")
 
 
+# El resultado de apply se reconstruye únicamente desde el log original, no se vuelve a aplicar IaC.
 def resumen03():
     texto = log("02-tofu-apply.log")
     marcador = "Apply complete! Resources: 5 added, 0 changed, 0 destroyed."
@@ -109,6 +110,7 @@ def resumen05():
     print("RESULTADO_COMPLIANCE_IAC=0")
 
 
+# La idempotencia exige el recap sin cambios y la ausencia de cambios en el segundo plan.
 def resumen06():
     ans = log("04-ansible-idempotencia.log")
     tf = log("05-tofu-idempotencia.log")

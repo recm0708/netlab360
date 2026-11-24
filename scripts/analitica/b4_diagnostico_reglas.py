@@ -45,6 +45,7 @@ def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+# El umbral se obtiene de la referencia normal de la misma sesión; las señales no constituyen etiquetas independientes.
 def evaluate_rows(rows: list[dict], normal_p95: float, factor: float = 3.0) -> dict:
     if not (math.isfinite(normal_p95) and normal_p95 > 0):
         raise ValueError("p95 de referencia normal inexistente o no positivo")
@@ -109,6 +110,7 @@ def evaluate_rows(rows: list[dict], normal_p95: float, factor: float = 3.0) -> d
     }
 
 
+# Comprobamos la procedencia del perfil y del inventario antes de interpretar señales.
 def analyze(profile: dict, audit: dict, factor: float = 3.0) -> dict:
     sessions = profile.get("sessions")
     if not isinstance(sessions, list) or len(sessions) != 1:

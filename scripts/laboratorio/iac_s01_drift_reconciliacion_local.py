@@ -45,6 +45,7 @@ def resumen_ansible(texto, esperado):
     return recap
 
 
+# Verificamos la dirección y puerta de enlace del host antes y después del ensayo.
 def admin():
     addr = run(["ip", "-4", "-br", "address", "show", "ens33"]).stdout
     route = run(["ip", "-4", "route", "show", "default"]).stdout
@@ -53,6 +54,7 @@ def admin():
     return addr, route
 
 
+# Trabajamos en una copia exclusiva; las configuraciones originales no son el objetivo de reconciliación.
 def main():
     assert sys.argv[1:] == [], "Uso: python3 scripts/laboratorio/iac_s01_drift_reconciliacion_local.py"
     before = admin()

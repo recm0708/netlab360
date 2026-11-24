@@ -54,6 +54,7 @@ def icmp_bool(value: str) -> bool:
     raise ValueError(f"icmp_ok no reconocido: {value!r}")
 
 
+# Usamos el rango más próximo para mantener la definición empírica de percentil.
 def percentile_nearest_rank(values: list[float], q: float) -> float | None:
     if not values:
         return None
@@ -61,6 +62,7 @@ def percentile_nearest_rank(values: list[float], q: float) -> float | None:
     return ordered[max(0, math.ceil(q * len(ordered)) - 1)]
 
 
+# Agrupamos por fase y rechazamos duplicados; las medidas de sesiones distintas no se combinan.
 def analyze_csv(path: Path) -> dict:
     phases = defaultdict(lambda: {"samples": 0, "icmp_ok": 0,
                                   "fib": Counter(), "rtt": [],

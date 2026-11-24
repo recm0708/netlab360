@@ -76,12 +76,14 @@ def current_phase():
     with LOCK:
         return PHASE[0]
 
+# Registramos el tiempo monotónico de cada transición para asociar sondeos a su fase.
 def set_phase(value):
     with LOCK:
         PHASE[0] = value
     EVENTS[value] = time.monotonic()
     log(f"FASE={value}")
 
+# El monitor recoge ICMP y selección FIB durante el ciclo; no modifica el encaminamiento.
 def monitor():
     try:
         pid = pid_hq()

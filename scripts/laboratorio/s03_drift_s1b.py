@@ -135,6 +135,7 @@ def primary_routes(current:dict) -> None:
     print("S03_RUTAS_PRIMARIAS_INTACTAS=3/3")
 
 
+# Comparamos los ocho costos; solo el recurso de respaldo S1 puede diferir en el ensayo.
 def validate_costs(desired:dict, actual:dict, expected_target:int) -> None:
     count=0
     for router,rows in desired.items():
@@ -149,6 +150,7 @@ def validate_costs(desired:dict, actual:dict, expected_target:int) -> None:
     print(f"S03_WAN_COSTOS_VERIFICADOS={count}/8 TARGET={expected_target}")
 
 
+# Limitamos la escritura a la interfaz fijada y a los valores 100/150; no persistimos la configuración.
 def vtysh_set_cost(current:dict,new_cost:int) -> None:
     if new_cost not in (100,150):
         raise RuntimeError("Costo fuera del escenario permitido")
