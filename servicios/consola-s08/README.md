@@ -11,7 +11,8 @@ aceptados de las fases anteriores.
 | Componente | Función |
 |---|---|
 | [api/ui_http.py](api/ui_http.py) | Publicación de HTML y recursos visuales fijos |
-| [ui/index.html](ui/index.html) | Estructura visual inicial y metadatos públicos |
+| [ui/login.html](ui/login.html) | Acceso independiente |
+| [ui/index.html](ui/index.html) | Consola autenticada y navegación |
 | [api/advisory_reader.py](api/advisory_reader.py) | Resúmenes históricos de la API Unix S07 |
 | [Pruebas del asesor](../../tests/test_s08_advisory.py) | Identidad del servidor, vigencia y límites de lectura |
 | [api/inference_reader.py](api/inference_reader.py) | Inferencia exploratoria S06 mediante NOC |
@@ -71,15 +72,25 @@ metadatos de arranque. No constituye una consola autenticada.
 ## Interfaz gráfica inicial
 
 En modo autenticado servimos la estructura HTML, CSS y JavaScript
-en la raíz del mismo origen. No publicamos el árbol de archivos,
+en rutas explícitas del mismo origen. No publicamos el árbol de archivos,
 no utilizamos CDN ni abrimos rutas privadas sin sesión.
-La pantalla inicial consulta healthz y capabilities sin credenciales.
+La raíz redirige a /login o /home según la sesión. Servimos un documento
+independiente para el acceso y otro para las quince rutas de consola,
+protegidas en el servidor. La marca enlaza a /home; la cabecera reúne
+identidad, vencimiento y cierre de sesión. El menú se puede contraer.
+Las vistas todavía no habilitadas indican su indisponibilidad, sin
+simular datos. Reservamos /administration para la gestión de identidad
+propia y futura administración de cuentas (#242), y /debug para el
+explorador técnico (#243), inicialmente restringido a OPERATOR en
+el servidor. No habilitamos escrituras ni un rol ADMIN hasta validar
+su política de autorización y persistencia. Las consultas de diagnóstico
+técnico no autorizan intervenciones de red. La pantalla de inicio consulta healthz y capabilities.
 El formulario utiliza login, resume, activity, continue y logout del mismo
 origen, sin guardar credenciales ni tokens en almacenamiento web.
 Recuperamos identidad y comprobante CSRF en memoria mediante la cookie
 HttpOnly vigente. La recarga no requiere credenciales ni prolonga el plazo.
 La UI indica el rol y la expiración, pero no autoriza acciones. Los estados
-operacionales no consultados permanecen UNKNOWN. La navegación de detalle
+operacionales no consultados permanecen UNKNOWN. La presentación de datos de cada módulo
 y Plotly se integrarán por separado. La política CSP permite solo scripts, estilos
 y consultas del mismo origen, sin código inline.
 

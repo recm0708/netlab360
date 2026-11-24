@@ -89,14 +89,11 @@ async function update() {
 }
 
 refresh.addEventListener("click", update);
-update();
 
 /* La sesión se recupera con cookie HttpOnly; la autoridad reside en el servidor. */
-const form = document.getElementById("login-form");
-const loginFields = document.getElementById("login-fields");
-const username = document.getElementById("username");
-const password = document.getElementById("password");
-const sessionPanel = document.getElementById("session-panel");
+const shell = document.getElementById("console-shell");
+const recoveryPanel = document.getElementById("session-recovery");
+const recoveryNotice = document.getElementById("recovery-notice");
 const logout = document.getElementById("logout");
 const authNotice = document.getElementById("auth-notice");
 const accessState = document.getElementById("access-state");
@@ -120,30 +117,29 @@ function serverNow() {
 }
 
 function controls() {
-  loginFields.disabled = busy || session !== null;
   logout.disabled = busy || session === null;
   idleLogout.disabled = busy || session === null;
   idleContinue.disabled = busy || session === null ||
     session.expiresAt >= session.absoluteExpiresAt;
 }
 
-function clearIdentity(message) {
+function clearIdentity(message, redirect = true) {
   clearTimeout(activityTimer);
   activityTimer = null;
   lastActivitySent = -Infinity;
   session = null;
   if (idleDialog.open) idleDialog.close();
-  form.hidden = false;
-  sessionPanel.hidden = true;
-  password.value = "";
-  document.getElementById("session-user").textContent = "";
-  document.getElementById("session-role").textContent = "";
-  document.getElementById("session-expiry").textContent = "";
+  shell.hidden = true;
+  recoveryPanel.hidden = false;
+  recoveryNotice.textContent = message;
+  for (const id of ["session-user","session-role","session-expiry"]) {
+    document.getElementById(id).textContent = "";
+  }
   identityLabel.textContent = "Sin sesión";
   accessState.textContent = "Sin sesión";
   accessState.dataset.state = "unknown";
-  authNotice.textContent = message;
   controls();
+  if (redirect) location.replace("/login");
 }
 
 function validIdentity(data) {
@@ -171,6 +167,7 @@ function showIdentity(data) {
       data.expires_at - data.server_now > 360) {
     throw new Error("INVALID_IDENTITY");
   }
+  const first = session === null;
   session = {
     username: data.username, role: data.role, csrf: data.csrf_token,
     expiresAt: data.expires_at, warningAt: data.warning_at,
@@ -182,10 +179,16 @@ function showIdentity(data) {
   document.getElementById("session-expiry").textContent =
     formatPanama(new Date(session.expiresAt * 1000));
   identityLabel.textContent = session.username + " · " + session.role;
+  document.querySelector('[data-view="debug"]').hidden = session.role !== "OPERATOR";
+  if (location.pathname === "/debug" && session.role !== "OPERATOR") {
+    location.replace("/home");
+    return;
+  }
   accessState.textContent = "Autenticado";
   accessState.dataset.state = "ok";
-  form.hidden = true;
-  sessionPanel.hidden = false;
+  shell.hidden = false;
+  recoveryPanel.hidden = true;
+  if (first && location.pathname === "/home") update();
   authNotice.textContent = "Sesión vigente. Acciones de red deshabilitadas.";
   controls();
   tick();
@@ -207,7 +210,7 @@ async function recover() {
       throw new Error("SESSION_NOT_CONFIRMED");
     }
   } catch {
-    clearIdentity("No se pudo comprobar la sesión. Actualice la página o vuelva a autenticarse.");
+    clearIdentity("No se pudo comprobar la sesión. Reintente el acceso.", false);
   } finally {
     busy = false;
     controls();
@@ -289,38 +292,6 @@ for (const event of ["pointerdown", "keydown", "wheel", "touchstart"]) {
   document.addEventListener(event, recordActivity, {passive: true});
 }
 
-form.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  if (busy || session !== null) return;
-  busy = true;
-  controls();
-  authNotice.textContent = "Verificando credenciales…";
-  try {
-    const request = authRequest("/api/v1/auth/login", {
-      method: "POST", headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({username: username.value, password: password.value})
-    });
-    password.value = "";
-    const response = await request;
-    if (response.status === 401) {
-      authNotice.textContent = "Credenciales incorrectas o cuenta no disponible.";
-    } else if (response.status === 429) {
-      authNotice.textContent = "Límite de intentos alcanzado. Intente nuevamente en un minuto.";
-    } else if (!response.ok) {
-      throw new Error("LOGIN_FAILED");
-    } else {
-      showIdentity(await response.json());
-    }
-  } catch {
-    clearIdentity("No se pudo confirmar el inicio de sesión. Vuelva a intentarlo.");
-  } finally {
-    password.value = "";
-    busy = false;
-    controls();
-    if (session !== null && !idleDialog.open) logout.focus();
-  }
-});
-
 async function closeSession() {
   if (busy || session === null) return;
   busy = true;
@@ -342,7 +313,6 @@ async function closeSession() {
   } finally {
     busy = false;
     controls();
-    if (session === null) username.focus();
   }
 }
 
@@ -355,5 +325,30 @@ document.addEventListener("visibilitychange", () => {
   if (!document.hidden && session) recover();
 });
 
+// Cada ruta se comprueba en el servidor; las vistas no habilitadas no consultan fuentes.
+const links = Array.from(document.querySelectorAll("#navigation a[data-view]"));
+const active = links.find(link => link.getAttribute("href") === location.pathname);
+if (active) {
+  active.classList.add("current");
+  active.setAttribute("aria-current", "page");
+  const home = active.dataset.view === "home";
+  document.getElementById("home-view").hidden = !home;
+  document.getElementById("module-view").hidden = home;
+  const label = active.querySelector(".nav-text").textContent;
+  document.getElementById("module-title").textContent = label;
+  document.title = "NETLAB360 | " + label;
+}
+
+const menuToggle = document.getElementById("menu-toggle");
+menuToggle.addEventListener("click", () => {
+  const collapsed = shell.classList.toggle("menu-collapsed");
+  menuToggle.setAttribute("aria-expanded", String(!collapsed));
+  menuToggle.setAttribute("aria-label", collapsed ? "Expandir menú" : "Contraer menú");
+});
+
+// Comprobar la sesión también al volver desde la caché de navegación.
+window.addEventListener("pageshow", event => {
+  if (event.persisted) recover();
+});
 setInterval(tick, 1000);
 recover();

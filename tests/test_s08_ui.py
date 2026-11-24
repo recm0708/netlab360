@@ -42,6 +42,20 @@ class StructureTests(unittest.TestCase):
         self.assertTrue({"main", "refresh", "notice", "api-state", "capabilities", "observed"} <= set(parser.ids))
         self.assertFalse(parser.inline)
 
+    def test_separate_login_resources(self):
+        parser = PageParser()
+        html = (UI / "login.html").read_text(encoding="utf-8")
+        parser.feed(html)
+        self.assertEqual(set(parser.resources),{"/ui/static/styles.css","/ui/static/login.js"})
+        self.assertEqual(len(parser.ids),len(set(parser.ids)))
+        self.assertFalse(parser.inline)
+        self.assertNotIn("data-view=",html)
+        self.assertNotIn('id="login-form"',(UI / "index.html").read_text(encoding="utf-8"))
+        js = (UI / "static/login.js").read_text(encoding="utf-8")
+        self.assertIn('location.replace("/home")',js)
+        for value in ("localStorage","sessionStorage","document.cookie","innerHTML"):
+            self.assertNotIn(value,js)
+
     def test_no_operational_fetch_or_browser_storage(self):
         js = (UI / "static/app.js").read_text(encoding="utf-8")
         for value in ("localStorage", "sessionStorage", "innerHTML",
@@ -50,20 +64,20 @@ class StructureTests(unittest.TestCase):
         self.assertIn('credentials: "omit"', js)
 
     def test_login_structure(self):
-        html = (UI / "index.html").read_text(encoding="utf-8")
+        html = (UI / "login.html").read_text(encoding="utf-8")
         for fragment in ('id="login-form" method="post"', 'id="login-fields" disabled',
                          'type="password"', 'autocomplete="current-password"',
-                         'id="session-panel" hidden', 'id="logout" type="button" disabled'):
+                         'id="login-button" type="submit"'):
             self.assertIn(fragment, html)
 
     def test_product_labels_and_clock(self):
         html = (UI / "index.html").read_text(encoding="utf-8")
         self.assertNotRegex(html.lower(), r"\bfase\s*\d+|\bs0[1-9]\b|laboratorio académico")
-        self.assertIn("Supervisión multisede", html)
+        self.assertIn("CENTRO DE OPERACIONES DE RED", html)
         self.assertIn("<dt>Fecha y hora</dt>", html)
         self.assertIn("Vencimiento de la sesión por inactividad o límite máximo.", html)
         self.assertNotIn("Expiración (Panamá)", html)
-        self.assertEqual(html.count('aria-disabled="true"'), 12)
+        self.assertEqual(html.count("data-view="), 15)
         js = (UI / "static/app.js").read_text(encoding="utf-8")
         self.assertIn('timeZone: "America/Panama"', js)
         self.assertIn('hourCycle: "h12"', js)
@@ -73,7 +87,7 @@ class StructureTests(unittest.TestCase):
         self.assertIn("formatPanama(new Date(session.expiresAt * 1000))", js)
 
     def test_auth_client_fixed_routes(self):
-        js = (UI / "static/app.js").read_text(encoding="utf-8")
+        js = (UI / "static/app.js").read_text(encoding="utf-8") + (UI / "static/login.js").read_text(encoding="utf-8")
         for route in ("/api/v1/auth/login", "/api/v1/auth/resume", "/api/v1/auth/logout",
                       "/api/v1/auth/activity", "/api/v1/auth/continue"):
             self.assertIn(route, js)
@@ -104,7 +118,7 @@ if AVAILABLE:
     module = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = module
     spec.loader.exec_module(module)
-    from netlab360_s08_ui import storage, security
+    from netlab360_s08_ui import storage, security, sessions
     from netlab360_s08_ui.main import create_app
 
 
@@ -121,11 +135,11 @@ class UIHttpTests(unittest.TestCase):
         self.addCleanup(self.client.close)
 
     def test_html_and_csp(self):
-        r = self.client.get("/")
+        r = self.client.get("/login")
         self.assertEqual(r.status_code, 200)
         self.assertIn("text/html", r.headers["content-type"])
         self.assertIn("NETLAB360", r.text)
-        self.assertIn("UNKNOWN", r.text)
+        self.assertNotIn("console-shell", r.text)
         csp = r.headers["content-security-policy"]
         for part in ("script-src 'self'", "style-src 'self'", "connect-src 'self'",
                      "form-action 'none'", "frame-ancestors 'none'"):
@@ -135,7 +149,8 @@ class UIHttpTests(unittest.TestCase):
 
     def test_assets(self):
         for path, mime in (("/ui/static/styles.css", "text/css"),
-                           ("/ui/static/app.js", "text/javascript")):
+                           ("/ui/static/app.js", "text/javascript"),
+                           ("/ui/static/login.js", "text/javascript")):
             r = self.client.get(path)
             self.assertEqual(r.status_code, 200)
             self.assertIn(mime, r.headers["content-type"])
@@ -168,6 +183,48 @@ class UIHttpTests(unittest.TestCase):
         self.assertEqual(self.client.post("/api/v1/auth/logout",
                          headers={**origin, "X-CSRF-Token": result.json()["csrf_token"]}).status_code, 200)
         self.assertEqual(self.client.get("/api/v1/auth/me").status_code, 401)
+
+    def test_navigation_guards_and_logout(self):
+        from netlab360_s08_ui.ui_http import PAGES
+        self.assertEqual(len(PAGES), 15)
+        for path in ("/", *PAGES):
+            r = self.client.get(path, follow_redirects=False)
+            self.assertEqual((r.status_code,r.headers["location"]),(303,"/login"))
+        security.create_user(self.directory, "viewer", "synthetic test phrase only", "VIEWER")
+        issued = sessions.issue(self.directory,"viewer")
+        self.client.cookies.set("netlab360_session",issued["token"])
+        for path in ("/","/login"):
+            r = self.client.get(path,follow_redirects=False)
+            self.assertEqual((r.status_code,r.headers["location"]),(303,"/home"))
+        for path in PAGES:
+            r = self.client.get(path,follow_redirects=False)
+            if path == "/debug":
+                self.assertEqual(r.status_code,403)
+                continue
+            self.assertEqual(r.status_code,200)
+            self.assertIn('href="/home"',r.text)
+            self.assertNotIn('id="login-form"',r.text)
+            self.assertIn('id="logout"',r.text)
+        self.assertEqual(self.client.get("/unknown-module").status_code,404)
+        self.assertEqual(self.client.post("/api/v1/auth/logout",
+            headers={"Origin":"http://127.0.0.1:9140","X-CSRF-Token":issued["csrf_token"]}).status_code,200)
+        self.assertEqual(self.client.get("/home",follow_redirects=False).status_code,303)
+
+    def test_debug_reserved_to_operator(self):
+        security.create_user(self.directory, "operator", "synthetic test phrase only", "OPERATOR")
+        issued = sessions.issue(self.directory, "operator")
+        self.client.cookies.set("netlab360_session", issued["token"])
+        for path in ("/debug", "/administration"):
+            r = self.client.get(path, follow_redirects=False)
+            self.assertEqual(r.status_code, 200)
+            self.assertIn("Función no disponible", r.text)
+            self.assertEqual(self.client.post(path).status_code, 405)
+
+    def test_expired_session_redirects(self):
+        security.create_user(self.directory,"viewer","synthetic test phrase only","VIEWER")
+        issued = sessions.issue(self.directory,"viewer",now=100)
+        self.client.cookies.set("netlab360_session",issued["token"])
+        self.assertEqual(self.client.get("/topology",follow_redirects=False).headers["location"],"/login")
 
     def test_bootstrap_no_ui(self):
         with TestClient(create_app(), base_url="http://127.0.0.1:9140") as client:

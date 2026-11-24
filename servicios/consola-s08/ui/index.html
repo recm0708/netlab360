@@ -11,36 +11,49 @@
 <body>
   <a class="skip" href="#main">Ir al contenido</a>
   <!-- Estructura inicial sin datos privados ni acciones operacionales. -->
-  <div class="shell">
+  <div class="shell" id="console-shell" hidden>
     <aside class="sidebar" aria-label="Secciones de NETLAB360">
-      <div class="brand"><span class="brand-mark" aria-hidden="true">N</span><div><strong>NETLAB360</strong><small>Consola de operaciones</small></div></div>
-      <nav aria-label="Menú principal">
+      <a class="brand" href="/home" aria-label="NETLAB360, inicio"><span class="brand-mark" aria-hidden="true">N</span><span class="brand-text"><strong>NETLAB360</strong><small>Consola de operaciones</small></span></a>
+      <nav id="navigation" aria-label="Menú principal">
         <p class="nav-label">Supervisión</p>
-        <a class="current" href="#main" aria-current="page">Inicio / Salud</a>
-        <span class="pending" aria-disabled="true">Topología en vivo</span>
-        <span class="pending" aria-disabled="true">Redes / WAN / OSPF</span>
-        <span class="pending" aria-disabled="true">LAN / VLAN / ACL</span>
-        <span class="pending" aria-disabled="true">Servicios HTTP / HA</span>
-        <span class="pending" aria-disabled="true">LACP</span>
-        <span class="pending" aria-disabled="true">SDN / OVS / Faucet</span>
+        <a href="/home" data-view="home"><span class="nav-symbol" aria-hidden="true">⌂</span><span class="nav-text">Inicio / Salud</span></a>
+        <a href="/topology" data-view="topology"><span class="nav-symbol" aria-hidden="true">◇</span><span class="nav-text">Topología en vivo</span></a>
+        <a href="/wan" data-view="wan"><span class="nav-symbol" aria-hidden="true">↔</span><span class="nav-text">WAN / OSPF</span></a>
+        <a href="/lan" data-view="lan"><span class="nav-symbol" aria-hidden="true">▦</span><span class="nav-text">LAN / VLAN / ACL</span></a>
+        <a href="/services" data-view="services"><span class="nav-symbol" aria-hidden="true">▤</span><span class="nav-text">Servicios HTTP / HA</span></a>
+        <a href="/lacp" data-view="lacp"><span class="nav-symbol" aria-hidden="true">⇄</span><span class="nav-text">LACP</span></a>
+        <a href="/sdn" data-view="sdn"><span class="nav-symbol" aria-hidden="true">▧</span><span class="nav-text">SDN / OVS / Faucet</span></a>
         <p class="nav-label">Diagnóstico</p>
-        <span class="pending" aria-disabled="true">Pruebas de red</span>
-        <span class="pending" aria-disabled="true">Observabilidad</span>
-        <span class="pending" aria-disabled="true">Diagnóstico IA</span>
-        <span class="pending" aria-disabled="true">Incidentes y AIOps</span>
-        <span class="pending" aria-disabled="true">Copiloto RAG</span>
+        <a href="/diagnostics" data-view="diagnostics"><span class="nav-symbol" aria-hidden="true">⌁</span><span class="nav-text">Pruebas de red</span></a>
+        <a href="/observability" data-view="observability"><span class="nav-symbol" aria-hidden="true">∿</span><span class="nav-text">Observabilidad</span></a>
+        <a href="/intelligence" data-view="intelligence"><span class="nav-symbol" aria-hidden="true">✳</span><span class="nav-text">Diagnóstico inteligente</span></a>
+        <a href="/incidents" data-view="incidents"><span class="nav-symbol" aria-hidden="true">!</span><span class="nav-text">Incidentes y AIOps</span></a>
+        <a href="/copilot" data-view="copilot"><span class="nav-symbol" aria-hidden="true">◈</span><span class="nav-text">Copiloto RAG</span></a>
         <p class="nav-label">Administración</p>
-        <span class="pending" aria-disabled="true">Evidencias y sistema</span>
+        <a href="/system" data-view="system"><span class="nav-symbol" aria-hidden="true">⚙</span><span class="nav-text">Evidencias y sistema</span></a>
+        <a href="/administration" data-view="administration"><span class="nav-symbol" aria-hidden="true">♙</span><span class="nav-text">Usuarios y seguridad</span></a>
+        <a href="/debug" data-view="debug" hidden><span class="nav-symbol" aria-hidden="true">⌘</span><span class="nav-text">Diagnóstico técnico</span></a>
       </nav>
-      <p class="sidebar-note">Las secciones no habilitadas todavía no admiten consultas.</p>
+
     </aside>
     <div class="workspace">
       <header class="topbar">
-        <span>Supervisión multisede</span>
-        <span class="mode">Solo lectura</span>
-        <span id="identity-label" class="muted">Sin sesión</span>
+        <div class="header-brand"><button id="menu-toggle" class="secondary" type="button" aria-controls="navigation" aria-expanded="true" aria-label="Contraer menú">☰</button><strong class="header-title">CENTRO DE OPERACIONES DE RED</strong></div>
+        <div class="header-account">
+          <span class="mode">Solo lectura</span>
+          <details id="session-panel">
+            <summary id="identity-label">Comprobando sesión…</summary>
+            <div class="account-details panel">
+              <dl><dt>Usuario</dt><dd id="session-user"></dd><dt>Rol</dt><dd id="session-role"></dd><dt>Fecha y hora</dt><dd id="session-expiry" aria-describedby="session-expiry-note"></dd></dl>
+              <p id="session-expiry-note" class="muted">Vencimiento de la sesión por inactividad o límite máximo.</p>
+            </div>
+          </details>
+          <button id="logout" class="secondary" type="button" disabled>Cerrar sesión</button>
+        </div>
       </header>
       <main id="main" tabindex="-1">
+        <p id="auth-notice" role="status" aria-live="polite" class="muted"></p>
+        <section id="home-view">
         <div class="heading">
           <div>
             <p class="eyebrow">Centro de operaciones</p>
@@ -49,32 +62,6 @@
           </div>
           <button id="refresh" type="button">Actualizar estado</button>
         </div>
-        <!-- El formulario no envía datos por navegación ni funciona sin JavaScript. -->
-        <section class="panel access-panel" aria-labelledby="access-heading">
-          <h2 id="access-heading">Acceso a NETLAB360</h2>
-          <form id="login-form" method="post" autocomplete="on">
-            <fieldset id="login-fields" disabled>
-              <legend class="muted">Cuenta local</legend>
-              <div class="login-grid">
-                <label for="username">Usuario
-                  <input id="username" name="username" autocomplete="username" required maxlength="32" pattern="[a-z][a-z0-9_\-]{2,31}">
-                </label>
-                <label for="password">Contraseña
-                  <input id="password" name="password" type="password" autocomplete="current-password" required maxlength="256">
-                </label>
-                <button id="login-button" type="submit">Iniciar sesión</button>
-              </div>
-            </fieldset>
-          </form>
-          <div id="session-panel" hidden>
-            <dl><dt>Usuario</dt><dd id="session-user"></dd><dt>Rol</dt><dd id="session-role"></dd><dt>Fecha y hora</dt><dd id="session-expiry" aria-describedby="session-expiry-note"></dd></dl>
-            <p id="session-expiry-note" class="muted">Vencimiento de la sesión por inactividad o límite máximo.</p>
-            <p class="muted">El rol no autoriza modificaciones de red.</p>
-            <button id="logout" type="button" disabled>Cerrar sesión</button>
-          </div>
-          <p id="auth-notice" role="status" aria-live="polite">Comprobando sesión…</p>
-          <noscript>El acceso requiere JavaScript local.</noscript>
-        </section>
         <div class="status-grid" aria-label="Estado de arranque">
           <section class="panel"><h2>Proceso FastAPI</h2><p id="api-state" class="metric" data-state="unknown">Sin consultar</p><p class="muted">Disponibilidad del proceso, no de toda la red.</p></section>
           <section class="panel"><h2>Infraestructura</h2><p class="metric" data-state="unknown">UNKNOWN</p><p class="muted">No se ha consultado telemetría autenticada.</p></section>
@@ -88,10 +75,16 @@
           <p id="notice" role="status" aria-live="polite">Esperando consulta local.</p>
         </section>
         <section class="panel"><h2>Funciones de supervisión</h2><p>Las vistas de topología, métricas y diagnóstico aún no están disponibles. Las intervenciones de red están deshabilitadas.</p></section>
+        </section>
+        <section id="module-view" hidden>
+          <h1 id="module-title"></h1>
+          <div class="panel"><h2>Función no disponible</h2><p>La vista de este módulo aún no está habilitada. No se han realizado consultas ni acciones.</p><a href="/home">Volver al inicio</a></div>
+        </section>
       </main>
       <footer>NETLAB360 · Consola de operaciones · Acciones de red deshabilitadas</footer>
     </div>
   </div>
+  <section id="session-recovery" class="panel recovery-panel" role="status"><h1>Comprobando acceso</h1><p id="recovery-notice">Verificando la sesión.</p><a href="/">Reintentar acceso</a></section>
   <dialog id="idle-dialog" aria-labelledby="idle-title" aria-describedby="idle-description">
     <h2 id="idle-title">¿Desea mantener su sesión?</h2>
     <p id="idle-description">Por seguridad, confirme que desea continuar.</p>
