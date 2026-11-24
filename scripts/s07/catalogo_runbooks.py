@@ -24,9 +24,9 @@ def entry(scope,args,refs,requirements,description,change=False):
 def catalog():
     common=["FRESH_EVIDENCE","OWNERSHIP_VERIFIED","MANAGEMENT_PROTECTED"]
     entries={
-        "S07_READ_WAN_V1":entry("WAN_LINK",{"link":WAN},["WAN","SCOPE","ARCH"],common,"Revisar extremos administrativos y adyacencias."),
-        "S07_READ_FIB_V1":entry("FIRST_HOP",{"route":ROUTES},["WAN","SCOPE"],common,"Revisar selección FIB del primer salto."),
-        "S07_AUDIT_OSPF_COST_V1":entry("OSPF_COST_PROFILE",{},["COST","WAN","POLICY"],common+["SOT_VALIDATED"],"Comparar costos explícitos con SoT candidato S03."),
+        "S07_READ_WAN_V1":entry("WAN_LINK",{"link":WAN},["WAN","SCOPE","ARCH","INVENTORY"],common,"Revisar extremos administrativos y adyacencias."),
+        "S07_READ_FIB_V1":entry("FIRST_HOP",{"route":ROUTES},["WAN","SCOPE","INVENTORY"],common,"Revisar selección FIB del primer salto."),
+        "S07_AUDIT_OSPF_COST_V1":entry("OSPF_COST_PROFILE",{},["COST","WAN","POLICY","INVENTORY"],common+["SOT_VALIDATED"],"Comparar costos explícitos con SoT candidato S03."),
         "S07_READ_HTTP_V1":entry("HTTP_MONITOR",{},["HA","SCOPE"],common,"Revisar disponibilidad observada y backend; no cambiar selección."),
         "S07_READ_LACP_V1":entry("SITE_BOND",{"site":SITES},["LACP","WAN"],common,"Revisar miembros y estado LACP de la sede."),
         "S07_READ_SDN_V1":entry("FAUCET",{},["SDN","ARCH"],common,"Revisar controlador y reglas sin intervenir."),
@@ -34,7 +34,7 @@ def catalog():
         "S07_READ_TELEMETRY_V1":entry("S04_COLLECTION",{},["TELEMETRY","SCOPE"],common,"Verificar adquisición y vigencia de telemetría."),
         "S07_READ_ROUTER_V1":entry("ROUTER_EXISTENCE",{"site":SITES},["WAN","ARCH"],common,"Verificar identidad y existencia del router."),
         "S07_READ_VLAN_V1":entry("VLAN_ADMIN",{"vlan":VLANS},["WAN","ARCH"],common,"Contrastar estado administrativo de la VLAN."),
-        "S07_RESTORE_OSPF_COST_V1":entry("OSPF_COST_PROFILE",{"site":SITES,"interface":("s1p","s1b","s2p","s2b"),"cost":(10,100)},["COST","POLICY","ARCH"],common+["SOT_VALIDATED","RFC_APPROVED","EXCLUSIVE_LOCK","WATCHDOG_READY","ROLLBACK_VERIFIED"],"Propuesta futura de restauración del costo deseado; no ejecutable en S07-003.",True),
+        "S07_RESTORE_OSPF_COST_V1":entry("OSPF_COST_PROFILE",{"site":SITES,"interface":("s1p","s1b","s2p","s2b"),"cost":(10,100)},["COST","POLICY","ARCH","INVENTORY"],common+["SOT_VALIDATED","RFC_APPROVED","EXCLUSIVE_LOCK","WATCHDOG_READY","ROLLBACK_VERIFIED"],"Propuesta futura de restauración del costo deseado; no ejecutable en S07-003.",True),
     }
     return {"schema":SCHEMA,"version":VERSION,"actions":deepcopy(entries),
             "network_mutations_authorized":False}

@@ -91,8 +91,8 @@ class RunbookTests(unittest.TestCase):
 
     def test_index_sources(self):
         data=corpus()
-        self.assertEqual(len(data["entries"]),10)
-        self.assertEqual(len({e["id"] for e in data["entries"]}),10)
+        self.assertEqual(len(data["entries"]),11)
+        self.assertEqual(len({e["id"] for e in data["entries"]}),11)
         for row in data["entries"]:
             self.assertTrue(row["excerpt"])
             self.assertTrue(cite(row["id"])["source_revision"])

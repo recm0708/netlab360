@@ -34,8 +34,8 @@
     {
       "id": "HA",
       "path": "docs/diseno/s05-ha-servicios-multisede.md",
-      "line_start": 36,
-      "line_end": 36,
+      "line_start": 5,
+      "line_end": 14,
       "terms": [
         "http",
         "ha",
@@ -43,7 +43,7 @@
         "frontal",
         "respaldo"
       ],
-      "excerpt": "La conmutación se produce entre instancias de aplicación dentro de una misma VM. No constituye redundancia del frontal, de Ubuntu, de VMware ni del hardware físico. Tampoco debe confundirse con la recuperación de un miembro LACP o con la conmutación de un enlace WAN."
+      "excerpt": "Implementamos dos instancias lógicas de servicio HTTP en HQ y S1, con un frontal de acceso en HQ y observación desde S2. El objetivo es evaluar la selección de una instancia alternativa cuando el backend principal deja de responder.\n\n## Arquitectura\n\n| Componente | Ubicación | Dirección IPv4 |\n|---|---|---|\n| Backend principal | HQ, VLAN 120 | `10.70.20.21/24` |\n| Backend alternativo | S1, VLAN 220 | `10.71.20.21/24` |\n| Frontal HTTP | HQ, VLAN 120 | `10.70.20.23/24` |\n| Cliente de observación | S2, VLAN 320 | `10.72.20.20/24` |"
     },
     {
       "id": "LACP",
@@ -74,16 +74,16 @@
     {
       "id": "IA",
       "path": "docs/diseno/s06-v2-deriva-deteccion-y-limitaciones-finales.md",
-      "line_start": 20,
-      "line_end": 20,
+      "line_start": 5,
+      "line_end": 7,
       "terms": [
         "ia",
         "icmp",
-        "drift",
         "modelo",
-        "inferencial"
+        "retardo",
+        "inferencia"
       ],
-      "excerpt": "- **Concept drift:** dos eventos positivos por cada split de prueba aportan baja potencia; puede describirse estabilidad de los errores, pero **no hay prueba confiable de un cambio de relación entre telemetría y verdad de terreno**. Estado `NO_EVALUABLE` como conclusión inferencial."
+      "excerpt": "El TEST V2 ya fue ejecutado y calificado con modelos congelados y protocolo común de tres paquetes ICMP. VALIDATION y TEST contienen **20 NORMAL, 8 DEGRADED y 12 RECOVERY por ruta**, con dos eventos de retardo 40 ms cada uno, capturados después de TRAIN. Los tres métodos reconocieron las ocho ventanas positivas de cada ruta en TEST; FP=0 para LogisticRegression, FP=0/1 para P95 según ruta y FP=1 por ruta para IsolationForest; FN=0 en los seis resultados de TEST. No hubo falsas alarmas en las 12 ventanas RECOVERY de TEST de cada ruta. La validez experimental se limita al egreso HQ sometido al mismo tipo de retardo artificial.\n\nTRAIN por ruta: 40 NORMAL, 8 DEGRADED, 12 RECOVERY; los 4 modelos V2 se congelaron antes de VALIDATION y TEST. Se comprobó que el TEST es cronológicamente posterior a VALIDATION y usa nuevos tokens. Los 6 tokens son eventos diferentes en el tiempo, pero ambas rutas comparten cada perturbación; no representan 12 fallas independientes."
     },
     {
       "id": "TELEMETRY",
@@ -143,6 +143,20 @@
         "causalidad"
       ],
       "excerpt": "NOC y Prometheus pueden depender del mismo colector S04: la coincidencia no es evidencia estadísticamente independiente. La observación FIB no prueba tráfico. El plano de control SDN, el servicio HTTP y la inferencia ICMP conservan ámbitos separados. La adquisición se evalúa en su cierre histórico, no como estado actual. Si la ventana no cumple los límites, ninguna referencia se considera utilizable."
+    },
+    {
+      "id": "INVENTORY",
+      "path": "inventario/ipam/topologia-s02.yaml",
+      "line_start": 43,
+      "line_end": 67,
+      "terms": [
+        "inventario",
+        "ipam",
+        "subred",
+        "wan",
+        "ospf_cost"
+      ],
+      "excerpt": "wan_links:\n  - id: WAN-PRIMARIA-HQ-S1\n    status: candidate\n    subnet: 10.78.0.0/30\n    ospf_cost: 10\n    a: {router: R-HQ, address: 10.78.0.1/30}\n    b: {router: R-S1, address: 10.78.0.2/30}\n  - id: WAN-RESPALDO-HQ-S1\n    status: candidate\n    subnet: 10.78.0.4/30\n    ospf_cost: 100\n    a: {router: R-HQ, address: 10.78.0.5/30}\n    b: {router: R-S1, address: 10.78.0.6/30}\n  - id: WAN-PRIMARIA-HQ-S2\n    status: candidate\n    subnet: 10.78.0.8/30\n    ospf_cost: 10\n    a: {router: R-HQ, address: 10.78.0.9/30}\n    b: {router: R-S2, address: 10.78.0.10/30}\n  - id: WAN-RESPALDO-HQ-S2\n    status: candidate\n    subnet: 10.78.0.12/30\n    ospf_cost: 100\n    a: {router: R-HQ, address: 10.78.0.13/30}\n    b: {router: R-S2, address: 10.78.0.14/30}"
     }
   ]
 }
