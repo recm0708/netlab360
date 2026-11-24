@@ -32,4 +32,4 @@ La separación acreditada corresponde a privilegios de Linux, no a dos personas 
 
 ## Documentación relacionada
 
-[Pruebas de intención](../../tests/test_s07_intent_rfc.py) · [Pruebas del broker operacional](../../tests/test_s07_rfc_ospf_operacional.py) · [Watchdog](s07-plan-intervencion-y-watchdog.md) · [API](s07-api-controlada.md) · [Evidencias](../../evidencias/capturas/fase7/README.md).
+[Pruebas de intención](../../tests/test_s07_intent_rfc.py) · [Pruebas del broker operacional](../../tests/test_s07_rfc_ospf_operacional.py) · [Watchdog](s07-intervencion-ospf-y-watchdog.md) · [API](s07-api-controlada.md) · [Evidencias](../../evidencias/capturas/fase7/README.md).

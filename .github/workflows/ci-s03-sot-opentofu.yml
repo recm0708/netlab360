@@ -8,7 +8,7 @@ on:
     paths:
       - 'iac/s03/**'
       - 'inventario/ipam/topologia-s02.yaml'
-      - 'scripts/automatizacion/s03-generar-sot.py'
+      - 'scripts/automatizacion/s03_generar_sot.py'
       - 'scripts/validacion/s03-*.py'
       - 'scripts/laboratorio/s03-*.py'
       - 'ansible/s03/**'
@@ -19,7 +19,7 @@ on:
     paths:
       - 'iac/s03/**'
       - 'inventario/ipam/topologia-s02.yaml'
-      - 'scripts/automatizacion/s03-generar-sot.py'
+      - 'scripts/automatizacion/s03_generar_sot.py'
       - 'scripts/validacion/s03-*.py'
       - 'scripts/laboratorio/s03-*.py'
       - 'ansible/s03/**'

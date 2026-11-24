@@ -39,4 +39,4 @@ Las 870 observaciones de ventanas no son muestras estadísticamente independient
 
 ## Documentación relacionada
 
-[Correlación RCA](s07-contexto-y-correlacion-rca.md) · [Recuperación OSPF](s07-plan-intervencion-y-watchdog.md) · [Evidencias S07](../../evidencias/capturas/fase7/README.md).
+[Correlación RCA](s07-contexto-y-correlacion-rca.md) · [Recuperación OSPF](s07-intervencion-ospf-y-watchdog.md) · [Evidencias S07](../../evidencias/capturas/fase7/README.md).

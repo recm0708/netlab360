@@ -22,4 +22,4 @@ El laboratorio integra contenedores Docker, namespaces Linux y switches virtuale
 
 Preservamos el tráfico de administración fuera de las WAN y VLAN simuladas. El acceso SSH desde Windows utiliza claves ED25519 y se restringe a la red administrativa autorizada; no versionamos contraseñas, llaves privadas ni tokens.
 
-[Configuración de Ubuntu y acceso SSH](02-ubuntu-desktop-instalacion-ssh.md) · [ADR de IP fija](../decisiones/ADR-002-ip-fija-vmnet8.md) · [Arquitectura implementada](../arquitectura/arquitectura-multisede-implementada.md).
+[Configuración de Ubuntu y acceso SSH](ubuntu-desktop-y-ssh.md) · [ADR de IP fija](../decisiones/adr-002-direccion-administrativa.md) · [Arquitectura implementada](../arquitectura/arquitectura-multisede-implementada.md).

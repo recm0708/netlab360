@@ -25,4 +25,4 @@ La normalización de títulos, etiquetas y tipos nativos fue verificada. El últ
 
 ## Documentación relacionada
 
-[Gestión de milestones](s01-s08-hitos-descripciones-y-contador-s05.md) · [Convenciones del proyecto](../../.github/CONTRIBUTING.md).
+[Gestión de milestones](gestion-milestones-s01-s08.md) · [Convenciones del proyecto](../../.github/CONTRIBUTING.md).

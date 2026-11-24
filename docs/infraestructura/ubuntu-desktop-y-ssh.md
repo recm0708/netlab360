@@ -26,4 +26,4 @@ Comprobamos autenticación SSH por clave, acceso de usuario no privilegiado y op
 
 Una suspensión de VMware preserva temporalmente los recursos en memoria, pero un apagado del invitado no conserva automáticamente los namespaces efímeros. La recuperación tras reinicio requiere un procedimiento adicional de reconstrucción que no se considera validado.
 
-[Inventario VMware](01-inventario-host-y-vmware.md) · [Red multisede](../../topologias/s02-frr/README.md) · [Acta S05](../gestion/ACTA-ACEPTACION-TECNICA-S05-20261115.md).
+[Inventario VMware](inventario-host-y-vmware.md) · [Red multisede](../../topologias/s02-frr/README.md) · [Acta S05](../gestion/s05-acta-aceptacion-tecnica.md).
