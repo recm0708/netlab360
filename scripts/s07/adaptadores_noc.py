@@ -8,7 +8,10 @@ import json
 import math
 from urllib.request import HTTPRedirectHandler, ProxyHandler, build_opener
 
-from contrato_eventos import make_event, normalize_batch
+if __package__:
+    from .contrato_eventos import make_event, normalize_batch
+else:
+    from contrato_eventos import make_event, normalize_batch
 
 URLS = {
     "NOC_S05": "http://127.0.0.1:9130/api/v1/graph",

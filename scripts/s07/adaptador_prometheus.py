@@ -9,8 +9,12 @@ import math
 from urllib.parse import urlencode
 from urllib.request import ProxyHandler, build_opener
 
-from adaptadores_noc import NoRedirect, unique_pairs, reject_constant, now_utc
-from contrato_eventos import make_event, normalize_batch
+if __package__:
+    from .adaptadores_noc import NoRedirect, unique_pairs, reject_constant, now_utc
+    from .contrato_eventos import make_event, normalize_batch
+else:
+    from adaptadores_noc import NoRedirect, unique_pairs, reject_constant, now_utc
+    from contrato_eventos import make_event, normalize_batch
 
 JOB = "netlab360-s04-multisede"
 INSTANCE = "127.0.0.1:9110"

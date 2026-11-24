@@ -6,7 +6,7 @@ import asyncio
 from fastapi import FastAPI, HTTPException, Request
 from starlette.concurrency import run_in_threadpool
 
-from . import readers, sessions
+from . import readers, sessions, prometheus_reader
 from .auth_http import COOKIE
 from .models import SourceBatch, SourceObservation
 
@@ -15,8 +15,7 @@ def register_sources(app: FastAPI, directory) -> None:
     """Exponer solo observaciones normalizadas; sin URL ni comandos del cliente."""
     gate = asyncio.Lock()
 
-    @app.get("/api/v1/sources", response_model=SourceBatch)
-    async def sources(request: Request) -> SourceBatch:
+    async def acquire(request: Request, collector) -> SourceBatch:
         identity = await run_in_threadpool(sessions.resolve, directory, request.cookies.get(COOKIE))
         if identity is None:
             raise HTTPException(401)
@@ -25,5 +24,13 @@ def register_sources(app: FastAPI, directory) -> None:
         if gate.locked():
             raise HTTPException(429, headers={"Retry-After": "3"})
         async with gate:
-            rows = await run_in_threadpool(readers.collect)
+            rows = await run_in_threadpool(collector)
         return SourceBatch(observations=[SourceObservation(**row) for row in rows])
+
+    @app.get("/api/v1/sources", response_model=SourceBatch)
+    async def sources(request: Request) -> SourceBatch:
+        return await acquire(request, readers.collect)
+
+    @app.get("/api/v1/metrics", response_model=SourceBatch)
+    async def metrics(request: Request) -> SourceBatch:
+        return await acquire(request, prometheus_reader.collect)
