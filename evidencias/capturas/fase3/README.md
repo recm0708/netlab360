@@ -2,11 +2,11 @@
 
 ## Descripción
 
-La tercera fase documenta la fuente de información de red, Ansible, OpenTofu, cumplimiento de FRR y reconciliación de cambios.
+Documentamos la fuente de información de red, la automatización con Ansible, los metadatos OpenTofu y la reconciliación de cambios.
 
 ## Capturas disponibles
 
-**Total: 8 imágenes PNG.** Los archivos se enumeran con su identificador normalizado para facilitar su consulta y la selección de figuras del informe.
+**Total: 8 imágenes PNG.**
 
 - [S03_F01_SoT_Inventario_Declarativo_Tres_Sedes.png](S03_F01_SoT_Inventario_Declarativo_Tres_Sedes.png)
 - [S03_F02_SoT_Contra_Estado_Real_Tres_Sedes.png](S03_F02_SoT_Contra_Estado_Real_Tres_Sedes.png)
@@ -19,6 +19,6 @@ La tercera fase documenta la fuente de información de red, Ansible, OpenTofu, c
 
 ## Uso académico
 
-Las capturas representan resultados del laboratorio. Para el informe final seleccionaremos las imágenes pertinentes, con numeración y explicación acordes con el documento académico. El catálogo no presupone que todas deban incluirse como figuras.
+Las imágenes distinguen el estado declarativo candidato, la auditoría de FRR, la desviación controlada y la reconciliación idempotente. Los recursos locales OpenTofu representan metadatos, no aprovisionamiento externo.
 
 [Volver al catálogo general](../README.md).

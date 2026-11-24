@@ -2,7 +2,7 @@
 
 ## Descripción
 
-Complementar la primera sesión observacional **S06-032**, validada con 12/12 muestras y 25 series de estado por consulta, con mediciones originales de **RTT, pérdida ICMP y latencia de respuesta HTTP** sobre endpoints reales y permitidos de HQ, S1 y S2. Estas mediciones se hacen con una carga pequeña y sin modificar interfaces, rutas ni servicios.
+Complementamos la primera sesión observacional **S06-032**, validada con 12/12 muestras y 25 series de estado por consulta, con mediciones originales de **RTT, pérdida ICMP y latencia de respuesta HTTP** sobre endpoints reales y permitidos de HQ, S1 y S2. Realizamos estas mediciones con una carga pequeña y sin modificar interfaces, rutas ni servicios.
 
 **Distinción esencial:** las cinco familias S04 de Prometheus observan principalmente estado y administración; no acreditan pérdida, jitter, throughput ni latencia. Los RTT proceden de sondas ICMP acotadas; **no son equivalentes a latencia de aplicación ni a jitter UDP**.
 

@@ -1,5 +1,4 @@
-# NETLAB360 | Gestión de servicios del laboratorio
-# Configuración del componente correspondiente; conservar los recursos ajenos.
+# NOC local en 9130; consulta telemetría y observador de solo lectura sin ejecutar cambios.
 [Unit]
 Description=NETLAB360 S05 NOC topologia e inspeccion FIB (solo lectura)
 Wants=network-online.target netlab360-s04-exporter.service
@@ -20,6 +19,7 @@ TimeoutStopSec=12
 KillMode=control-group
 UMask=0027
 PrivateTmp=yes
+# La protección limita la escritura del proceso, no la conectividad del namespace.
 ProtectSystem=strict
 ProtectHome=read-only
 ProtectKernelTunables=yes

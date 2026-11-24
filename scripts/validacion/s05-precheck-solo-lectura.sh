@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-# NETLAB360 | Validación: s05 precheck solo lectura
-# Alcance: recursos propios del módulo, sin alterar la red administrativa.
-
 # NETLAB360 S05/P0 - Auditoria PREVIA, sin cambios en red, Docker ni SO.
 # Ejecutar como usuario regular: bash scripts/validacion/s05-precheck-solo-lectura.sh
 set -uo pipefail

@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Comprobar de manera reproducible que el entorno S06 ejecuta un pipeline **real** de entrenamiento y evaluación de un método no supervisado, pero **sin atribuirle capacidad de detectar degradaciones que aún no se han probado**.
+Implementamos un pipeline reproducible de entrenamiento y evaluación de un método no supervisado. Este ensayo inicial utiliza exclusivamente datos NORMAL y no acredita detección de degradaciones.
 
 `scripts/s06/entrenar_baseline_anomalias.py` consume **tres sesiones S06-041A distintas** con clase NORMAL restringida a `HQ_CLIENT_EGRESS_NETWORK_STATE`. Las sesiones se generan con observación independiente de la qdisc noqueue, rutas y NOC antes/después de cada ventana y son datos reales de ICMP HQ→S1/S2, nunca muestras sintéticas.
 

@@ -1,5 +1,5 @@
-# NETLAB360 | Automatización de pruebas y tareas del repositorio
-# Configuración del componente correspondiente; conservar los recursos ajenos.
+# Comprueba la API y visualización de topología, HA, FIB, LACP y SDN.
+# La CI usa regresiones offline, no interviene los servicios de la VM.
 name: NETLAB360 - S05 Topologia interactiva solo lectura
 
 on:

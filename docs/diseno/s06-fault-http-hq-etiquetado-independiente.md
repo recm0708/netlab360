@@ -2,7 +2,7 @@
 
 ## Descripción y alcance
 
-El cierre científico V2 verificó la clasificación de **degradación artificial de latencia ICMP de 40 ms**, pero esa perturbación no acredita una falla de servicio. S06 necesita una segunda evidencia independiente de FAULT. Se emplea el backend HTTP propio de S05, con frontal HQ, respaldo S1 y NOC S05 como fuente observacional, **sin intervenir WAN, FRR/OSPF, LACP, OpenFlow, Docker, namespaces ni `ens33`**.
+El cierre científico V2 verificó la clasificación de **degradación artificial de latencia ICMP de 40 ms**, pero esa perturbación no acredita una falla de servicio. Para evaluar una falla de servicio independiente, empleamos el backend HTTP propio de S05, con frontal HQ, respaldo S1 y NOC S05 como fuente observacional, **sin intervenir WAN, FRR/OSPF, LACP, OpenFlow, Docker, namespaces ni `ens33`**.
 
 El precheck no invasivo del 23/11/2026 fue satisfactorio (`S05_HA_INSTANCIA_PREFLIGHT=OK_SOLO_LECTURA`), con seis servicios HA/NOC y exporter activos, 21 namespaces, cuatro Docker, FIB `S1=s1p` / `S2=s2p` y guardia de experimentación HQ `NONE/BASELINE`. Dos ciclos HA S05 históricos del 11 y 15 de noviembre mostraron secuencia BACKEND_HQ → BACKEND_S1 → BACKEND_HQ y FIB conservada; son **contexto histórico, no nuevas muestras S06 ni TEST ML**.
 

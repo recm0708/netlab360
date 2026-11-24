@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-# NETLAB360 | Laboratorio: b2 dualwan ping lan
-# Alcance: recursos propios del módulo, sin alterar la red administrativa.
-
 # NETLAB360 B2 — prueba de paquetes ICMP reales entre LAN HQ y S1.
 # No crea redes ni modifica enlaces. Requiere dualwan up.
 set -Eeuo pipefail

@@ -45,6 +45,7 @@ def session_time(identifier: str) -> datetime:
         tzinfo=timezone.utc)
 
 
+# Comprobamos el orden global de sesiones, además de excluir identificadores compartidos.
 def chronology(train: list[str], test: list[str]) -> dict:
     if (not isinstance(train, list) or not isinstance(test, list)
             or not train or not test or len(train) != len(set(train))
@@ -100,6 +101,7 @@ def count_originals() -> dict:
     return counts
 
 
+# El dictamen distingue la auditoría correcta de la ausencia de evidencia prospectiva.
 def findings(report: dict, counts: dict) -> dict:
     validate_counts(counts)
     if report.get("globally_chronological_holdout") is not False:

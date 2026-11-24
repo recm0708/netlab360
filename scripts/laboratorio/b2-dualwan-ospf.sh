@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-# NETLAB360 | Laboratorio: b2 dualwan ospf
-# Alcance: recursos propios del módulo, sin alterar la red administrativa.
-
 # NETLAB360 B2-L3: FRR HQ-S1 con WAN doble, aislado de VMnet8.
 # Requiere Ubuntu netlab360-lab y snapshot base confirmado. No usar --privileged.
 set -Eeuo pipefail

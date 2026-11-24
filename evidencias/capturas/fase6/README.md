@@ -2,7 +2,7 @@
 
 ## Descripción
 
-Telemetría, detección de anomalías, evaluación de modelos, diagnóstico y recuperación experimental controlada.
+Documentamos la telemetría, la detección de anomalías, la evaluación de modelos y la recuperación experimental controlada.
 
 ## Capturas disponibles
 

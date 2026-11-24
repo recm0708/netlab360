@@ -2,7 +2,7 @@
 
 ## Descripción
 
-Este catálogo reúne las capturas obtenidas durante el desarrollo y las pruebas del laboratorio de redes empresariales multisede. Cada fase tiene su propia carpeta y un único documento `README.md` que enumera las imágenes disponibles.
+Reunimos en este catálogo las capturas obtenidas durante el desarrollo y las pruebas del laboratorio de redes empresariales multisede. Cada fase tiene su propia carpeta y un único documento `README.md` que enumera las imágenes disponibles.
 
 ## Inventario por fase
 

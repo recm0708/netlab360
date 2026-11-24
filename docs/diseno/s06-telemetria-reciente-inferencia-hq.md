@@ -2,7 +2,7 @@
 
 ## Descripción
 
-Después de S06-045 (replay histórico verificado y captura F07 aprobada) se incorpora una fuente de **mediciones recientes** desde el cliente verdadero `nl360-s02-h-hq-120`, hacia `10.71.20.20` (S1) y `10.72.20.20` (S2). Son seis solicitudes ICMP por ejecución, **tres por ruta**, por `sudo -n ip netns exec` permitido y con origen/destino fijos. No se inducen fallas, no se crean interfaces/namespace ni se cambia qdisc, FRR u otros servicios.
+Después de verificar el replay histórico S06-045, incorporamos una fuente de **mediciones recientes** desde el cliente verdadero `nl360-s02-h-hq-120`, hacia `10.71.20.20` (S1) y `10.72.20.20` (S2). Son seis solicitudes ICMP por ejecución, **tres por ruta**, por `sudo -n ip netns exec` permitido y con origen/destino fijos. No se inducen fallas, no se crean interfaces/namespace ni se cambia qdisc, FRR u otros servicios.
 
 **Esta etapa es observación real de baja carga, no una nueva evaluación independiente de sensibilidad**: las respuestas a mediciones nuevas carecen de etiqueta de verdad de terreno de degradación, que siempre se conserva como `UNKNOWN`. La comparación con modelos de S06-044 es exploratoria y no certifica otras clases de fallo ni predicción temprana.
 

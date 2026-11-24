@@ -200,6 +200,7 @@ def get_json(url: str, timeout=3) -> dict:
         return json.load(r)
 
 
+# El estado basal es desconocido: una fuente ausente o caducada no se interpreta como falla de WAN.
 def normalize_telemetry(snapshot: dict | None, now: datetime | None = None) -> dict:
     base = {"available": False, "source_ok": False, "fresh": False,
             "age_seconds": None, "topology": "unknown", "sites": {}, "error": ""}
@@ -233,6 +234,7 @@ def normalize_telemetry(snapshot: dict | None, now: datetime | None = None) -> d
     return base
 
 
+# Mantenemos independientes la disponibilidad de scrape y el conocimiento de alertas.
 def normalize_prometheus(targets: dict | None, alerts: dict | None,
                          error: str = "") -> dict:
     p = {"available": False, "scrape": "unknown", "alerts_known": False,

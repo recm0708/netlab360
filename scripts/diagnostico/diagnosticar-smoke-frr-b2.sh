@@ -1,8 +1,4 @@
 #!/usr/bin/env bash
-# NETLAB360 | Herramientas del proyecto: diagnosticar smoke frr b2
-# Alcance: ejecutar únicamente los recursos del componente correspondiente.
-# Seguridad: mantener separada la red de administración del laboratorio.
-
 # NETLAB360: diagnostico ESTATICO tras fallar el primer smoke FRR.
 # No inicia zebra/ospfd ni modifica configuraciones, contenedores, rutas o interfaces.
 set -Eeuo pipefail

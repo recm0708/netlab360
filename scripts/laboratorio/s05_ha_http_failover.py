@@ -49,6 +49,7 @@ def sudo(*args: str) -> str:
     return cmd("sudo", "-n", *args)
 
 
+# La respuesta HTTP procede del cliente S2 y debe identificar el frontal correcto.
 def probe() -> dict:
     raw = sudo("ip", "netns", "exec", CLIENT, "/usr/bin/python3",
                "-c", PROBE)
@@ -97,6 +98,7 @@ def check() -> None:
     log("S05_HTTP_PRECHECK=OK_PRINCIPAL_HQ")
 
 
+# Comprobamos por separado que el failover HTTP no se confunda con un cambio WAN.
 def fib_check() -> None:
     with urlopen("http://127.0.0.1:9130/api/v1/graph", timeout=5) as response:
         graph = json.load(response)

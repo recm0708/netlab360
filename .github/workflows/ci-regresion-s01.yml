@@ -1,5 +1,5 @@
-# NETLAB360 | Automatización de pruebas y tareas del repositorio
-# Configuración del componente correspondiente; conservar los recursos ajenos.
+# Regresión offline: valida sintaxis, IPAM y pruebas sin desplegar la topología.
+# Se ejecuta también cuando cambian los documentos o la licencia.
 name: NETLAB360 - CI regresion B1 B2 B3 IaC B4
 
 on:
@@ -57,6 +57,9 @@ jobs:
 
       - name: Ejecutar regresiones offline
         run: python -m unittest discover -s tests -p 'test_*.py' -v
+
+      - name: Auditar comentarios y estructura editorial
+        run: python scripts/validacion/auditar_estilo_repositorio.py
 
       - name: Validar sintaxis Bash
         shell: bash

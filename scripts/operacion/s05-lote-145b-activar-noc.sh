@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
-# NETLAB360 | Operación: s05 lote 145b activar noc
-# Alcance: recursos propios del módulo, sin alterar la red administrativa.
-
-# NETLAB360 S05: procedimiento versionado, ejecutar como usuario rc-aa-ec.
+# NETLAB360 S05: integración del NOC con el observador ya validado en 145A.
+# Exige el resultado de instalación previo; conserva WAN, LACP y SDN.
 bash <<'BASH'
 set -Eeuo pipefail
 cd ~/proyectos/netlab360

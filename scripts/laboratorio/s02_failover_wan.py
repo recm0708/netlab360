@@ -3,7 +3,7 @@
 
 Solo baja/sube una interfaz WAN primaria en el namespace de R-HQ.
 Nunca modifica interfaces o rutas del host. Mantener LAN/servicios activos.
-Uso: sudo -v; python3 scripts/laboratorio/s02-failover-wan.py S1|S2 [--hold-seconds 0-30]
+Uso: sudo -v; python3 scripts/laboratorio/s02_failover_wan.py S1|S2 [--hold-seconds 0-30]
 """
 from __future__ import annotations
 
@@ -41,6 +41,7 @@ def sud(*cmd: str, **kw) -> str:
     return run("sudo", "-n", *cmd, **kw)
 
 
+# Solo aceptamos routers y estados pertenecientes a la topología WAN registrada.
 def validate_ownership() -> dict[str, str]:
     if not STATE.is_file() or STATE.is_symlink():
         raise RuntimeError("No existe estado WAN S02 legitimo")
@@ -71,6 +72,7 @@ def is_via(result: str, dev: str) -> bool:
     return "dev " + dev in result
 
 
+# Esperamos la selección FIB prevista; observar una ruta no sustituye el ping posterior.
 def wait_fib(pid: str, target: str, dev: str, limit: int = 60) -> str:
     result = ""
     for second in range(limit):

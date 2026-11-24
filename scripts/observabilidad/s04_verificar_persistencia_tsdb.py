@@ -33,6 +33,7 @@ def get_json(url: str) -> dict:
         return json.load(response)
 
 
+# Consultamos la misma ventana histórica y el mismo paso antes y después del reinicio.
 def query_range(expr: str, reader=get_json) -> list:
     qs = urlencode({"query": expr, "start": START, "end": END, "step": "2s"})
     doc = reader(PROM + "/api/v1/query_range?" + qs)
@@ -80,6 +81,7 @@ def snapshot(reader=get_json) -> dict:
     }
 
 
+# La persistencia requiere nuevo startTime y coincidencia exacta de las series anteriores.
 def validate_after(before: dict, after: dict) -> None:
     if before.get("schema") != after.get("schema"):
         raise RuntimeError("Version de baseline no coincide")

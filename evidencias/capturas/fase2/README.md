@@ -2,11 +2,11 @@
 
 ## Descripción
 
-La segunda fase muestra la integración de las tres sedes, el enrutamiento OSPF, las VLAN, la conectividad HTTP y la recuperación WAN.
+Integramos tres sedes y documentamos el enrutamiento OSPF, las VLAN, la conectividad HTTP y la recuperación WAN.
 
 ## Capturas disponibles
 
-**Total: 9 imágenes PNG.** Los archivos se enumeran con su identificador normalizado para facilitar su consulta y la selección de figuras del informe.
+**Total: 9 imágenes PNG.**
 
 - [S02_F01_Precheck_Inicial_Integracion_Multisede.png](S02_F01_Precheck_Inicial_Integracion_Multisede.png)
 - [S02_F02_Validacion_IPAM_Tres_Sedes_Cuatro_WAN.png](S02_F02_Validacion_IPAM_Tres_Sedes_Cuatro_WAN.png)
@@ -20,6 +20,6 @@ La segunda fase muestra la integración de las tres sedes, el enrutamiento OSPF,
 
 ## Uso académico
 
-Las capturas representan resultados del laboratorio. Para el informe final seleccionaremos las imágenes pertinentes, con numeración y explicación acordes con el documento académico. El catálogo no presupone que todas deban incluirse como figuras.
+Las imágenes respaldan el inventario multisede, las adyacencias OSPF, la selección y recuperación de rutas WAN, las nueve VLAN y las pruebas de acceso HTTP. No acreditan disponibilidad física continua.
 
 [Volver al catálogo general](../README.md).

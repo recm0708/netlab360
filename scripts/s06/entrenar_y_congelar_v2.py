@@ -86,6 +86,7 @@ def validate_train_map(data: dict) -> tuple[list[str], list[str], list[str], Pat
     return normal, degraded, recovery, folder
 
 
+# Revalidamos exclusivamente las sesiones TRAIN y la congelación de los modelos históricos.
 def verified_training() -> tuple[dict, dict]:
     assert_legacy_lock()
     data = json.loads(read_regular(TRAIN, 50000))
@@ -201,6 +202,7 @@ def build_estimators(vectors: dict) -> tuple[dict, dict]:
     return models, cutoffs
 
 
+# Guardamos una nueva versión de los modelos sin sustituir el conjunto congelado anterior.
 def persist_freeze(source: dict, models: dict, cutoffs: dict) -> Path:
     import joblib
     if (STUDY.is_symlink() or not STUDY.is_dir()

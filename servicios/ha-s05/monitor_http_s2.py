@@ -32,6 +32,7 @@ TARGETS = {
 OPENER = build_opener(ProxyHandler({}))
 
 
+# Verificamos el namespace de origen para que las sondas representen al cliente de S2.
 def ensure_network_namespace() -> None:
     expected = Path("/run/netns") / SOURCE
     if not expected.exists():
@@ -84,6 +85,7 @@ def probe(identity: str) -> dict:
         return sample
 
 
+# Consultamos los tres endpoints fijos con concurrencia acotada; cada respuesta conserva su identidad.
 def observe() -> dict:
     with ThreadPoolExecutor(max_workers=3) as pool:
         values = list(pool.map(probe, TARGETS))

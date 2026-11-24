@@ -2,7 +2,7 @@
 
 ## Descripción
 
-Incremento posterior a S06-044, que **sí se ejecutó en VM**: F06 aprobada, 23 pruebas locales, TRAIN/TEST separados por sesión y modelos privados íntegros. S06-045 introduce código nuevo; **aceptado técnicamente en VM el 23/11/2026**, tras validaciones completas de los modelos y API temporal.
+Implementamos una API de inferencia histórica de solo lectura después de verificar la separación por sesión y las 23 pruebas específicas de S06-044. Validamos los modelos y la API temporal en la VM el 23 de noviembre de 2026.
 
 No se intenta "predecir" estados futuros: la API reproduce inferencias sobre el TEST histórico reservado de S06-044. Son **las mismas muestras evaluadas anteriormente**, por lo que la reproducción NO constituye una segunda validación independiente ni evidencia de generalización. La integración de telemetría reciente aplica controles de calidad y vigencia independientes.
 

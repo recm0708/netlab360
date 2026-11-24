@@ -72,6 +72,7 @@ def safe_dir(session: str, pattern: re.Pattern) -> Path:
     return folder
 
 
+# Verificamos la procedencia de cada sesión antes de transformar unidades y registros.
 def load_session(session: str, pattern: re.Pattern,
                  schema: str, filename: str, checksum_key: str) -> tuple[dict, list[dict]]:
     directory = safe_dir(session, pattern)
@@ -139,6 +140,7 @@ def long_row(*, source: str, session: str, idx: int,
     }
 
 
+# Las métricas observacionales conservan su identidad de serie y se rechazan duplicados.
 def transform_baseline(session: str, records: list[dict]) -> tuple[list[dict], dict]:
     output = []
     seen = set()

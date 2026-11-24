@@ -2,9 +2,7 @@
 
 ## Descripción
 
-AIOps supervisado, correlación de eventos, diagnóstico RCA,
-Intent Assurance, runbooks, aprobación operacional, ejecución
-protegida, recuperación y API controlada.
+Documentamos AIOps supervisado: correlación de eventos, diagnóstico RCA, Intent Assurance, runbooks, aprobación operacional, ejecución protegida, recuperación y API controlada.
 
 ## Capturas disponibles
 

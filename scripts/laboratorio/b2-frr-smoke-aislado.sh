@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-# NETLAB360 | Laboratorio: b2 frr smoke aislado
-# Alcance: recursos propios del módulo, sin alterar la red administrativa.
-
 # NETLAB360 B2-L3: prueba efimera de arranque de FRR, SIN redes WAN.
 # No vincular ens33, no modificar rutas del anfitrion.
 set -Eeuo pipefail

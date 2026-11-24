@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-# NETLAB360 | Laboratorio: s03 preparar opentofu
-# Alcance: recursos propios del módulo, sin alterar la red administrativa.
-
 # NETLAB360 fase 3: preparar espacio aislado para OpenTofu metadata-only.
 # No inicia routers, no modifica enlaces WAN/LAN y nunca sobrescribe states.
 set -Eeuo pipefail

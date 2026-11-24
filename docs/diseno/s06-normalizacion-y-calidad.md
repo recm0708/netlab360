@@ -2,7 +2,7 @@
 
 ## Descripción
 
-Unificar las observaciones S06-032 (estados S04/NOC/Prometheus) con las mediciones S06-033 (ICMP y HTTP), de forma que se puedan auditar las fuentes, unidades, marcas de tiempo, identidad de sondas, cobertura, duplicados y ausencias. El producto de este paso es un **conjunto analítico preliminar**, NO un dataset supervisado ni un modelo entrenado.
+Unificamos las observaciones S06-032 (estados S04/NOC/Prometheus) con las mediciones S06-033 (ICMP y HTTP), de forma que se puedan auditar las fuentes, unidades, marcas de tiempo, identidad de sondas, cobertura, duplicados y ausencias. El producto de este paso es un **conjunto analítico preliminar**, NO un dataset supervisado ni un modelo entrenado.
 
 ## Fuentes
 

@@ -71,6 +71,7 @@ def protected_services(data: dict) -> None:
     print("S05_SDN_FAULT_GESTION_FRR_NOC_HA=CONSERVADOS", flush=True)
 
 
+# La propiedad del bridge, controlador y puerto debe comprobarse antes de inducir una interrupción.
 def precheck() -> dict:
     data = lab.state_read()
     if data.get("status") != "active":
@@ -96,6 +97,7 @@ def precheck() -> dict:
     return data
 
 
+# Armamos el rescate independiente antes de deshabilitar el puerto; no depende del proceso SSH.
 def failsafe_arm() -> str:
     executable = shutil.which("ip")
     if not executable or not Path(executable).is_absolute():

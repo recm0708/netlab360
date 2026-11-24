@@ -2,11 +2,11 @@
 
 ## Descripción
 
-La quinta fase documenta la integración WAN/HTTP, la agregación LACP, Open vSwitch/Faucet, el NOC multisede y la recuperación de servicios.
+Documentamos la integración WAN/HTTP, la agregación LACP, Open vSwitch/Faucet, el NOC multisede y la recuperación de servicios.
 
 ## Capturas disponibles
 
-**Total: 71 imágenes PNG.** Los archivos se enumeran con su identificador normalizado para facilitar su consulta y la selección de figuras del informe.
+**Total: 71 imágenes PNG.**
 
 - [S05_F01_LACP_Flujo_Unico.png](S05_F01_LACP_Flujo_Unico.png)
 - [S05_F02_Precheck_Red_Gestion_y_Repositorio.png](S05_F02_Precheck_Red_Gestion_y_Repositorio.png)
@@ -82,6 +82,6 @@ La quinta fase documenta la integración WAN/HTTP, la agregación LACP, Open vSw
 
 ## Uso académico
 
-Las capturas representan resultados del laboratorio. Para el informe final seleccionaremos las imágenes pertinentes, con numeración y explicación acordes con el documento académico. El catálogo no presupone que todas deban incluirse como figuras.
+Las imágenes respaldan la disponibilidad lógica HTTP, las rutas de respaldo, los ensayos LACP, el dominio SDN aislado y su visualización en el NOC. Los pilotos y mediciones de rendimiento corresponden a sesiones distintas.
 
 [Volver al catálogo general](../README.md).

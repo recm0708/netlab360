@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-# NETLAB360 | Laboratorio: b2 l2 aislado
-# Alcance: recursos propios del módulo, sin alterar la red administrativa.
-
 # Prueba B2: VLAN L2 efimera mediante namespaces y veth.
 # Precondicion humana: snapshot VMware confirmado. No modifica ens33.
 set -Eeuo pipefail

@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-# NETLAB360 | Laboratorio: b2 l2 trunk 8021q
-# Alcance: recursos propios del módulo, sin alterar la red administrativa.
-
 # NETLAB360 B2-L2: demostrar dos VLAN HQ sobre un trunk Linux bridge 802.1Q.
 # Solo crea namespaces propios nl360-ta/tb/t110a/t110b/t120a/t120b.
 # Nunca configura ens33, gateway, VMnet8 ni firewall del host.

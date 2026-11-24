@@ -2,7 +2,7 @@
 
 ## Antecedente
 
-El usuario ejecutó S06-038B en Ubuntu y obtuvo `S06-038B_ROLLBACK_AISLADO_VALIDADO=OK`, RC 0; 24 tests específicos y 523 globales correctos. En el namespace temporal `nl360-s06-isotest`, la interfaz `dummy0` no recibió direcciones IP ni ruta default. Se comprobó que un temporizador systemd de 20 segundos, armado **antes** de netem 106:, eliminó esta qdisc de prueba y devolvió el estado `noqueue`. El estado `RESTORED` fue verificado; luego `cleanup` regresó el inventario a 21 namespaces. No se modificó el cliente HQ, el host VMware, FRR, HA, LACP, SDN ni los servicios de observabilidad. Bitácora privada: `~/netlab360-bootstrap/s06/rollback-aislado-20261123_004737/S06_038B_Rollback_Aislado.txt`.
+Ejecutamos S06-038B en Ubuntu y obtuvimos `S06-038B_ROLLBACK_AISLADO_VALIDADO=OK`, RC 0; 24 tests específicos y 523 globales correctos. En el namespace temporal `nl360-s06-isotest`, la interfaz `dummy0` no recibió direcciones IP ni ruta default. Se comprobó que un temporizador systemd de 20 segundos, armado **antes** de netem 106:, eliminó esta qdisc de prueba y devolvió el estado `noqueue`. El estado `RESTORED` fue verificado; luego `cleanup` regresó el inventario a 21 namespaces. No se modificó el cliente HQ, el host VMware, FRR, HA, LACP, SDN ni los servicios de observabilidad. Bitácora privada: `~/netlab360-bootstrap/s06/rollback-aislado-20261123_004737/S06_038B_Rollback_Aislado.txt`.
 
 **Un dummy sin conectividad y un cliente veth integrado a la topología no tienen el mismo riesgo.** El resultado demuestra restitución de qdisc aislada, no seguridad automática de cambios en el cliente productivo ni etiquetas reales de degradación.
 
@@ -42,4 +42,4 @@ La auditoría de viabilidad no constituye autorización de intervención.
 
 ## Validación
 
-S06-039 aprobó 19/19 pruebas específicas y 542/542 offline. Se verificó el enlace veth al switch nl360-s02-sw-hq, las rutas a S1/S2 por eth0 y gateway 10.70.20.1, qdisc noqueue, siete servicios, 21 namespaces, cuatro contenedores y gestión. El reporte conserva production_change_authorized=false y ground_truth_verified=false. La auditoría es de lectura; no concede permiso. [Recuperación aislada de veth](s06-recuperacion-veth-aislada.md).
+En S06-039 aprobamos 19/19 pruebas específicas y 542/542 offline. Verificamos el enlace veth al switch nl360-s02-sw-hq, las rutas a S1/S2 por eth0 y gateway 10.70.20.1, qdisc noqueue, siete servicios, 21 namespaces, cuatro contenedores y gestión. El reporte conserva production_change_authorized=false y ground_truth_verified=false. La auditoría es de lectura; no concede permiso. [Recuperación aislada de veth](s06-recuperacion-veth-aislada.md).

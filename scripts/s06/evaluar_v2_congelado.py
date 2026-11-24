@@ -38,6 +38,7 @@ LABELS = ("NORMAL", "DEGRADED", "RECOVERY")
 METHODS = ("P95_RTT", "IsolationForest", "LogisticRegression")
 
 
+# La etapa se admite solo si respeta el orden y las restricciones del reporte congelado.
 def parse_manifest(stage: str, frozen: dict) -> tuple[dict, dict]:
     if stage not in SCHEMA_STAGE:
         raise ValueError("stage_not_allowed")
@@ -161,6 +162,7 @@ def read_stage(stage: str, frozen: dict) -> tuple[dict, dict]:
                                          for s in ids_).isoformat()}, tables
 
 
+# RECOVERY se analiza separadamente de los positivos DEGRADED y negativos NORMAL del cálculo binario.
 def route_metrics(route: str, vectors: dict, frozen: dict, models: dict) -> dict:
     n = [x for sid in vectors["NORMAL"].values() for x in sid[route]]
     degraded_sessions = list(vectors["DEGRADED"].values())

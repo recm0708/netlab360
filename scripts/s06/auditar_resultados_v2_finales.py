@@ -30,6 +30,7 @@ def utc(s):
     return d.astimezone(timezone.utc)
 
 
+# El estadístico KS es descriptivo; no se calcula significación ni se atribuye deriva de concepto.
 def ks(a, b):
     if len(a) < 2 or len(b) < 2 or any(not math.isfinite(v) for v in a+b):
         raise ValueError("ks_invalid_samples")
@@ -80,6 +81,7 @@ def predicted(rows, method, cutoff, models):
     return out
 
 
+# La primera ventana positiva posterior al estímulo mide oportunidad retrospectiva, no alerta en tiempo real.
 def event_opportunities(stage, route, models, cutoff, rows, scored):
     result = {}
     for method in METHODS:

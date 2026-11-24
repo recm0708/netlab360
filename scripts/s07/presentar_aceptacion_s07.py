@@ -25,6 +25,7 @@ def title(t):
 def end(t):
     rule();print("REGISTROS EXPERIMENTALES | SIN NUEVAS MUTACIONES")
     line();print(color(" "+t));line()
+# La presentación comprueba los registros existentes; no vuelve a solicitar una autorización.
 def broker(p,section):
     d=read(p,"estado-broker-final");j=read(p,"journal-protegido")["transaction"]
     check(d["status"]==j["status"]=="VERIFIED" and j["baseline"]==j["final_observation"])
@@ -53,6 +54,7 @@ def broker(p,section):
         print("RESTAURACION: "+color(j["events"][-1]["source"]))
         end("S07-004H-J | CICLO VERIFICADO")
 
+# La auditoría de la captura exige el ciclo verificado y la coincidencia del estado basal y final.
 def api(p,section):
     s=read(p,"summary");j=read(p,"journal-protegido")["transaction"]
     check(s["status"]==j["status"]=="VERIFIED" and s["cycle"]==[100,150,100] and j["baseline"]==j["final_observation"])
