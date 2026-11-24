@@ -1,6 +1,6 @@
-# S06-050 — Preregistro de TEST futuro con modelos congelados
+# Prerregistro y congelación del estudio histórico — Fase 06
 
-## Motivación y garantía metodológica
+## Descripción
 
 S06-049 comprobó en la VM que existen por ruta 60 ventanas NORMAL, 16 DEGRADED y 24 RECOVERY, pero **no** se dispone de un holdout cronológico global. El TEST NORMAL histórico precede a algunas sesiones degradadas usadas en TRAIN; las rutas HQ→S1/HQ→S2 comparten eventos y el fallo probado se limita al retardo fijo de 40 ms. Por tanto, no corresponde volver a evaluar el mismo TEST y presentarlo como validación prospectiva.
 
@@ -22,16 +22,8 @@ El acta se guarda en `~/netlab360-bootstrap/s06/preregistros/S06_050_Prerregistr
 - Data drift solo como diagnóstico descriptivo si el muestreo es comparable; concept drift solo con etiquetas futuras. Sin objetivo temporal, horizonte y múltiples eventos genuinos, el pronóstico se declara `NO_EVALUABLE`, no se comunica MAE ni capacidad de alerta temprana ficticia.
 - Cualquier estímulo real de red necesitará un procedimiento específico de aprobación y un watchdog root con recuperación verificada **antes** de su ejecución. Este archivo no autoriza acciones sobre FRR, qdisc, OVS, contenedores ni interfaz ens33.
 
-## Aceptación pendiente en VM
-
-Tras aprobar CI, ejecutar los 12 tests específicos y `python3 scripts/s06/prerregistrar_estudio_futuro.py --freeze` solo si no existe ya el acta, seguido de `--check`. Confirmar que hay cuatro modelos congelados y que se registra `MUESTREO_COMPATIBLE=SI` o `NO` según los metadatos reales. **Ambos resultados son válidos para la auditoría**; no forzar el estado `PLAN_READY` si el muestreo es desigual.
-
-Cerrar con qdisc HQ `noqueue`, guardia `NONE/BASELINE`, 21 namespaces/cuatro contenedores, IP administrativa .40 y gateway .2, NOC, Prometheus y observabilidad LACP/SDN sanos, Git limpio. No se necesita captura académica adicional por esta congelación: la bitácora y acta privada son evidencias metodológicas para el informe.
-
-**Estado:** PR [#175](https://github.com/recm0708/netlab360/pull/175) fusionado en `main` mediante `32b108a` y **776 pruebas CI (775 aprobadas, una omitida)**. Las acciones `--freeze` y `--check` se ejecutaron correctamente en la VM; identificaron muestreo histórico de 2 y 3 paquetes, incompatible según el preregistro, que requiere auditoría por clase y partición antes de nuevas mediciones. Fase S06 permanece al 80 % técnico validado mientras no existan sesiones nuevas etiquetadas, prospectiva y drift verificables.
-
-## Resultado real en VM — preregistro conservado (23/11/2026)
+## Validación
 
 Las 12 pruebas específicas pasaron. El comando `--freeze` creó de manera exclusiva `~/netlab360-bootstrap/s06/preregistros/S06_050_Prerregistro_Prospectivo.json`, y `--check` verificó el mismo archivo sin sobrescribirlo. Los cuatro modelos permanecen congelados. Resultado `PAQUETES_ORIGINALES=2,3`, `MUESTREO_COMPATIBLE=NO`, `STATUS=BLOCKED_INCOMPATIBLE_SAMPLING`, `TEST_PROSPECTIVO_EJECUTADO=NO`, `S06-050_PRERREGISTRO_VALIDADO=OK`, `RESULTADO_RC=0`. Bitácora `~/netlab360-bootstrap/s06/validacion-s06-050-20261123_061334/S06_050_Validacion_Completa.txt`.
 
-Postcondiciones: 21 namespaces, cuatro contenedores, gestión `ens33 192.168.47.40/24` vía gateway `.2`, guardia `NONE/BASELINE`, qdisc `noqueue`, NOC con 18 nodos/21 enlaces y LACP/SDN operativos; no hubo cambios de red, entrenamiento ni nueva evaluación de modelos. **S06-050 se acepta como preregistro, no como aprobación de muestreo ni TEST prospectivo**. El acta no se modifica para conseguir `PLAN_READY`. Siguiente **S06-051**: auditar todos los archivos de sesión NORMAL/DEGRADED/RECOVERY y sus conteos efectivos por clase, entrenamiento/TEST y ruta antes de elegir un diseño de muestreo comparable.
+Postcondiciones: 21 namespaces, cuatro contenedores, gestión `ens33 192.168.47.40/24` vía gateway `.2`, guardia `NONE/BASELINE`, qdisc `noqueue`, NOC con 18 nodos/21 enlaces y LACP/SDN operativos; no hubo cambios de red, entrenamiento ni nueva evaluación de modelos. **S06-050 se acepta como preregistro, no como aprobación de muestreo ni TEST prospectivo**. El acta no se modifica para conseguir `PLAN_READY`. [Auditoría del muestreo histórico](s06-auditoria-muestreo-protocolo-historico.md).

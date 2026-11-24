@@ -1,6 +1,6 @@
-# S06 — Mediciones activas de rendimiento en NETLAB360
+# Mediciones activas de rendimiento — Fase 06
 
-## Objetivo
+## Descripción
 
 Complementar la primera sesión observacional **S06-032**, validada con 12/12 muestras y 25 series de estado por consulta, con mediciones originales de **RTT, pérdida ICMP y latencia de respuesta HTTP** sobre endpoints reales y permitidos de HQ, S1 y S2. Estas mediciones se hacen con una carga pequeña y sin modificar interfaces, rutas ni servicios.
 
@@ -23,7 +23,7 @@ La sonda HTTP reproduce el origen y la URL del ensayo HTTP HA S05. No se introdu
 - 21 namespaces, entre ellos los tres clientes seleccionados; exporter y NOC con fuentes correctas; FRRouting y HA operativos con backend principal HQ.
 - Sesión original S06-032 íntegra, con metadata complete y etiqueta no supervisada UNKNOWN, que se enlaza como referencia por su identificador exacto.
 
-## Procedimiento de prueba propuesto
+## Procedimiento de medición
 
 Ejecutar desde el directorio principal del repositorio:
 
@@ -45,14 +45,8 @@ Cada sesión se escribe bajo el subdirectorio privado netlab360-bootstrap/s06/da
 - measurement_valid=false y quality_warnings: fallo de medición, timeout o respuesta incompatible con el contrato; no se sustituye por ceros ni por datos sintéticos.
 - ground_truth_label=UNKNOWN y ground_truth_verified=false para **todas** las observaciones. Las métricas cuantitativas no determinan por sí solas la causa del comportamiento.
 
-El P95 calculado con cinco paquetes es solo una **estimación exploratoria**, no una prueba de SLO ni base estadística para detección de anomalías. Posteriormente usaremos ventanas mayores y sesiones separadas.
+El P95 calculado con cinco paquetes es solo una **estimación exploratoria**, no una prueba de SLO ni base estadística para detección de anomalías. Los ensayos etiquetados posteriores emplearon un protocolo separado.
 
-## Continuación de S06
+## Validación y limitaciones
 
-1. Validar captura real, conteos por origen/destino, calidad, integridad de archivos y conectividad con la referencia S06-032.
-2. Definir una estructura común para series de estado y resultados cuantitativos, preservando unidades y timestamps.
-3. Diseñar escenarios autorizados de degradación con estímulo independiente de la señal predictora, registro de inicio/fin y recuperación verificada.
-4. Incorporar throughput TCP/UDP con iperf3 **únicamente** después de verificar servidores, rutas, carga y limitaciones de la VM.
-5. Dividir por sesión y tiempo, controlar fugas y comparar modelos con baseline explicable. No entrenar un clasificador con las muestras UNKNOWN.
-
-Relacionadas: issues #25, #6 y #26; [protocolo de S06](s06-adquisicion-observacional.md).
+S06-033 registró nueve mediciones ICMP y tres HTTP válidas. Pérdida ICMP observada: 0 %. RTT medio HQ→S1: 0,084 ms; HQ→S2: 0,074 ms; S2→frontal HQ: 0,081 ms. Latencia HTTP media: 7,594 ms, con BACKEND_HQ en las tres peticiones. Las medidas son puntuales, proceden de una VM y no acreditan SLO ni rendimiento de WAN físicas. Todas las etiquetas permanecen UNKNOWN. [Normalización](s06-normalizacion-y-calidad.md).

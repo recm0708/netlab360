@@ -1,6 +1,6 @@
-# S06-051 — Auditoría del protocolo ICMP por sesión, clase y split
+# Auditoría de muestreo ICMP del corpus histórico — Fase 06
 
-## Problema detectado y alcance
+## Descripción y alcance
 
 La VM ejecutó S06-050 correctamente (12 pruebas, `S06-050_PRERREGISTRO_VALIDADO=OK`, RC=0), pero el preregistro identificó **dos protocolos ICMP, de 2 y 3 paquetes por ventana**, y mantuvo `BLOCKED_INCOMPATIBLE_SAMPLING`. No es una falla de la topología ni un resultado negativo de rendimiento. El acta privada `~/netlab360-bootstrap/s06/preregistros/S06_050_Prerregistro_Prospectivo.json` **no debe reemplazarse ni editarse**.
 
@@ -19,15 +19,7 @@ Si NORMAL y DEGRADED usan tamaños de muestra disjuntos, se marca `HIGH_IF_PACKE
 
 La solución no consiste en reetiquetar sesiones antiguas ni modificar el archivo congelado. Se deberá diseñar un estudio separado con muestreo uniforme y justificación experimental. Los nuevos modelos, si fueran necesarios, tendrían que registrarse como una versión distinta, sin sustituir los modelos originales ni presentar las observaciones ya vistas como TEST nuevo. Cualquier perturbación de red futura requerirá autorización específica y watchdog.
 
-## Aceptación en VM
-
-Tras aprobar CI, ejecutar las pruebas específicas y el auditor con `--save`. Corroborar once sesiones originales, coherencia entre metadatos y transmisiones, el desglose por clase/split y `S06_051_AUDITORIA_READONLY=OK`. El gate esperado es `INDEPENDENT_COMPARABILITY_PROTOCOL_BEFORE_NEW_LABELED_TEST`, **no** `PLAN_READY`.
-
-Al terminar, verificar 21 namespaces, cuatro contenedores, ens33 .40/24 con gateway .2, guardia `NONE/BASELINE`, qdisc `noqueue`, NOC 18/21, LACP/SDN y Prometheus. Ninguna nueva captura académica hasta conocer resultados. F01–F09B siguen válidas como evidencia de lo que se ejecutó, con limitaciones metodológicas claramente declaradas.
-
-**Estado:** PR [#176](https://github.com/recm0708/netlab360/pull/176) fusionado a `main` con `bc741db`. CI general **789 pruebas (788 aprobadas y una omitida)**, incluyendo 13 tests nuevos. **La auditoría real en la VM está pendiente**: aún no afirmamos cuál de las clases utilizó dos o tres paquetes. S06 permanece en 80 % técnico validado mientras no exista evidencia prospectiva independiente.
-
-## Resultado real — aceptación en VM
+## Resultados
 
 13 pruebas unitarias específicas OK y `S06-051_AUDITORIA_VALIDADA=OK` / `RESULTADO_RC=0`. La lectura de once sesiones verificó que **NORMAL tiene 60 ventanas de 3 paquetes, DEGRADED 16 de 2 y RECOVERY 24 de 3 por ruta**, sin discrepancias entre `requested_packets`, `sent` y metadatos. En TRAIN: NORMAL 40 ventanas × 3 paquetes y DEGRADED 12 × 2; en TEST: NORMAL 20 × 3 y DEGRADED 4 × 2. El tamaño muestral separa perfectamente las etiquetas NORMAL/DEGRADED, lo que constituye un **factor de confusión de protocolo** y limita el F1 histórico; no demuestra causalidad individual sobre las predicciones.
 
