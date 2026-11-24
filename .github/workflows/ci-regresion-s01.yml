@@ -77,3 +77,26 @@ jobs:
         run: |
           echo "CI_OFFLINE_REGRESION=OK"
           echo "AVISO: sin Docker/FRRouting real, sin VMware, sin validacion de entregables APA u OVA."
+
+  s08-api:
+    # Validar el backend con el intérprete de referencia sin alterar el job mínimo.
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Obtener codigo
+        uses: actions/checkout@v5
+
+      - name: Configurar Python de referencia S08
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+
+      - name: Instalar dependencias API segun inventario
+        run: |
+          python --version
+          python -m pip install --disable-pip-version-check -c requirements-cientifico.txt fastapi uvicorn pydantic httpx
+          python -m pip check
+          python -c "import fastapi, uvicorn, pydantic, httpx"
+
+      - name: Validar contrato y rutas S08
+        run: python -m unittest discover -s tests -p 'test_s08_*.py' -v
