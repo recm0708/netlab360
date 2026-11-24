@@ -18,7 +18,7 @@ La documentación vigente describe el sistema y sus resultados. Las instruccione
 | Evidencia PNG | SNN_FNN_Descripcion_Tecnica.png |
 | Archivos institucionales | nombres reconocidos por GitHub y el ecosistema (README.md, LICENSE, CITATION.cff, SECURITY.md, etc.) |
 
-Los archivos de herramientas con nombres convencionales, las rutas de systemd, las interfaces de importación, los recursos de runtime y las referencias fijadas a revisiones históricas requieren un análisis de compatibilidad antes de modificarse. No renombrar indiscriminadamente por extensión.
+Los archivos de herramientas con nombres convencionales, las rutas de systemd, las interfaces de importación, los recursos de runtime y las referencias fijadas a revisiones históricas requieren un análisis de compatibilidad antes de modificarse. Los identificadores históricos B1–B4, versiones de ensayos y nombres de registros originales se conservan cuando identifican procedimientos o procedencia experimental. Los archivos .yml y .yaml son válidos según su consumidor; las unidades .service, plantillas .j2, configuraciones .conf, main.tf y nombres reservados conservan su contrato. No renombrar indiscriminadamente por extensión. Las referencias a revisiones históricas permanecen vinculadas a la revisión original.
 
 ## Código y pruebas
 
@@ -28,4 +28,4 @@ Al cambiar nombres o rutas, actualizar referencias Markdown, importaciones, ruta
 
 ## Gestión de cambios
 
-Mantener ramas de trabajo acotadas, historial ordinario y commits descriptivos. No incluir estados privados, credenciales, material ajeno ni copias temporales. Consultar [convenciones de GitHub](../docs/gestion/normalizacion-issues-y-etiquetas-es.md) y [política de seguridad](../SECURITY.md).
+Mantener ramas de trabajo acotadas, historial ordinario y commits descriptivos. No incluir estados privados, credenciales, material ajeno ni copias temporales. Consultar [convenciones de GitHub](../docs/gestion/convenciones-issues-etiquetas.md) y [política de seguridad](../SECURITY.md).

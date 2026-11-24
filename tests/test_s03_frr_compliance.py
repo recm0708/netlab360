@@ -6,7 +6,7 @@ import unittest
 
 ROOT=Path(__file__).resolve().parents[1]
 SPEC=importlib.util.spec_from_file_location(
-    "s03costs",ROOT/"scripts/validacion/s03-frr-compliance.py")
+    "s03costs",ROOT/"scripts/validacion/s03_frr_compliance.py")
 assert SPEC and SPEC.loader
 m=importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(m)

@@ -63,7 +63,7 @@ precheck() {
   host_guard
   command -v nsenter >/dev/null
   command -v ip >/dev/null
-  python3 scripts/validacion/validar-ipam.py inventario/ipam/topologia-b1.yaml
+  python3 scripts/validacion/validar_ipam.py inventario/ipam/topologia-b1.yaml
   sudo docker image inspect "$IMAGE" --format 'FRR={{.Id}} Arch={{.Architecture}}'
   if exists "$HQ" || exists "$S1" || [[ -e "$STATE" ]]; then
     echo "ERROR: recursos previos B2; revisar antes de iniciar, no borrar"; return 3
@@ -75,7 +75,7 @@ precheck() {
     [[ "$IAC_CONF_DIR" == "$HOME/netlab360-bootstrap/iac/s01/rendered" ]] || {
       echo "ERROR: IAC_CONFIG_DIR fuera de directorio externo permitido"; return 3;
     }
-    python3 scripts/validacion/precheck-iac-b2.py || return 3
+    python3 scripts/validacion/precheck_iac_b2.py || return 3
     echo "B2_ORIGEN_CONFIG=IAC_OPENTOFU_ANSIBLE"
   else
     echo "B2_ORIGEN_CONFIG=BASELINE_REPOSITORIO"

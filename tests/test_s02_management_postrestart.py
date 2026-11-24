@@ -12,8 +12,8 @@ import tempfile
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
-WAN = "s02-wan-links.py"
-LAN = "s02-lan-vlan.py"
+WAN = "s02_wan_links.py"
+LAN = "s02_lan_vlan.py"
 MGMT_ADDR = ("2: ens33 inet 192.168.47.40/24 brd 192.168.47.255 "
              "scope global noprefixroute ens33\n")
 DEFAULT = "default via 192.168.47.2 dev ens33 proto static metric 100"
@@ -142,7 +142,7 @@ class LanValidatorManagementTests(unittest.TestCase):
     def setUpClass(cls):
 
         target = (
-            ROOT / "scripts/validacion/validar-lan-s02.py"
+            ROOT / "scripts/validacion/validar_lan_s02.py"
         )
 
         spec = importlib.util.spec_from_file_location(

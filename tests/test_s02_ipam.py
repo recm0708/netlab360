@@ -12,7 +12,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
-FILE = ROOT / "scripts/validacion/validar-ipam-s02.py"
+FILE = ROOT / "scripts/validacion/validar_ipam_s02.py"
 SPEC = importlib.util.spec_from_file_location("netlab360_s02_ipam_validator", FILE)
 assert SPEC and SPEC.loader
 validator = importlib.util.module_from_spec(SPEC)

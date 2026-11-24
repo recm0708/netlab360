@@ -13,6 +13,9 @@ on:
       - 'ansible/**'
       - 'iac/**'
       - 'tests/**'
+      - '**/*.md'
+      - 'CITATION.cff'
+      - 'LICENSE'
       - '.github/workflows/ci-regresion-s01.yml'
   pull_request:
     paths:
@@ -22,6 +25,9 @@ on:
       - 'ansible/**'
       - 'iac/**'
       - 'tests/**'
+      - '**/*.md'
+      - 'CITATION.cff'
+      - 'LICENSE'
       - '.github/workflows/ci-regresion-s01.yml'
 
 permissions:
@@ -47,7 +53,7 @@ jobs:
         run: python -m compileall -q scripts servicios tests
 
       - name: Validar IPAM declarativo
-        run: python scripts/validacion/validar-ipam.py inventario/ipam/topologia-b1.yaml
+        run: python scripts/validacion/validar_ipam.py inventario/ipam/topologia-b1.yaml
 
       - name: Ejecutar regresiones offline
         run: python -m unittest discover -s tests -p 'test_*.py' -v

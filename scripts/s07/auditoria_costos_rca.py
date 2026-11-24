@@ -15,7 +15,7 @@ def now():
 
 
 def load_parser():
-    path=Path(__file__).resolve().parents[1]/"validacion/s03-frr-compliance.py"
+    path=Path(__file__).resolve().parents[1]/"validacion/s03_frr_compliance.py"
     spec=importlib.util.spec_from_file_location("s03_cost_parser",path)
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)

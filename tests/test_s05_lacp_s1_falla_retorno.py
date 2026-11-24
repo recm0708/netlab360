@@ -11,7 +11,7 @@ import unittest
 from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
-PATH = ROOT / "scripts/laboratorio/s05-lacp-s1-falla-retorno.py"
+PATH = ROOT / "scripts/laboratorio/s05_lacp_s1_falla_retorno.py"
 spec = importlib.util.spec_from_file_location("s05_lacp_s1_falla", PATH)
 assert spec is not None and spec.loader is not None
 module = importlib.util.module_from_spec(spec)

@@ -11,7 +11,7 @@ import unittest
 from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPT = ROOT / "scripts/laboratorio/s05-sdn-falla-retorno-puerto-a.py"
+SCRIPT = ROOT / "scripts/laboratorio/s05_sdn_falla_retorno_puerto_a.py"
 spec = importlib.util.spec_from_file_location("s05_sdn_fault_a", SCRIPT)
 assert spec and spec.loader
 mod = importlib.util.module_from_spec(spec)

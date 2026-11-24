@@ -10,7 +10,7 @@ from unittest import mock
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
-PATH = ROOT / "scripts/validacion/s05-lacp-integracion-precheck.py"
+PATH = ROOT / "scripts/validacion/s05_lacp_integracion_precheck.py"
 spec = importlib.util.spec_from_file_location("lacp_precheck", PATH)
 assert spec and spec.loader
 module = importlib.util.module_from_spec(spec)

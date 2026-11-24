@@ -38,17 +38,19 @@ S07 cuenta con las ocho issues técnicas cerradas, 49 capturas y regresión de 1
 
 ## Documentación
 
+El [índice completo de documentación técnica](docs/README.md) organiza todos los documentos por su responsabilidad.
+
 | Área | Referencia |
 |---|---|
 | Arquitectura | [Red multisede](docs/arquitectura/arquitectura-multisede-implementada.md) |
-| Infraestructura | [Virtualización](docs/infraestructura/01-inventario-host-y-vmware.md) · [Ubuntu y SSH](docs/infraestructura/02-ubuntu-desktop-instalacion-ssh.md) |
+| Infraestructura | [Virtualización](docs/infraestructura/inventario-host-y-vmware.md) · [Ubuntu y SSH](docs/infraestructura/ubuntu-desktop-y-ssh.md) |
 | Automatización | [Ansible](ansible/s03/README.md) · [OpenTofu](iac/s03/README.md) |
 | Observabilidad | [Prometheus](servicios/observabilidad/README.md) · [NOC](servicios/topologia-s05/README.md) |
-| Disponibilidad y SDN | [HTTP HA](docs/diseno/s05-ha-servicios-multisede.md) · [LACP](docs/diseno/s05-lacp-8023ad-multisede.md) · [SDN](docs/diseno/s05-ovs-faucet-vs-bridge-frr-y-limpieza-segura.md) |
-| Diagnóstico inteligente | [Protocolo V2](docs/diseno/s06-estudio-prospectivo-uniforme-y-cierre-consolidado.md) · [Evaluación](docs/diseno/s06-v2-evaluacion-cronologica-congelada.md) · [Falla HTTP](docs/diseno/s06-fault-http-hq-etiquetado-independiente.md) |
+| Disponibilidad y SDN | [HTTP HA](docs/diseno/s05-ha-servicios-multisede.md) · [LACP](docs/diseno/s05-lacp-8023ad-multisede.md) · [SDN](docs/diseno/s05-dominio-sdn-ovs-faucet.md) |
+| Diagnóstico inteligente | [Protocolo V2](docs/diseno/s06-protocolo-uniforme-v2.md) · [Evaluación](docs/diseno/s06-v2-evaluacion-cronologica-congelada.md) · [Falla HTTP](docs/diseno/s06-fault-http-hq-etiquetado-independiente.md) |
 | AIOps supervisado | [Eventos](docs/diseno/s07-contrato-eventos-e-incidentes.md) · [RCA](docs/diseno/s07-contexto-y-correlacion-rca.md) · [Runbooks](docs/diseno/s07-runbooks-y-recomendaciones.md) |
-| Actuación y API | [Intent Assurance y RFC](docs/diseno/s07-intent-assurance-y-rfc.md) · [Watchdog](docs/diseno/s07-plan-intervencion-y-watchdog.md) · [API](docs/diseno/s07-api-controlada.md) |
-| Validación | [S01–S04](docs/validacion/s01-s04-resultados.md) · [S05](docs/validacion/s05-integracion-y-aceptacion.md) · [S07](docs/diseno/s07-ensayos-servicios.md) |
+| Actuación y API | [Intent Assurance y RFC](docs/diseno/s07-intent-assurance-y-rfc.md) · [Watchdog](docs/diseno/s07-intervencion-ospf-y-watchdog.md) · [API](docs/diseno/s07-api-controlada.md) |
+| Validación | [S01–S04](docs/validacion/s01-s04-resultados.md) · [S05](docs/validacion/s05-integracion-y-aceptacion.md) · [S07](docs/diseno/s07-ensayos-operacionales.md) |
 | Evidencias | [Catálogo general](evidencias/capturas/README.md) |
 | Planificación | [Plan maestro](docs/diseno/s06-s08-plan-maestro-y-criterios.md) · [Consola S08](docs/diseno/s08-consola-interactiva-y-acciones.md) · [Cobertura académica](docs/gestion/cobertura-academica-netlab360.md) |
 
@@ -58,7 +60,7 @@ Desde la raíz del repositorio, con las dependencias del entorno técnico dispon
 
 ```bash
 python3 -m unittest discover -s tests -p 'test_*.py' -v
-python3 scripts/validacion/validar-capturas-unificadas.py
+python3 scripts/validacion/validar_capturas_unificadas.py
 ```
 
 Las regresiones de software no sustituyen las comprobaciones de la infraestructura activa. No ejecutar procedimientos de intervención sin verificar el alcance y disponer de los mecanismos de recuperación correspondientes.

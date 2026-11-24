@@ -18,7 +18,7 @@ ip -4 -o address show dev ens33 | grep -q '192\.168\.47\.40/24' || { echo "IP en
 ip -4 route show default | grep -q 'default via 192\.168\.47\.2 dev ens33' || { echo "Gateway inesperado" >&2; exit 2; }
 
 cd "$HOME/proyectos/netlab360"
-python3 scripts/validacion/validar-ipam.py inventario/ipam/topologia-b1.yaml
+python3 scripts/validacion/validar_ipam.py inventario/ipam/topologia-b1.yaml
 IMAGE="quay.io/frrouting/frr:10.7.1"
 NAME="nl360-frr-smoke-v4"
 sudo -v

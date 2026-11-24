@@ -11,7 +11,7 @@ import unittest
 from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
-HELPER = ROOT / "scripts/operacion/s05-observador-privilegiado.py"
+HELPER = ROOT / "scripts/operacion/s05_observador_privilegiado.py"
 APP = ROOT / "servicios/topologia-s05/app.py"
 
 

@@ -3,7 +3,7 @@ import importlib.util
 from pathlib import Path
 import unittest
 
-P = Path(__file__).resolve().parents[1] / "scripts/observabilidad/s04-sli-slo-observabilidad.py"
+P = Path(__file__).resolve().parents[1] / "scripts/observabilidad/s04_sli_slo_observabilidad.py"
 spec = importlib.util.spec_from_file_location("netlab360_g5_sli", P)
 assert spec and spec.loader
 sli = importlib.util.module_from_spec(spec)

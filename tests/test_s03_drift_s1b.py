@@ -6,7 +6,7 @@ from unittest.mock import patch
 import yaml
 
 ROOT=Path(__file__).resolve().parents[1]
-SOURCE=ROOT/"scripts/laboratorio/s03-drift-s1b.py"
+SOURCE=ROOT/"scripts/laboratorio/s03_drift_s1b.py"
 SPEC=importlib.util.spec_from_file_location("s03drift",SOURCE)
 assert SPEC and SPEC.loader
 m=importlib.util.module_from_spec(SPEC)

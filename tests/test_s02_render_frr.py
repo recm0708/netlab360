@@ -9,7 +9,7 @@ import unittest
 import yaml
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-SCRIPT = ROOT / "scripts/automatizacion/render-frr-s02.py"
+SCRIPT = ROOT / "scripts/automatizacion/render_frr_s02.py"
 SPEC = importlib.util.spec_from_file_location("nl360_render_s02", SCRIPT)
 assert SPEC and SPEC.loader
 mod = importlib.util.module_from_spec(SPEC)

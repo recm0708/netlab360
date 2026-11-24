@@ -7,9 +7,9 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 FILES = (
-    "s02-wan-links.py",
-    "s02-lan-vlan.py",
-    "s02-http-acl-demo.py",
+    "s02_wan_links.py",
+    "s02_lan_vlan.py",
+    "s02_http_acl_demo.py",
 )
 
 
@@ -40,7 +40,7 @@ class TestS02PortablePaths(unittest.TestCase):
                 self.assertEqual(module.IPAM, ROOT / "inventario/ipam/topologia-s02.yaml")
 
     def test_http_loads_lan_module_from_same_repository(self):
-        module = load_script("s02-http-acl-demo.py")
+        module = load_script("s02_http_acl_demo.py")
         self.assertEqual(module.lan.ROOT, ROOT)
         self.assertEqual(module.lan.IPAM, ROOT / "inventario/ipam/topologia-s02.yaml")
 

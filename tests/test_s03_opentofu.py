@@ -11,7 +11,7 @@ ROOT=Path(__file__).resolve().parents[1]
 SRC=ROOT/"inventario/ipam/topologia-s02.yaml"
 HCL=ROOT/"iac/s03/main.tf"
 SPEC=importlib.util.spec_from_file_location(
-    "s03_manifest_validator", ROOT/"scripts/validacion/s03-tofu-manifest.py")
+    "s03_manifest_validator", ROOT/"scripts/validacion/s03_tofu_manifest.py")
 assert SPEC and SPEC.loader
 mod=importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(mod)

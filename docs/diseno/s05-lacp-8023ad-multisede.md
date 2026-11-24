@@ -46,7 +46,7 @@ Se conserva el paquete técnico original en `~/netlab360-bootstrap/s05/evidencia
 
 Los análisis deben mantener separadas las ejecuciones P1 y P1B y evitar atribuir a una sesión los resultados de otra.
 
-Procedimientos relacionados: [piloto LACP](../../scripts/laboratorio/s05-lacp-multistream-piloto.sh), [auditoría de procedencia](../../scripts/validacion/s05-auditar-origen-p1.py) y [recuperación de registros](../../scripts/validacion/s05-recuperar-p1-tar-historico.py).
+Procedimientos relacionados: [piloto LACP](../../scripts/laboratorio/s05-lacp-multistream-piloto.sh), [auditoría de procedencia](../../scripts/validacion/s05_auditar_origen_p1.py) y [recuperación de registros](../../scripts/validacion/s05_recuperar_p1_tar_historico.py).
 
 ### Ensayo comparativo de rendimiento P1B
 

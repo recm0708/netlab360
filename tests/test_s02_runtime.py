@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "scripts/automatizacion/preparar-runtime-frr-s02.py"
+SRC = ROOT / "scripts/automatizacion/preparar_runtime_frr_s02.py"
 SPEC = importlib.util.spec_from_file_location("s02runtime", SRC)
 assert SPEC and SPEC.loader
 module = importlib.util.module_from_spec(SPEC)

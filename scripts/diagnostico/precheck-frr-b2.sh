@@ -34,7 +34,7 @@ if ! ip -4 route show default | grep -q 'default via 192\.168\.47\.2 dev ens33';
   exit 2
 fi
 echo "========== VALIDAR IPAM =========="
-python3 scripts/validacion/validar-ipam.py inventario/ipam/topologia-b1.yaml
+python3 scripts/validacion/validar_ipam.py inventario/ipam/topologia-b1.yaml
 echo "========== ESTADO DE GIT =========="
 git status --short --branch
 echo "========== REDES Y PROCESOS DEL LABORATORIO =========="

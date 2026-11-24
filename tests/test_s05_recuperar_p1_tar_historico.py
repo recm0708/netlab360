@@ -9,7 +9,7 @@ import tarfile
 from tempfile import TemporaryDirectory
 import unittest
 
-SRC = Path(__file__).resolve().parents[1] / "scripts/validacion/s05-recuperar-p1-tar-historico.py"
+SRC = Path(__file__).resolve().parents[1] / "scripts/validacion/s05_recuperar_p1_tar_historico.py"
 spec = importlib.util.spec_from_file_location("s05_p1_recover", SRC)
 m = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(m)

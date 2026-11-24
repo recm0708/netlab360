@@ -32,4 +32,4 @@ La solución aporta tolerancia a fallas **lógicas** de rutas, enlaces y servici
 
 ## Documentación relacionada
 
-[Diseño HTTP](../diseno/s05-ha-servicios-multisede.md) · [Agregación LACP](../diseno/s05-lacp-8023ad-multisede.md) · [Segmentación SDN](../diseno/s05-ovs-faucet-vs-bridge-frr-y-limpieza-segura.md).
+[Diseño HTTP](../diseno/s05-ha-servicios-multisede.md) · [Agregación LACP](../diseno/s05-lacp-8023ad-multisede.md) · [Segmentación SDN](../diseno/s05-dominio-sdn-ovs-faucet.md).

@@ -14,7 +14,7 @@ set -Eeuo pipefail
 OLD_SHA=8c4480989b675f50b3b561b8a1fb0887c48f1352fba06ee611317808b3b04bad
 NEW_SHA=ba2a87081cf8537dcd388bb86a8e2437679aea4a079411094948695b252ef54f
 BIN=/usr/local/libexec/netlab360-observer
-SRC="$PWD/scripts/operacion/s05-observador-privilegiado.py"
+SRC="$PWD/scripts/operacion/s05_observador_privilegiado.py"
 BACKUP=/var/backups/netlab360/s05-observer-legacy-20261115
 STAGE=/usr/local/libexec/.netlab360-observer-stage-145
 MUTATED=0

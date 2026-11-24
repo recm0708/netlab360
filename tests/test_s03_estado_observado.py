@@ -6,7 +6,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location(
-    "s03obs", ROOT/"scripts/validacion/s03-estado-observado.py"
+    "s03obs", ROOT/"scripts/validacion/s03_estado_observado.py"
 )
 assert SPEC and SPEC.loader
 mod = importlib.util.module_from_spec(SPEC)

@@ -5,7 +5,7 @@ import unittest
 from unittest.mock import patch
 
 
-MODULE_PATH = Path(__file__).resolve().parents[1] / "scripts/observabilidad/s04-incidente-wan.py"
+MODULE_PATH = Path(__file__).resolve().parents[1] / "scripts/observabilidad/s04_incidente_wan.py"
 spec = importlib.util.spec_from_file_location("netlab360_s04_incidente_wan", MODULE_PATH)
 assert spec is not None and spec.loader is not None
 incident = importlib.util.module_from_spec(spec)

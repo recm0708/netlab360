@@ -11,7 +11,7 @@ import unittest
 from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
-PATH = ROOT / "scripts/laboratorio/s05-sdn-recuperar-faucet-logs.py"
+PATH = ROOT / "scripts/laboratorio/s05_sdn_recuperar_faucet_logs.py"
 spec = importlib.util.spec_from_file_location("s05_recover_faucet_logs", PATH)
 assert spec and spec.loader
 module = importlib.util.module_from_spec(spec)

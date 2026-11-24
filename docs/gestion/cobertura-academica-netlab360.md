@@ -66,13 +66,13 @@ Laboratorio 1: intención y diferenciación de drift/falla. Laboratorio 2: recur
 
 ## Estado técnico de referencia
 
-Las fases S01–S06 se encuentran cerradas. La plataforma dispone de enrutamiento multisede, segmentación VLAN, automatización declarativa, observabilidad, LACP, disponibilidad lógica HTTP, SDN y detección experimental de anomalías.
+Las fases S01–S06 se encuentran cerradas; S07 tiene aceptación técnica completa. La plataforma dispone de enrutamiento multisede, segmentación VLAN, automatización declarativa, observabilidad, LACP, disponibilidad lógica HTTP, SDN y detección experimental de anomalías.
 
 El estudio V2 utiliza particiones cronológicas independientes, modelos congelados y un protocolo uniforme de medición ICMP. La falla HTTP fue evaluada como escenario independiente. No se atribuye a los resultados capacidad de pronóstico futuro, generalización automática entre protocolos ni remediación autónoma.
 
 ## Planificación de las fases restantes
 
-S07 desarrollará la operación inteligente supervisada mediante correlación de eventos, diagnóstico, recomendación, aprobación humana, ejecución autorizada, comprobación y rollback.
+S07 validó la operación inteligente supervisada mediante correlación, diagnóstico, recomendación, aprobación, ejecución, comprobación y rollback.
 
 S08 consolidará la aplicación interactiva, las pruebas reproducibles, el copiloto generativo RAG (#198), la recuperación operativa y la preparación de la entrega según el alcance aprobado. S07 se controla mediante #7 y #190–#197.
 
@@ -118,7 +118,7 @@ La ampliación de funcionalidades exige pruebas independientes y no modifica ret
 
 [Plan maestro y criterios técnicos](../diseno/s06-s08-plan-maestro-y-criterios.md).
 
-## Reevaluación técnica al final de S07 (24/11/2026)
+## Cobertura acreditada en S07
 
 - I, III y IV: conformidad e intención separadas, drift real de costo OSPF, autorización y políticas protegidas, retorno verificado; no multivendor ni reconciliación GitOps continua demostrados.
 - VIII, IX, X, XII y XIII: 58 observaciones normalizadas por adquisición, correlación temporal/topológica, hipótesis con incertidumbre y runbooks. 15 ventanas seleccionadas de cinco escenarios, 870 registros de ventana no independientes, 11 hipótesis y recomendaciones coincidentes; abstención offline y controles negativos comprobados. Sin estimación poblacional de falsas alarmas, pronóstico o deriva inferencial. SDN puerto aislado verificado por evidencia directa, no detección automática de puerto.
@@ -126,4 +126,4 @@ La ampliación de funcionalidades exige pruebas independientes y no modifica ret
 - XV y XVI: ciclo supervisado integrado por API local Unix, dos aprobaciones, idempotencia persistente, watchdog y postcondiciones reales. Regresión de 1258 pruebas, una omitida, cero fallos. Separación de privilegios, no de personas; disponibilidad continua y arranque frío no acreditados.
 - II, V, VII y XI: persisten las brechas de IaC con recursos reales/backend remoto, streaming gNMI, cloud-native y predicción prospectiva. VI: observabilidad experimental previa; S08 integra visualización y pruebas, sin extender automáticamente SLI/SLO.
 
-S08 sigue siendo la fase comprometida: consola, RAG, pruebas acotadas y recuperación/entrega. No se aprueba S09 en esta revisión; reevaluar después de S08 con alcance y tiempo disponibles. El cierre documental y gráfico de S07 se controla en #197 y #7.
+S08 sigue siendo la fase comprometida: consola, RAG, pruebas acotadas y recuperación/entrega. No se aprueba S09 en esta revisión; reevaluar después de S08 con alcance y tiempo disponibles. La aceptación técnica y el catálogo S07 están completos; la actualización del informe se controla en #7.

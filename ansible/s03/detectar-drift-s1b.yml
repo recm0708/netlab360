@@ -10,7 +10,7 @@
   connection: local
   vars:
     ansible_python_interpreter: /usr/bin/python3
-    s03_script: "{{ playbook_dir }}/../../scripts/validacion/s03-frr-compliance.py"
+    s03_script: "{{ playbook_dir }}/../../scripts/validacion/s03_frr_compliance.py"
   tasks:
     - name: Revisar alcance del experimento
       ansible.builtin.assert:

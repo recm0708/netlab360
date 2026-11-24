@@ -11,7 +11,7 @@ import unittest
 from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPT = ROOT / "scripts/laboratorio/s05-lacp-hq-integracion.py"
+SCRIPT = ROOT / "scripts/laboratorio/s05_lacp_hq_integracion.py"
 spec = importlib.util.spec_from_file_location("s05_lacp_hq", SCRIPT)
 assert spec and spec.loader
 lab = importlib.util.module_from_spec(spec)

@@ -7,15 +7,15 @@ on:
   pull_request:
     paths:
       - 'evidencias/capturas/**'
-      - 'scripts/validacion/validar-capturas-unificadas.py'
-      - 'tests/test_capturas_por_fase.py'
+      - 'scripts/validacion/validar_capturas_unificadas.py'
+      - 'tests/test_transversal_capturas.py'
       - '.github/workflows/ci-evidencias.yml'
   push:
     branches: [main]
     paths:
       - 'evidencias/capturas/**'
-      - 'scripts/validacion/validar-capturas-unificadas.py'
-      - 'tests/test_capturas_por_fase.py'
+      - 'scripts/validacion/validar_capturas_unificadas.py'
+      - 'tests/test_transversal_capturas.py'
       - '.github/workflows/ci-evidencias.yml'
 
 permissions:
@@ -33,6 +33,6 @@ jobs:
         with:
           python-version: '3.12'
       - name: Revisar organización y formato de PNG
-        run: python scripts/validacion/validar-capturas-unificadas.py
+        run: python scripts/validacion/validar_capturas_unificadas.py
       - name: Ejecutar pruebas del catálogo
-        run: python -m unittest discover -s tests -p 'test_capturas_por_fase.py' -v
+        run: python -m unittest discover -s tests -p 'test_transversal_capturas.py' -v

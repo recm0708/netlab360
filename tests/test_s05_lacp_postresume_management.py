@@ -19,7 +19,7 @@ EXTRAS = (
 
 
 def load(site: str):
-    path = ROOT / f"scripts/laboratorio/s05-lacp-{site}-integracion.py"
+    path = ROOT / f"scripts/laboratorio/s05_lacp_{site}_integracion.py"
     spec = importlib.util.spec_from_file_location(f"s05_management_{site}", path)
     assert spec and spec.loader
     module = importlib.util.module_from_spec(spec)

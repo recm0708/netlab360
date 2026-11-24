@@ -111,8 +111,8 @@ def guard(op,rid=None,*,directory=None):
 
 def wan_case(directory):
     base=preflight()
-    s02=load_s05("s02-failover-wan.py")
-    ha=load_s05("s05-ha-http-failover.py")
+    s02=load_s05("s02_failover_wan.py")
+    ha=load_s05("s05_ha_http_failover.py")
     pids=s02.validate_ownership()
     def probes():
         if s02.validate_ownership()!=pids: raise RuntimeError("WAN_SESSION_CHANGED")
@@ -146,7 +146,7 @@ def wan_case(directory):
     return results
 
 def sdn_case(directory):
-    fault=load_s05("s05-sdn-falla-retorno-puerto-a.py")
+    fault=load_s05("s05_sdn_falla_retorno_puerto_a.py")
     fault.precheck()
     base=preflight()
     fault.icmp.measure("a","198.18.41.12",allowed=True)
