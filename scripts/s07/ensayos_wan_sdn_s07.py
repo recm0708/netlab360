@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import signal
+import subprocess
 import sys
 import time
 from ensayos_servicios_s07 import (collect,diagnose,recommend,now,utc,cmd,active,
@@ -88,11 +89,24 @@ def capture(directory,case,stage,after=None,timeout=45,extra=None):
         if time.monotonic()>=end: raise RuntimeError(case+"_"+stage+"_NOT_VERIFIED")
         time.sleep(1)
 
-def guard(op,rid=None):
+def guard(op,rid=None,*,directory=None):
     args=["sudo","-n","/usr/bin/python3","-I",GUARD,op]
     if rid: args.append(rid)
-    d=json.loads(cmd(*args,timeout=45))
-    if not d["ok"]: raise RuntimeError("WAN_GUARD_DENIED")
+    result=subprocess.run(args,text=True,capture_output=True,timeout=45)
+    try:
+        d=json.loads(result.stdout)
+    except (ValueError,TypeError):
+        d=None
+    if result.returncode or not isinstance(d,dict) or d.get("ok") is not True:
+        report={"operation":op,"rfc_id":rid,"returncode":result.returncode,
+                "response":d,"stdout":result.stdout[-8192:],
+                "stderr":result.stderr[-8192:],"observed_at_utc":now()}
+        if directory is not None:
+            from uuid import uuid4
+            save(directory,"wan-guard-error-"+op+"-"+uuid4().hex,report)
+        print("WAN_GUARD_ERROR="+json.dumps(report,ensure_ascii=False),file=sys.stderr,flush=True)
+        reason=d.get("reason","UNKNOWN") if isinstance(d,dict) else "INVALID_RESPONSE"
+        raise RuntimeError("WAN_GUARD_DENIED: "+str(reason))
     return d
 
 def wan_case(directory):
@@ -106,7 +120,7 @@ def wan_case(directory):
         ha.expected("BACKEND_HQ","PRINCIPAL")
         return {"hq_loopback_icmp":"2/2 destinos, 2 paquetes por destino","http_from_s2":"BACKEND_HQ"}
     results={"baseline":capture(directory,"WAN","BASELINE",extra=probes())}
-    d=guard("start")
+    d=guard("start",directory=directory)
     rid=d["id"]
     try:
         save(directory,"wan-guard-start",d)
@@ -120,12 +134,12 @@ def wan_case(directory):
         if "UP" in json.loads(current)[0]["flags"]: raise RuntimeError("WAN_STIMULUS_NO_LONGER_ACTIVE")
         results["fault_observed_s"]=round(time.monotonic()-started,6)
     finally:
-        restored=guard("restore",rid)
+        restored=guard("restore",rid,directory=directory)
         save(directory,"wan-guard-restore",restored)
     results["recovery"]=capture(directory,"WAN","RECOVERY",restored["up_verified_at_utc"],timeout=100)
     save(directory,"wan-recovery-probes",probes())
     if preflight()!=base: raise RuntimeError("WAN_BASELINE_CHANGED")
-    final=guard("finish",rid)
+    final=guard("finish",rid,directory=directory)
     save(directory,"wan-guard-final",final)
     results.update(restored=True,scope="HQ_S1_PRIMARY_ONLY",watchdog=final["unit"])
     save(directory,"wan-summary",results)

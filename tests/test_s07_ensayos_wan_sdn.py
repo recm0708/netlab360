@@ -1,11 +1,15 @@
 """Aceptación de SDN: alcance del controlador, sin inferir puerto."""
 import sys
+import json
+import tempfile
+import subprocess
 from pathlib import Path
 import unittest
 from unittest import mock
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts/s07"))
 from ensayos_wan_sdn_s07 import assess,BACKUP
 import wan_trial_guard as guard
+import ensayos_wan_sdn_s07 as supervisor
 
 class ScopeTests(unittest.TestCase):
     def fixture(self):
@@ -101,5 +105,25 @@ class GuardTests(unittest.TestCase):
         with mock.patch.object(guard,"identity",return_value=(expected,False)),mock.patch.object(guard,"run"):
             with self.assertRaisesRegex(ValueError,"LINK_POSTCONDITION_FAILED"):
                 guard.set_link(None,{},expected,True)
+
+class GuardResponseTests(unittest.TestCase):
+    def test_denial_preserves_json(self):
+        with tempfile.TemporaryDirectory() as td:
+            p=Path(td)
+            result=subprocess.CompletedProcess([],3,'{"ok":false,"reason":"PIN_MISMATCH"}','')
+            with mock.patch.object(supervisor.subprocess,"run",return_value=result),mock.patch("sys.stderr"):
+                with self.assertRaisesRegex(RuntimeError,"PIN_MISMATCH"):
+                    supervisor.guard("start",directory=p)
+            files=list(p.glob("wan-guard-error-start-*.json"))
+            self.assertEqual(len(files),1)
+            self.assertEqual(json.loads(files[0].read_text())["response"]["reason"],"PIN_MISMATCH")
+    def test_non_json_failure(self):
+        result=subprocess.CompletedProcess([],1,"","sudo denied")
+        with mock.patch.object(supervisor.subprocess,"run",return_value=result),mock.patch("sys.stderr"):
+            with self.assertRaisesRegex(RuntimeError,"INVALID_RESPONSE"): supervisor.guard("start")
+    def test_success(self):
+        result=subprocess.CompletedProcess([],0,'{"ok":true,"id":"test"}',"")
+        with mock.patch.object(supervisor.subprocess,"run",return_value=result):
+            self.assertEqual(supervisor.guard("start")["id"],"test")
 
 if __name__=="__main__": unittest.main()
