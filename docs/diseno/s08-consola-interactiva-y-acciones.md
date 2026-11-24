@@ -35,6 +35,52 @@ Una sola aplicación local, con barra lateral, encabezado de estado general y pa
 - **Exposición:** por defecto solo `127.0.0.1:9140` en la VM. Demo desde Windows: túnel SSH `ssh -L 9140:127.0.0.1:9140 rc-aa-ec@192.168.47.40`; navegador Windows `http://127.0.0.1:9140`. Acceso externo solo tras revisar controles de autenticación, CSRF y autorizaciones.
 - **Protocolo UI:** peticiones REST + actualización ligera por polling/SSE; límites de frecuencia y tiempo. Evitar WebSockets por defecto si no se justifican.
 
+### Compatibilidad y dependencias
+
+Conservamos el entorno científico utilizado durante las fases
+06 y 07 como referencia de compatibilidad para la fase 08.
+La comprobación previa se realizó con Python
+3.14.4 sobre Ubuntu 26.04.1 LTS,
+sin instalar ni actualizar paquetes.
+
+| Biblioteca | Versión comprobada |
+|---|---|
+| NumPy | 2.5.5 |
+| Pandas | 3.1.1 |
+| SciPy | 1.18.1 |
+| scikit-learn | 1.9.1 |
+| Joblib | 1.6.0 |
+| FastAPI | 0.165.0 |
+| Uvicorn | 0.54.0 |
+| Pydantic | 2.14.4 |
+| Plotly | 7.1.0 |
+| Dash | 4.5.1 |
+| HTTPX | 0.28.1 |
+| Prometheus Client | 0.26.0 |
+
+Registramos las versiones de las distribuciones instaladas en
+el [inventario de dependencias científicas](../../requirements-cientifico.txt).
+Este archivo incluye dependencias directas y transitivas, pero
+no constituye un lockfile con hashes de distribución ni acredita
+una reconstrucción limpia del entorno.
+
+Comprobamos la consistencia mediante `pip check`, las
+importaciones principales y la suite de inferencia de la fase 06
+utilizando su intérprete científico. La prueba de rutas FastAPI
+omitida en la regresión general se ejecutó satisfactoriamente
+en este entorno.
+
+Para reproducir el entorno utilizaremos inicialmente un entorno
+virtual separado, verificando la versión de Python, disponibilidad
+de distribuciones, procedencia y compatibilidad de las bibliotecas.
+No actualizaremos el entorno histórico ni volveremos a entrenar
+los modelos para satisfacer dependencias de la interfaz.
+
+Las dependencias adicionales de la consola se incorporarán
+durante su implementación, con versiones verificadas y pruebas
+propias. La validación de reconstrucción completa permanece
+pendiente.
+
 ## 3. Organización del código y de los comandos
 
 ```text
