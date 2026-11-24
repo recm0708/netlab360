@@ -12,6 +12,7 @@ import sys
 REPO = "recm0708/netlab360"
 TITLE = re.compile(r"^\[(S0[1-8]|GESTIÓN)\] .{12,}$")
 TOPIC = re.compile(r"^tipo:.+$")
+PHASE_LABEL = re.compile(r"^fase:0[1-8]$")
 
 
 def audit(prs):
@@ -20,6 +21,8 @@ def audit(prs):
         raise ValueError("Inventario de PR ausente")
     seen = set()
     defects = []
+    without_milestone = []
+    review_milestone = []
     for pr in prs:
         number = pr["number"]
         if number in seen:
@@ -29,12 +32,23 @@ def audit(prs):
         labels = {x["name"] for x in pr.get("labels", [])}
         milestone = pr.get("milestone") or {}
         phase = milestone.get("title", "")
-        if not TITLE.fullmatch(pr.get("title", "")):
+        title = TITLE.fullmatch(pr.get("title", ""))
+        phase_labels = {label for label in labels if PHASE_LABEL.fullmatch(label)}
+        if not title:
             reasons.append("TITULO")
-        if not re.fullmatch(r"S0[1-8]", phase):
-            reasons.append("MILESTONE")
-        elif "fase:" + phase[1:] not in labels:
-            reasons.append("ETIQUETA_FASE")
+        elif title.group(1) != "GESTIÓN" and "fase:" + title.group(1)[1:] not in phase_labels:
+            reasons.append("ETIQUETA_FASE_TITULO")
+        if any(label.startswith("fase:") and label not in phase_labels for label in labels):
+            reasons.append("ETIQUETA_FASE_INVALIDA")
+        # El hito es condicional; su pertinencia semántica requiere revisión humana.
+        if not milestone:
+            without_milestone.append(number)
+        elif not re.fullmatch(r"S0[1-8]", phase):
+            reasons.append("MILESTONE_INVALIDO")
+        elif "fase:" + phase[1:] not in phase_labels:
+            reasons.append("ETIQUETA_FASE_MILESTONE")
+        elif len(phase_labels) > 1 or (title and title.group(1) == "GESTIÓN"):
+            review_milestone.append(number)
         if not any(TOPIC.fullmatch(label) for label in labels):
             reasons.append("ETIQUETA_TEMATICA")
         if not any(x.get("login") for x in pr.get("assignees", [])):
@@ -42,7 +56,8 @@ def audit(prs):
         if reasons:
             defects.append({"number": number, "reasons": reasons})
     return {"total": len(prs), "states": dict(Counter(p.get("state") for p in prs)),
-            "defects": defects}
+            "defects": defects, "without_milestone": without_milestone,
+            "review_milestone": review_milestone}
 
 
 def fetch():
@@ -65,6 +80,10 @@ def main():
     report = audit(fetch())
     print("PRS_TOTALES=" + str(report["total"]))
     print("PRS_SIN_METADATOS=" + str(len(report["defects"])))
+    print("PRS_SIN_MILESTONE=" + str(len(report["without_milestone"])))
+    print("PRS_MILESTONE_REVISION_SEMANTICA=" + str(len(report["review_milestone"])))
+    for number in report["review_milestone"]:
+        print(f"PR_{number}=REVISAR_PERTINENCIA_MILESTONE")
     for defect in report["defects"]:
         print(f"PR_{defect['number']}=" + ",".join(defect["reasons"]))
     print("METADATOS_PR=" + ("OK" if not report["defects"] else "REVISAR"))

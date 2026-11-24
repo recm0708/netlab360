@@ -6,8 +6,8 @@ Describimos el componente modificado, el propósito y su relación con NETLAB360
 
 ## Metadatos
 
-- [ ] Etiqueta de fase y etiqueta temática asignadas.
-- [ ] Milestone correspondiente al alcance de aceptación asignada.
+- [ ] Etiqueta temática y etiquetas de fase pertinentes asignadas.
+- [ ] Milestone asignado si existe un hito de aceptación inequívoco; en caso contrario, campo vacío y alcance descrito.
 - [ ] Responsable asignado en Assignees.
 
 ## Verificaciones
