@@ -84,6 +84,35 @@ def register(app: FastAPI, directory) -> None:
     async def me(request: Request) -> Identity:
         return await identity(request)
 
+    @app.post("/api/v1/auth/resume", response_model=LoginResult)
+    async def resume(request: Request) -> LoginResult:
+        # La cookie HttpOnly y el origen exacto permiten recuperar CSRF sin
+        # guardar secretos en el navegador ni aceptar solicitudes simples.
+        require_origin(request)
+        if request.headers.get("x-netlab360-resume") != "1":
+            raise HTTPException(403)
+        result = await run_in_threadpool(sessions.resume,directory,request.cookies.get(COOKIE))
+        if result is None:
+            raise HTTPException(401)
+        return LoginResult(**result)
+
+    async def activity(request: Request, *, confirmed: bool) -> LoginResult:
+        require_origin(request)
+        await identity(request)
+        result = await run_in_threadpool(sessions.touch,directory,request.cookies.get(COOKIE),
+                                         request.headers.get("x-csrf-token"),confirmed=confirmed)
+        if result is None:
+            raise HTTPException(403)
+        return LoginResult(**result)
+
+    @app.post("/api/v1/auth/activity", response_model=LoginResult)
+    async def record_activity(request: Request) -> LoginResult:
+        return await activity(request, confirmed=False)
+
+    @app.post("/api/v1/auth/continue", response_model=LoginResult)
+    async def continue_session(request: Request) -> LoginResult:
+        return await activity(request, confirmed=True)
+
     @app.get("/api/v1/auth/operator-check", response_model=Identity)
     async def operator_check(request: Request) -> Identity:
         user = await identity(request)

@@ -91,7 +91,7 @@ async function update() {
 refresh.addEventListener("click", update);
 update();
 
-/* La autoridad reside en FastAPI, no en el estado visual del navegador. */
+/* La sesión se recupera con cookie HttpOnly; la autoridad reside en el servidor. */
 const form = document.getElementById("login-form");
 const loginFields = document.getElementById("login-fields");
 const username = document.getElementById("username");
@@ -101,19 +101,38 @@ const logout = document.getElementById("logout");
 const authNotice = document.getElementById("auth-notice");
 const accessState = document.getElementById("access-state");
 const identityLabel = document.getElementById("identity-label");
+const idleDialog = document.getElementById("idle-dialog");
+const idleContinue = document.getElementById("idle-continue");
+const idleLogout = document.getElementById("idle-logout");
+const idleNotice = document.getElementById("idle-notice");
+const idleCountdown = document.getElementById("idle-countdown");
+const idleDescription = document.getElementById("idle-description");
 
 let session = null;
 let busy = false;
-let expiryTimer = null;
+let activityTimer = null;
+let lastActivitySent = -Infinity;
+
+// Los plazos proceden del servidor. El reloj monotónico evita que un
+// cambio del reloj local prolongue la presentación de una sesión vencida.
+function serverNow() {
+  return session.serverNow + (performance.now() - session.receivedAt) / 1000;
+}
 
 function controls() {
   loginFields.disabled = busy || session !== null;
   logout.disabled = busy || session === null;
+  idleLogout.disabled = busy || session === null;
+  idleContinue.disabled = busy || session === null ||
+    session.expiresAt >= session.absoluteExpiresAt;
 }
 
 function clearIdentity(message) {
-  clearTimeout(expiryTimer);
+  clearTimeout(activityTimer);
+  activityTimer = null;
+  lastActivitySent = -Infinity;
   session = null;
+  if (idleDialog.open) idleDialog.close();
   form.hidden = false;
   sessionPanel.hidden = true;
   password.value = "";
@@ -135,7 +154,6 @@ function validIdentity(data) {
 }
 
 async function authRequest(path, options = {}) {
-  // Rutas constantes del mismo origen. La cookie HttpOnly la gestiona el navegador.
   return fetch(path, {
     credentials: "same-origin", cache: "no-store", redirect: "error",
     signal: AbortSignal.timeout(10000), ...options
@@ -143,14 +161,22 @@ async function authRequest(path, options = {}) {
 }
 
 function showIdentity(data) {
-  const remaining = data.expires_at * 1000 - Date.now();
   if (!validIdentity(data) || typeof data.csrf_token !== "string" ||
       !/^[A-Za-z0-9_-]{43}$/.test(data.csrf_token) ||
-      !Number.isSafeInteger(data.expires_at) || remaining <= 0) {
+      ![data.warning_at, data.expires_at, data.absolute_expires_at, data.server_now]
+        .every(Number.isSafeInteger) ||
+      data.server_now >= data.expires_at || data.warning_at > data.expires_at ||
+      data.expires_at > data.absolute_expires_at ||
+      data.expires_at - data.warning_at > 60 ||
+      data.expires_at - data.server_now > 360) {
     throw new Error("INVALID_IDENTITY");
   }
-  session = {username: data.username, role: data.role, csrf: data.csrf_token,
-             expiresAt: data.expires_at};
+  session = {
+    username: data.username, role: data.role, csrf: data.csrf_token,
+    expiresAt: data.expires_at, warningAt: data.warning_at,
+    absoluteExpiresAt: data.absolute_expires_at,
+    serverNow: data.server_now, receivedAt: performance.now()
+  };
   document.getElementById("session-user").textContent = session.username;
   document.getElementById("session-role").textContent = session.role;
   document.getElementById("session-expiry").textContent =
@@ -160,9 +186,107 @@ function showIdentity(data) {
   accessState.dataset.state = "ok";
   form.hidden = true;
   sessionPanel.hidden = false;
-  authNotice.textContent = "Sesión iniciada. Acciones de red deshabilitadas.";
-  expiryTimer = setTimeout(() => clearIdentity("Sesión expirada. Inicie sesión nuevamente."),
-    Math.min(remaining, 1800000));
+  authNotice.textContent = "Sesión vigente. Acciones de red deshabilitadas.";
+  controls();
+  tick();
+}
+
+async function recover() {
+  if (busy) return;
+  busy = true;
+  controls();
+  try {
+    const response = await authRequest("/api/v1/auth/resume", {
+      method: "POST", headers: {"X-Netlab360-Resume": "1"}
+    });
+    if (response.status === 401) {
+      clearIdentity("Inicie sesión para continuar.");
+    } else if (response.ok) {
+      showIdentity(await response.json());
+    } else {
+      throw new Error("SESSION_NOT_CONFIRMED");
+    }
+  } catch {
+    clearIdentity("No se pudo comprobar la sesión. Actualice la página o vuelva a autenticarse.");
+  } finally {
+    busy = false;
+    controls();
+  }
+}
+
+function tick() {
+  if (!session) return;
+  const remaining = Math.ceil(session.expiresAt - serverNow());
+  if (remaining <= 0) {
+    // Otra pestaña puede haber renovado la misma sesión. Consultamos una vez
+    // sin extender el plazo; una respuesta no válida retira la identidad.
+    if (!busy) recover();
+    idleCountdown.textContent = "00:00";
+    return;
+  }
+  if (serverNow() >= session.warningAt) {
+    clearTimeout(activityTimer);
+    activityTimer = null;
+    idleCountdown.textContent =
+      String(Math.floor(remaining / 60)).padStart(2, "0") + ":" +
+      String(remaining % 60).padStart(2, "0");
+    idleDescription.textContent = session.expiresAt >= session.absoluteExpiresAt
+      ? "Se alcanzará el límite máximo de la sesión. Vuelva a autenticarse al finalizar."
+      : "Detectamos inactividad. Confirme que desea continuar antes de que venza la sesión.";
+    if (!idleDialog.open) {
+      idleNotice.textContent = "";
+      idleDialog.showModal();
+    }
+  } else if (idleDialog.open) {
+    idleDialog.close();
+  }
+  controls();
+}
+
+async function renew(confirmed) {
+  if (busy || session === null) return;
+  if (!confirmed && serverNow() >= session.warningAt) return;
+  busy = true;
+  lastActivitySent = performance.now();
+  controls();
+  try {
+    const response = await authRequest(
+      confirmed ? "/api/v1/auth/continue" : "/api/v1/auth/activity", {
+        method: "POST", headers: {"X-CSRF-Token": session.csrf}
+      });
+    if (response.status === 401 || response.status === 403) {
+      busy = false;
+      await recover();
+    } else if (response.ok) {
+      showIdentity(await response.json());
+    } else {
+      throw new Error("ACTIVITY_NOT_CONFIRMED");
+    }
+  } catch {
+    authNotice.textContent = "No se confirmó la renovación. El plazo anterior sigue vigente.";
+    idleNotice.textContent = "No se confirmó la renovación. Reintente.";
+  } finally {
+    busy = false;
+    controls();
+    tick();
+  }
+}
+
+function recordActivity(event) {
+  // No renovamos por carga, foco, sondeos, movimientos accidentales ni
+  // eventos sintéticos. Limitamos a una solicitud cada quince segundos.
+  if (!event.isTrusted || !session || busy || serverNow() >= session.warningAt ||
+      idleDialog.open) return;
+  clearTimeout(activityTimer);
+  const delay = Math.max(0, 15000 - (performance.now() - lastActivitySent));
+  activityTimer = setTimeout(() => {
+    activityTimer = null;
+    renew(false);
+  }, delay);
+}
+
+for (const event of ["pointerdown", "keydown", "wheel", "touchstart"]) {
+  document.addEventListener(event, recordActivity, {passive: true});
 }
 
 form.addEventListener("submit", async (event) => {
@@ -186,7 +310,6 @@ form.addEventListener("submit", async (event) => {
       throw new Error("LOGIN_FAILED");
     } else {
       showIdentity(await response.json());
-      logout.focus();
     }
   } catch {
     clearIdentity("No se pudo confirmar el inicio de sesión. Vuelva a intentarlo.");
@@ -194,11 +317,11 @@ form.addEventListener("submit", async (event) => {
     password.value = "";
     busy = false;
     controls();
-    if (session !== null) logout.focus();
+    if (session !== null && !idleDialog.open) logout.focus();
   }
 });
 
-logout.addEventListener("click", async () => {
+async function closeSession() {
   if (busy || session === null) return;
   busy = true;
   controls();
@@ -214,43 +337,23 @@ logout.addEventListener("click", async () => {
       throw new Error("LOGOUT_NOT_CONFIRMED");
     }
   } catch {
-    authNotice.textContent = "No se confirmó el cierre remoto. Reintente; la sesión tiene expiración absoluta.";
+    authNotice.textContent = "No se confirmó el cierre remoto. Reintente.";
+    idleNotice.textContent = "No se confirmó el cierre remoto. Reintente.";
   } finally {
     busy = false;
     controls();
     if (session === null) username.focus();
   }
+}
+
+logout.addEventListener("click", closeSession);
+idleLogout.addEventListener("click", closeSession);
+idleContinue.addEventListener("click", () => renew(true));
+idleDialog.addEventListener("cancel", event => event.preventDefault());
+window.addEventListener("focus", () => { if (session) recover(); });
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden && session) recover();
 });
 
-// Una sesión reemplazada o deshabilitada se detecta al regresar a la ventana.
-window.addEventListener("focus", async () => {
-  if (busy || session === null) return;
-  busy = true;
-  controls();
-  try {
-    const response = await authRequest("/api/v1/auth/me");
-    if (response.status === 401) {
-      clearIdentity("Sesión no vigente. Inicie sesión nuevamente.");
-    } else {
-      if (!response.ok) throw new Error("IDENTITY_UNAVAILABLE");
-      const data = await response.json();
-      if (!validIdentity(data) || !session ||
-          data.username !== session.username || data.role !== session.role) {
-        clearIdentity("Identidad no confirmada. Inicie sesión nuevamente.");
-      } else {
-        accessState.textContent = "Autenticado";
-        accessState.dataset.state = "ok";
-        authNotice.textContent = "Sesión verificada. Acciones de red deshabilitadas.";
-      }
-    }
-  } catch {
-    authNotice.textContent = "No se pudo verificar la sesión. No se muestran datos privados.";
-    accessState.textContent = "UNKNOWN";
-    accessState.dataset.state = "unknown";
-  } finally {
-    busy = false;
-    controls();
-  }
-});
-
-clearIdentity("Inicie sesión. Al recargar, deberá autenticarse nuevamente.");
+setInterval(tick, 1000);
+recover();

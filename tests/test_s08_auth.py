@@ -72,7 +72,7 @@ class AuthTests(unittest.TestCase):
         self.assertEqual(result.status_code,200)
         self.assertNotIn("token",result.json())
         header = result.headers["set-cookie"].lower()
-        for field in ("httponly","samesite=strict","max-age=1800","path=/"):
+        for field in ("httponly","samesite=strict","max-age=28800","path=/"):
             self.assertIn(field,header)
         self.assertEqual(self.client.get(ME).json()["role"],"VIEWER")
 
@@ -124,8 +124,59 @@ class AuthTests(unittest.TestCase):
     def test_expiration_and_future(self):
         issued = sessions.issue(self.directory,"viewer",now=100)
         self.assertIsNone(sessions.resolve(self.directory,issued["token"],now=99))
-        self.assertIsNotNone(sessions.resolve(self.directory,issued["token"],now=1899))
-        self.assertIsNone(sessions.resolve(self.directory,issued["token"],now=1900))
+        self.assertIsNotNone(sessions.resolve(self.directory,issued["token"],now=459))
+        self.assertIsNone(sessions.resolve(self.directory,issued["token"],now=460))
+
+    def test_resume_does_not_extend_or_rotate(self):
+        a = self.login().json()
+        for headers in ({"Origin": ORIGIN}, {"Origin": "https://evil.invalid",
+                         "X-Netlab360-Resume": "1"}, {"X-Netlab360-Resume": "1"}):
+            self.assertEqual(self.client.post("/api/v1/auth/resume",headers=headers).status_code,403)
+        r = self.client.post("/api/v1/auth/resume",headers={"Origin":ORIGIN,"X-Netlab360-Resume":"1"})
+        self.assertEqual(r.status_code,200)
+        b = r.json()
+        for key in ("csrf_token","warning_at","expires_at","absolute_expires_at","username","role"):
+            self.assertEqual(a[key],b[key])
+        self.assertNotIn("token",b)
+        self.assertEqual(b["expires_at"]-b["warning_at"],60)
+
+    def test_idle_warning_and_confirmation(self):
+        a = sessions.issue(self.directory,"viewer",now=100)
+        token, csrf = a["token"], a["csrf_token"]
+        self.assertEqual((a["warning_at"],a["expires_at"]),(400,460))
+        self.assertEqual(sessions.resume(self.directory,token,now=399)["expires_at"],460)
+        self.assertEqual(sessions.touch(self.directory,token,csrf,now=400)["expires_at"],460)
+        b = sessions.touch(self.directory,token,csrf,confirmed=True,now=459)
+        self.assertEqual((b["warning_at"],b["expires_at"]),(759,819))
+        self.assertIsNone(sessions.resolve(self.directory,token,now=819))
+        self.assertIsNone(sessions.touch(self.directory,token,csrf,confirmed=True,now=819))
+
+    def test_activity_and_absolute_limit(self):
+        a = sessions.issue(self.directory,"viewer",now=100)
+        token, csrf = a["token"],a["csrf_token"]
+        for now in range(350,28900,250):
+            b = sessions.touch(self.directory,token,csrf,confirmed=True,now=now)
+            self.assertIsNotNone(b)
+            self.assertLessEqual(b["expires_at"],28900)
+        self.assertEqual(b["expires_at"],28900)
+        self.assertIsNone(sessions.resolve(self.directory,token,now=28900))
+
+    def test_http_activity_requires_origin_and_csrf(self):
+        a = self.login().json()
+        for path in ("/api/v1/auth/activity","/api/v1/auth/continue"):
+            self.assertEqual(self.client.post(path,headers={"Origin":ORIGIN}).status_code,403)
+            self.assertEqual(self.client.post(path,headers={"X-CSRF-Token":a["csrf_token"]}).status_code,403)
+            r = self.client.post(path,headers={"Origin":ORIGIN,"X-CSRF-Token":a["csrf_token"]})
+            self.assertEqual(r.status_code,200)
+            self.assertEqual(r.json()["absolute_expires_at"],a["absolute_expires_at"])
+
+    def test_legacy_session_rejected(self):
+        a = sessions.issue(self.directory,"viewer")
+        with closing(sqlite3.connect(self.path)) as db:
+            db.execute("UPDATE sessions SET csrf_digest=?",(b"x"*32,))
+            db.commit()
+        self.assertIsNone(sessions.resolve(self.directory,a["token"]))
+        self.assertIsNone(sessions.resume(self.directory,a["token"]))
 
     def test_session_replacement_and_digest_only(self):
         a = sessions.issue(self.directory,"viewer")

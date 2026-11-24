@@ -82,3 +82,10 @@ footer { color: var(--muted); padding: 16px 28px; border-top: 1px solid var(--li
 }
 #session-panel dl { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); max-width: 640px; }
 #session-panel dd { text-align: left; }
+
+/* Advertencia accesible de inactividad, sin cerrar al pulsar Escape. */
+#idle-dialog { width: min(480px, calc(100% - 32px)); border: 1px solid var(--line); border-radius: 12px; padding: 24px; color: var(--text); background: var(--surface); }
+#idle-dialog::backdrop { background: rgba(0, 0, 0, .65); }
+#idle-countdown { font-size: 2.4rem; font-variant-numeric: tabular-nums; }
+.dialog-actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: flex-end; margin-top: 20px; }
+button.secondary { background: transparent; color: var(--text); border: 1px solid var(--line); }

@@ -68,11 +68,11 @@
           </form>
           <div id="session-panel" hidden>
             <dl><dt>Usuario</dt><dd id="session-user"></dd><dt>Rol</dt><dd id="session-role"></dd><dt>Fecha y hora</dt><dd id="session-expiry" aria-describedby="session-expiry-note"></dd></dl>
-            <p id="session-expiry-note" class="muted">Vencimiento de la sesión.</p>
+            <p id="session-expiry-note" class="muted">Vencimiento de la sesión por inactividad o límite máximo.</p>
             <p class="muted">El rol no autoriza modificaciones de red.</p>
             <button id="logout" type="button" disabled>Cerrar sesión</button>
           </div>
-          <p id="auth-notice" role="status" aria-live="polite">Inicie sesión. Al recargar, deberá autenticarse nuevamente.</p>
+          <p id="auth-notice" role="status" aria-live="polite">Comprobando sesión…</p>
           <noscript>El acceso requiere JavaScript local.</noscript>
         </section>
         <div class="status-grid" aria-label="Estado de arranque">
@@ -92,5 +92,16 @@
       <footer>NETLAB360 · Consola de operaciones · Acciones de red deshabilitadas</footer>
     </div>
   </div>
+  <dialog id="idle-dialog" aria-labelledby="idle-title" aria-describedby="idle-description">
+    <h2 id="idle-title">¿Desea mantener su sesión?</h2>
+    <p id="idle-description">Por seguridad, confirme que desea continuar.</p>
+    <p class="muted">Tiempo restante</p>
+    <p id="idle-countdown" class="metric" data-state="unknown">01:00</p>
+    <p id="idle-notice" role="status" aria-live="polite"></p>
+    <div class="dialog-actions">
+      <button id="idle-logout" type="button" class="secondary">Cerrar sesión</button>
+      <button id="idle-continue" type="button" autofocus>Mantener sesión</button>
+    </div>
+  </dialog>
 </body>
 </html>

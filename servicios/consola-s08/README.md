@@ -74,10 +74,10 @@ En modo autenticado servimos la estructura HTML, CSS y JavaScript
 en la raíz del mismo origen. No publicamos el árbol de archivos,
 no utilizamos CDN ni abrimos rutas privadas sin sesión.
 La pantalla inicial consulta healthz y capabilities sin credenciales.
-El formulario utiliza login, me y logout del mismo origen, sin guardar
-credenciales ni tokens en almacenamiento web. El comprobante CSRF queda
-solo en memoria. Al recargar se exige otro login, que reemplaza la sesión
-previa de la misma cuenta; la recarga no implica revocación remota.
+El formulario utiliza login, resume, activity, continue y logout del mismo
+origen, sin guardar credenciales ni tokens en almacenamiento web.
+Recuperamos identidad y comprobante CSRF en memoria mediante la cookie
+HttpOnly vigente. La recarga no requiere credenciales ni prolonga el plazo.
 La UI indica el rol y la expiración, pero no autoriza acciones. Los estados
 operacionales no consultados permanecen UNKNOWN. La navegación de detalle
 y Plotly se integrarán por separado. La política CSP permite solo scripts, estilos
@@ -96,8 +96,8 @@ Durante el desarrollo, los recursos visuales se leen del disco en cada
 solicitud. Aplicamos cambios HTML, CSS y JavaScript mediante avance rápido
 de Git y recarga del navegador, sin reiniciar Uvicorn. Los cambios Python
 requieren reiniciar únicamente la consola, no los servicios de red.
-Validamos el código antes de actualizar la copia activa; la recarga exige
-volver a autenticar al usuario según la política de sesión vigente.
+Validamos el código antes de actualizar la copia activa; al recargar
+recuperamos la sesión vigente sin extender su plazo.
 
 ## Persistencia local
 
@@ -145,15 +145,27 @@ La aplicación no crea cuentas por HTTP.
 | POST /api/v1/auth/login | Origen local exacto, JSON acotado y credenciales |
 | GET /api/v1/auth/me | Cookie de sesión vigente |
 | GET /api/v1/auth/operator-check | Sesión con rol OPERATOR |
+| POST /api/v1/auth/resume | Cookie vigente, origen exacto y cabecera fija de recuperación |
+| POST /api/v1/auth/activity | Origen, cookie y CSRF; antes de la advertencia |
+| POST /api/v1/auth/continue | Confirmación explícita, origen, cookie y CSRF |
 | POST /api/v1/auth/logout | Origen exacto, sesión y token CSRF |
 
 Emitimos tokens opacos de 256 bits con verificadores almacenados,
-una sesión por cuenta y expiración absoluta de 30 minutos.
+una sesión por cuenta y límite absoluto de ocho horas.
+El campo expires_at de SQLite v2 representa ahora el límite efectivo:
+cinco minutos de inactividad más 60 segundos de advertencia, sin superar
+el límite absoluto. Las consultas GET y la recuperación no renuevan plazos.
+Solo registramos actividad deliberada del usuario (máximo una renovación
+por 15 segundos en el cliente) o confirmación expresa durante el aviso.
+El servidor rechaza las sesiones vencidas incluso sin navegador activo.
 La cookie es HttpOnly y SameSite Strict; la bandera Secure queda
 pendiente de HTTPS, pues el modo de desarrollo utiliza HTTP local
-sobre túnel SSH. El token CSRF se devuelve al iniciar sesión y no
-se registra. La UI deberá conservarlo en memoria; al perderlo
-se inicia sesión nuevamente. Las escrituras operacionales siguen
+sobre túnel SSH. Derivamos CSRF mediante HMAC con separación de dominio
+a partir del token opaco y conservamos únicamente su verificador.
+La recuperación exige el origen exacto y una cabecera no simple;
+no habilitamos CORS. Las sesiones anteriores con CSRF aleatorio dejan de
+ser válidas y deben autenticarse una vez; no modificamos cuentas ni
+migramos SQLite. La UI conserva CSRF exclusivamente en memoria. Las escrituras operacionales siguen
 deshabilitadas. Limitamos el login a ocho intentos por minuto
 por proceso y una derivación scrypt concurrente, sin cola.
 Este límite local se reinicia con el proceso y no constituye
