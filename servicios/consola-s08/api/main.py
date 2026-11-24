@@ -59,7 +59,9 @@ def create_app(directory: Path | None = None) -> FastAPI:
     async def capabilities() -> Capabilities:
         return Capabilities(mode=mode, persistence_enabled=directory is not None,
                             authentication_enabled=directory is not None,
-                            source_readers_enabled=directory is not None)
+                            source_readers_enabled=directory is not None,
+                            diagnostics_enabled=directory is not None,
+                            advisory_enabled=directory is not None)
 
     if directory is not None:
         from .auth_http import register

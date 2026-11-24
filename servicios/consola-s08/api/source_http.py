@@ -13,14 +13,16 @@ from .models import SourceBatch, SourceObservation
 
 def register_sources(app: FastAPI, directory) -> None:
     """Exponer solo observaciones normalizadas; sin URL ni comandos del cliente."""
-    gate = asyncio.Lock()
+    # Un lector lento no impide adquirir otra fuente; máximo cuatro lecturas.
+    gates = {name: asyncio.Lock() for name in ("sources", "metrics", "diagnostics", "advisory")}
 
-    async def acquire(request: Request, collector) -> SourceBatch:
+    async def acquire(request: Request, source: str, collector) -> SourceBatch:
         identity = await run_in_threadpool(sessions.resolve, directory, request.cookies.get(COOKIE))
         if identity is None:
             raise HTTPException(401)
         if request.query_params:
             raise HTTPException(400)
+        gate = gates[source]
         if gate.locked():
             raise HTTPException(429, headers={"Retry-After": "3"})
         async with gate:
@@ -29,16 +31,16 @@ def register_sources(app: FastAPI, directory) -> None:
 
     @app.get("/api/v1/sources", response_model=SourceBatch)
     async def sources(request: Request) -> SourceBatch:
-        return await acquire(request, readers.collect)
+        return await acquire(request, "sources", readers.collect)
 
     @app.get("/api/v1/metrics", response_model=SourceBatch)
     async def metrics(request: Request) -> SourceBatch:
-        return await acquire(request, prometheus_reader.collect)
+        return await acquire(request, "metrics", prometheus_reader.collect)
 
     @app.get("/api/v1/diagnostics", response_model=SourceBatch)
     async def diagnostics(request: Request) -> SourceBatch:
-        return await acquire(request, inference_reader.collect)
+        return await acquire(request, "diagnostics", inference_reader.collect)
 
     @app.get("/api/v1/advisory", response_model=SourceBatch)
     async def advisory(request: Request) -> SourceBatch:
-        return await acquire(request, advisory_reader.collect)
+        return await acquire(request, "advisory", advisory_reader.collect)
