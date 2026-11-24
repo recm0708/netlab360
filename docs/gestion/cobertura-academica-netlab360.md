@@ -117,3 +117,13 @@ Cada tecnología se clasificará según su evidencia real: implementada y valida
 La ampliación de funcionalidades exige pruebas independientes y no modifica retroactivamente los resultados alcanzados.
 
 [Plan maestro y criterios técnicos](../diseno/s06-s08-plan-maestro-y-criterios.md).
+
+## Reevaluación técnica al final de S07 (24/11/2026)
+
+- I, III y IV: conformidad e intención separadas, drift real de costo OSPF, autorización y políticas protegidas, retorno verificado; no multivendor ni reconciliación GitOps continua demostrados.
+- VIII, IX, X, XII y XIII: 58 observaciones normalizadas por adquisición, correlación temporal/topológica, hipótesis con incertidumbre y runbooks. 15 ventanas seleccionadas de cinco escenarios, 870 registros de ventana no independientes, 11 hipótesis y recomendaciones coincidentes; abstención offline y controles negativos comprobados. Sin estimación poblacional de falsas alarmas, pronóstico o deriva inferencial. SDN puerto aislado verificado por evidencia directa, no detección automática de puerto.
+- XIV: recuperación documental léxica de corpus propio; RAG generativo y evaluación de grounding permanecen en #198/S08.
+- XV y XVI: ciclo supervisado integrado por API local Unix, dos aprobaciones, idempotencia persistente, watchdog y postcondiciones reales. Regresión de 1258 pruebas, una omitida, cero fallos. Separación de privilegios, no de personas; disponibilidad continua y arranque frío no acreditados.
+- II, V, VII y XI: persisten las brechas de IaC con recursos reales/backend remoto, streaming gNMI, cloud-native y predicción prospectiva. VI: observabilidad experimental previa; S08 integra visualización y pruebas, sin extender automáticamente SLI/SLO.
+
+S08 sigue siendo la fase comprometida: consola, RAG, pruebas acotadas y recuperación/entrega. No se aprueba S09 en esta revisión; reevaluar después de S08 con alcance y tiempo disponibles. El cierre documental y gráfico de S07 se controla en #197 y #7.
