@@ -1,8 +1,4 @@
 #!/usr/bin/env bash
-# NETLAB360 | Herramientas del proyecto: precheck b1
-# Alcance: ejecutar únicamente los recursos del componente correspondiente.
-# Seguridad: mantener separada la red de administración del laboratorio.
-
 # NETLAB360 B1: inventario de host/red (solo lectura; NO cambia red/VM).
 set -Eeuo pipefail
 if [[ $(hostname) != netlab360-lab ]]; then
