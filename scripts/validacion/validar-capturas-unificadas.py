@@ -12,7 +12,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 CAPTURAS = ROOT / "evidencias" / "capturas"
-FASES_COMPLETADAS = {1: 83, 2: 9, 3: 8, 4: 22, 5: 71, 6: 11}
+FASES_COMPLETADAS = {1: 83, 2: 9, 3: 8, 4: 22, 5: 71, 6: 11, 7: 49}
 PNG_MAGIC = b"\x89PNG\r\n\x1a\n"
 
 

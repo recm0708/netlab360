@@ -22,7 +22,7 @@ class CatalogoCapturasTests(unittest.TestCase):
         conteos = module.validar_catalogo()
         self.assertEqual(
             [conteos[i] for i in range(1, 9)],
-            [83, 9, 8, 22, 71, 11, 0, 0],
+            [83, 9, 8, 22, 71, 11, 49, 0],
         )
 
     def test_cabecera_invalida(self):

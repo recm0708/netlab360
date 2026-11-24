@@ -30,7 +30,7 @@ El laboratorio funciona sobre Ubuntu Desktop en VMware Workstation. La red admin
 | S04 | Métricas, incidentes y observabilidad de la red multisede |
 | S05 | HTTP HA, LACP, SDN con Faucet y NOC integrado |
 | S06 | Detección de anomalías, diagnóstico inteligente y evaluación experimental de modelos |
-| S07 | AIOps supervisado pendiente: issue maestra #7 y #190–#197 |
+| S07 | AIOps supervisado y API controlada validados; cierre documental pendiente |
 | S08 | Consola integrada, copiloto RAG #198, recuperación y entrega pendientes |
 | S09 | Ampliación condicionada; sin milestone aprobada |
 

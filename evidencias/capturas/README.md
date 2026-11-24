@@ -14,7 +14,8 @@ Este catálogo reúne las capturas obtenidas durante el desarrollo y las pruebas
 | [04](fase4/README.md) | Observabilidad e incidentes | 22 |
 | [05](fase5/README.md) | WAN, LACP, HTTP, SDN y NOC integrados | 71 |
 | [06](fase6/README.md) | Telemetría, diagnóstico inteligente y validación experimental | 11 |
-| **Total** | **Fases ejecutadas** | **204** |
+| [07](fase7/README.md) | AIOps supervisado, RCA, RFC y API controlada | 49 |
+| **Total** | **Fases ejecutadas** | **253** |
 
 ## Estándar de nomenclatura
 
