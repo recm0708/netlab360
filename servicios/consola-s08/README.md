@@ -75,11 +75,16 @@ En modo autenticado servimos la estructura HTML, CSS y JavaScript
 en rutas explícitas del mismo origen. No publicamos el árbol de archivos,
 no utilizamos CDN ni abrimos rutas privadas sin sesión.
 La raíz redirige a /login o /home según la sesión. Servimos un documento
-independiente para el acceso y otro para las trece rutas de consola,
+independiente para el acceso y otro para las quince rutas de consola,
 protegidas en el servidor. La marca enlaza a /home; la cabecera reúne
 identidad, vencimiento y cierre de sesión. El menú se puede contraer.
 Las vistas todavía no habilitadas indican su indisponibilidad, sin
-simular datos. La pantalla de inicio consulta healthz y capabilities.
+simular datos. Reservamos /administration para la gestión de identidad
+propia y futura administración de cuentas (#242), y /debug para el
+explorador técnico (#243), inicialmente restringido a OPERATOR en
+el servidor. No habilitamos escrituras ni un rol ADMIN hasta validar
+su política de autorización y persistencia. Las consultas de diagnóstico
+técnico no autorizan intervenciones de red. La pantalla de inicio consulta healthz y capabilities.
 El formulario utiliza login, resume, activity, continue y logout del mismo
 origen, sin guardar credenciales ni tokens en almacenamiento web.
 Recuperamos identidad y comprobante CSRF en memoria mediante la cookie

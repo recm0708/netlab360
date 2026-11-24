@@ -179,6 +179,11 @@ function showIdentity(data) {
   document.getElementById("session-expiry").textContent =
     formatPanama(new Date(session.expiresAt * 1000));
   identityLabel.textContent = session.username + " · " + session.role;
+  document.querySelector('[data-view="debug"]').hidden = session.role !== "OPERATOR";
+  if (location.pathname === "/debug" && session.role !== "OPERATOR") {
+    location.replace("/home");
+    return;
+  }
   accessState.textContent = "Autenticado";
   accessState.dataset.state = "ok";
   shell.hidden = false;

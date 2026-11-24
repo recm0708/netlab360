@@ -1,14 +1,14 @@
 """Rutas visuales explícitas y comprobación de identidad antes de servir la consola."""
 from pathlib import Path
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import RedirectResponse, Response
 
 from . import sessions
 from .auth_http import COOKIE
 
 UI = Path(__file__).resolve().parents[1] / "ui"
-PAGES = ("/home", "/topology", "/wan", "/lan", "/services", "/lacp", "/sdn", "/diagnostics", "/observability", "/intelligence", "/incidents", "/copilot", "/system")
+PAGES = ("/home", "/topology", "/wan", "/lan", "/services", "/lacp", "/sdn", "/diagnostics", "/observability", "/intelligence", "/incidents", "/copilot", "/system", "/administration", "/debug")
 HTML_CSP = ("default-src 'none'; script-src 'self'; style-src 'self'; "
             "connect-src 'self'; base-uri 'none'; form-action 'none'; "
             "frame-ancestors 'none'; object-src 'none'")
@@ -35,8 +35,12 @@ def register_ui(app: FastAPI, directory) -> None:
         return page("login.html")
 
     def console(request: Request):
-        if not authenticated(request):
+        identity = sessions.resolve(directory, request.cookies.get(COOKIE))
+        if identity is None:
             return RedirectResponse("/login", status_code=303)
+        # La reserva de diagnóstico técnico no amplía los permisos existentes.
+        if request.url.path == "/debug" and identity["role"] != "OPERATOR":
+            raise HTTPException(403)
         return page("index.html")
 
     for path in PAGES:

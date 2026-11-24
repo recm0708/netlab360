@@ -23,6 +23,14 @@ Una sola aplicación local, con barra lateral, encabezado de estado general y pa
 | **11. Incidentes y AIOps** | Correlación de fuente, línea de tiempo, recomendación, riesgo y postcondición mediante la API de la fase 07 validada, con lector de resúmenes de fase 08 y presentación detallada pendiente | Crear solicitud, consultar estado y resultado; aprobación administrativa separada, ejecución protegida y retorno |
 | **12. Copiloto RAG** | Respuestas con fuentes propias, incertidumbre y citas | Consultas de solo lectura; sin autorización de cambios (#198) |
 | **13. Evidencias y sistema** | Historial de trabajos, logs sanitizados, versiones, tests, métricas y catálogo | Descargar resultados JSON/CSV, generar inventario técnico y comprobar salud |
+| **14. Usuarios y seguridad** | Perfil propio, cuentas, roles, sesiones y auditoría de acceso (#242) | Cambios autorizados de identidad, contraseña y MFA; administración separada de privilegios operacionales |
+| **15. Diagnóstico técnico** | Catálogo de API, salud de aplicación, respuestas y errores sanitizados (#243) | Consultas de lectura permitidas, copia y exportación delimitada; sin shell, proxy arbitrario ni cambios de red |
+
+Reservamos ambas rutas sin implementar sus acciones. La administración
+propia estará disponible a cada usuario; la administración de terceros
+requiere un futuro rol ADMIN con MFA y reautenticación para operaciones
+sensibles. La identidad ADMIN no implica privilegios de root ni permiso
+operacional. El diagnóstico técnico se reserva inicialmente a OPERATOR.
 
 **Diseño adaptable:** desktop en VMware/Windows con barra lateral fija; tarjetas en pantallas estrechas; secciones sin implementación muestran `PENDIENTE` explícitamente, nunca resultados ficticios. Mantener el NOC de la fase 05 accesible durante la migración.
 
