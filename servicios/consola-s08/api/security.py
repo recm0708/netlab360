@@ -9,6 +9,8 @@ import hashlib
 import hmac
 import re
 import secrets
+import sys
+import warnings
 
 from . import storage
 
@@ -46,7 +48,7 @@ def _path(directory):
     path = storage._directory(directory, create=False)
     with closing(storage._connect(path, readonly=True)) as db:
         if (db.execute("PRAGMA application_id").fetchone()[0] != storage.APPLICATION_ID
-                or db.execute("PRAGMA user_version").fetchone()[0] != 2):
+                or db.execute("PRAGMA user_version").fetchone()[0] not in (2, 3)):
             raise ValueError("SECURITY_SCHEMA_REQUIRED")
     return path
 
@@ -107,6 +109,9 @@ def main() -> None:
     parser.add_argument("username")
     parser.add_argument("role", choices=sorted(ROLES))
     args = parser.parse_args()
+    if not sys.stdin.isatty():
+        raise SystemExit("INTERACTIVE_TERMINAL_REQUIRED")
+    warnings.simplefilter("error", getpass.GetPassWarning)
     password = getpass.getpass("Contraseña local: ")
     confirm = getpass.getpass("Confirmar contraseña: ")
     if password != confirm:

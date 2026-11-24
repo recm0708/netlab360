@@ -12,10 +12,11 @@ import stat
 
 APPLICATION_ID = 0x4E4C5338
 SCHEMA_VERSION = 1
-LATEST_SCHEMA_VERSION = 2
+LATEST_SCHEMA_VERSION = 3
 DB_NAME = "consola.sqlite3"
 TABLES = frozenset({"schema_migrations", "jobs", "audit_events"})
 TABLES_V2 = TABLES | {"users", "sessions"}
+TABLES_V3 = TABLES_V2 | {"profiles"}
 
 # Los trabajos se reservan para una fase posterior: no se crean
 # registros de ejecución ficticios ni se interpretan como RFC S07.
@@ -100,11 +101,11 @@ def inspect(directory: Path) -> dict:
     with closing(_connect(path, readonly=True)) as db:
         app_id = db.execute("PRAGMA application_id").fetchone()[0]
         version = db.execute("PRAGMA user_version").fetchone()[0]
-        if app_id != APPLICATION_ID or version not in (SCHEMA_VERSION, LATEST_SCHEMA_VERSION):
+        if app_id != APPLICATION_ID or version not in (1, 2, LATEST_SCHEMA_VERSION):
             raise ValueError("UNSUPPORTED_STORAGE_SCHEMA")
         tables = {row[0] for row in db.execute(
             "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")}
-        if tables != (TABLES if version == 1 else TABLES_V2):
+        if tables != {1: TABLES, 2: TABLES_V2, 3: TABLES_V3}[version]:
             raise ValueError("UNEXPECTED_STORAGE_TABLES")
         if db.execute("PRAGMA integrity_check").fetchall() != [("ok",)]:
             raise ValueError("STORAGE_INTEGRITY_ERROR")
@@ -189,7 +190,7 @@ DDL_V2 = (
 def migrate(directory: Path) -> dict:
     """Ampliar una base v1 verificada de forma transaccional y explícita."""
     before = inspect(directory)
-    if before["schema_version"] == LATEST_SCHEMA_VERSION:
+    if before["schema_version"] >= 2:
         return before
     path = _directory(directory, create=False)
     with closing(_connect(path, readonly=False)) as db:
@@ -216,12 +217,70 @@ def migrate(directory: Path) -> dict:
     return inspect(directory)
 
 
+# Conservamos usuarios, verificadores y sesiones existentes. La administración
+# de terceros no se activa por la mera migración de almacenamiento.
+DDL_V3 = (
+    "ALTER TABLE schema_migrations RENAME TO schema_migrations_v2",
+    """CREATE TABLE schema_migrations (
+        version INTEGER PRIMARY KEY CHECK(version BETWEEN 1 AND 3),
+        applied_at_utc TEXT NOT NULL
+    )""",
+    "INSERT INTO schema_migrations SELECT version, applied_at_utc FROM schema_migrations_v2",
+    "DROP TABLE schema_migrations_v2",
+    """CREATE TABLE profiles (
+        username TEXT PRIMARY KEY NOT NULL REFERENCES users(username) ON DELETE CASCADE,
+        display_name TEXT NOT NULL DEFAULT '' CHECK(length(display_name)<=100),
+        email TEXT NOT NULL DEFAULT '' CHECK(length(email)<=254),
+        updated_at_utc TEXT NOT NULL
+    )""",
+    """INSERT INTO profiles(username, updated_at_utc)
+        SELECT username, created_at_utc FROM users""",
+    """CREATE TRIGGER profile_after_user_insert AFTER INSERT ON users
+        BEGIN
+            INSERT INTO profiles(username, updated_at_utc)
+            VALUES (NEW.username, NEW.created_at_utc);
+        END""",
+)
+
+
+def migrate_v3(directory: Path) -> dict:
+    """Ampliar explícitamente v2, sin promover usuarios ni modificar sesiones."""
+    before = inspect(directory)
+    if before["schema_version"] == 3:
+        return before
+    if before["schema_version"] != 2:
+        raise ValueError("STORAGE_V2_REQUIRED")
+    path = _directory(directory, create=False)
+    with closing(_connect(path, readonly=False)) as db:
+        db.execute("BEGIN IMMEDIATE")
+        try:
+            if (db.execute("PRAGMA application_id").fetchone()[0] != APPLICATION_ID
+                    or db.execute("PRAGMA user_version").fetchone()[0] != 2):
+                raise ValueError("CONCURRENT_SCHEMA_CHANGE")
+            for statement in DDL_V3:
+                db.execute(statement)
+            stamp = datetime.now(timezone.utc).isoformat()
+            db.execute("INSERT INTO schema_migrations VALUES (?, ?)", (3, stamp))
+            db.execute(
+                "INSERT INTO audit_events(event_type,observed_at_utc,details_json) VALUES (?,?,?)",
+                ("STORAGE_MIGRATED", stamp, '{"schema_version":3}'))
+            db.execute("PRAGMA user_version=3")
+            if db.execute("PRAGMA foreign_key_check").fetchall():
+                raise ValueError("STORAGE_FOREIGN_KEY_ERROR")
+            db.execute("COMMIT")
+        except BaseException:
+            db.execute("ROLLBACK")
+            raise
+    return inspect(directory)
+
+
 def main() -> None:
     """CLI local de administración de almacenamiento, sin opciones de ruta web."""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("operation", choices=("init", "check", "migrate"))
+    parser.add_argument("operation", choices=("init", "check", "migrate", "migrate-v3"))
     args = parser.parse_args()
-    action = {"init": initialize, "check": inspect, "migrate": migrate}[args.operation]
+    action = {"init": initialize, "check": inspect, "migrate": migrate,
+              "migrate-v3": migrate_v3}[args.operation]
     print(json.dumps(action(default_dir()), sort_keys=True, allow_nan=False))
 
 
