@@ -63,6 +63,9 @@ class LoginResult(Identity):
     """El token de sesión viaja únicamente en la cookie HttpOnly."""
     csrf_token: str
     expires_at: int
+    warning_at: int
+    absolute_expires_at: int
+    server_now: int
 
 
 class LogoutResult(PublicModel):
