@@ -353,11 +353,13 @@ function initializeConsole() {
       apiState.dataset.state = health.healthy === true ? "ok" : "unknown";
       observed.textContent = "Respuesta del proceso (Panamá): " + formatPanama(stamp);
       showCapabilities(caps);
+      document.getElementById("console-mode").textContent = health.mode === "AUTHENTICATED_JOBS" ? "Pruebas autorizadas" : "Solo lectura";
       notice.textContent = "Metadatos recibidos. La salud global de red sigue siendo UNKNOWN.";
     } catch {
       apiState.textContent = "UNKNOWN";
       apiState.dataset.state = "unknown";
       showCapabilities({});
+      document.getElementById("console-mode").textContent = "Modo no confirmado";
       notice.textContent = "No se pudieron validar los metadatos. No se conservan valores previos.";
     }
   }
@@ -383,7 +385,7 @@ function initializeConsole() {
   let lastActivitySent = -Infinity;
   // El proceso previo puede servir archivos nuevos sin tener registrada la ruta del módulo.
   const jobsView = typeof createJobsView === "function"
-    ? createJobsView(() => session ? {...session, active: serverNow() < session.warningAt} : null, authRequest)
+    ? createJobsView(() => session ? {...session, active: serverNow() < session.warningAt} : null, authRequest, formatPanama)
     : {controls(){}, reset(){}, sync(){
       if (location.pathname === "/diagnostics") document.getElementById("jobs-notice").textContent = "Ejecución de pruebas no habilitada en esta instancia.";
     }};
