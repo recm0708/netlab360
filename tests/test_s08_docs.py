@@ -85,6 +85,17 @@ class AssetTests(unittest.TestCase):
             for color in methods.values():
                 self.assertGreaterEqual(contrast(color, palette["button-text"]), 4.5)
 
+    def test_copy_icon_and_native_select(self):
+        css = (ROOT / "servicios/consola-s08/ui/static/swagger-theme.css").read_text()
+        self.assertIn(".copy-to-clipboard button::before", css)
+        self.assertIn(".copy-to-clipboard button::after", css)
+        self.assertIn("border:1.5px solid currentColor", css)
+        self.assertIn("pointer-events:none", css)
+        self.assertIn("background:var(--copy-fill)", css)
+        self.assertIn("--copy-fill:var(--accent); color:var(--button-text)", css)
+        self.assertIn(".swagger-ui select {\n  appearance:auto;", css)
+        self.assertNotIn(".swagger-ui .copy-to-clipboard {\n  display:none", css)
+
     def test_no_arbitrary_destination(self):
         with self.assertRaises(ValueError):
             swagger_assets.download("https://example.invalid/file", 10)
