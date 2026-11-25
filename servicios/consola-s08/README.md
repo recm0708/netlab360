@@ -342,3 +342,25 @@ pendiente.
 
 - [Diseño de la consola](../../docs/diseno/s08-consola-interactiva-y-acciones.md).
 - [Contrato histórico de eventos S07](../../docs/diseno/s07-contrato-eventos-e-incidentes.md).
+
+## Topología integrada
+
+En /topology consultamos el grafo existente por una ruta autenticada de
+solo lectura. Validamos los 18 nodos y 21 enlaces registrados, mantenemos
+separadas la existencia, el estado administrativo, la selección FIB y la
+observación HTTP. La generación del grafo no sustituye las fechas de
+telemetría y HTTP. El inspector permite seleccionar equipos y enlaces
+sin alterar la infraestructura. La vista descarta datos al perder sesión
+o vigencia; la API no acepta destinos arbitrarios. Conservamos la
+interfaz previa hasta completar y validar la equivalencia funcional.
+
+Mantenemos una vista resumida con dos enlaces WAN lógicos y una vista
+detallada en otra pestaña, abierta mediante /topology?view=detailed.
+La representación detallada conserva los 18 nodos y 21 enlaces,
+incluidas las relaciones HTTP. Separamos físicamente el dibujo de las
+conexiones de acceso y las relaciones lógicas de servicio. Actualizamos
+atributos de los elementos SVG existentes, no su geometría, y mantenemos
+la selección durante las consultas. La limitación compartida de frecuencia
+provoca reintentos, no el borrado del inventario. Los estados caducados o
+no disponibles pasan a desconocidos; al perder sesión eliminamos todos
+los datos. La presentación detallada admite pantalla completa nativa.

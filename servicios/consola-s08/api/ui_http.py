@@ -90,3 +90,8 @@ def register_ui(app: FastAPI, directory) -> None:
     def history_script():
         return Response((UI / "static/history.js").read_text(encoding="utf-8"),
                         media_type="text/javascript")
+
+    @app.get("/ui/static/topology.js", include_in_schema=False)
+    def topology_script():
+        return Response((UI / "static/topology.js").read_text(encoding="utf-8"),
+                        media_type="text/javascript")

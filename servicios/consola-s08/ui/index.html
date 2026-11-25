@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="/ui/static/styles.css">
   <script src="/ui/static/app.js"></script>
   <script src="/ui/static/history.js"></script>
+  <script src="/ui/static/topology.js"></script>
 </head>
 <body>
   <a class="skip" href="#main">Ir al contenido</a>
@@ -105,6 +106,19 @@
         <section id="module-view" hidden>
           <h1 id="module-title"></h1>
           <div id="module-placeholder" class="panel"><h2>Función no disponible</h2><p>La vista de este módulo aún no está habilitada. No se han realizado consultas ni acciones.</p><a href="/home">Volver al inicio</a></div>
+        </section>
+        <section id="topology-view" hidden>
+          <div id="topology-workspace">
+            <div class="heading"><div><p class="eyebrow">Supervisión</p><h1 id="topology-title">Topología en vivo</h1><p class="muted">Inventario multisede y observaciones reales de red.</p></div>
+              <div class="topology-controls"><button id="topology-run" type="button">Actualizar topología</button><a id="topology-expand" class="topology-action" href="/topology?view=detailed" target="_blank" rel="noopener">Abrir diagrama detallado ↗</a><a id="topology-return" class="topology-action" href="/topology" hidden>Vista resumida</a><button id="topology-fullscreen" type="button" hidden>Pantalla completa</button></div>
+            </div>
+            <p id="topology-status" role="status" aria-live="polite">Esperando sesión.</p>
+            <div class="topology-layout">
+              <section class="panel topology-map"><svg id="topology-map" viewBox="0 0 1250 620" aria-label="Diagrama interactivo multisede"></svg></section>
+              <section class="panel topology-inspector"><h2>Inspector</h2><p id="topology-selection" class="muted">Seleccione un equipo o enlace.</p><dl id="topology-details"></dl></section>
+            </div>
+            <section class="panel"><h2>Convenciones</h2><p class="muted">Verde: existencia observada o principal elegida por FIB, según el recurso. Azul: respaldo elegido. Naranja: principal elegida con respaldo inactivo. Rojo: inactividad comprobada (en el resumen WAN, ambas alternativas inactivas). Gris: sin verificación o en espera. La selección visual es independiente del estado. Las líneas HTTP representan relaciones de servicio, no cables físicos. FIB no acredita OSPF FULL ni tráfico.</p></section>
+          </div>
         </section>
         <section id="history-view" hidden>
           <div class="heading"><div><p class="eyebrow">Observabilidad</p><h1>Históricos de supervisión</h1><p class="muted">Muestras reales de Prometheus. Los estados administrativos no acreditan conectividad.</p></div></div>

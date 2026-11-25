@@ -343,6 +343,7 @@ function initializeConsole() {
     resetDebug();
     clearDashboard();
     clearHistory();
+    clearTopology();
     if (idleDialog.open) idleDialog.close();
     shell.hidden = true;
     recoveryPanel.hidden = false;
@@ -412,6 +413,8 @@ function initializeConsole() {
         loadDebug().then(() => restoreContentIfUnchanged());
       } else if (location.pathname === "/observability") {
         updateHistory().then(() => restoreContentIfUnchanged());
+      } else if (location.pathname === "/topology") {
+        updateTopology().then(() => restoreContentIfUnchanged());
       }
     }
     authNotice.textContent = "Sesión vigente. Acciones de red deshabilitadas.";
@@ -448,6 +451,7 @@ function initializeConsole() {
     if (remaining <= 0) {
       clearDashboard();
       clearHistory();
+      clearTopology();
       // Otra pestaña puede haber renovado la misma sesión. Consultamos una vez
       // sin extender el plazo; una respuesta no válida retira la identidad.
       if (!busy) recover();
@@ -562,7 +566,9 @@ function initializeConsole() {
     document.getElementById("home-view").hidden = !home;
     const debug = active.dataset.view === "debug";
     const history = active.dataset.view === "observability";
-    document.getElementById("module-view").hidden = home || debug || history;
+    const topology = active.dataset.view === "topology";
+    document.getElementById("module-view").hidden = home || debug || history || topology;
+    document.getElementById("topology-view").hidden = !topology;
     document.getElementById("history-view").hidden = !history;
     document.getElementById("debug-view").hidden = !debug;
     const label = active.querySelector(".nav-text").textContent;
@@ -862,6 +868,115 @@ function initializeConsole() {
   },15000);
   document.addEventListener("visibilitychange",()=>{
     if(!document.hidden&&dashboardAuto.checked&&dashboardAllowed()) updateDashboard();
+  });
+
+  // Una consulta fija alimenta ambas vistas. Los errores transitorios no borran el mapa.
+  const topologyMap=document.getElementById("topology-map");
+  const topologyRun=document.getElementById("topology-run");
+  const topologyStatus=document.getElementById("topology-status");
+  const topologyDetails=document.getElementById("topology-details");
+  const topologySelection=document.getElementById("topology-selection");
+  const topologyWorkspace=document.getElementById("topology-workspace");
+  const topologyFull=document.getElementById("topology-fullscreen");
+  const topologyMode=new URLSearchParams(location.search).get("view")==="detailed"?"detailed":"summary";
+  let topologyEpoch=0,topologyBusy=false,topologyData=null,topologySelected=null;
+  let topologyReceived=0,topologyUnavailable=false,topologyTimer=null,topologyInspectorKey="";
+  const detailed=topologyMode==="detailed";
+  document.getElementById("topology-expand").hidden=detailed;
+  document.getElementById("topology-return").hidden=!detailed;
+  topologyFull.hidden=!detailed;
+  document.getElementById("topology-title").textContent=detailed?"Topología detallada":"Topología en vivo";
+
+  function topologyAllowed() {
+    return location.pathname==="/topology" && session!==null && serverNow()<session.expiresAt;
+  }
+
+  function clearTopology() {
+    topologyEpoch++;topologyBusy=false;topologyData=null;topologySelected=null;
+    topologyUnavailable=false;topologyInspectorKey="";
+    clearTimeout(topologyTimer);topologyTimer=null;
+    window.NetlabTopology.reset(topologyMap);topologyDetails.replaceChildren();
+    topologySelection.textContent="Seleccione un equipo o enlace.";
+    topologyStatus.textContent="Sin observación topológica vigente.";
+    topologyRun.disabled=false;
+    if(document.fullscreenElement===topologyWorkspace)document.exitFullscreen().catch(()=>{});
+  }
+
+  function renderTopology() {
+    if(!topologyData||!topologyAllowed()) return;
+    const model=window.NetlabTopology;
+    const elapsed=(performance.now()-topologyReceived)/1000;
+    const aged=model.aged(topologyData,elapsed,topologyUnavailable);
+    if(!topologyUnavailable&&!model.isFresh(topologyData.graph,elapsed))
+      topologyStatus.textContent="Observación caducada. Inventario conservado sin estados vigentes.";
+    const display=model.view(aged,topologyMode);
+    model.render(topologyMap,aged,topologySelected,id=>{
+      topologySelected=topologySelected===id?null:id;
+      renderTopology();
+    },topologyMode);
+    const item=[...display.nodes,...display.links].find(x=>x.id===topologySelected);
+    const label=item?model.name(item):"Seleccione un equipo o enlace.";
+    const rows=item?model.details(item):[];
+    const key=JSON.stringify([label,rows]);
+    if(key!==topologyInspectorKey){
+      topologyInspectorKey=key;topologySelection.textContent=label;
+      topologyDetails.replaceChildren();
+      for(const [name,value] of rows){
+        const dt=document.createElement("dt"),dd=document.createElement("dd");
+        dt.textContent=name;dd.textContent=value;topologyDetails.append(dt,dd);
+      }
+    }
+  }
+
+  function scheduleTopology(delay=5000+Math.random()*1500){
+    clearTimeout(topologyTimer);
+    if(location.pathname==="/topology")topologyTimer=setTimeout(updateTopology,delay);
+  }
+
+  async function updateTopology() {
+    if(!topologyAllowed()||topologyBusy)return;
+    if(document.hidden||serverNow()>=session.warningAt){scheduleTopology();return;}
+    const epoch=topologyEpoch,started=performance.now();
+    topologyBusy=true;topologyRun.disabled=true;
+    let delay;
+    try {
+      const {status,data}=await debugRead("/api/v1/topology");
+      if(epoch!==topologyEpoch||!topologyAllowed()) return;
+      if(status===401||status===403) {clearTopology();recover();return;}
+      if(status===429){
+        topologyStatus.textContent="Consulta compartida ocupada. Reintentando automáticamente.";
+        delay=2500+Math.random()*1500;
+        return;
+      }
+      if(status!==200||!window.NetlabTopology.valid(data)||data.graph.quality!=="VALID") throw new Error("GRAPH");
+      topologyData=data;topologyReceived=started;topologyUnavailable=false;
+      renderTopology();
+      topologyStatus.textContent="Consulta: "+formatPanama(new Date(data.graph.observed_at_utc))+
+        " · "+data.nodes.length+" equipos y "+data.links.length+" enlaces en inventario · "+data.warning_count+" advertencias de origen.";
+    } catch {
+      if(epoch!==topologyEpoch) return;
+      topologyUnavailable=true;
+      renderTopology();
+      topologyStatus.textContent="Fuente temporalmente no disponible. Conservamos el inventario sin estados vigentes.";
+    } finally {
+      if(epoch===topologyEpoch) {topologyBusy=false;topologyRun.disabled=false;scheduleTopology(delay);}
+    }
+  }
+  topologyRun.addEventListener("click",updateTopology);
+  setInterval(()=>{
+    if(topologyData&&topologyAllowed())renderTopology();
+  },1000);
+  document.addEventListener("visibilitychange",()=>{
+    if(topologyAllowed()&&!document.hidden)updateTopology();
+  });
+  topologyFull.addEventListener("click",async()=>{
+    try {
+      if(document.fullscreenElement===topologyWorkspace)await document.exitFullscreen();
+      else await topologyWorkspace.requestFullscreen();
+    } catch {topologyStatus.textContent="El navegador no permitió cambiar a pantalla completa.";}
+  });
+  document.addEventListener("fullscreenchange",()=>{
+    topologyFull.textContent=document.fullscreenElement===topologyWorkspace?"Salir de pantalla completa":"Pantalla completa";
   });
 
   // Las series históricas permanecen en memoria y se descartan al perder la sesión.
