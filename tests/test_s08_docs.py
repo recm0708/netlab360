@@ -52,6 +52,10 @@ class AssetTests(unittest.TestCase):
         self.assertIn("fill:var(--text) !important", css)
         self.assertIn("color:var(--muted) !important", css)
         self.assertIn(".btn.execute", css)
+        self.assertIn(".opblock .opblock-summary .copy-to-clipboard {\n  display:none !important;", css)
+        self.assertIn(".info .title > span {\n  display:inline-flex; align-items:center", css)
+        self.assertIn("position:static; top:auto;", css)
+        self.assertIn("small pre.version", css)
 
         def luminance(value):
             value = value.lstrip("#")
@@ -76,6 +80,8 @@ class AssetTests(unittest.TestCase):
             for fg in ("text", "muted", "accent", "fault"):
                 for bg in ("bg", "surface"):
                     self.assertGreaterEqual(contrast(palette[fg], palette[bg]), 4.5)
+            for badge in ("muted", "ok"):
+                self.assertGreaterEqual(contrast(palette[badge], palette["bg"]), 4.5)
             for color in methods.values():
                 self.assertGreaterEqual(contrast(color, palette["button-text"]), 4.5)
 

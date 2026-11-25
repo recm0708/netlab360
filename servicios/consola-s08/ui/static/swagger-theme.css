@@ -90,3 +90,27 @@ html, body { background:var(--surface); color:var(--text); }
 #swagger-ui .swagger-ui :is(input,textarea,select):disabled { color:var(--muted); opacity:1; }
 #swagger-ui .swagger-ui .opblock .opblock-summary-method { background:var(--method); color:var(--button-text) !important; }
 #swagger-ui .swagger-ui .auth-wrapper, #swagger-ui .swagger-ui .authorization__btn { display:none !important; }
+
+/* Eliminamos el control redundante de copia de ruta, no el de respuesta. */
+#swagger-ui .swagger-ui .opblock .opblock-summary .copy-to-clipboard {
+  display:none !important;
+}
+/* Alineamos las versiones de API y OpenAPI con la línea del título. */
+#swagger-ui .swagger-ui .info .title {
+  display:flex; align-items:center; flex-wrap:wrap; column-gap:8px; row-gap:5px;
+}
+#swagger-ui .swagger-ui .info .title > span {
+  display:inline-flex; align-items:center; flex-wrap:wrap; gap:5px;
+}
+#swagger-ui .swagger-ui .info .title small {
+  position:static; top:auto; display:inline-flex; align-items:center;
+  vertical-align:middle; margin:0; padding:3px 8px; border-radius:999px;
+  background:var(--muted); color:var(--bg); line-height:1.2;
+}
+#swagger-ui .swagger-ui .info .title small.version-stamp {
+  background:var(--ok); color:var(--bg);
+}
+#swagger-ui .swagger-ui .info .title small pre.version {
+  margin:0; padding:0; color:inherit; background:transparent;
+  font:600 .82rem/1.2 system-ui,sans-serif;
+}
