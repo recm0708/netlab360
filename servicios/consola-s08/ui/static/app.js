@@ -217,6 +217,29 @@ function dashboardDetail(row) {
 
 /* Fin de la proyección pura del dashboard. */
 
+/* Preferencias de actualización global: únicamente valores de presentación. */
+const refreshIntervals=Object.freeze([5,10,15,30,60,300]);
+const refreshKey="netlab360.refresh.v1";
+function parseRefresh(value){
+  const match=/^(on|off):(5|10|15|30|60|300)$/.exec(typeof value==="string"?value:"");
+  return match?{auto:match[1]==="on",seconds:Number(match[2])}:{auto:true,seconds:5};
+}
+function refreshValue(auto,seconds){
+  return (auto===true?"on":"off")+":"+(refreshIntervals.includes(seconds)?seconds:5);
+}
+function refreshScheduler(run,clock){
+  let timer=null;
+  return {
+    configure(preference){
+      if(timer!==null)clock.clearInterval(timer);
+      timer=null;
+      if(preference.auto)timer=clock.setInterval(()=>run("auto"),preference.seconds*1000);
+    },
+    stop(){if(timer!==null)clock.clearInterval(timer);timer=null;}
+  };
+}
+/* Fin de preferencias de actualización. */
+
 /* La consola solo se inicializa en su documento autenticado. */
 function initializeConsole() {
   const refresh = document.getElementById("refresh");
@@ -329,6 +352,7 @@ function initializeConsole() {
   }
 
   function controls() {
+    syncRefreshControls();
     logout.disabled = busy || session === null;
     idleLogout.disabled = busy || session === null;
     idleContinue.disabled = busy || session === null ||
@@ -408,17 +432,7 @@ function initializeConsole() {
     recoveryPanel.hidden = true;
     if (first) {
       restorePresentation();
-      if (location.pathname === "/home") {
-        updateDashboard().then(() => restoreContentIfUnchanged());
-      } else if (location.pathname === "/debug") {
-        loadDebug().then(() => restoreContentIfUnchanged());
-      } else if (location.pathname === "/observability") {
-        updateHistory().then(() => restoreContentIfUnchanged());
-      } else if (networkConfig[location.pathname]) {
-        updateNetwork().then(() => restoreContentIfUnchanged());
-      } else if (location.pathname === "/topology") {
-        updateTopology().then(() => restoreContentIfUnchanged());
-      }
+      refreshCurrent("initial").then(() => restoreContentIfUnchanged());
     }
     authNotice.textContent = "Sesión vigente. Acciones de red deshabilitadas.";
     controls();
@@ -449,13 +463,15 @@ function initializeConsole() {
   }
 
   function tick() {
+    syncRefreshControls();
     if (!session) return;
     const remaining = Math.ceil(session.expiresAt - serverNow());
     if (remaining <= 0) {
       clearDashboard();
       clearHistory();
       clearTopology();
-    clearNetwork();
+      clearNetwork();
+      resetDebug();
       // Otra pestaña puede haber renovado la misma sesión. Consultamos una vez
       // sin extender el plazo; una respuesta no válida retira la identidad.
       if (!busy) recover();
@@ -584,7 +600,6 @@ function initializeConsole() {
 
   // El explorador nunca toma URLs del usuario ni exporta respuestas de error.
   const debugSelect = document.getElementById("debug-select");
-  const debugRun = document.getElementById("debug-run");
   const debugNotice = document.getElementById("debug-notice");
   const debugMeta = document.getElementById("debug-meta");
   const debugOutput = document.getElementById("debug-output");
@@ -597,7 +612,7 @@ function initializeConsole() {
   ]);
   let debugEpoch = 0;
   let debugResult = null;
-  let debugReady = false;
+  let debugReady = false, debugArmed = false;
   let debugBusy = false;
 
   function debugAllowed() {
@@ -609,11 +624,12 @@ function initializeConsole() {
     debugEpoch++;
     debugResult = null;
     debugReady = false;
+    debugArmed = false;
     debugBusy = false;
     debugSelect.replaceChildren();
     debugCatalog.replaceChildren();
     debugSelect.disabled = true;
-    debugRun.disabled = true;
+
     exportButtons.forEach(button => button.disabled = true);
     debugOutput.textContent = "Sin resultados.";
     debugMeta.textContent = "Sin consulta.";
@@ -675,8 +691,8 @@ function initializeConsole() {
       }
       debugReady = true;
       debugSelect.disabled = false;
-      debugRun.disabled = false;
-      debugNotice.textContent = "Catálogo disponible. Seleccione una consulta.";
+
+      debugNotice.textContent = "Catálogo disponible. Seleccione una consulta y pulse Actualizar.";
     } catch {
       if (epoch !== debugEpoch) return;
       resetDebug();
@@ -689,8 +705,10 @@ function initializeConsole() {
     const epoch = debugEpoch;
     const key = debugSelect.value;
     debugBusy = true;
+    debugArmed = true;
+    debugSelect.disabled = true;
     debugResult = null;
-    debugRun.disabled = true;
+
     exportButtons.forEach(button => button.disabled = true);
     debugOutput.textContent = "Consultando…";
     debugNotice.textContent = "Consulta en curso.";
@@ -722,7 +740,8 @@ function initializeConsole() {
     } finally {
       if (epoch === debugEpoch) {
         debugBusy = false;
-        debugRun.disabled = !debugAllowed() || !debugReady;
+        debugSelect.disabled = !debugReady || !debugAllowed();
+
       }
     }
   }
@@ -755,7 +774,12 @@ function initializeConsole() {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
-  debugRun.addEventListener("click", runDebug);
+  debugSelect.addEventListener("change",()=>{
+    debugArmed=false;debugResult=null;
+    exportButtons.forEach(button=>button.disabled=true);
+    debugOutput.textContent="Sin resultados.";debugMeta.textContent="Sin consulta.";
+    debugNotice.textContent="Pulse Actualizar para consultar el recurso seleccionado.";
+  });
   exportButtons[0].addEventListener("click", async () => {
     if (!debugResult || !debugAllowed()) return;
     try {
@@ -770,7 +794,6 @@ function initializeConsole() {
 
   // Las consultas son independientes; no se conserva telemetría en almacenamiento web.
   const dashboardStatus = document.getElementById("dashboard-status");
-  const dashboardAuto = document.getElementById("dashboard-auto");
   const dashboardTable = document.getElementById("dashboard-rows");
   const dashboardPaths = {
     sources:"/api/v1/sources",metrics:"/api/v1/metrics",
@@ -819,7 +842,7 @@ function initializeConsole() {
     dashboardEpoch++;
     dashboardBatches={};
     dashboardBusy=false;
-    refresh.disabled=false;
+
     dashboardSignature="";
     dashboardStatus.textContent="Sin observaciones autenticadas.";
     renderDashboard(true);
@@ -829,7 +852,7 @@ function initializeConsole() {
     if(!dashboardAllowed()||dashboardBusy||serverNow()>=session.warningAt) return;
     const epoch=dashboardEpoch;
     dashboardBusy=true;
-    refresh.disabled=true;
+
     dashboardStatus.textContent="Consultando fuentes independientes…";
     const requests=Object.entries(dashboardPaths).map(async ([key,path])=>{
       const started=performance.now();
@@ -860,21 +883,12 @@ function initializeConsole() {
     } finally {
       if(epoch===dashboardEpoch) {
         dashboardBusy=false;
-        refresh.disabled=false;
+
       }
     }
   }
 
-  refresh.addEventListener("click", updateDashboard);
-  setInterval(() => {
-    if(dashboardAllowed()) renderDashboard();
-  },1000);
-  setInterval(() => {
-    if(dashboardAuto.checked&&!document.hidden&&dashboardAllowed()) updateDashboard();
-  },15000);
-  document.addEventListener("visibilitychange",()=>{
-    if(!document.hidden&&dashboardAuto.checked&&dashboardAllowed()) updateDashboard();
-  });
+  setInterval(() => { if(dashboardAllowed()) renderDashboard(); },1000);
 
   // Vistas de dominio: reutilizamos los contratos validados del panel inicial.
   const networkConfig=Object.freeze({
@@ -886,7 +900,6 @@ function initializeConsole() {
   });
   const networkCurrent=networkConfig[location.pathname];
   const networkBody=document.getElementById("network-rows"),networkStatus=document.getElementById("network-status");
-  const networkRefresh=document.getElementById("network-refresh");
   let networkEpoch=0,networkBusy=false,networkBatches={},networkSignature="";
   if(networkCurrent){
     document.getElementById("network-title").textContent=networkCurrent.title;
@@ -895,7 +908,7 @@ function initializeConsole() {
   function networkAllowed(){return !!networkCurrent&&session!==null&&serverNow()<session.expiresAt;}
   function clearNetwork(){
     networkEpoch++;networkBusy=false;networkBatches={};networkSignature="";
-    networkBody.replaceChildren();networkStatus.textContent="Sin observaciones autenticadas.";networkRefresh.disabled=false;
+    networkBody.replaceChildren();networkStatus.textContent="Sin observaciones autenticadas.";
   }
   function renderNetwork(){
     if(!networkAllowed())return;
@@ -920,7 +933,7 @@ function initializeConsole() {
   async function updateNetwork(){
     if(!networkAllowed()||networkBusy||serverNow()>=session.warningAt)return;
     const epoch=networkEpoch,key=networkCurrent.key,started=performance.now();
-    networkBusy=true;networkRefresh.disabled=true;
+    networkBusy=true;
     try{
       const {status,data}=await debugRead(dashboardPaths[key]);
       if(epoch!==networkEpoch||!networkAllowed())return;
@@ -932,17 +945,13 @@ function initializeConsole() {
       if(epoch!==networkEpoch)return;
       networkBatches[key]={error:"ERROR"};networkStatus.textContent="Fuente no disponible.";
     }finally{
-      if(epoch===networkEpoch){networkBusy=false;networkRefresh.disabled=false;renderNetwork();}
+      if(epoch===networkEpoch){networkBusy=false;renderNetwork();}
     }
   }
-  networkRefresh.addEventListener("click",updateNetwork);
   setInterval(()=>{if(networkAllowed())renderNetwork();},1000);
-  setInterval(()=>{if(networkAllowed()&&!document.hidden)updateNetwork();},15000);
-  document.addEventListener("visibilitychange",()=>{if(networkAllowed()&&!document.hidden)updateNetwork();});
 
   // Una consulta fija alimenta ambas vistas. Los errores transitorios no borran el mapa.
   const topologyMap=document.getElementById("topology-map");
-  const topologyRun=document.getElementById("topology-run");
   const topologyStatus=document.getElementById("topology-status");
   const topologyDetails=document.getElementById("topology-details");
   const topologySelection=document.getElementById("topology-selection");
@@ -950,7 +959,7 @@ function initializeConsole() {
   const topologyFull=document.getElementById("topology-fullscreen");
   const topologyMode=new URLSearchParams(location.search).get("view")==="detailed"?"detailed":"summary";
   let topologyEpoch=0,topologyBusy=false,topologyData=null,topologySelected=null;
-  let topologyReceived=0,topologyUnavailable=false,topologyTimer=null,topologyInspectorKey="";
+  let topologyReceived=0,topologyUnavailable=false,topologyInspectorKey="";
   const detailed=topologyMode==="detailed";
   const topologySite=document.getElementById("topology-site");
   let topologyBox=window.NetlabTopology.viewport(topologyMode);
@@ -977,12 +986,11 @@ function initializeConsole() {
   function clearTopology() {
     topologyEpoch++;topologyBusy=false;topologyData=null;topologySelected=null;
     topologyUnavailable=false;topologyInspectorKey="";
-    clearTimeout(topologyTimer);topologyTimer=null;
     window.NetlabTopology.reset(topologyMap);topologyDetails.replaceChildren();
     resetTopologyBox();
     topologySelection.textContent="Seleccione un equipo o enlace.";
     topologyStatus.textContent="Sin observación topológica vigente.";
-    topologyRun.disabled=false;
+
     if(document.fullscreenElement===topologyWorkspace)document.exitFullscreen().catch(()=>{});
   }
 
@@ -1013,24 +1021,17 @@ function initializeConsole() {
     }
   }
 
-  function scheduleTopology(delay=5000+Math.random()*1500){
-    clearTimeout(topologyTimer);
-    if(location.pathname==="/topology")topologyTimer=setTimeout(updateTopology,delay);
-  }
-
   async function updateTopology() {
     if(!topologyAllowed()||topologyBusy)return;
-    if(document.hidden||serverNow()>=session.warningAt){scheduleTopology();return;}
+    if(serverNow()>=session.warningAt)return;
     const epoch=topologyEpoch,started=performance.now();
-    topologyBusy=true;topologyRun.disabled=true;
-    let delay;
+    topologyBusy=true;
     try {
       const {status,data}=await debugRead("/api/v1/topology");
       if(epoch!==topologyEpoch||!topologyAllowed()) return;
       if(status===401||status===403) {clearTopology();recover();return;}
       if(status===429){
-        topologyStatus.textContent="Consulta compartida ocupada. Reintentando automáticamente.";
-        delay=2500+Math.random()*1500;
+        topologyStatus.textContent="Consulta compartida ocupada. Intente nuevamente o espere la próxima actualización.";
         return;
       }
       if(status!==200||!window.NetlabTopology.valid(data)||data.graph.quality!=="VALID") throw new Error("GRAPH");
@@ -1044,16 +1045,12 @@ function initializeConsole() {
       renderTopology();
       topologyStatus.textContent="Fuente temporalmente no disponible. Conservamos el inventario sin estados vigentes.";
     } finally {
-      if(epoch===topologyEpoch) {topologyBusy=false;topologyRun.disabled=false;scheduleTopology(delay);}
+      if(epoch===topologyEpoch) topologyBusy=false;
     }
   }
-  topologyRun.addEventListener("click",updateTopology);
   setInterval(()=>{
     if(topologyData&&topologyAllowed())renderTopology();
   },1000);
-  document.addEventListener("visibilitychange",()=>{
-    if(topologyAllowed()&&!document.hidden)updateTopology();
-  });
   topologyFull.addEventListener("click",async()=>{
     try {
       if(document.fullscreenElement===topologyWorkspace)await document.exitFullscreen();
@@ -1061,13 +1058,14 @@ function initializeConsole() {
     } catch {topologyStatus.textContent="El navegador no permitió cambiar a pantalla completa.";}
   });
   document.addEventListener("fullscreenchange",()=>{
+    if(document.fullscreenElement===topologyWorkspace)topologyWorkspace.prepend(refreshControls);
+    else document.getElementById("refresh-slot").append(refreshControls);
     topologyFull.textContent=document.fullscreenElement===topologyWorkspace?"Salir de pantalla completa":"Pantalla completa";
   });
 
   // Las series históricas permanecen en memoria y se descartan al perder la sesión.
   const historyGroup = document.getElementById("history-group");
   const historyWindow = document.getElementById("history-window");
-  const historyRun = document.getElementById("history-run");
   const historyStatus = document.getElementById("history-status");
   const historyPlot = document.getElementById("history-plot");
   let historyEpoch = 0, historyBusy = false, historyData = null;
@@ -1082,7 +1080,7 @@ function initializeConsole() {
     historyEpoch++;
     historyData = null;
     historyBusy = false;
-    historyRun.disabled = false;
+
     for (const id of ["history-valid","history-null","history-series","history-scope"])
       document.getElementById(id).textContent = "—";
     historyStatus.textContent = "Sin consulta histórica vigente.";
@@ -1133,10 +1131,9 @@ function initializeConsole() {
     if(!historyAllowed()||historyBusy||serverNow()>=session.warningAt) return;
     const group=historyGroup.value, span=historyWindow.value;
     if(!window.NetlabHistory.allowed(group,span)) return;
-    clearHistory();
     const epoch=historyEpoch;
     historyBusy=true;
-    historyRun.disabled=true;
+
     historyStatus.textContent="Consultando muestras históricas…";
     try {
       const {status,data}=await debugRead("/api/v1/history/"+group+"/"+span,1048576);
@@ -1153,23 +1150,28 @@ function initializeConsole() {
       document.getElementById("history-series").textContent=counts.series+" / "+result.series.length;
       document.getElementById("history-scope").textContent=window.NetlabHistory.description(group);
       if(counts.valid) await drawHistory(result,epoch);
+      else {historyPlot.hidden=true;if(window.Plotly)window.Plotly.purge(historyPlot);}
       if(epoch!==historyEpoch||!historyAllowed()) return;
       historyStatus.textContent=(counts.valid?"Intervalo consultado: ":"Sin muestras válidas: ")+
         formatPanama(new Date(result.start_epoch*1000))+" — "+formatPanama(new Date(result.end_epoch*1000));
     } catch(error) {
       if(epoch!==historyEpoch) return;
+      if(error.message==="LIMITED"&&historyData){
+        historyStatus.textContent="Consulta ocupada; se conserva el intervalo anterior: "+formatPanama(new Date(historyData.start_epoch*1000))+" — "+formatPanama(new Date(historyData.end_epoch*1000));
+        return;
+      }
       clearHistory();
       historyStatus.textContent=error.message==="LIMITED"?
         "Consulta ocupada. Intente nuevamente después de dos segundos.":
         "No fue posible obtener o representar el histórico.";
     } finally {
-      if(epoch===historyEpoch) {historyBusy=false;historyRun.disabled=false;}
+      if(epoch===historyEpoch) historyBusy=false;
     }
   }
 
-  historyRun.addEventListener("click",updateHistory);
-  historyGroup.addEventListener("change",clearHistory);
-  historyWindow.addEventListener("change",clearHistory);
+  function historySelectionChanged(){clearHistory();if(refreshPreference.auto)refreshCurrent("auto");}
+  historyGroup.addEventListener("change",historySelectionChanged);
+  historyWindow.addEventListener("change",historySelectionChanged);
   new MutationObserver(()=>{
     if(historyData&&historyAllowed()) drawHistory(historyData,historyEpoch).catch(()=>{
       clearHistory();historyStatus.textContent="No fue posible actualizar la apariencia del gráfico.";
@@ -1278,6 +1280,61 @@ function initializeConsole() {
   window.addEventListener("pageshow", event => {
     if (event.persisted) recover();
   });
+  // Un solo temporizador de adquisición; la caducidad visual continúa sin consultas.
+  const refreshControls=document.getElementById("refresh-controls");
+  const refreshAuto=document.getElementById("refresh-auto");
+  const refreshInterval=document.getElementById("refresh-interval");
+  let refreshPreference=parseRefresh(null),refreshBusy=false;
+  try{refreshPreference=parseRefresh(localStorage.getItem(refreshKey));}catch{}
+  const scheduler=refreshScheduler(refreshCurrent,window);
+  function refreshAvailable(){
+    return dashboardAllowed()||topologyAllowed()||networkAllowed()||historyAllowed()||debugAllowed();
+  }
+  function syncRefreshControls(){
+    refresh.disabled=refreshBusy||!refreshAvailable()||!session||serverNow()>=session.warningAt;
+    refresh.textContent=refreshBusy?"Actualizando…":"Actualizar";
+  }
+  async function refreshCurrent(reason="manual"){
+    if(refreshBusy||!refreshAvailable()||document.hidden||serverNow()>=session.warningAt)return;
+    if(reason==="auto"&&!refreshPreference.auto)return;
+    if(debugAllowed()&&reason==="auto"&&!debugArmed)return;
+    refreshBusy=true;syncRefreshControls();
+    try{
+      if(dashboardAllowed())await updateDashboard();
+      else if(topologyAllowed())await updateTopology();
+      else if(networkAllowed())await updateNetwork();
+      else if(historyAllowed())await updateHistory();
+      else if(debugAllowed()){
+        if(!debugReady)await loadDebug();
+        else if(reason!=="initial")await runDebug();
+      }
+    }finally{refreshBusy=false;syncRefreshControls();}
+  }
+  function applyRefreshPreference(){
+    refreshAuto.checked=refreshPreference.auto;
+    refreshInterval.value=String(refreshPreference.seconds);
+    refreshInterval.disabled=!refreshPreference.auto;
+    scheduler.configure(refreshPreference);
+    syncRefreshControls();
+  }
+  function saveRefreshPreference(){
+    const value=refreshValue(refreshAuto.checked,Number(refreshInterval.value));
+    refreshPreference=parseRefresh(value);
+    try{localStorage.setItem(refreshKey,value);}catch{}
+    applyRefreshPreference();
+  }
+  refresh.addEventListener("click",()=>refreshCurrent("manual"));
+  refreshAuto.addEventListener("change",saveRefreshPreference);
+  refreshInterval.addEventListener("change",saveRefreshPreference);
+  window.addEventListener("storage",event=>{
+    if(event.key===refreshKey||event.key===null){
+      refreshPreference=parseRefresh(event.key===null?null:event.newValue);applyRefreshPreference();
+    }
+  });
+  document.addEventListener("visibilitychange",()=>{
+    if(!document.hidden&&refreshPreference.auto)refreshCurrent("auto");
+  });
+  applyRefreshPreference();
   setInterval(tick, 1000);
   recover();
 }

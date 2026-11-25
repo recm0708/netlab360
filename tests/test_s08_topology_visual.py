@@ -111,7 +111,8 @@ class TopologyVisualTests(unittest.TestCase):
     def test_controller_and_fullscreen(self):
         html = (UI / "index.html").read_text(encoding="utf-8")
         js = (UI / "static/app.js").read_text(encoding="utf-8")
-        self.assertIn('href="/topology?view=detailed" target="_blank" rel="noopener"', html)
+        self.assertIn('href="/topology?view=detailed">Vista detallada', html)
+        self.assertNotIn('href="/topology?view=detailed" target="_blank"', html)
         self.assertIn('id="topology-workspace"', html)
         self.assertIn("topologyWorkspace.requestFullscreen()", js)
         self.assertIn("document.exitFullscreen()", js)
@@ -119,5 +120,6 @@ class TopologyVisualTests(unittest.TestCase):
         self.assertIn("applyTopologyBox();", js)
         self.assertIn("moveViewport(topologyMode", js)
         self.assertIn('if(status===429)', js)
-        self.assertIn("scheduleTopology(delay)", js)
+        self.assertIn("refreshCurrent", js)
+        self.assertNotIn("scheduleTopology(", js)
         self.assertIn('await debugRead("/api/v1/topology")', js)

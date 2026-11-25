@@ -68,20 +68,20 @@ class StructureTests(unittest.TestCase):
         html = (UI / "index.html").read_text(encoding="utf-8")
         for key in ("coverage", "routers", "wan", "vlan", "ha", "lacp", "sdn", "inference", "advisory"):
             self.assertIn(f'id="dash-{key}"', html)
-        self.assertIn('id="dashboard-auto" type="checkbox" checked', html)
+        self.assertIn('id="refresh-auto" type="checkbox" checked', html)
         self.assertIn('id="dashboard-rows"', html)
         js = (UI / "static/app.js").read_text(encoding="utf-8")
         self.assertIn("dashboardBatch(key,data,started)", js)
         self.assertIn("dashboardEpoch++", js)
-        self.assertIn("dashboardAuto.checked&&!document.hidden&&dashboardAllowed()", js)
-        self.assertIn("},15000);", js)
+        self.assertIn('if(reason==="auto"&&!refreshPreference.auto)return', js)
+        self.assertIn("scheduler.configure(refreshPreference)", js)
         self.assertIn("await debugRead(path)", js)
         self.assertIn("clearDashboard();", js)
 
     def test_debug_structure_and_exports(self):
         html = (UI / "index.html").read_text(encoding="utf-8")
         self.assertIn('id="debug-view" hidden', html)
-        for name in ("debug-run", "debug-copy", "debug-json", "debug-csv"):
+        for name in ("refresh", "debug-copy", "debug-json", "debug-csv"):
             self.assertIn(f'id="{name}"', html)
         js = (UI / "static/app.js").read_text(encoding="utf-8")
         self.assertIn('debugPaths.has(debugSelect.value)', js)
@@ -135,7 +135,7 @@ class StructureTests(unittest.TestCase):
 
     def test_theme_storage_is_enum_only(self):
         js = (UI / "static/app.js").read_text(encoding="utf-8")
-        self.assertEqual(js.count("localStorage."), 2)
+        self.assertEqual(js.count("localStorage."), 4)
         self.assertIn('const themeKey = "netlab360.theme.v1"', js)
         self.assertIn('const themes = ["auto", "light", "dark"]', js)
         self.assertIn("themePreference = validTheme(value)", js)
@@ -406,3 +406,17 @@ class NetworkViewStructureTests(unittest.TestCase):
         self.assertIn("dashboardBatch(key,data,started)", js)
         self.assertIn("clearNetwork();", js)
         self.assertIn("No acredita forwarding ni cumplimiento de ACL", js)
+
+
+class GlobalRefreshTests(unittest.TestCase):
+    def test_single_control_and_dispatch(self):
+        html = (UI / "index.html").read_text(encoding="utf-8")
+        js = (UI / "static/app.js").read_text(encoding="utf-8")
+        self.assertEqual(html.count('id="refresh"'), 1)
+        for old in ("dashboard-auto", "network-refresh", "topology-run", "history-run", "debug-run"):
+            self.assertNotIn(f'id="{old}"', html)
+        self.assertIn('const refreshIntervals=Object.freeze([5,10,15,30,60,300])', js)
+        self.assertIn('if(refreshBusy||!refreshAvailable()||document.hidden', js)
+        self.assertIn('if(debugAllowed()&&reason==="auto"&&!debugArmed)return', js)
+        self.assertIn('localStorage.setItem(refreshKey,value)', js)
+        self.assertIn('topologyWorkspace.prepend(refreshControls)', js)

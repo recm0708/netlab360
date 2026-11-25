@@ -355,7 +355,7 @@ o vigencia; la API no acepta destinos arbitrarios. Conservamos la
 interfaz previa hasta completar y validar la equivalencia funcional.
 
 Mantenemos una vista resumida con dos enlaces WAN lógicos y una vista
-detallada en otra pestaña, abierta mediante /topology?view=detailed.
+detallada en la misma pestaña, abierta mediante /topology?view=detailed.
 La representación detallada conserva los 18 nodos y 21 enlaces,
 incluidas las relaciones HTTP. Separamos físicamente el dibujo de las
 conexiones de acceso y las relaciones lógicas de servicio. Actualizamos
@@ -378,3 +378,15 @@ validadas de la consola, con procedencia y vigencia por recurso. No
 atribuimos adyacencias OSPF, cumplimiento ACL, tráfico ni disponibilidad
 extremo a extremo a muestras administrativas o de control. Esas
 comprobaciones requieren las adquisiciones y pruebas correspondientes.
+
+## Actualización común de la consola
+
+Centralizamos la consulta manual y automática en la cabecera, incluso en
+pantalla completa. La preferencia contiene solo un interruptor y uno de
+los intervalos 5, 10, 15, 30, 60 o 300 segundos; el valor inicial es cinco
+segundos. Consultamos únicamente la vista activa, sin solicitudes
+superpuestas ni renovación automática de la sesión. Las muestras
+caducan aunque se pause la adquisición. En el explorador técnico la
+repetición automática comienza tras una consulta explícita; cambiar el
+recurso la desarma. Las páginas aún no implementadas no ejecutan
+consultas. Conservamos las protecciones y límites del servidor.

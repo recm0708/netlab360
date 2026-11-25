@@ -1,0 +1,54 @@
+"""Verificamos preferencias y temporizador global con reloj controlado."""
+from pathlib import Path
+import shutil
+import subprocess
+import unittest
+
+ROOT = Path(__file__).resolve().parents[1]
+APP = ROOT / "servicios/consola-s08/ui/static/app.js"
+
+SCRIPT = r"""
+const fs=require("node:fs"),vm=require("node:vm"),assert=require("node:assert/strict");
+const js=fs.readFileSync(process.argv[1],"utf8");
+const start=js.indexOf("const refreshIntervals=");
+const end=js.indexOf("/* Fin de preferencias de actualización. */");
+assert(start>=0&&end>start);
+const ctx=vm.createContext({});
+vm.runInContext(js.slice(start,end)+"\nthis.model={parseRefresh,refreshValue,refreshScheduler};",ctx);
+const m=ctx.model;
+assert.equal(m.parseRefresh(null).seconds,5);
+assert.equal(m.parseRefresh(null).auto,true);
+for(const seconds of [5,10,15,30,60,300]){
+  const value=m.refreshValue(false,seconds);
+  assert.equal(m.parseRefresh(value).seconds,seconds);
+  assert.equal(m.parseRefresh(value).auto,false);
+}
+for(const invalid of ["on:1","off:999","on:5:secret","x",{},null]){
+  assert.equal(m.parseRefresh(invalid).seconds,5);
+  assert.equal(m.parseRefresh(invalid).auto,true);
+}
+let count=0,seq=0;
+const timers=new Map();
+const clock={setInterval(fn,ms){const id=++seq;timers.set(id,{fn,ms});return id;},clearInterval(id){timers.delete(id);}};
+const scheduler=m.refreshScheduler(reason=>{assert.equal(reason,"auto");count++;},clock);
+scheduler.configure(m.parseRefresh("on:5"));
+assert.equal(timers.size,1);
+assert.equal([...timers.values()][0].ms,5000);
+[...timers.values()][0].fn();assert.equal(count,1);
+scheduler.configure(m.parseRefresh("on:30"));
+assert.equal(timers.size,1);assert.equal([...timers.values()][0].ms,30000);
+scheduler.configure(m.parseRefresh("off:30"));
+assert.equal(timers.size,0);assert.equal(count,1);
+scheduler.configure(m.parseRefresh("on:300"));
+assert.equal([...timers.values()][0].ms,300000);
+scheduler.stop();assert.equal(timers.size,0);
+"""
+
+
+class RefreshSchedulerTests(unittest.TestCase):
+    @unittest.skipUnless(shutil.which("node"), "Node requerido para temporizador")
+    def test_preference_and_clock(self):
+        result = subprocess.run(
+            ["node", "-e", SCRIPT, str(APP)],
+            capture_output=True, text=True, timeout=15)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)

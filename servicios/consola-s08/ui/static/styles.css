@@ -292,3 +292,15 @@ details.summary > summary { cursor: pointer; font-weight: 600; }
 .topology-toolbar select { font:inherit; background:var(--surface); color:var(--text); border:1px solid var(--line); border-radius:6px; padding:7px; }
 #network-view table { width:100%; border-collapse:collapse; }
 #network-view th,#network-view td { text-align:left; padding:10px; border-bottom:1px solid var(--line); }
+
+/* Control global compartido por toda la consola, también en pantalla completa. */
+.refresh-slot { flex:1 0 100%; min-width:0; }
+.refresh-controls { display:flex; flex-wrap:wrap; justify-content:flex-end; align-items:center; gap:12px; }
+.refresh-controls label { display:flex; align-items:center; gap:7px; font-size:.85rem; color:var(--muted); }
+.refresh-controls input { accent-color:var(--accent); }
+.refresh-controls select { background:var(--surface); color:var(--text); border:1px solid var(--line); border-radius:6px; font:inherit; padding:7px; }
+#topology-workspace:fullscreen .refresh-controls { margin-bottom:12px; }
+/* El foco no dibuja un segundo contorno sobre controles ni elementos SVG. */
+:focus { outline:none !important; }
+:focus:not(:focus-visible) { box-shadow:none !important; }
+@media(max-width:700px){.refresh-controls{justify-content:flex-start;}}
