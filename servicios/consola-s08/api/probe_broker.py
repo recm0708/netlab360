@@ -39,7 +39,7 @@ def decode_request(raw):
         raise ValueError("INVALID_SELECTION") from None
 
 
-def read_request(conn):
+def read_frame(conn):
     """Limitar bytes y tiempo de lectura; no procesar una segunda solicitud."""
     deadline = time.monotonic() + 3
     data = bytearray()
@@ -54,7 +54,11 @@ def read_request(conn):
         data.extend(block)
         if b"\n" in data:
             break
-    return decode_request(bytes(data))
+    return bytes(data)
+
+
+def read_request(conn):
+    return decode_request(read_frame(conn))
 
 
 def peer_uid(conn):
@@ -114,12 +118,12 @@ def response(status, result=None):
     return {"schema": "NETLAB360_S08_BROKER_V1", "status": status, "result": result}
 
 
-def handle(conn, allowed_uid, lock_factory=global_lock, executor=run_probe, transfer=None):
+def handle(conn, allowed_uid, lock_factory=global_lock, executor=run_probe, transfer=None, selection=None):
     """Autorizar al par y reservar la plaza antes de llamar al ejecutor."""
     try:
         if type(allowed_uid) is not int or allowed_uid <= 0 or peer_uid(conn) != allowed_uid:
             return response("DENIED")
-        selection = read_request(conn)
+        selection = read_request(conn) if selection is None else selection
         is_probe = selection.action in probe_executor.ACTIONS
         if not is_probe and transfer is None:
             return response("NOT_ENABLED")
@@ -140,9 +144,32 @@ def handle(conn, allowed_uid, lock_factory=global_lock, executor=run_probe, tran
         return response("REJECTED")
 
 
-def serve(conn, allowed_uid, transfer=None):
+def serve(conn, allowed_uid, transfer=None, worker=None):
     """Una conexión, una respuesta acotada; sin acceso a SQLite ni shell."""
-    result = handle(conn, allowed_uid, transfer=transfer)
+    if type(allowed_uid) is not int or allowed_uid <= 0 or peer_uid(conn) != allowed_uid:
+        result = response("DENIED")
+    else:
+        try:
+            raw_request = read_frame(conn)
+            if len(raw_request) > MAX_REQUEST or raw_request.count(b"\n") != 1 or not raw_request.endswith(b"\n"):
+                raise ValueError("INVALID_FRAME")
+            data = json.loads(raw_request.decode("utf-8"), object_pairs_hook=unique_object)
+            if type(data) is dict and data.get("stream") is True:
+                from . import broker_stream
+                selection = select({k: v for k, v in data.items() if k != "stream"})
+                if worker is None or selection.action != "test.content.tcp":
+                    broker_stream.frame(conn, broker_stream.final("NOT_ENABLED"))
+                    return
+                try:
+                    with global_lock():
+                        reply = broker_stream.run(conn, selection, *worker)
+                except BlockingIOError:
+                    reply = broker_stream.final("BUSY")
+                broker_stream.frame(conn, reply)
+                return
+            result = handle(conn, allowed_uid, transfer=transfer, selection=decode_request(raw_request))
+        except (ValueError, OSError, RecursionError, TypeError):
+            result = response("REJECTED")
     raw = (json.dumps(result, allow_nan=False, ensure_ascii=True) + "\n").encode()
     if len(raw) > MAX_RESPONSE:
         raw = (json.dumps(response("INVALID_RESULT")) + "\n").encode()
