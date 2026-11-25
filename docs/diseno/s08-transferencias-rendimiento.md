@@ -14,7 +14,7 @@ El ejecutor manual de transferencias usa el catálogo de identidades y rutas de 
 | tcp-2gb | TCP | 2 000 000 000 bytes | 100 Mbit/s | 220/230 s |
 | tcp-5gb | TCP | 5 000 000 000 bytes | 100 Mbit/s | 520/530 s |
 
-La tasa es un objetivo de pacing, no un policer estricto. El perfil por bytes permite comprobar el volumen recibido; no acredita identidad del contenido de un archivo. Los perfiles extendidos utilizan ventanas de 10 s desde 1 GB para acotar el tamaño del JSON. La verificación de contenido se realiza de forma independiente con el ejecutor TCP de contenido reproducible. El seguimiento en vivo y los escenarios de conmutación no están habilitados.
+La tasa es un objetivo de pacing, no un policer estricto. El perfil por bytes fija un objetivo mínimo de medición; iPerf3 puede superar ese objetivo. Registramos el volumen real, el estado EXACT, EXCEEDED o SHORT, el excedente y el déficit; no imponemos una tolerancia inventada ni confundimos un excedente con una transferencia incompleta. Para TCP exigimos que ambos extremos concuerden en bytes y que se alcance el objetivo. Un resultado satisfactorio no acredita tamaño exacto ni identidad del contenido de un archivo. La tasa objetivo y los timeouts se mantienen; no constituyen un límite estricto de bytes transmitidos. Para un volumen exacto se utiliza el ejecutor de contenido. Los perfiles extendidos utilizan ventanas de 10 s desde 1 GB para acotar el tamaño del JSON. La verificación de contenido se realiza de forma independiente con el ejecutor TCP de contenido reproducible. El seguimiento en vivo y los escenarios de conmutación no están habilitados.
 
 ## Operación local
 
