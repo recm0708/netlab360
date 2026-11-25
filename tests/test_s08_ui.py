@@ -38,10 +38,27 @@ class StructureTests(unittest.TestCase):
     def test_local_resources_and_unique_ids(self):
         parser = PageParser()
         parser.feed((UI / "index.html").read_text(encoding="utf-8"))
-        self.assertEqual(set(parser.resources), {"/ui/static/styles.css", "/ui/static/app.js", "/ui/static/history.js", "/ui/static/topology.js"})
+        self.assertEqual(set(parser.resources), {"/ui/static/styles.css", "/ui/static/app.js",
+                                                 "/ui/static/history.js", "/ui/static/topology.js",
+                                                 "/ui/static/jobs.js"})
         self.assertEqual(len(parser.ids), len(set(parser.ids)))
         self.assertTrue({"main", "refresh", "notice", "api-state", "capabilities", "observed"} <= set(parser.ids))
         self.assertFalse(parser.inline)
+        self.assertTrue({"jobs-title", "jobs-result-panel", "jobs-transfer-panel",
+                         "jobs-diagnostic-panel", "jobs-diagnostic-rows",
+                         "jobs-history", "console-mode"} <= set(parser.ids))
+        html = (UI / "index.html").read_text(encoding="utf-8")
+        self.assertIn("<th>Fecha y hora</th><th>Tipo de prueba</th><th>Configuración</th>", html)
+        self.assertIn('id="jobs-title" tabindex="-1"', html)
+        self.assertIn('class="dashboard-table jobs-table"', html)
+        css = (UI / "static/styles.css").read_text(encoding="utf-8")
+        self.assertIn("#main table { width:100%; max-width:100%; min-width:0; table-layout:auto;", css)
+        self.assertIn("#main table :is(th,td) { text-align:left; vertical-align:middle; padding:8px 14px;", css)
+        self.assertIn("#main .dashboard-table-wrap { margin-block:12px 0; }", css)
+        self.assertIn("#main .action-row { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-block:12px; }", css)
+        self.assertIn('class="action-row"><button type="button" id="jobs-refresh"', html)
+        self.assertNotIn("#jobs-view .jobs-table { min-width:", css)
+        self.assertNotIn("Fecha y hora (Panamá)", html)
 
     def test_separate_login_resources(self):
         parser = PageParser()
@@ -63,6 +80,19 @@ class StructureTests(unittest.TestCase):
                       "document.cookie", "eval(", "new Function("):
             self.assertNotIn(value, js)
         self.assertIn('credentials: "omit"', js)
+        jobs_js = (UI / "static/jobs.js").read_text(encoding="utf-8")
+        for value in ("innerHTML", "document.cookie", "eval(", "new Function(",
+                      "localStorage", "sessionStorage"):
+            self.assertNotIn(value, jobs_js)
+        for fragment in ('"test.ping.short":"Ping corto"', '"test.ping.long":"Ping extendido"',
+                         '"test.traceroute":"Traceroute"', '"4 paquetes ICMP"', '"20 paquetes ICMP"',
+                         "dateLabel(job.created_at_utc)", "actionLabel(job.selection)",
+                         "profileLabel(job.selection)", "statusLabel(job)",
+                         'byId("result-panel").scrollIntoView', 'byId("title").focus',
+                         "preferred || selected?.job_id || body.jobs.find(active)?.job_id",
+                         '"fecha_utc","fecha_panama","accion_id","prueba"'):
+            self.assertIn(fragment, jobs_js)
+        self.assertIn("authRequest, formatPanama)", js)
 
     def test_dashboard_structure_and_read_only_polling(self):
         html = (UI / "index.html").read_text(encoding="utf-8")
@@ -299,7 +329,8 @@ class UIHttpTests(unittest.TestCase):
                            ("/ui/static/app.js", "text/javascript"),
                            ("/ui/static/login.js", "text/javascript"),
                            ("/ui/static/history.js", "text/javascript"),
-                           ("/ui/static/topology.js", "text/javascript")):
+                           ("/ui/static/topology.js", "text/javascript"),
+                           ("/ui/static/jobs.js", "text/javascript")):
             r = self.client.get(path)
             self.assertEqual(r.status_code, 200)
             self.assertIn(mime, r.headers["content-type"])

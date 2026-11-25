@@ -22,7 +22,7 @@ WINDOW = 60
 def require_origin(request: Request) -> None:
     """Exigir el origen exacto de la consola local en toda escritura."""
     origin = request.headers.get("origin")
-    if origin not in ORIGINS or origin != "http://" + request.headers.get("host", ""):
+    if origin not in getattr(request.app.state, "allowed_origins", ORIGINS) or origin != "http://" + request.headers.get("host", ""):
         raise HTTPException(403)
 
 

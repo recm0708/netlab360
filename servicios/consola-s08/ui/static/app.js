@@ -341,7 +341,7 @@ function initializeConsole() {
       ]);
       if (health.project !== "NETLAB360" || caps.project !== "NETLAB360" ||
           health.service !== "netlab360-s08-console" ||
-          health.mode !== "AUTHENTICATED_READ_ONLY" ||
+          !["AUTHENTICATED_READ_ONLY","AUTHENTICATED_JOBS"].includes(health.mode) ||
           caps.mode !== health.mode ||
           health.network_mutations_authorized !== false ||
           caps.network_mutations_authorized !== false) {
@@ -353,11 +353,13 @@ function initializeConsole() {
       apiState.dataset.state = health.healthy === true ? "ok" : "unknown";
       observed.textContent = "Respuesta del proceso (Panamá): " + formatPanama(stamp);
       showCapabilities(caps);
+      document.getElementById("console-mode").textContent = health.mode === "AUTHENTICATED_JOBS" ? "Pruebas autorizadas" : "Solo lectura";
       notice.textContent = "Metadatos recibidos. La salud global de red sigue siendo UNKNOWN.";
     } catch {
       apiState.textContent = "UNKNOWN";
       apiState.dataset.state = "unknown";
       showCapabilities({});
+      document.getElementById("console-mode").textContent = "Modo no confirmado";
       notice.textContent = "No se pudieron validar los metadatos. No se conservan valores previos.";
     }
   }
@@ -381,6 +383,12 @@ function initializeConsole() {
   let busy = false;
   let activityTimer = null;
   let lastActivitySent = -Infinity;
+  // El proceso previo puede servir archivos nuevos sin tener registrada la ruta del módulo.
+  const jobsView = typeof createJobsView === "function"
+    ? createJobsView(() => session ? {...session, active: serverNow() < session.warningAt} : null, authRequest, formatPanama)
+    : {controls(){}, reset(){}, sync(){
+      if (location.pathname === "/diagnostics") document.getElementById("jobs-notice").textContent = "Ejecución de pruebas no habilitada en esta instancia.";
+    }};
 
   // Los plazos proceden del servidor. El reloj monotónico evita que un
   // cambio del reloj local prolongue la presentación de una sesión vencida.
@@ -390,6 +398,7 @@ function initializeConsole() {
 
   function controls() {
     syncRefreshControls();
+    jobsView.controls();
     logout.disabled = busy || session === null;
     idleLogout.disabled = busy || session === null;
     idleContinue.disabled = busy || session === null ||
@@ -401,6 +410,7 @@ function initializeConsole() {
     activityTimer = null;
     lastActivitySent = -Infinity;
     session = null;
+    jobsView.reset();
     resetDebug();
     clearDashboard();
     clearHistory();
@@ -469,10 +479,11 @@ function initializeConsole() {
     recoveryPanel.hidden = true;
     if (first) {
       restorePresentation();
+      if (location.pathname !== "/home") void update();
       refreshCurrent("initial").then(() => restoreContentIfUnchanged());
       if (debugAllowed() && new URLSearchParams(location.search).get("tab") === "docs") openSwagger();
     }
-    authNotice.textContent = "Sesión vigente. Acciones de red deshabilitadas.";
+    authNotice.textContent = "Sesión vigente. Las mutaciones de red están deshabilitadas.";
     controls();
     tick();
   }
@@ -505,6 +516,7 @@ function initializeConsole() {
     if (!session) return;
     const remaining = Math.ceil(session.expiresAt - serverNow());
     if (remaining <= 0) {
+      jobsView.reset();
       clearDashboard();
       clearHistory();
       clearTopology();
@@ -533,6 +545,7 @@ function initializeConsole() {
       idleDialog.close();
     }
     controls();
+    void jobsView.sync();
   }
 
   async function renew(confirmed) {
@@ -626,7 +639,9 @@ function initializeConsole() {
     const history = active.dataset.view === "observability";
     const topology = active.dataset.view === "topology";
     const network = ["/wan","/lan","/services","/lacp","/sdn","/intelligence"].includes(location.pathname);
-    document.getElementById("module-view").hidden = home || debug || history || topology || network;
+    const jobs = active.dataset.view === "diagnostics";
+    document.getElementById("jobs-view").hidden = !jobs;
+    document.getElementById("module-view").hidden = home || debug || history || topology || network || jobs;
     document.getElementById("network-view").hidden = !network;
     document.getElementById("topology-view").hidden = !topology;
     document.getElementById("history-view").hidden = !history;

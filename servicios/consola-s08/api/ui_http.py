@@ -73,6 +73,11 @@ def register_ui(app: FastAPI, directory) -> None:
         return Response((UI / "static/app.js").read_text(encoding="utf-8"),
                         media_type="text/javascript")
 
+    @app.get("/ui/static/jobs.js", include_in_schema=False)
+    def jobs_script():
+        return Response((UI / "static/jobs.js").read_text(encoding="utf-8"),
+                        media_type="text/javascript")
+
     @app.get("/ui/static/login.js", include_in_schema=False)
     def login_script():
         return Response((UI / "static/login.js").read_text(encoding="utf-8"),

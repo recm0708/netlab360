@@ -17,7 +17,7 @@ class Health(PublicModel):
     project: Literal["NETLAB360"] = "NETLAB360"
     schema_version: Literal[1] = 1
     service: Literal["netlab360-s08-console"] = "netlab360-s08-console"
-    mode: Literal["BOOTSTRAP_READ_ONLY", "AUTHENTICATED_READ_ONLY"] = "BOOTSTRAP_READ_ONLY"
+    mode: Literal["BOOTSTRAP_READ_ONLY", "AUTHENTICATED_READ_ONLY", "AUTHENTICATED_JOBS"] = "BOOTSTRAP_READ_ONLY"
     healthy: Literal[True] = True
     infrastructure_state: Literal["UNKNOWN"] = "UNKNOWN"
     generated_at_utc: datetime
@@ -28,7 +28,7 @@ class Capabilities(PublicModel):
     """Inventario de funciones disponibles y pendientes durante el arranque."""
     project: Literal["NETLAB360"] = "NETLAB360"
     schema_version: Literal[1] = 1
-    mode: Literal["BOOTSTRAP_READ_ONLY", "AUTHENTICATED_READ_ONLY"] = "BOOTSTRAP_READ_ONLY"
+    mode: Literal["BOOTSTRAP_READ_ONLY", "AUTHENTICATED_READ_ONLY", "AUTHENTICATED_JOBS"] = "BOOTSTRAP_READ_ONLY"
     health_available: Literal[True] = True
     source_readers_enabled: bool = False
     persistence_enabled: bool = False

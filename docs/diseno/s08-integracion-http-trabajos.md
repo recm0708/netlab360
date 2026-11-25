@@ -1,22 +1,35 @@
 # Integración HTTP de trabajos de diagnóstico
 
-Las rutas de trabajos se registran únicamente si la aplicación recibe un transporte explícito y una base de estado. El arranque normal no habilita estas rutas. La integración permite probar el contrato HTTP con un transporte sintético, sin tráfico ni cambios en la instalación existente.
+La aplicación habilita el contrato de trabajos únicamente con un transporte explícito y una base privada. El arranque habitual conserva sus rutas de lectura. La instancia dedicada adquiere un bloqueo exclusivo antes de abrir las rutas y comprobar trabajos interrumpidos.
 
 ## Contrato HTTP
 
 | Método | Ruta | Función |
 |---|---|---|
-| GET | /api/v1/jobs/catalog | Consultar las 34 selecciones del contrato |
-| POST | /api/v1/jobs | Registrar un trabajo y solicitar su despacho |
-| GET | /api/v1/jobs/{job_id} | Consultar un trabajo propio |
-| POST | /api/v1/jobs/{job_id}/cancel | Cancelar un trabajo que todavía está en cola |
+| GET | /api/v1/jobs/catalog | Consultar las 34 selecciones y alcance del transporte |
+| GET | /api/v1/jobs | Consultar hasta 50 trabajos propios, activos primero |
+| POST | /api/v1/jobs | Registrar y despachar un trabajo |
+| GET | /api/v1/jobs/{job_id} | Consultar estado, muestras y resultado propios |
+| POST | /api/v1/jobs/{job_id}/cancel | Solicitar cancelación de un trabajo en cola o de contenido activo |
 
-Exigimos operador habilitado y sesión vigente. Las escrituras requieren origen exacto y comprobante CSRF. Limitamos el cuerpo y rechazamos claves repetidas, parámetros adicionales y selecciones fuera del catálogo. La identidad del actor procede de la sesión. No renovamos la sesión por sondeos. Un trabajo activo impide otro en la misma base.
+Exigimos operador habilitado y sesión vigente. Las escrituras requieren origen exacto y comprobante CSRF. Limitamos cuerpo y parámetros. El actor procede de la sesión, no del navegador. Los sondeos no renuevan la sesión.
 
-El despacho se reclama una sola vez mediante la transición transaccional. Solo una respuesta de medición satisfactoria y concordante con la selección permite cerrar el trabajo. La salud observada es independiente del éxito de la ejecución. Si el transporte se desconecta, devuelve un rechazo, informa error o produce un resultado incompatible, conservamos RUNNING y registramos UNCERTAIN cuando es posible. No reintentamos automáticamente ni liberamos la reserva sin conciliación. Esta política es deliberadamente conservadora: incluso una respuesta BUSY queda pendiente de conciliación hasta distinguir de forma verificable la no ejecución y la limpieza.
+## Ejecución y recuperación
 
-## Cliente Unix y despliegue
+El despacho reclama una reserva transaccional una sola vez. Los diagnósticos e iPerf3 conservan el protocolo de respuesta final. El canal de contenido permite muestras independientes del emisor y receptor, con cancelación activa después de la aceptación de la conexión. Cancelación solicitada y cancelación confirmada son estados distintos: la plaza solo se libera con respuesta final que confirme limpieza. Si falta confirmación, conservamos RUNNING con calidad UNCERTAIN; no reintentamos automáticamente.
 
-El cliente real exige la cuenta netlab360-s08-api, valida propiedad y modo del socket, identidad del par servidor, tamaño de respuesta y plazo total de recepción. Solo envía la selección cerrada. No ejecuta sudo ni acepta rutas arbitrarias. El proceso web actual no se cambia de identidad en esta revisión.
+Al iniciar bajo el bloqueo de instancia, cancelamos trabajos en cola abandonados y marcamos los trabajos en ejecución como inciertos. Nunca inferimos limpieza por tiempo transcurrido. La conciliación de una ejecución incierta requiere comprobación operacional independiente. No se habilita un desbloqueo administrativo por HTTP.
 
-Las pruebas HTTP utilizan bases temporales y resultados sintéticos identificados como tales. La validación del cliente Unix real se realiza independientemente con la cuenta dedicada. El despliegue web requiere preparar una instancia aislada con esa identidad y estado propio, verificar acceso a sus recursos, ajustar capacidades publicadas y aceptar recuperación de trabajos pendientes. El despacho posterior a la respuesta HTTP no es una cola durable independiente del proceso: un reinicio puede dejar un trabajo en cola o en ejecución. La cancelación activa, conciliación operacional tras interrupción, histórico y seguimiento en vivo permanecen pendientes. No se habilitan intervenciones de red.
+## Vista de pruebas y datos
+
+La vista de pruebas ofrece selección cerrada de acción, ruta y perfil. Los paneles muestran contadores medidos, tasa por intervalo y avance de recepción real cuando existe volumen y observación. Los intervalos de iPerf3 se presentan al finalizar y no como muestras en vivo. Conservamos el historial propio, el resultado detallado y exportación JSON o CSV de las muestras mediante identificadores únicos. No mostramos integridad confirmada de contenido parcial ni estimamos avance a partir del tiempo.
+
+El historial identifica el tipo de prueba y su configuración legible, sin sustituir los identificadores del contrato. Presentamos fechas con el formato y la zona horaria Panamá de la consola; conservamos UTC en la exportación. La consulta de un resultado desplaza el foco al panel seleccionado y mantiene la selección durante el sondeo. Las pruebas ICMP, traceroute y HTTP presentan sus mediciones específicas sin paneles de transferencia vacíos. El CSV incluye identidad de prueba, configuración, resumen y muestras observadas; el JSON conserva el documento original.
+
+La instancia de validación utiliza el puerto local 9145 y su origen exacto, con una base independiente. El servicio existente permanece en el puerto 9140. El piloto verifica el flujo HTTP real y reabre el historial, mientras que la navegación visual y el despliegue definitivo requieren aceptación adicional.
+
+## Convenciones visuales compartidas
+
+Las tablas propias de la consola, incluidas las vistas futuras, ocupan todo el ancho útil de su panel, distribuyen las columnas automáticamente según el contenido y mantienen alineación horizontal izquierda y vertical centrada. Las celdas tienen separación interior uniforme de 8 px verticales y 14 px horizontales; las tablas se separan de los controles precedentes mediante un margen común. Los grupos de acciones permiten ajuste de línea. Se mantienen cabeceras visibles y desplazamiento cuando el espacio sea insuficiente. La cabecera Fecha y hora no repite la zona local; las fechas mantienen el reloj de Panamá y la exportación conserva UTC. Swagger mantiene su distribución especializada con celdas compactas y la paleta común.
+
+El único acceso oficial para el equipo será la consola en 9140. Las instancias de validación en 9145 son temporales y no constituyen otro producto. La consolidación definitiva preservará identidades autorizadas, históricos, fuentes y contratos internos; las páginas redundantes se retirarán después de validar equivalencia y recuperación. Los recursos locales de Swagger y las demás dependencias visuales deben estar disponibles en la instancia persistente.

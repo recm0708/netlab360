@@ -229,10 +229,16 @@ nav a { min-height: 42px; gap: 11px; border: 0; }
 .dashboard-grid .panel { margin: 0; }
 .dashboard-grid .metric { font-variant-numeric: tabular-nums; }
 .dashboard-table-wrap { max-height: 60vh; overflow: auto; overscroll-behavior: contain; }
-.dashboard-table { width: 100%; border-collapse: collapse; min-width: 790px; font-size: .85rem; }
-.dashboard-table th, .dashboard-table td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
-.dashboard-table th { position: sticky; top: 0; background: var(--surface); color: var(--text); z-index: 1; }
-.dashboard-table td:last-child { font-variant-numeric: tabular-nums; white-space: nowrap; }
+#main .dashboard-table-wrap { margin-block:12px 0; }
+#main .action-row { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-block:12px; }
+/* Tablas propias de la consola: ocupan el ancho útil del panel.
+   Las páginas actuales y futuras bajo main heredan la alineación y separación. */
+#main table { width:100%; max-width:100%; min-width:0; table-layout:auto; border-collapse:collapse; font-size:.9rem; }
+#main table :is(th,td) { text-align:left; vertical-align:middle; padding:8px 14px; border-bottom:1px solid var(--line); overflow-wrap:anywhere; }
+#main table th { position:sticky; top:0; background:var(--table-head,var(--surface)); color:var(--text); z-index:1; }
+#main table td { font-variant-numeric:tabular-nums; }
+#main table button { min-height:30px; padding:5px 10px; white-space:nowrap; font-size:inherit; }
+#main table th:last-child { white-space:nowrap; }
 .dashboard-table td[data-state] { font-weight: 600; }
 details.summary > summary { cursor: pointer; font-weight: 600; }
 
@@ -298,8 +304,6 @@ details.summary > summary { cursor: pointer; font-weight: 600; }
 .topology-toolbar { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:10px 0 14px; }
 .topology-toolbar label { display:flex; align-items:center; gap:8px; }
 .topology-toolbar select { font:inherit; background:var(--surface); color:var(--text); border:1px solid var(--line); border-radius:6px; padding:7px; }
-#network-view table { width:100%; border-collapse:collapse; }
-#network-view th,#network-view td { text-align:left; padding:10px; border-bottom:1px solid var(--line); }
 
 /* Control global compartido por toda la consola, también en pantalla completa. */
 .refresh-slot { flex:0 1 auto; min-width:0; }
@@ -330,8 +334,6 @@ input:not([type="checkbox"]) { font-size:var(--size-control); }
 .panel { padding:14px; margin-bottom:10px; }
 .status-grid,.dashboard-grid,.topology-layout { gap:10px; margin-bottom:10px; }
 .muted,.topology-inspector dt { font-size:var(--size-secondary); }
-.dashboard-table, #network-view table { font-size:1rem; }
-.dashboard-table th,.dashboard-table td,#network-view th,#network-view td { padding:7px 8px; }
 footer { padding:8px 20px; }
 .content-tools { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; margin:0 0 12px; }
 .content-tools #auth-notice { margin:0; }
@@ -353,7 +355,7 @@ footer { padding:8px 20px; }
 
 #alerts-content h2 { margin-top:16px; }
 #alerts-content select { background:var(--surface); color:var(--text); border:1px solid var(--line); border-radius:6px; }
-#alerts-content .dashboard-table-wrap { margin:8px 0 12px; }
+#main #alerts-content .dashboard-table-wrap { margin-block:12px; }
 
 /* Separación uniforme de las convenciones bajo las series históricas. */
 .history-state-key { margin:8px 0 0; }
@@ -387,3 +389,21 @@ td[data-state="unknown"] { --state-bg: var(--unknown-bg, transparent); }
 button.secondary, .topology-action {
   border-color: var(--control-line, var(--line));
 }
+
+/* Progreso medido y detalles de trabajos; paleta compartida entre temas. */
+#jobs-progress { width: 100%; height: 16px; accent-color: var(--accent); }
+#jobs-view .panel { margin-bottom: 14px; min-width: 0; }
+#jobs-view pre { max-height: 360px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; }
+#jobs-view .metric { overflow-wrap: anywhere; }
+
+/* Vista de pruebas: columnas completas, selección visible y adaptación al espacio. */
+#jobs-view .jobs-endpoints { grid-template-columns: repeat(2,minmax(0,1fr)); }
+#jobs-view .filter-row { display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
+#jobs-view .filter-row label { display:flex; align-items:center; gap:8px; }
+#jobs-history tr[data-selected="true"] { background:var(--recovery-bg); }
+#jobs-history tr[data-selected="true"] button { color:var(--accent); }
+#jobs-history td:first-child { white-space:nowrap; font-variant-numeric:tabular-nums; }
+#jobs-result-panel { scroll-margin-top:12px; }
+#jobs-title:focus-visible { text-decoration:underline; text-underline-offset:4px; }
+#jobs-diagnostic-rows { margin:8px 0; padding-inline-start:24px; }
+@media(max-width:700px) { #jobs-view .jobs-endpoints { grid-template-columns:1fr; } }
