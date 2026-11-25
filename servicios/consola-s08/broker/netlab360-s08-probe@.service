@@ -1,0 +1,19 @@
+[Unit]
+Description=NETLAB360 S08 - Diagnostico protegido por conexion
+
+[Service]
+Type=exec
+User=root
+Group=root
+ExecStart=/usr/bin/python3 -I -B /usr/local/libexec/netlab360/s08-broker/entry.py
+StandardInput=socket
+StandardOutput=socket
+StandardError=journal
+WorkingDirectory=/
+UMask=0077
+NoNewPrivileges=yes
+ProtectHome=yes
+PrivateTmp=yes
+RuntimeMaxSec=90
+TimeoutStopSec=3
+KillMode=control-group
