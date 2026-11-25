@@ -10,6 +10,21 @@
     vlan:[110,120,130,210,220,230,310,320,330].map(n=>["VLAN-"+n,"ADMIN_STATE_ONLY","VLAN "+n])
   };
   const windows={"5m":300,"15m":900,"1h":3600};
+  // Paletas categóricas por identidad, independientes del significado del estado.
+  const palettes=Object.freeze({
+    dark:Object.freeze(["#60a5fa","#facc15","#c084fc","#2dd4bf","#f472b6","#fb923c","#a3e635","#94a3b8","#fb7185"]),
+    light:Object.freeze(["#1559ad","#936000","#7c3aad","#00756d","#ad2865","#b34b0a","#467315","#45556f","#a13a36"])
+  });
+
+  function stateLabel(scope,value) {
+    const labels={
+      SCRAPE_AVAILABILITY:["Scrape no disponible","Scrape disponible"],
+      COLLECTOR_READ:["Lectura fallida","Lectura disponible"],
+      CONTAINER_RUNNING_ONLY:["Contenedor detenido","Contenedor en ejecución"],
+      ADMIN_STATE_ONLY:["Administrativamente inactiva","Administrativamente activa"]
+    };
+    return value+" · "+labels[scope][value];
+  }
 
   function allowed(group,span) {
     return Object.hasOwn(catalog,group)&&Object.hasOwn(windows,span);
@@ -61,6 +76,7 @@
   function figure(data,format,colors) {
     const traces=[];
     const entries=catalog[data.group];
+    const palette=palettes[colors.theme === "light" ? "light" : "dark"];
     // Eje numérico en epoch: la etiqueta y el hover se formatean en Panamá.
     // Cada serie tiene una banda propia para evitar superposición de estados.
     for(const [index,[id,scope,name]] of entries.entries()) {
@@ -70,8 +86,8 @@
       traces.push({
         type:"scatter",mode:"markers",name,
         x:points.map(p=>p[0]),y:points.map(p=>lane+p[1]),
-        customdata:points.map(p=>[format(new Date(p[0]*1000)),p[1]===1?"1 · Activo":"0 · Inactivo"]),
-        marker:{size:5,color:points.map(p=>p[1]===1?colors.ok:colors.fault)},
+        customdata:points.map(p=>[format(new Date(p[0]*1000)),stateLabel(scope,p[1])]),
+        marker:{size:5,color:palette[index],symbol:points.map(p=>p[1]===1?"circle":"x")},
         hovertemplate:name+"<br>%{customdata[0]}<br>%{customdata[1]}<extra></extra>",
         showlegend:true
       });
@@ -87,7 +103,8 @@
         tickvals:times,ticktext:times.map(t=>format(new Date(t*1000)).slice(11)),title:{text:"Hora de Panamá"},gridcolor:colors.line},
       yaxis:{tickmode:"array",tickvals:ticks,ticktext:entries.map(x=>x[2]),range:[-0.6,entries.length*3-0.8],
         fixedrange:true,gridcolor:colors.line,zeroline:false},
-      legend:{orientation:"h",y:-0.30},showlegend:true
+      legend:{orientation:"h",x:0.5,xanchor:"center",y:-0.25,yanchor:"top"},
+      modebar:{color:colors.text,activecolor:palette[0],bgcolor:colors.surface},showlegend:true
     };
     return {traces,layout};
   }

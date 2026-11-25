@@ -31,6 +31,16 @@ assert.equal(fig.traces[0].x.length,2);
 assert.equal(fig.traces[0].x[1],1010);
 assert.equal(fig.traces[0].y[1],3);
 assert.equal(fig.traces[1].x.length,0);
+assert.notEqual(fig.traces[0].marker.color,fig.traces[1].marker.color);
+assert.equal(fig.traces[0].marker.symbol[0],"circle");
+assert.equal(fig.traces[0].marker.symbol[1],"x");
+assert.equal(fig.traces[0].customdata[0][1],"1 · Scrape disponible");
+assert.equal(fig.traces[0].customdata[1][1],"0 · Scrape no disponible");
+assert.equal(fig.layout.legend.x,0.5);
+assert.equal(fig.layout.legend.xanchor,"center");
+const light=h.figure(p,d=>d.toISOString(),{theme:"light",surface:"#fff",text:"#111",line:"#aaa"});
+assert.notEqual(light.traces[0].marker.color,fig.traces[0].marker.color);
+assert.equal(light.traces[0].marker.symbol[1],"x");
 for(const change of [
  q=>q.network_mutations_authorized=true,q=>q.series[0].scope="ADMIN_STATE_ONLY",
  q=>q.series[0].points.push([1301,1]),q=>q.series[0].points.push([1002,1]),
@@ -60,3 +70,5 @@ class HistoryVisualTests(unittest.TestCase):
         self.assertIn("historyEpoch++",js)
         self.assertIn("window.Plotly.purge(historyPlot)",js)
         self.assertNotIn("https://",html)
+        self.assertIn("history-state-key",html)
+        self.assertIn("El color identifica el recurso",html)

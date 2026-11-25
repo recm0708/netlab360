@@ -915,6 +915,7 @@ function initializeConsole() {
       const style=getComputedStyle(document.documentElement);
       const color=name=>style.getPropertyValue("--"+name).trim();
       const figure=window.NetlabHistory.figure(data,formatPanama,{
+        theme:document.documentElement.dataset.theme,
         surface:color("surface"),text:color("text"),line:color("line"),
         ok:color("ok"),fault:color("fault"),unknown:color("unknown")
       });

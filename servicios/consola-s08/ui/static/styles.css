@@ -237,3 +237,8 @@ details.summary > summary { cursor: pointer; font-weight: 600; }
 .history-counts { display:flex; flex-wrap:wrap; gap:20px; color:var(--muted); }
 .history-counts strong { color:var(--text); font-variant-numeric:tabular-nums; }
 #history-plot { width:100%; min-width:0; }
+
+/* Leyenda de estados separada de los colores categóricos de las series. */
+.history-state-key { display:flex; flex-wrap:wrap; justify-content:center; gap:10px 24px; color:var(--text); font-size:.85rem; }
+.history-state-key strong { font-size:1rem; }
+.history-explanation { text-align:center; }

@@ -118,7 +118,8 @@
             <p id="history-scope" class="muted"></p>
             <div class="history-counts"><p>Muestras válidas: <strong id="history-valid">—</strong></p><p>Muestras nulas: <strong id="history-null">—</strong></p><p>Series con datos: <strong id="history-series">—</strong></p></div>
             <div id="history-plot" aria-label="Gráfico temporal de muestras reales"></div>
-            <p class="muted">Cada marcador es una muestra observada. Los huecos no se interpolan. Eje temporal y fechas en Panamá (UTC−5).</p>
+            <div class="history-state-key" aria-label="Convenciones de estado"><span><strong aria-hidden="true">●</strong> 1 · Activo / disponible</span><span><strong aria-hidden="true">×</strong> 0 · Inactivo / no disponible</span><span><strong aria-hidden="true">—</strong> Sin muestra válida</span></div>
+            <p class="muted history-explanation">El color identifica el recurso; la forma y posición identifican el estado observado. Cada marcador representa una muestra. No interpolamos huecos. Hora de Panamá (UTC−5).</p>
           </section>
         </section>
         <section id="debug-view" hidden>
