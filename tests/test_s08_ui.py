@@ -92,6 +92,12 @@ class StructureTests(unittest.TestCase):
         self.assertIn('URL.revokeObjectURL(url)', js)
         self.assertIn('csvCell', js)
         self.assertIn('debugOutput.textContent = JSON.stringify(data, null, 2)', js)
+        start = js.index('alertsExport.addEventListener("click"')
+        end = js.index("async function updateAlerts", start)
+        export = js[start:end]
+        self.assertIn("row.map(csvCell)", export)
+        self.assertNotIn("const cell=", export)
+        self.assertNotIn("let historyEpoch", export)
 
     def test_vector_icons_and_scroll_layout(self):
         html = (UI / "index.html").read_text(encoding="utf-8")
