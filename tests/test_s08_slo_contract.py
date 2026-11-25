@@ -86,6 +86,29 @@ for unit, ns, root in (("pilot-am", hq, False), ("pilot-bb-hq", None, False),
         subprocess.run([sys.executable, "-I", "-B", "-c", code, str(pilot)],
                        check=True, timeout=10)
 
+    def test_cached_package_integrity(self):
+        pilot = Path(__file__).resolve().parents[1] / "scripts/s08/piloto_sondas_y_stream.py"
+        code = """
+import hashlib, runpy, sys, tempfile
+from pathlib import Path
+verify = runpy.run_path(sys.argv[1])["package_digest"]
+with tempfile.TemporaryDirectory() as directory:
+    path = Path(directory) / "test.deb"
+    path.write_bytes(b"example")
+    digest = hashlib.sha256(b"example").hexdigest()
+    meta = "Package: demo\\nVersion: 1\\nArchitecture: amd64\\nSize: 7\\nSHA256: " + digest
+    assert verify(path, meta, "demo", "1") == digest
+    path.write_bytes(b"changed")
+    try:
+        verify(path, meta, "demo", "1")
+    except ValueError as exc:
+        assert str(exc) == "PACKAGE_DIGEST"
+    else:
+        raise AssertionError("Tampered package accepted")
+"""
+        subprocess.run([sys.executable, "-I", "-B", "-c", code, str(pilot)],
+                       check=True, timeout=10)
+
     def test_invalid_counts(self):
         for args in ((3, 30, 30, 30, 30), (5, True, 1, 1, 1), (5, 1, 2, 1, 1),
                      (5, 30, 20, 21, 21), (5, 30, 30, 20, 21)):
