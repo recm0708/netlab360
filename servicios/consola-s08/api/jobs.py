@@ -259,3 +259,24 @@ def finish_cancelled(directory, job_id, *, cleanup_verified):
                    (now, encode(job["data"]), job_id))
         audit(db, "JOB_CANCELLED", job_id, job["actor_id"], now)
         return record(db, job_id)
+
+
+def recover_interrupted(directory):
+    """Solo bajo la exclusión del servicio al arrancar: nunca reintentar tráfico."""
+    with transaction(directory) as db:
+        rows = db.execute("SELECT job_id FROM jobs WHERE status IN ('QUEUED','RUNNING')").fetchall()
+        recovered = []
+        for (job_id,) in rows:
+            job = record(db, job_id)
+            data = job["data"]
+            if job["status"] == "QUEUED":
+                now = stamp()
+                db.execute("UPDATE jobs SET status='CANCELLED',finished_at_utc=? WHERE job_id=?", (now, job_id))
+                audit(db, "JOB_QUEUE_INTERRUPTED", job_id, job["actor_id"], now)
+            elif data.get("execution_quality") != "UNCERTAIN":
+                data["execution_quality"] = "UNCERTAIN"
+                data["uncertainty_reason"] = "EXECUTION_UNCONFIRMED"
+                db.execute("UPDATE jobs SET result_json=? WHERE job_id=?", (encode(data), job_id))
+                audit(db, "JOB_UNCERTAIN", job_id, job["actor_id"], stamp())
+            recovered.append(record(db, job_id)["status"])
+        return recovered
