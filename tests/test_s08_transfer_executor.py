@@ -27,6 +27,7 @@ def fixture(protocol="TCP", volume=25000000):
         "sum_sent": {"bytes": volume, "bits_per_second": 20000000, "retransmits": 0},
         "sum_received": {"bytes": volume, "bits_per_second": 20000000, "seconds": 10,
                          "lost_packets": 0, "packets": 1000, "lost_percent": 0, "jitter_ms": 0.3}}
+    rx["end"] = {"sum_received": dict(tx["end"]["sum_received"])}
     return tx, rx
 
 
@@ -63,7 +64,8 @@ class TransferTests(unittest.TestCase):
 
     def test_udp_loss(self):
         a, b = fixture("UDP")
-        a["end"]["sum_received"].update(lost_packets=10, lost_percent=1)
+        for document in (a, b):
+            document["end"]["sum_received"].update(lost_packets=10, lost_percent=1)
         result = M.parse_results("udp-10s", "HQ_A_S1", a, b)
         self.assertEqual(result["status"], "PARTIAL")
         self.assertEqual(result["jitter_ms"], 0.3)
@@ -86,8 +88,44 @@ class TransferTests(unittest.TestCase):
     def test_receiver_mismatch(self):
         a, b = fixture()
         b["intervals"][0]["sum"]["bytes"] -= 1
-        with self.assertRaises(ValueError):
+        result = M.parse_results("tcp-10s", "HQ_A_S1", a, b)
+        self.assertEqual(result["interval_accounting"]["status"], "DISCREPANT")
+        self.assertEqual(result["interval_accounting"]["receiver_delta_bytes"], -1)
+        self.assertEqual(result["bytes_received"], 25000000)
+
+    def test_udp_observed_interval_discrepancy(self):
+        a, b = fixture("UDP", volume=25000800)
+        for document in (a, b):
+            document["end"]["sum_received"].update(packets=20834, jitter_ms=0.0496088985908028)
+        b["intervals"][0]["sum"]["bytes"] = 24999600
+        result = M.parse_results("udp-10s", "HQ_A_S1", a, b)
+        self.assertEqual(result["status"], "OK")
+        self.assertEqual(result["bytes_received"], 25000800)
+        self.assertEqual(result["lost_packets"], 0)
+        self.assertEqual(result["receiver_packets"], 20834)
+        self.assertEqual(result["interval_accounting"]["receiver_delta_bytes"], -1200)
+        self.assertEqual(result["interval_accounting"]["status"], "DISCREPANT")
+        self.assertEqual(result["receiver_intervals"][0]["bytes"], 24999600)
+
+    def test_receiver_summaries_mismatch(self):
+        a, b = fixture()
+        b["end"]["sum_received"]["bytes"] -= 1
+        with self.assertRaisesRegex(ValueError, "RECEIVER_SUMMARIES_MISMATCH"):
             M.parse_results("tcp-10s", "HQ_A_S1", a, b)
+
+    def test_udp_summary_packet_mismatch(self):
+        a, b = fixture("UDP")
+        b["end"]["sum_received"]["packets"] += 1
+        with self.assertRaisesRegex(ValueError, "UDP_SUMMARIES_MISMATCH"):
+            M.parse_results("udp-10s", "HQ_A_S1", a, b)
+
+    def test_sender_interval_discrepancy(self):
+        a, b = fixture()
+        a["intervals"][0]["sum"]["bytes"] -= 1
+        result = M.parse_results("tcp-10s", "HQ_A_S1", a, b)
+        self.assertEqual(result["interval_accounting"]["sender_delta_bytes"], -1)
+        self.assertEqual(result["interval_accounting"]["receiver_delta_bytes"], 0)
+        self.assertEqual(result["interval_accounting"]["status"], "DISCREPANT")
 
     def test_invalid_metrics(self):
         for value in (float("nan"), -1, True, None):
@@ -102,7 +140,8 @@ class TransferTests(unittest.TestCase):
 
     def test_udp_inconsistent_loss(self):
         a, b = fixture("UDP")
-        a["end"]["sum_received"].update(lost_packets=1001, lost_percent=1)
+        for document in (a, b):
+            document["end"]["sum_received"].update(lost_packets=1001, lost_percent=1)
         with self.assertRaises(ValueError):
             M.parse_results("udp-10s", "HQ_A_S1", a, b)
 
