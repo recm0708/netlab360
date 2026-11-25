@@ -74,16 +74,20 @@ class AssetTests(unittest.TestCase):
             block = re.search(re.escape(selector) + r"\s*\{([^}]+)\}", source)[1]
             return dict(re.findall(r"--([\w-]+):\s*(#[0-9a-fA-F]+)", block))
 
-        for selector in (":root", ':root[data-theme="light"]'):
+        for selector in (":root", ':root[data-theme="light"]', ":root:not([data-theme])"):
             palette = variables(shared, selector)
             methods = variables(css, selector)
+            self.assertEqual(len(methods), 6)
             for fg in ("text", "muted", "accent", "fault"):
                 for bg in ("bg", "surface"):
-                    self.assertGreaterEqual(contrast(palette[fg], palette[bg]), 4.5)
+                    self.assertGreaterEqual(contrast(palette[fg], palette[bg]), 7)
             for badge in ("muted", "ok"):
-                self.assertGreaterEqual(contrast(palette[badge], palette["bg"]), 4.5)
+                self.assertGreaterEqual(contrast(palette[badge], palette["bg"]), 7)
             for color in methods.values():
-                self.assertGreaterEqual(contrast(color, palette["button-text"]), 4.5)
+                self.assertGreaterEqual(contrast(color, palette["button-text"]), 7)
+                self.assertGreaterEqual(contrast(color, palette["bg"]), 7)
+        self.assertEqual(variables(css, ':root[data-theme="light"]'),
+                         variables(css, ":root:not([data-theme])"))
 
     def test_copy_icon_and_native_select(self):
         css = (ROOT / "servicios/consola-s08/ui/static/swagger-theme.css").read_text()
