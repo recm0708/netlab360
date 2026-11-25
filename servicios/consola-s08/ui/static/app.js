@@ -341,7 +341,7 @@ function initializeConsole() {
       ]);
       if (health.project !== "NETLAB360" || caps.project !== "NETLAB360" ||
           health.service !== "netlab360-s08-console" ||
-          health.mode !== "AUTHENTICATED_READ_ONLY" ||
+          !["AUTHENTICATED_READ_ONLY","AUTHENTICATED_JOBS"].includes(health.mode) ||
           caps.mode !== health.mode ||
           health.network_mutations_authorized !== false ||
           caps.network_mutations_authorized !== false) {
