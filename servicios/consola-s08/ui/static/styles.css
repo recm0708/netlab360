@@ -229,10 +229,14 @@ nav a { min-height: 42px; gap: 11px; border: 0; }
 .dashboard-grid .panel { margin: 0; }
 .dashboard-grid .metric { font-variant-numeric: tabular-nums; }
 .dashboard-table-wrap { max-height: 60vh; overflow: auto; overscroll-behavior: contain; }
-.dashboard-table { width: 100%; border-collapse: collapse; min-width: 790px; font-size: .85rem; }
-.dashboard-table th, .dashboard-table td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
-.dashboard-table th { position: sticky; top: 0; background: var(--surface); color: var(--text); z-index: 1; }
-.dashboard-table td:last-child { font-variant-numeric: tabular-nums; white-space: nowrap; }
+/* Tablas propias de la consola: dimensiones intrínsecas y alineación común.
+   Las páginas futuras bajo main heredan esta regla, sin obligar a llenar el panel. */
+#main table { width:auto; max-width:100%; min-width:0; table-layout:auto; border-collapse:collapse; font-size:.9rem; }
+#main table :is(th,td) { text-align:left; vertical-align:middle; padding:5px 9px; border-bottom:1px solid var(--line); overflow-wrap:anywhere; }
+#main table th { position:sticky; top:0; background:var(--table-head,var(--surface)); color:var(--text); z-index:1; }
+#main table td { font-variant-numeric:tabular-nums; }
+#main table button { min-height:0; padding:5px 9px; white-space:nowrap; font-size:inherit; }
+#main table th:last-child { white-space:nowrap; }
 .dashboard-table td[data-state] { font-weight: 600; }
 details.summary > summary { cursor: pointer; font-weight: 600; }
 
@@ -298,8 +302,6 @@ details.summary > summary { cursor: pointer; font-weight: 600; }
 .topology-toolbar { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:10px 0 14px; }
 .topology-toolbar label { display:flex; align-items:center; gap:8px; }
 .topology-toolbar select { font:inherit; background:var(--surface); color:var(--text); border:1px solid var(--line); border-radius:6px; padding:7px; }
-#network-view table { width:100%; border-collapse:collapse; }
-#network-view th,#network-view td { text-align:left; padding:10px; border-bottom:1px solid var(--line); }
 
 /* Control global compartido por toda la consola, también en pantalla completa. */
 .refresh-slot { flex:0 1 auto; min-width:0; }
@@ -330,8 +332,6 @@ input:not([type="checkbox"]) { font-size:var(--size-control); }
 .panel { padding:14px; margin-bottom:10px; }
 .status-grid,.dashboard-grid,.topology-layout { gap:10px; margin-bottom:10px; }
 .muted,.topology-inspector dt { font-size:var(--size-secondary); }
-.dashboard-table, #network-view table { font-size:1rem; }
-.dashboard-table th,.dashboard-table td,#network-view th,#network-view td { padding:7px 8px; }
 footer { padding:8px 20px; }
 .content-tools { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; margin:0 0 12px; }
 .content-tools #auth-notice { margin:0; }
@@ -398,7 +398,6 @@ button.secondary, .topology-action {
 #jobs-view .jobs-endpoints { grid-template-columns: repeat(2,minmax(0,1fr)); }
 #jobs-view .filter-row { display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
 #jobs-view .filter-row label { display:flex; align-items:center; gap:8px; }
-#jobs-view .jobs-table { min-width: 660px; width:100%; }
 #jobs-history tr[data-selected="true"] { background:var(--recovery-bg); }
 #jobs-history tr[data-selected="true"] button { color:var(--accent); }
 #jobs-history td:first-child { white-space:nowrap; font-variant-numeric:tabular-nums; }
