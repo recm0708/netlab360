@@ -355,7 +355,7 @@ o vigencia; la API no acepta destinos arbitrarios. Conservamos la
 interfaz previa hasta completar y validar la equivalencia funcional.
 
 Mantenemos una vista resumida con dos enlaces WAN lógicos y una vista
-detallada en otra pestaña, abierta mediante /topology?view=detailed.
+detallada en la misma pestaña, abierta mediante /topology?view=detailed.
 La representación detallada conserva los 18 nodos y 21 enlaces,
 incluidas las relaciones HTTP. Separamos físicamente el dibujo de las
 conexiones de acceso y las relaciones lógicas de servicio. Actualizamos
@@ -364,3 +364,86 @@ la selección durante las consultas. La limitación compartida de frecuencia
 provoca reintentos, no el borrado del inventario. Los estados caducados o
 no disponibles pasan a desconocidos; al perder sesión eliminamos todos
 los datos. La presentación detallada admite pantalla completa nativa.
+
+## Navegación y supervisión por dominio
+
+Aplicamos encuadre por sede, acercamiento, alejamiento, desplazamiento y
+restablecimiento sobre ambas vistas SVG sin modificar el inventario. El
+encuadre se conserva durante las consultas. Retiramos el enlace auxiliar
+de salto y los recuadros adicionales de foco, conservando la selección
+funcional y una indicación discreta para el teclado.
+
+Las vistas WAN, LAN, HTTP/HA, LACP y SDN reutilizan las observaciones
+validadas de la consola, con procedencia y vigencia por recurso. No
+atribuimos adyacencias OSPF, cumplimiento ACL, tráfico ni disponibilidad
+extremo a extremo a muestras administrativas o de control. Esas
+comprobaciones requieren las adquisiciones y pruebas correspondientes.
+
+## Actualización común de la consola
+
+Centralizamos la consulta manual y automática en la cabecera, incluso en
+pantalla completa. La preferencia contiene solo un interruptor y uno de
+los intervalos 5, 10, 15, 30, 60 o 300 segundos; el valor inicial es cinco
+segundos. Consultamos únicamente la vista activa, sin solicitudes
+superpuestas ni renovación automática de la sesión. Las muestras
+caducan aunque se pause la adquisición. En Observabilidad y Diagnóstico técnico las consultas de datos son
+exclusivamente manuales; conservamos la preferencia global sin aplicarla
+allí. Las páginas aún no implementadas no ejecutan
+consultas. Conservamos las protecciones y límites del servidor.
+
+## Presentación compacta y vistas por sede
+
+Aplicamos una escala tipográfica común y alineamos el menú contraído
+mediante reservas de desplazamiento simétricas. Los controles de consulta
+se ubican en el área de contenido; en históricos y diagnóstico técnico
+se colocan junto a sus selectores sin temporizador periódico.
+
+La vista de inicio conserva los indicadores globales y permite filtrar
+inventario y observaciones por sede. Las vistas WAN, VLAN y LACP admiten
+el mismo filtro sin cambiar la adquisición. Integramos la lectura
+exploratoria de inferencia HQ con sus métodos, RTT, pérdida, vigencia y
+abstención, sin iniciar el servicio de modelos ni confirmar incidentes.
+
+Migramos las alertas activas y una copia explícita de las transiciones
+históricas al módulo de Observabilidad. El retiro de las interfaces
+independientes exige comprobar equivalencia y recuperación; conservamos
+los servicios de adquisición y los registros históricos.
+
+## Alertas e historial migrado
+
+La consulta autenticada GET `/api/v1/alerts` separa alertas vigentes de
+Prometheus y las últimas 200 transiciones registradas en el NOC anterior.
+La copia identifica fecha y cantidad total en el origen; no equivale a
+un registro continuo ni reconstruye eventos no observados. La generamos
+como usuario propietario, sin modificar la base original, mediante
+`python -B -m api.alerts_reader export --directory RUTA_PRIVADA` desde
+el directorio del servicio. La ruta privada se fija al iniciar la API;
+no aceptamos rutas de archivos ni destinos desde el navegador. El
+historial se filtra por sede y se exporta como CSV. La consulta vacía
+confirmada y la fuente no disponible se presentan por separado.
+
+## Documentación interactiva de la API
+
+Integramos Swagger UI en Diagnóstico técnico mediante una pestaña de la
+consola y conservamos la entrada `/docs`, que redirige a esa vista. El
+marco interno comparte el origen, la sesión y la paleta efectiva de la
+aplicación. La especificación `/openapi.json` y los recursos siguen
+reservados a sesiones de operador. No solicitamos claves adicionales ni
+exponemos la cookie HttpOnly. Conservamos los resultados del explorador
+al cambiar de pestaña y retiramos el marco al salir o perder la sesión. La consola documenta las rutas reales;
+la ejecución interactiva se restringe a GET y las rutas mantienen sus
+controles de sesión, alcance y frecuencia. Las operaciones de sesión se
+documentan sin habilitar su ejecución en Swagger. No habilitamos CORS,
+servidores externos, validadores remotos ni acciones de red. Conservamos
+el explorador técnico y sus exportaciones.
+
+Instalamos los archivos locales de Swagger UI 5.34.1 en el directorio
+privado de la instancia con `python -B -m api.swagger_assets install
+--directory RUTA_PRIVADA` desde el servicio. La descarga usa el registro
+npm oficial y verifica la integridad SHA-512 publicada; no ejecutamos
+scripts de npm. Los archivos no forman parte de la base SQLite ni del
+repositorio. Si faltan, la documentación interactiva devuelve 503 y el
+explorador original sigue disponible. La recuperación y el instalador
+integral deben incorporar esta dependencia antes del despliegue final.
+
+La presentación de Swagger utiliza selectores acotados al marco de documentación. Verificamos el contraste de textos, fondos y etiquetas HTTP en ambas paletas; los controles estructurales conservan un estilo neutro distinto de las acciones principales.

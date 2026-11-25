@@ -17,6 +17,7 @@ HTML_CSP = ("default-src 'none'; script-src 'self'; style-src 'self'; "
 
 
 # Plotly genera estilos SVG/CSS dinámicos. Limitamos esta excepción a observabilidad.
+DEBUG_CSP = HTML_CSP.replace("frame-ancestors", "frame-src 'self'; frame-ancestors")
 PLOT_CSP = HTML_CSP.replace("style-src 'self';", "style-src 'self' 'unsafe-inline'; img-src data: blob:;")
 
 @lru_cache(maxsize=1)
@@ -56,7 +57,8 @@ def register_ui(app: FastAPI, directory) -> None:
         # La reserva de diagnóstico técnico no amplía los permisos existentes.
         if request.url.path == "/debug" and identity["role"] != "OPERATOR":
             raise HTTPException(403)
-        return page("index.html", PLOT_CSP if request.url.path == "/observability" else HTML_CSP)
+        csp = {"/observability": PLOT_CSP, "/debug": DEBUG_CSP}.get(request.url.path, HTML_CSP)
+        return page("index.html", csp)
 
     for path in PAGES:
         app.add_api_route(path, console, methods=["GET"], include_in_schema=False)

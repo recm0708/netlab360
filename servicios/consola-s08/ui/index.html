@@ -11,7 +11,6 @@
   <script src="/ui/static/topology.js"></script>
 </head>
 <body>
-  <a class="skip" href="#main">Ir al contenido</a>
   <!-- Estructura inicial sin datos privados ni acciones operacionales. -->
   <div class="shell" id="console-shell" hidden>
     <aside class="sidebar" aria-label="Secciones de NETLAB360">
@@ -54,8 +53,14 @@
           <button id="logout" class="secondary" type="button" disabled>Cerrar sesión</button>
         </div>
       </header>
-      <main id="main" tabindex="-1">
-        <p id="auth-notice" role="status" aria-live="polite" class="muted"></p>
+      <main id="main">
+        <div class="content-tools"><p id="auth-notice" role="status" aria-live="polite" class="muted"></p>
+        <div id="refresh-slot" class="refresh-slot"><div id="refresh-controls" class="refresh-controls">
+          <label id="refresh-auto-label"><input id="refresh-auto" type="checkbox" checked> Actualización automática</label>
+          <label id="refresh-interval-label">Intervalo <select id="refresh-interval"><option value="5">5 segundos</option><option value="10">10 segundos</option><option value="15">15 segundos</option><option value="30">30 segundos</option><option value="60">1 minuto</option><option value="300">5 minutos</option></select></label>
+          <button id="refresh" type="button" disabled>Actualizar</button>
+        </div></div>
+        </div>
         <section id="home-view">
         <div class="heading">
           <div>
@@ -63,7 +68,7 @@
             <h1>Inicio / Salud</h1>
             <p class="muted">Observaciones de infraestructura, servicios y fuentes de supervisión.</p>
           </div>
-          <button id="refresh" type="button">Actualizar estado</button>
+
         </div>
         <div class="status-grid" aria-label="Disponibilidad y acceso">
           <section class="panel"><h2>Proceso FastAPI</h2><p id="api-state" class="metric" data-state="unknown">Sin consultar</p><p class="muted">Disponibilidad del proceso, no de toda la red.</p></section>
@@ -72,7 +77,8 @@
         </div>
         <div class="dashboard-toolbar">
           <p id="dashboard-status" role="status" aria-live="polite" class="muted">Esperando observaciones autenticadas.</p>
-          <label><input id="dashboard-auto" type="checkbox" checked> Actualización automática (15 s)</label>
+          <label for="dashboard-site">Sede <select id="dashboard-site"><option value="all">Todas las sedes</option><option value="HQ">HQ</option><option value="S1">S1</option><option value="S2">S2</option></select></label>
+
         </div>
         <div class="dashboard-grid" aria-label="Indicadores operacionales">
           <section class="panel"><h2>Telemetría vigente</h2><p id="dash-coverage" class="metric" data-state="unknown">Sin datos</p><p id="dash-coverage-detail" class="muted">Observaciones operacionales vigentes.</p></section>
@@ -86,9 +92,14 @@
           <section class="panel"><h2>Consulta asesora</h2><p id="dash-advisory" class="metric" data-state="unknown">Sin datos</p><p id="dash-advisory-detail" class="muted">Resúmenes históricos; no acreditan salud actual.</p></section>
         </div>
         <section class="panel">
+          <h2>Inventario por sede</h2>
+          <p class="muted">Existencia del router y estado administrativo de interfaces; no demuestra conectividad.</p>
+          <div id="site-overview" class="site-grid"></div>
+        </section>
+        <section class="panel">
           <h2>Procedencia y vigencia de las observaciones</h2>
           <p class="muted">Las muestras ausentes, vencidas o inválidas no se presentan como estados normales. Las fechas corresponden a la observación de cada fuente.</p>
-          <div class="dashboard-table-wrap" tabindex="0" aria-label="Tabla de observaciones">
+          <div class="dashboard-table-wrap" aria-label="Tabla de observaciones">
             <table class="dashboard-table">
               <thead><tr><th scope="col">Fuente</th><th scope="col">Recurso</th><th scope="col">Vigencia</th><th scope="col">Estado</th><th scope="col">Observación</th><th scope="col">Fecha y hora</th></tr></thead>
               <tbody id="dashboard-rows"></tbody>
@@ -107,12 +118,25 @@
           <h1 id="module-title"></h1>
           <div id="module-placeholder" class="panel"><h2>Función no disponible</h2><p>La vista de este módulo aún no está habilitada. No se han realizado consultas ni acciones.</p><a href="/home">Volver al inicio</a></div>
         </section>
+        <section id="network-view" hidden>
+          <div class="heading"><div><p class="eyebrow">Supervisión</p><h1 id="network-title"></h1><p id="network-scope" class="muted"></p></div></div>
+          <p id="network-status" class="muted" role="status">Esperando observaciones autenticadas.</p>
+          <div id="network-filter" class="filter-row" hidden><label for="network-site">Sede <select id="network-site"><option value="all">Todas las sedes</option><option value="HQ">HQ</option><option value="S1">S1</option><option value="S2">S2</option></select></label></div>
+          <section class="panel"><h2>Observaciones por recurso</h2><div class="dashboard-table-wrap"><table><thead><tr><th>Fuente</th><th>Recurso</th><th>Vigencia</th><th>Estado</th><th>Observación</th><th>Fecha y hora</th></tr></thead><tbody id="network-rows"></tbody></table></div></section>
+          <p><a href="/topology">Consultar topología e inspector</a> · <a href="/observability">Consultar históricos</a></p>
+        </section>
         <section id="topology-view" hidden>
           <div id="topology-workspace">
             <div class="heading"><div><p class="eyebrow">Supervisión</p><h1 id="topology-title">Topología en vivo</h1><p class="muted">Inventario multisede y observaciones reales de red.</p></div>
-              <div class="topology-controls"><button id="topology-run" type="button">Actualizar topología</button><a id="topology-expand" class="topology-action" href="/topology?view=detailed" target="_blank" rel="noopener">Abrir diagrama detallado ↗</a><a id="topology-return" class="topology-action" href="/topology" hidden>Vista resumida</a><button id="topology-fullscreen" type="button" hidden>Pantalla completa</button></div>
+              <div class="topology-controls"><a id="topology-expand" class="topology-action" href="/topology?view=detailed">Vista detallada</a><a id="topology-return" class="topology-action" href="/topology" hidden>Vista resumida</a><button id="topology-fullscreen" type="button" hidden>Pantalla completa</button></div>
             </div>
             <p id="topology-status" role="status" aria-live="polite">Esperando sesión.</p>
+            <div class="topology-toolbar">
+              <label>Enfocar sede <select id="topology-site"><option value="all">Todas las sedes</option><option value="HQ">HQ</option><option value="S1">S1</option><option value="S2">S2</option></select></label>
+              <button type="button" class="secondary" id="topology-zoom-in" title="Acercar">+</button><button type="button" class="secondary" id="topology-zoom-out" title="Alejar">−</button>
+              <button type="button" class="secondary" id="topology-left" title="Desplazar a la izquierda">←</button><button type="button" class="secondary" id="topology-up" title="Desplazar arriba">↑</button><button type="button" class="secondary" id="topology-down" title="Desplazar abajo">↓</button><button type="button" class="secondary" id="topology-right" title="Desplazar a la derecha">→</button>
+              <button type="button" class="secondary" id="topology-reset">Restablecer vista</button>
+            </div>
             <div class="topology-layout">
               <section class="panel topology-map"><svg id="topology-map" viewBox="0 0 1250 620" aria-label="Diagrama interactivo multisede"></svg></section>
               <section class="panel topology-inspector"><h2>Inspector</h2><p id="topology-selection" class="muted">Seleccione un equipo o enlace.</p><dl id="topology-details"></dl></section>
@@ -124,34 +148,50 @@
           <div class="heading"><div><p class="eyebrow">Observabilidad</p><h1>Históricos de supervisión</h1><p class="muted">Muestras reales de Prometheus. Los estados administrativos no acreditan conectividad.</p></div></div>
           <section class="panel">
             <div class="history-controls">
-              <label for="history-group">Grupo<select id="history-group"><option value="collection">Recolección de telemetría</option><option value="routers">Contenedores de routers</option><option value="wan">Interfaces WAN</option><option value="vlan">Interfaces VLAN</option></select></label>
-              <label for="history-window">Intervalo<select id="history-window"><option value="5m">5 minutos</option><option value="15m" selected>15 minutos</option><option value="1h">1 hora</option></select></label>
-              <button id="history-run" type="button">Consultar histórico</button>
+              <label for="history-group">Grupo<select id="history-group"><option value="collection">Recolección de telemetría</option><option value="routers">Contenedores de routers</option><option value="wan">Interfaces WAN</option><option value="vlan">Interfaces VLAN</option><option value="alerts">Alertas y transiciones</option></select></label>
+              <label for="history-window">Intervalo histórico<select id="history-window"><option value="5m">5 minutos</option><option value="15m" selected>15 minutos</option><option value="1h">1 hora</option></select></label>
+
+              <span id="history-refresh-slot"></span>
             </div>
+            <p class="muted">Consulta manual: seleccione el grupo y el intervalo histórico.</p>
             <p id="history-status" role="status" aria-live="polite">Esperando sesión.</p>
-            <p id="history-scope" class="muted"></p>
+            <div id="history-chart-content"><p id="history-scope" class="muted"></p>
             <div class="history-counts"><p>Muestras válidas: <strong id="history-valid">—</strong></p><p>Muestras nulas: <strong id="history-null">—</strong></p><p>Series con datos: <strong id="history-series">—</strong></p></div>
             <div id="history-plot" aria-label="Gráfico temporal de muestras reales"></div>
             <div class="history-state-key" aria-label="Convenciones de estado"><span><strong aria-hidden="true">●</strong> 1 · Activo / disponible</span><span><strong aria-hidden="true">×</strong> 0 · Inactivo / no disponible</span><span><strong aria-hidden="true">—</strong> Sin muestra válida</span></div>
-            <p class="muted history-explanation">El color identifica el recurso; la forma y posición identifican el estado observado. Cada marcador representa una muestra. No interpolamos huecos. Hora de Panamá (UTC−5).</p>
+            <p class="muted history-explanation">El color identifica el recurso; la forma y posición identifican el estado observado. Cada marcador representa una muestra. No interpolamos huecos.</p>
+            </div>
+            <div id="alerts-content" hidden>
+              <label for="alerts-site">Sede <select id="alerts-site"><option value="all">Todas las sedes</option><option value="HQ">HQ</option><option value="S1">S1</option><option value="S2">S2</option></select></label>
+              <h2>Alertas vigentes de Prometheus</h2><p id="alerts-current-status" class="muted"></p>
+              <div class="dashboard-table-wrap"><table class="dashboard-table"><thead><tr><th>Alerta</th><th>Sede</th><th>Recurso</th><th>Estado</th><th>Inicio</th></tr></thead><tbody id="alerts-current-rows"></tbody></table></div>
+              <h2>Transiciones históricas registradas</h2><p id="alerts-history-status" class="muted"></p>
+              <button id="alerts-export" class="secondary" type="button" disabled>Descargar CSV</button>
+              <div class="dashboard-table-wrap"><table class="dashboard-table"><thead><tr><th>Alerta</th><th>Sede</th><th>Recurso</th><th>Estado</th><th>Fecha y hora</th><th>Origen</th></tr></thead><tbody id="alerts-history-rows"></tbody></table></div>
+              <p class="muted">La copia conserva transiciones observadas; no reconstruye eventos faltantes ni confirma disponibilidad de red.</p>
+            </div>
           </section>
         </section>
         <section id="debug-view" hidden>
           <div class="heading"><div><p class="eyebrow">Administración técnica</p><h1>Diagnóstico técnico</h1><p class="muted">Explorador de API de solo lectura. No ejecuta comandos ni cambios de red.</p></div></div>
+          <div class="debug-tabs"><button type="button" id="debug-tab-queries">Consultas y exportaciones</button><button type="button" id="debug-tab-docs" class="secondary">Documentación Swagger</button></div>
+          <section id="debug-docs" class="panel" hidden><div id="swagger-host"></div></section>
+          <div id="debug-queries">
           <section class="panel">
             <h2>Catálogo de consultas</h2>
             <p class="muted">Las rutas originales conservan sus permisos. La prueba utiliza una proyección técnica delimitada.</p>
             <div id="debug-catalog" class="debug-catalog"></div>
             <label for="debug-select">Consulta autorizada</label>
-            <div class="debug-actions"><select id="debug-select" disabled></select><button id="debug-run" type="button" disabled>Ejecutar consulta</button></div>
+            <div class="debug-actions"><select id="debug-select" disabled></select><span id="debug-refresh-slot"></span></div>
             <p id="debug-notice" role="status" aria-live="polite">Esperando catálogo.</p>
           </section>
           <section class="panel">
             <h2>Resultado de la consulta</h2>
             <p id="debug-meta" class="muted">Sin consulta.</p>
             <div class="debug-actions"><button id="debug-copy" class="secondary" type="button" disabled>Copiar JSON</button><button id="debug-json" class="secondary" type="button" disabled>Descargar JSON</button><button id="debug-csv" class="secondary" type="button" disabled>Descargar CSV</button></div>
-            <pre id="debug-output" tabindex="0">Sin resultados.</pre>
+            <pre id="debug-output">Sin resultados.</pre>
           </section>
+          </div>
         </section>
       </main>
       <footer>NETLAB360 · Consola de operaciones · Acciones de red deshabilitadas</footer>

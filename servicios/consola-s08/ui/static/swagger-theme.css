@@ -1,0 +1,150 @@
+/* Adaptamos la presentación de Swagger a las variables compartidas del producto. */
+:root { --method-get:#7cc4ff; --method-post:#4ade80; --method-put:#ffb454; --method-delete:#ff7777; --method-patch:#c084fc; --method-other:#b8c4d6; }
+:root[data-theme="light"] { --method-get:#125785; --method-post:#005b25; --method-put:#853500; --method-delete:#a21422; --method-patch:#652894; --method-other:#424b59; }
+html, body { background:var(--surface); color:var(--text); }
+.docs-heading { padding:14px 18px 0; font:inherit; }
+.docs-heading p { margin:6px 0 0; color:var(--muted); font-size:.86rem; }
+#swagger-ui .swagger-ui { color:var(--text); font:inherit; }
+#swagger-ui .swagger-ui .wrapper { max-width:none; padding:0 18px; }
+#swagger-ui .swagger-ui .info { margin:18px 0; }
+#swagger-ui .swagger-ui .info .title { font:700 1.45rem system-ui,sans-serif; color:var(--text); }
+#swagger-ui .swagger-ui .info a, #swagger-ui .swagger-ui a { color:var(--accent); }
+#swagger-ui .swagger-ui .scheme-container { background:var(--surface); border-bottom:1px solid var(--line); box-shadow:none; padding:12px 0; }
+#swagger-ui .swagger-ui .auth-wrapper, #swagger-ui .swagger-ui .authorization__btn { display:none !important; }
+#swagger-ui .swagger-ui .opblock-tag, #swagger-ui .swagger-ui .opblock-summary, #swagger-ui .swagger-ui table thead tr th, #swagger-ui .swagger-ui table thead tr td { border-color:var(--line); }
+#swagger-ui .swagger-ui .opblock-tag, #swagger-ui .swagger-ui .opblock-summary-path, #swagger-ui .swagger-ui .opblock-summary-path__deprecated, #swagger-ui .swagger-ui .opblock-summary-description, #swagger-ui .swagger-ui .opblock-description-wrapper p, #swagger-ui .swagger-ui .opblock-external-docs-wrapper p, #swagger-ui .swagger-ui .opblock-title_normal, #swagger-ui .swagger-ui .response-col_status, #swagger-ui .swagger-ui .response-col_description, #swagger-ui .swagger-ui .response-col_links, #swagger-ui .swagger-ui .parameter__name, #swagger-ui .swagger-ui .parameter__type, #swagger-ui .swagger-ui .parameter__in, #swagger-ui .swagger-ui .parameters-col_description, #swagger-ui .swagger-ui .tab li, #swagger-ui .swagger-ui .model-title, #swagger-ui .swagger-ui .model, #swagger-ui .swagger-ui .prop-type, #swagger-ui .swagger-ui .prop-format, #swagger-ui .swagger-ui .servers-title, #swagger-ui .swagger-ui label, #swagger-ui .swagger-ui table thead tr th, #swagger-ui .swagger-ui table thead tr td, #swagger-ui .swagger-ui section.models h4, #swagger-ui .swagger-ui .renderedMarkdown p, #swagger-ui .swagger-ui .info p, #swagger-ui .swagger-ui .info li, #swagger-ui .swagger-ui .info hgroup.main a { color:var(--text); }
+#swagger-ui .swagger-ui .opblock { border-color:var(--method); background:var(--bg); box-shadow:none; }
+#swagger-ui .swagger-ui .opblock.opblock-get { --method:var(--method-get); }
+#swagger-ui .swagger-ui .opblock.opblock-post { --method:var(--method-post); }
+#swagger-ui .swagger-ui .opblock.opblock-put { --method:var(--method-put); }
+#swagger-ui .swagger-ui .opblock.opblock-delete { --method:var(--method-delete); }
+#swagger-ui .swagger-ui .opblock.opblock-patch { --method:var(--method-patch); }
+#swagger-ui .swagger-ui .opblock.opblock-head, #swagger-ui .swagger-ui .opblock.opblock-options { --method:var(--method-other); }
+#swagger-ui .swagger-ui .opblock .opblock-summary-method { background:var(--method); color:var(--button-text); font-size:.85rem; min-width:70px; }
+#swagger-ui .swagger-ui .opblock .opblock-summary { border-color:var(--method); }
+#swagger-ui .swagger-ui .opblock .opblock-section-header, #swagger-ui .swagger-ui .model-box, #swagger-ui .swagger-ui section.models .model-container, #swagger-ui .swagger-ui .model-example { background:var(--surface); box-shadow:none; }
+#swagger-ui .swagger-ui .opblock .opblock-section-header h4 { color:var(--text); }
+#swagger-ui .swagger-ui input, #swagger-ui .swagger-ui select, #swagger-ui .swagger-ui textarea { background:var(--bg); color:var(--text); border:1px solid var(--line); box-shadow:none; }
+#swagger-ui .swagger-ui .btn { color:var(--text); background:var(--surface); border:1px solid var(--line); box-shadow:none; font-size:.86rem; padding:6px 12px; }
+#swagger-ui .swagger-ui .btn.execute { background:var(--accent); color:var(--button-text); border-color:var(--accent); }
+#swagger-ui .swagger-ui .btn.cancel { color:var(--fault); border-color:var(--fault); }
+#swagger-ui .swagger-ui .opblock-control-arrow svg, #swagger-ui .swagger-ui .expand-operation svg { fill:var(--text); }
+#swagger-ui .swagger-ui .opblock-body pre, #swagger-ui .swagger-ui .highlight-code, #swagger-ui .swagger-ui .microlight { background:var(--bg); color:var(--text); }
+#swagger-ui .swagger-ui section.models, #swagger-ui .swagger-ui .model-container { border-color:var(--line); }
+#swagger-ui .swagger-ui .response-col_description__inner div.markdown, #swagger-ui .swagger-ui .response-col_description__inner div.renderedMarkdown { color:var(--text); }
+#swagger-ui .swagger-ui .errors-wrapper { background:var(--surface); color:var(--fault); border-color:var(--fault); }
+
+/* La hoja del proveedor tiene selectores anidados. Acotamos las
+   sobreescrituras al marco y conservamos la semántica de cada método. */
+#swagger-ui .swagger-ui { font-family:inherit; font-size:var(--size-control); }
+#swagger-ui .swagger-ui .opblock .opblock-summary { background:transparent; }
+#swagger-ui .swagger-ui .opblock .opblock-summary-path,
+#swagger-ui .swagger-ui .opblock .opblock-summary-path a,
+#swagger-ui .swagger-ui .opblock .opblock-summary-description,
+#swagger-ui .swagger-ui .opblock-tag small,
+#swagger-ui .swagger-ui .opblock-body :is(h1,h2,h3,h4,h5,p,li,td,th,label,small),
+#swagger-ui .swagger-ui :is(.parameter__name,.parameter__type,.parameter__in,.parameter__deprecated,.parameter__extension),
+#swagger-ui .swagger-ui :is(.response-col_status,.response-col_description,.response-col_links,.response-col_description__inner),
+#swagger-ui .swagger-ui :is(.model-title,.model,.model-box,.prop-name,.prop-type,.prop-format,.model-hint),
+#swagger-ui .swagger-ui section.models :is(h4,h5,span,small,code),
+#swagger-ui .swagger-ui :is(.json-schema-2020-12__title,.json-schema-2020-12__keyword,.json-schema-2020-12__attribute,.json-schema-2020-12__attribute--primary,.json-schema-2020-12__attribute--secondary) {
+  color:var(--text) !important;
+}
+#swagger-ui .swagger-ui :is(.opblock-summary-description,.parameter__in,.prop-format,.model-hint,.json-schema-2020-12__attribute--secondary) {
+  color:var(--muted) !important;
+}
+#swagger-ui .swagger-ui :is(.parameter__name.required span,.parameter__name.required:after,.errors-wrapper,.error-wrapper) {
+  color:var(--fault) !important;
+}
+#swagger-ui .swagger-ui :is(.prop-type,.json-schema-2020-12__attribute--primary) {
+  color:var(--accent) !important;
+}
+/* Los botones estructurales del proveedor no son acciones primarias. */
+#swagger-ui .swagger-ui button:not(.btn) {
+  background:transparent; color:var(--text); border:0; box-shadow:none;
+  min-height:0; padding:0; font:inherit;
+}
+#swagger-ui .swagger-ui :is(.opblock-summary-control,.opblock-control-arrow,.expand-operation,.models-control,.model-box-control,.json-schema-2020-12-accordion,.json-schema-2020-12-expand-deep-button) {
+  color:var(--text) !important;
+}
+#swagger-ui .swagger-ui :is(.json-schema-2020-12-expand-deep-button,.model-toggle) {
+  color:var(--accent) !important;
+}
+#swagger-ui .swagger-ui :is(.opblock-control-arrow,.opblock-summary-control,.expand-operation,.models-control,.model-box-control,.json-schema-2020-12-accordion) svg,
+#swagger-ui .swagger-ui :is(.opblock-control-arrow,.opblock-summary-control,.expand-operation,.models-control,.model-box-control,.json-schema-2020-12-accordion) svg path {
+  fill:var(--text) !important;
+}
+#swagger-ui .swagger-ui :is(.json-schema-2020-12,.json-schema-2020-12__body,.model-container,.model-box,.opblock-section-header,.responses-inner,.parameters-container) {
+  background:var(--surface);
+  color:var(--text);
+}
+#swagger-ui .swagger-ui :is(.curl-command,.request-url,.response,.highlight-code,.microlight) pre,
+#swagger-ui .swagger-ui :is(.curl-command,.request-url,.response,.highlight-code,.microlight) code,
+#swagger-ui .swagger-ui .microlight span {
+  background:var(--bg) !important;
+  color:var(--text) !important;
+}
+#swagger-ui .swagger-ui .btn.execute { background:var(--accent); color:var(--button-text); }
+#swagger-ui .swagger-ui .btn.cancel { color:var(--fault); }
+#swagger-ui .swagger-ui :is(input,textarea)::placeholder { color:var(--muted); opacity:1; }
+#swagger-ui .swagger-ui :is(input,textarea,select):disabled { color:var(--muted); opacity:1; }
+#swagger-ui .swagger-ui .opblock .opblock-summary-method { background:var(--method); color:var(--button-text) !important; }
+#swagger-ui .swagger-ui .auth-wrapper, #swagger-ui .swagger-ui .authorization__btn { display:none !important; }
+
+/* Eliminamos el control redundante de copia de ruta, no el de respuesta. */
+#swagger-ui .swagger-ui .opblock .opblock-summary .copy-to-clipboard {
+  display:none !important;
+}
+/* Alineamos las versiones de API y OpenAPI con la línea del título. */
+#swagger-ui .swagger-ui .info .title {
+  display:flex; align-items:center; flex-wrap:wrap; column-gap:8px; row-gap:5px;
+}
+#swagger-ui .swagger-ui .info .title > span {
+  display:inline-flex; align-items:center; flex-wrap:wrap; gap:5px;
+}
+#swagger-ui .swagger-ui .info .title small {
+  position:static; top:auto; display:inline-flex; align-items:center;
+  vertical-align:middle; margin:0; padding:3px 8px; border-radius:999px;
+  background:var(--muted); color:var(--bg); line-height:1.2;
+}
+#swagger-ui .swagger-ui .info .title small.version-stamp {
+  background:var(--ok); color:var(--bg);
+}
+#swagger-ui .swagger-ui .info .title small pre.version {
+  margin:0; padding:0; color:inherit; background:transparent;
+  font:600 .82rem/1.2 system-ui,sans-serif;
+}
+
+/* Restauramos el pictograma de copia sin depender de la imagen de fondo
+   original del proveedor, que se pierde al aplicar los estilos comunes. */
+#swagger-ui .swagger-ui .copy-to-clipboard {
+  --copy-fill:var(--surface);
+  background:var(--copy-fill); color:var(--text);
+  border:1px solid var(--accent); border-radius:5px;
+}
+#swagger-ui .swagger-ui .copy-to-clipboard button {
+  position:relative; display:block; width:100%; height:100%;
+  min-width:0; min-height:0; background:transparent; color:inherit;
+  border:0; padding:0; cursor:pointer;
+}
+#swagger-ui .swagger-ui .copy-to-clipboard button::before,
+#swagger-ui .swagger-ui .copy-to-clipboard button::after {
+  content:""; position:absolute; width:8px; height:10px;
+  border:1.5px solid currentColor; border-radius:2px;
+  pointer-events:none; box-sizing:border-box;
+}
+#swagger-ui .swagger-ui .copy-to-clipboard button::before {
+  top:calc(50% - 7px); left:calc(50% - 6px);
+}
+#swagger-ui .swagger-ui .copy-to-clipboard button::after {
+  top:calc(50% - 3px); left:calc(50% - 2px);
+  background:var(--copy-fill);
+}
+#swagger-ui .swagger-ui .copy-to-clipboard:hover,
+#swagger-ui .swagger-ui .copy-to-clipboard:active {
+  --copy-fill:var(--accent); color:var(--button-text);
+}
+/* El fondo temático también sustituía la flecha de los selectores. */
+#swagger-ui .swagger-ui select {
+  appearance:auto; padding-right:12px;
+}

@@ -68,20 +68,20 @@ class StructureTests(unittest.TestCase):
         html = (UI / "index.html").read_text(encoding="utf-8")
         for key in ("coverage", "routers", "wan", "vlan", "ha", "lacp", "sdn", "inference", "advisory"):
             self.assertIn(f'id="dash-{key}"', html)
-        self.assertIn('id="dashboard-auto" type="checkbox" checked', html)
+        self.assertIn('id="refresh-auto" type="checkbox" checked', html)
         self.assertIn('id="dashboard-rows"', html)
         js = (UI / "static/app.js").read_text(encoding="utf-8")
         self.assertIn("dashboardBatch(key,data,started)", js)
         self.assertIn("dashboardEpoch++", js)
-        self.assertIn("dashboardAuto.checked&&!document.hidden&&dashboardAllowed()", js)
-        self.assertIn("},15000);", js)
+        self.assertIn('if(reason==="auto"&&(!autoPage||!refreshPreference.auto))return', js)
+        self.assertIn("scheduler.configure({...refreshPreference,auto:autoPage&&refreshPreference.auto})", js)
         self.assertIn("await debugRead(path)", js)
         self.assertIn("clearDashboard();", js)
 
     def test_debug_structure_and_exports(self):
         html = (UI / "index.html").read_text(encoding="utf-8")
         self.assertIn('id="debug-view" hidden', html)
-        for name in ("debug-run", "debug-copy", "debug-json", "debug-csv"):
+        for name in ("refresh", "debug-copy", "debug-json", "debug-csv"):
             self.assertIn(f'id="{name}"', html)
         js = (UI / "static/app.js").read_text(encoding="utf-8")
         self.assertIn('debugPaths.has(debugSelect.value)', js)
@@ -102,8 +102,8 @@ class StructureTests(unittest.TestCase):
         css = (UI / "static/styles.css").read_text(encoding="utf-8")
         for rule in ("scrollbar-color:", "--scroll-thumb", "height: 100dvh",
                      "overflow-y: auto", "overscroll-behavior: contain",
-                     "width: 24px; height: 24px",
-                     ".menu-collapsed .nav-symbol { width: 24px; height: 24px; flex-basis: 24px; }"):
+                     "width: 22px; height: 22px",
+                     ".menu-collapsed .nav-symbol { width: 22px; height: 22px; flex-basis: 22px; }"):
             self.assertIn(rule, css)
 
     def test_presentation_storage_is_limited(self):
@@ -135,7 +135,7 @@ class StructureTests(unittest.TestCase):
 
     def test_theme_storage_is_enum_only(self):
         js = (UI / "static/app.js").read_text(encoding="utf-8")
-        self.assertEqual(js.count("localStorage."), 2)
+        self.assertEqual(js.count("localStorage."), 4)
         self.assertIn('const themeKey = "netlab360.theme.v1"', js)
         self.assertIn('const themes = ["auto", "light", "dark"]', js)
         self.assertIn("themePreference = validTheme(value)", js)
@@ -184,7 +184,7 @@ class StructureTests(unittest.TestCase):
         self.assertNotIn("border-left-color:", css)
         self.assertIn('#navigation a.current, #navigation a[aria-current="page"]', css)
         self.assertIn("background: var(--accent);\n  color: var(--button-text);", css)
-        self.assertIn("width: 48px; height: 48px;", css)
+        self.assertIn("width: 42px; height: 42px;", css)
         self.assertIn('[data-state="unknown"] { color: var(--unknown); }', css)
         self.assertIn('[data-state="fault"] { color: var(--fault); }', css)
 
@@ -391,3 +391,49 @@ class UIHttpTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class NetworkViewStructureTests(unittest.TestCase):
+    def test_domain_views_and_focus(self):
+        html = (UI / "index.html").read_text(encoding="utf-8")
+        css = (UI / "static/styles.css").read_text(encoding="utf-8")
+        js = (UI / "static/app.js").read_text(encoding="utf-8")
+        self.assertNotIn('class="skip"', html)
+        self.assertNotIn("outline: 3px solid", css)
+        self.assertIn('id="network-rows"', html)
+        for route in ("/wan", "/lan", "/services", "/lacp", "/sdn"):
+            self.assertIn(f'"{route}":{{title:', js)
+        self.assertIn("dashboardBatch(key,data,started)", js)
+        self.assertIn("clearNetwork();", js)
+        self.assertIn("No acredita forwarding ni cumplimiento de ACL", js)
+
+
+class GlobalRefreshTests(unittest.TestCase):
+    def test_single_control_and_dispatch(self):
+        html = (UI / "index.html").read_text(encoding="utf-8")
+        js = (UI / "static/app.js").read_text(encoding="utf-8")
+        self.assertEqual(html.count('id="refresh"'), 1)
+        for old in ("dashboard-auto", "network-refresh", "topology-run", "history-run", "debug-run"):
+            self.assertNotIn(f'id="{old}"', html)
+        self.assertIn('const refreshIntervals=Object.freeze([5,10,15,30,60,300])', js)
+        self.assertIn('if(refreshBusy||!refreshAvailable()||document.hidden', js)
+        self.assertIn('if(reason==="initial"&&manualHistory)return', js)
+        self.assertIn('localStorage.setItem(refreshKey,value)', js)
+        self.assertIn('topologyWorkspace.prepend(refreshControls)', js)
+
+
+class CompactConsoleTests(unittest.TestCase):
+    def test_manual_views_and_compact_navigation(self):
+        html = (UI / "index.html").read_text(encoding="utf-8")
+        js = (UI / "static/app.js").read_text(encoding="utf-8")
+        css = (UI / "static/styles.css").read_text(encoding="utf-8")
+        self.assertIn('class="content-tools"', html)
+        self.assertNotIn('id="refresh-slot"', html.split("</header>")[0])
+        self.assertIn('getElementById("history-refresh-slot").append(refreshControls)', js)
+        self.assertIn('getElementById("debug-refresh-slot").append(refreshControls)', js)
+        self.assertIn('scrollbar-gutter:stable both-edges', css)
+        self.assertIn('id="dashboard-site"', html)
+        self.assertIn('id="network-site"', html)
+        self.assertIn('id="site-overview"', html)
+        self.assertIn('"/intelligence":{title:', js)
+        self.assertNotIn('debugArmed', js)

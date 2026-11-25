@@ -21,7 +21,7 @@ def create_app(directory: Path | None = None) -> FastAPI:
     if os.geteuid() == 0:
         raise RuntimeError("S08_ROOT_FORBIDDEN")
 
-    app = FastAPI(title="NETLAB360 S08", version="0.1.0",
+    app = FastAPI(title="NETLAB360 API", version="0.1.0",
                   docs_url=None, redoc_url=None, openapi_url=None)
 
     @app.middleware("http")
@@ -75,8 +75,12 @@ def create_app(directory: Path | None = None) -> FastAPI:
         register_history(app, directory)
         from .topology_http import register_topology
         register_topology(app, directory)
+        from .alerts_http import register_alerts
+        register_alerts(app, directory)
         from .ui_http import register_ui
         register_ui(app, directory)
+        from .docs_http import register_docs
+        register_docs(app, directory)
 
     return app
 
