@@ -38,7 +38,9 @@ class StructureTests(unittest.TestCase):
     def test_local_resources_and_unique_ids(self):
         parser = PageParser()
         parser.feed((UI / "index.html").read_text(encoding="utf-8"))
-        self.assertEqual(set(parser.resources), {"/ui/static/styles.css", "/ui/static/app.js", "/ui/static/history.js", "/ui/static/topology.js"})
+        self.assertEqual(set(parser.resources), {"/ui/static/styles.css", "/ui/static/app.js",
+                                                 "/ui/static/history.js", "/ui/static/topology.js",
+                                                 "/ui/static/jobs.js"})
         self.assertEqual(len(parser.ids), len(set(parser.ids)))
         self.assertTrue({"main", "refresh", "notice", "api-state", "capabilities", "observed"} <= set(parser.ids))
         self.assertFalse(parser.inline)
@@ -63,6 +65,10 @@ class StructureTests(unittest.TestCase):
                       "document.cookie", "eval(", "new Function("):
             self.assertNotIn(value, js)
         self.assertIn('credentials: "omit"', js)
+        jobs_js = (UI / "static/jobs.js").read_text(encoding="utf-8")
+        for value in ("innerHTML", "document.cookie", "eval(", "new Function(",
+                      "localStorage", "sessionStorage"):
+            self.assertNotIn(value, jobs_js)
 
     def test_dashboard_structure_and_read_only_polling(self):
         html = (UI / "index.html").read_text(encoding="utf-8")
@@ -299,7 +305,8 @@ class UIHttpTests(unittest.TestCase):
                            ("/ui/static/app.js", "text/javascript"),
                            ("/ui/static/login.js", "text/javascript"),
                            ("/ui/static/history.js", "text/javascript"),
-                           ("/ui/static/topology.js", "text/javascript")):
+                           ("/ui/static/topology.js", "text/javascript"),
+                           ("/ui/static/jobs.js", "text/javascript")):
             r = self.client.get(path)
             self.assertEqual(r.status_code, 200)
             self.assertIn(mime, r.headers["content-type"])
