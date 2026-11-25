@@ -1,0 +1,23 @@
+# NETLAB360: módulos IPv4 acotados; destinos seleccionados por el supervisor.
+modules:
+  icmp_v4:
+    prober: icmp
+    timeout: 3s
+    icmp:
+      preferred_ip_protocol: ip4
+      ip_protocol_fallback: false
+  tcp_v4:
+    prober: tcp
+    timeout: 3s
+    tcp:
+      preferred_ip_protocol: ip4
+      ip_protocol_fallback: false
+  http_service:
+    prober: http
+    timeout: 3s
+    http:
+      method: GET
+      valid_status_codes: [200]
+      preferred_ip_protocol: ip4
+      ip_protocol_fallback: false
+      follow_redirects: false
