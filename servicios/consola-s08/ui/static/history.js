@@ -12,8 +12,8 @@
   const windows={"5m":300,"15m":900,"1h":3600};
   // Paletas categóricas por identidad, independientes del significado del estado.
   const palettes=Object.freeze({
-    dark:Object.freeze(["#60a5fa","#facc15","#c084fc","#2dd4bf","#f472b6","#fb923c","#a3e635","#94a3b8","#fb7185"]),
-    light:Object.freeze(["#004c9e","#755000","#652894","#005e58","#922050","#973c00","#375c0a","#37455e","#9b1427"])
+    dark:Object.freeze(["#82c7ff","#ffd078","#d3b2ff","#64e4d1","#ff9bd1","#ffb37e","#b8e77c","#b3c2d5","#ff9da4"]),
+    light:Object.freeze(["#06468c","#654000","#55217c","#00544e","#831848","#843500","#30520b","#354353","#8b1020"])
   });
 
   function stateLabel(scope,value) {
