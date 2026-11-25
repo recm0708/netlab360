@@ -445,3 +445,5 @@ scripts de npm. Los archivos no forman parte de la base SQLite ni del
 repositorio. Si faltan, la documentación interactiva devuelve 503 y el
 explorador original sigue disponible. La recuperación y el instalador
 integral deben incorporar esta dependencia antes del despliegue final.
+
+La presentación de Swagger utiliza selectores acotados al marco de documentación. Verificamos el contraste de textos, fondos y etiquetas HTTP en ambas paletas; los controles estructurales conservan un estilo neutro distinto de las acciones principales.

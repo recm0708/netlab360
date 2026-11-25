@@ -37,6 +37,48 @@ class AssetTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             swagger_assets.extract(raw, "sha512-invalid")
 
+    def test_theme_scoped_and_contrast(self):
+        import re
+
+        static = ROOT / "servicios/consola-s08/ui/static"
+        css = (static / "swagger-theme.css").read_text()
+        shared = (static / "styles.css").read_text()
+        for selector in (".opblock-summary-path", ".opblock-summary-description",
+                         ".json-schema-2020-12__title", ".model-box-control",
+                         ".microlight span", ".opblock-control-arrow"):
+            self.assertIn(selector, css)
+        self.assertIn("#swagger-ui .swagger-ui button:not(.btn)", css)
+        self.assertIn("color:var(--text) !important", css)
+        self.assertIn("fill:var(--text) !important", css)
+        self.assertIn("color:var(--muted) !important", css)
+        self.assertIn(".btn.execute", css)
+
+        def luminance(value):
+            value = value.lstrip("#")
+            if len(value) == 3:
+                value = "".join(c * 2 for c in value)
+            channels = [int(value[i:i+2], 16) / 255 for i in (0, 2, 4)]
+            linear = [c / 12.92 if c <= .04045 else ((c + .055) / 1.055) ** 2.4
+                      for c in channels]
+            return sum(c * w for c, w in zip(linear, (.2126, .7152, .0722)))
+
+        def contrast(a, b):
+            low, high = sorted((luminance(a), luminance(b)))
+            return (high + .05) / (low + .05)
+
+        def variables(source, selector):
+            block = re.search(re.escape(selector) + r"\s*\{([^}]+)\}", source)[1]
+            return dict(re.findall(r"--([\w-]+):\s*(#[0-9a-fA-F]+)", block))
+
+        for selector in (":root", ':root[data-theme="light"]'):
+            palette = variables(shared, selector)
+            methods = variables(css, selector)
+            for fg in ("text", "muted", "accent", "fault"):
+                for bg in ("bg", "surface"):
+                    self.assertGreaterEqual(contrast(palette[fg], palette[bg]), 4.5)
+            for color in methods.values():
+                self.assertGreaterEqual(contrast(color, palette["button-text"]), 4.5)
+
     def test_no_arbitrary_destination(self):
         with self.assertRaises(ValueError):
             swagger_assets.download("https://example.invalid/file", 10)
