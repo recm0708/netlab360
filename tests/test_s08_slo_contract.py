@@ -109,6 +109,61 @@ with tempfile.TemporaryDirectory() as directory:
         subprocess.run([sys.executable, "-I", "-B", "-c", code, str(pilot)],
                        check=True, timeout=10)
 
+    def test_alertmanager_uses_extracted_template(self):
+        pilot = Path(__file__).resolve().parents[1] / "scripts/s08/piloto_sondas_y_stream.py"
+        code = """
+import runpy, sys, tempfile
+from pathlib import Path
+from types import SimpleNamespace
+resolve = runpy.run_path(sys.argv[1])["alertmanager_template_args"]
+with tempfile.TemporaryDirectory() as directory:
+    root = Path(directory) / "usr"
+    binary = root / "bin/prometheus-alertmanager"
+    template = root / "share/prometheus/alertmanager/default.tmpl"
+    template.parent.mkdir(parents=True)
+    template.write_text("test")
+    resolve.__globals__["run"] = lambda args: SimpleNamespace(
+        stdout="  --template.default=PATH", stderr="")
+    assert resolve(binary) == ["--template.default=" + str(template)]
+    template.unlink()
+    try:
+        resolve(binary)
+    except ValueError as exc:
+        assert str(exc).startswith("ALERTMANAGER_TEMPLATE_MISSING:")
+    else:
+        raise AssertionError("Missing template accepted")
+"""
+        subprocess.run([sys.executable, "-I", "-B", "-c", code, str(pilot)],
+                       check=True, timeout=10)
+
+    def test_iperf_stream_only(self):
+        pilot = Path(__file__).resolve().parents[1] / "scripts/s08/piloto_sondas_y_stream.py"
+        code = """
+import json, runpy, sys, tempfile
+from pathlib import Path
+module = runpy.run_path(sys.argv[1])
+flags = module["stream_args"]
+events = module["events"]
+assert flags(["/usr/bin/iperf3", "-J", "-P", "1", "--json-stream-full-output"]) == [
+    "/usr/bin/iperf3", "-P", "1", "--json-stream", "--forceflush"]
+assert flags(flags(["/usr/bin/iperf3"])) == flags(["/usr/bin/iperf3"])
+with tempfile.TemporaryDirectory() as directory:
+    path = Path(directory) / "stream.jsonl"
+    frames = [{"event": event, "data": {}} for event in ("start", "interval", "end")]
+    path.write_text("".join(json.dumps(row) + "\\n" for row in frames) + "{")
+    assert events(path, partial=True) == frames
+    try:
+        events(path)
+    except json.JSONDecodeError:
+        pass
+    else:
+        raise AssertionError("Incomplete final frame accepted")
+    path.write_text("".join(json.dumps(row) + "\\n" for row in frames))
+    assert events(path) == frames
+"""
+        subprocess.run([sys.executable, "-I", "-B", "-c", code, str(pilot)],
+                       check=True, timeout=10)
+
     def test_invalid_counts(self):
         for args in ((3, 30, 30, 30, 30), (5, True, 1, 1, 1), (5, 1, 2, 1, 1),
                      (5, 30, 20, 21, 21), (5, 30, 30, 20, 21)):
