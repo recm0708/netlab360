@@ -43,9 +43,12 @@ def evaluate(identifier, minutes, end, up, probes):
         raise ValueError("UNPAIRED_PROBE_SAMPLE")
     row = S.summarize(minutes, len(scrape), sum(scrape.values()), len(probe), sum(probe.values()))
     slots = {}
+    # Trabajar con milisegundos enteros evita errores de redondeo en los límites.
+    start_ms = math.floor(start * 1000)
     for key in scrape:
-        # Ventana (inicio, fin]: un scrape por intervalo nominal de diez segundos.
-        slot = math.ceil((key / 1000 - start) / S.CADENCE_S) - 1
+        slot = (key - start_ms - 1) // (S.CADENCE_S * 1000)
+        if not 0 <= slot < row["nominal_slots"]:
+            raise ValueError("WINDOW_TIMESTAMP_BOUNDARY")
         slots[slot] = slots.get(slot, 0) + 1
     missing = row["nominal_slots"] - len(slots)
     duplicate = sum(count - 1 for count in slots.values())
