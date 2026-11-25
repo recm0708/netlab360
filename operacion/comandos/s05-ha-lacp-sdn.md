@@ -1,4 +1,4 @@
-# HA, LACP y SDN — Fase 05
+# HA, LACP y SDN
 
 ## Descripción
 

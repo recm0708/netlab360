@@ -1,4 +1,4 @@
-# Infraestructura declarativa con OpenTofu — Fase 03
+# Infraestructura declarativa con OpenTofu
 
 ## Descripción
 

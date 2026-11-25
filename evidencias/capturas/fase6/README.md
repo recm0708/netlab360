@@ -1,4 +1,4 @@
-# Evidencias gráficas — Fase 06
+# Evidencias gráficas
 
 ## Descripción
 

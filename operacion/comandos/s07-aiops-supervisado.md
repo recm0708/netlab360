@@ -1,4 +1,4 @@
-# AIOps supervisado — Fase 07
+# AIOps supervisado
 
 ## Descripción
 

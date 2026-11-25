@@ -1,4 +1,4 @@
-# Entorno y línea base — Fase 01
+# Entorno y línea base
 
 ## Descripción
 
