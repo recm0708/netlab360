@@ -162,6 +162,7 @@ def serve(conn, allowed_uid, transfer=None, worker=None):
                     return
                 try:
                     with global_lock():
+                        broker_stream.frame(conn, {"kind": "accepted"})
                         reply = broker_stream.run(conn, selection, *worker)
                 except BlockingIOError:
                     reply = broker_stream.final("BUSY")
