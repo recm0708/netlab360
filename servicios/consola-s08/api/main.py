@@ -16,16 +16,20 @@ HOST = "127.0.0.1"
 PORT = 9140
 
 
-def create_app(directory: Path | None = None, *, job_transport=None) -> FastAPI:
+def create_app(directory: Path | None = None, *, job_transport=None, job_stream=None, console_port=9140) -> FastAPI:
     """Crear la API de arranque o habilitar identidades sobre una base v2 explícita."""
     if os.geteuid() == 0:
         raise RuntimeError("S08_ROOT_FORBIDDEN")
 
+    if console_port not in (9140, 9145) or (job_stream is not None and job_transport is None):
+        raise ValueError("INVALID_CONSOLE_CONFIGURATION")
     if job_transport is not None and directory is None:
         raise ValueError("JOB_STORAGE_REQUIRED")
 
     app = FastAPI(title="NETLAB360 API", version="0.1.0",
                   docs_url=None, redoc_url=None, openapi_url=None)
+
+    app.state.allowed_origins = frozenset(f"http://{host}:{console_port}" for host in ("127.0.0.1", "localhost"))
 
     @app.middleware("http")
     async def response_headers(request: Request, call_next):
@@ -52,7 +56,8 @@ def create_app(directory: Path | None = None, *, job_transport=None) -> FastAPI:
         return JSONResponse(payload.model_dump(mode="json"),
                             status_code=exc.status_code, headers=exc.headers)
 
-    mode = "AUTHENTICATED_READ_ONLY" if directory is not None else "BOOTSTRAP_READ_ONLY"
+    mode = ("AUTHENTICATED_JOBS" if job_transport is not None else
+            "AUTHENTICATED_READ_ONLY" if directory is not None else "BOOTSTRAP_READ_ONLY")
 
     @app.get("/healthz", response_model=Health)
     async def health() -> Health:
@@ -86,7 +91,7 @@ def create_app(directory: Path | None = None, *, job_transport=None) -> FastAPI:
         register_docs(app, directory)
         if job_transport is not None:
             from .jobs_http import register_jobs
-            register_jobs(app, directory, job_transport)
+            register_jobs(app, directory, job_transport, job_stream)
 
     return app
 
