@@ -1,8 +1,8 @@
-# Adquisición experimental multisesión en HQ — Fase 06
+# Adquisición experimental multisesión en HQ
 
 ## Antecedente
 
-El proyecto NETLAB360 cuenta con 21 namespaces originales y cuatro contenedores. Los namespaces temporales de la fase 06 usados para ensayos de watchdog/dummy/veth fueron eliminados y la auditoría S06-042 detectó cero interfaces dummy. La administración `ens33 192.168.47.40/24`, gateway `192.168.47.2` y el cliente `nl360-s02-h-hq-120/eth0` (veth conectada al switch de HQ, `10.70.20.20/24`, gateway `10.70.20.1`) están conservados. No recrear interfaces ni namespaces en S06-043.
+El proyecto NETLAB360 cuenta con 21 namespaces originales y cuatro contenedores. Los namespaces temporales de experimentación usados para ensayos de watchdog/dummy/veth fueron eliminados y la auditoría S06-042 detectó cero interfaces dummy. La administración `ens33 192.168.47.40/24`, gateway `192.168.47.2` y el cliente `nl360-s02-h-hq-120/eth0` (veth conectada al switch de HQ, `10.70.20.20/24`, gateway `10.70.20.1`) están conservados. No recrear interfaces ni namespaces en S06-043.
 
 **S06-041:** 60 ventanas NORMAL verificadas, 120 mediciones ICMP y dos modelos exploratorios IsolationForest con test por sesión. **S06-042:** intervención controlada real `netem delay 40ms`, TTL 35 s con watchdog previo, 4 ventanas DEGRADED RTT medio 40.440 ms y 6 RECOVERY RTT medio 0.070 ms. `RESTORED`, `noqueue`, `cleanup NONE`. Las capturas académicas F01–F04 ya están tomadas y revisadas. Rutas de evidencia y sesiones completas: [§4.11 plan maestro](s06-s08-plan-maestro-y-criterios.md).
 
@@ -33,4 +33,4 @@ Directorio privado `~/netlab360-bootstrap/s06/experimentos/S06_043_<UTC>_<id>/`,
 
 **Tres ciclos completados en VM sobre el cliente HQ real existente**, cada uno con cuatro ventanas DEGRADED y seis RECOVERY verificadas por qdisc y control root. RTT degradación 40.419, 40.376, 40.381 ms; RTT recuperación 0.071, 0.075, 0.068 ms, watchdog RESTORED en todos y cleanup STATE=NONE. La validación posterior de solo lectura confirmó: integridad de registros/datos, 21 namespaces, 4 contenedores, gestión intacta, qdisc noqueue, NOC/Prometheus/7 servicios activos, sin interfaces ficticias.
 
-Totales del corpus histórico: 100 ventanas por ruta, 60 NORMAL, 16 DEGRADED y 24 RECOVERY. Los registros originales permanecen privados. [Evaluación binaria](s06-evaluacion-binaria-holdout.md) · [Evidencias de la fase 06](../../evidencias/capturas/fase6/README.md).
+Totales del corpus histórico: 100 ventanas por ruta, 60 NORMAL, 16 DEGRADED y 24 RECOVERY. Los registros originales permanecen privados. [Evaluación binaria](s06-evaluacion-binaria-holdout.md) · [Evidencias de diagnóstico inteligente](../../evidencias/capturas/fase6/README.md).

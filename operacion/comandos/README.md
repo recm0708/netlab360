@@ -2,7 +2,7 @@
 
 ## Descripción
 
-Organizamos los procedimientos de operación por fase.
+Organizamos los procedimientos de operación por componente.
 Reutilizamos los scripts y configuraciones versionados,
 sin mantener implementaciones duplicadas.
 
@@ -33,17 +33,21 @@ sudo -v
 bash operacion/estado.sh
 ```
 
-## Procedimientos por fase
+## Procedimientos por componente
 
-| Fase | Procedimiento |
+| Área | Procedimiento |
 |---|---|
-| 01 | [Entorno y línea base](s01-entorno-y-linea-base.md) |
-| 02 | [Red multisede](s02-red-multisede.md) |
-| 03 | [Automatización](s03-automatizacion.md) |
-| 04 | [Observabilidad](s04-observabilidad.md) |
-| 05 | [HA, LACP y SDN](s05-ha-lacp-sdn.md) |
-| 06 | [Diagnóstico inteligente](s06-diagnostico-inteligente.md) |
-| 07 | [AIOps supervisado](s07-aiops-supervisado.md) |
+| Entorno | [Entorno y línea base](s01-entorno-y-linea-base.md) |
+| Redes | [Red multisede](s02-red-multisede.md) |
+| IaC | [Automatización](s03-automatizacion.md) |
+| Telemetría | [Observabilidad](s04-observabilidad.md) |
+| Disponibilidad | [HA, LACP y SDN](s05-ha-lacp-sdn.md) |
+| Diagnóstico | [Diagnóstico inteligente](s06-diagnostico-inteligente.md) |
+| AIOps | [AIOps supervisado](s07-aiops-supervisado.md) |
+
+## Consola interactiva
+
+Consultamos los requisitos, arranque local, rutas y restricciones en la [documentación del servicio](../../servicios/consola-s08/README.md). La instalación permanente y la recuperación en frío requieren validación independiente.
 
 ## Criterios de ejecución
 

@@ -1,10 +1,10 @@
-# Gestión y aceptación de hitos de las fases 01–10
+# Gestión y aceptación de hitos
 
 ## Estado vigente
 
 Las fases 01–07 están cerradas. Las fases 08–10 están abiertas y disponen de alcance, issues y criterios de aceptación propios.
 
-Utilizamos la denominación «Fase 01», «Fase 02» y sucesivas en la documentación técnica. Los títulos de los hitos de GitHub utilizan «Fase 1», «Fase 2» y sucesivos, como convención administrativa. Conservamos los códigos S01, S02 y sucesivos exclusivamente como identificadores técnicos cuando forman parte de rutas, archivos, esquemas, ensayos, prefijos de issues y pull requests o evidencias originales.
+La documentación técnica utiliza títulos y referencias por componente. Los títulos de los hitos de GitHub utilizan «Fase 1», «Fase 2» y sucesivos, como convención administrativa. Conservamos los códigos S01, S02 y sucesivos exclusivamente como identificadores técnicos cuando forman parte de rutas, archivos, esquemas, ensayos, prefijos de issues y pull requests o evidencias originales.
 
 | Hito | Estado | Criterio central |
 |---|---|---|
@@ -43,3 +43,7 @@ La fase 06 no acredita pronóstico de fallas futuras, MAE prospectivo, deriva de
 Las ampliaciones tecnológicas se evaluarán conforme a su necesidad, viabilidad y pruebas propias, sin modificar retroactivamente los resultados de las fases cerradas.
 
 [Plan maestro](../diseno/s06-s08-plan-maestro-y-criterios.md) · [Cobertura académica](cobertura-academica-netlab360.md).
+
+## Corte de aceptación de la consola
+
+El backend (#204) y el explorador técnico (#243) están cerrados. La interfaz operacional (#205) conserva dos criterios de equivalencia integral pendientes; los PR funcionales hasta #253 se fusionaron. La regresión específica comprende 204 casos aprobados y la validación de Swagger en ambos temas. Las pruebas de red (#206) y sondas/SLI/SLO (#207) son el siguiente alcance. La administración avanzada (#242), recuperación (#106) y aceptación integral (#211) siguen abiertas.

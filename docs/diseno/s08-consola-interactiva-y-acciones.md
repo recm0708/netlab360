@@ -1,6 +1,6 @@
-# Consola interactiva y acciones — Fase 08
+# Consola interactiva y acciones
 
-**Estado:** diseño técnico aprobado como base de trabajo; backend inicial implementado con persistencia, autenticación y lectores; aceptación y aislamiento de servicio en curso. El NOC de la fase 05 y la API protegida de la fase 07 son antecedentes comprobados; la consola completa aún no está implementada. Destino: demostración académica ejecutable sin escribir comandos frente a la profesora y funcionamiento reproducible en la VM.
+**Estado:** backend, sesiones, dashboard, topología SVG resumida y detallada, vistas por dominio, históricos Plotly y explorador Swagger implementados y validados incrementalmente. Conservamos el despliegue local de desarrollo; la equivalencia completa, inferencia activa, pruebas de red, sondas, actuación protegida, administración de identidades y reconstrucción permanecen pendientes.
 
 ## 1. Experiencia de usuario
 
@@ -19,34 +19,33 @@ Una sola aplicación local, con barra lateral, encabezado de estado general y pa
 | **7. SDN/OVS/Faucet** | Estado del controlador, puertos, VLAN410/420, reglas y aislamiento | Verificar comunicación y aislamiento; falla/retorno de puerto autorizado |
 | **8. Pruebas de red** | Ping corto/extendido, traceroute, HTTP, iperf3 TCP/UDP con origen/destino permitido, pérdidas, RTT, tasa, jitter si se observa | Lanzar ensayo **acotado**, guardar resultado y compararlo |
 | **9. Observabilidad** | Prometheus, Blackbox, SLI/SLO de servicio, error budget, burn rate, Alertmanager, históricos, latencia P50/P95, pérdida y calidad de fuente | Seleccionar ventana/servicio y exportar gráfica o evidencia |
-| **10. Diagnóstico IA** | Detección, scores, explicación, confianza/UNKNOWN, baseline de reglas, pronóstico y deriva **pendientes de validación en la fase 10** | Inferencia solo lectura; consulta de evidencia |
-| **11. Incidentes y AIOps** | Correlación de fuente, línea de tiempo, recomendación, riesgo y postcondición mediante la API de la fase 07 validada, con lector de resúmenes de fase 08 y presentación detallada pendiente | Crear solicitud, consultar estado y resultado; aprobación administrativa separada, ejecución protegida y retorno |
+| **10. Diagnóstico IA** | Detección, scores, explicación, confianza/UNKNOWN, baseline de reglas, pronóstico y deriva **pendientes de evaluación científica** | Inferencia solo lectura; consulta de evidencia |
+| **11. Incidentes y AIOps** | Correlación de fuente, línea de tiempo, recomendación, riesgo y postcondición mediante la API protegida validada, con lector de resúmenes de la consola y presentación detallada pendiente | Crear solicitud, consultar estado y resultado; aprobación administrativa separada, ejecución protegida y retorno |
 | **12. Copiloto RAG** | Respuestas con fuentes propias, incertidumbre y citas | Consultas de solo lectura; sin autorización de cambios (#198) |
 | **13. Evidencias y sistema** | Historial de trabajos, logs sanitizados, versiones, tests, métricas y catálogo | Descargar resultados JSON/CSV, generar inventario técnico y comprobar salud |
 | **14. Usuarios y seguridad** | Perfil propio, cuentas, roles, sesiones y auditoría de acceso (#242) | Cambios autorizados de identidad, contraseña y MFA; administración separada de privilegios operacionales |
 | **15. Diagnóstico técnico** | Catálogo de API, salud de aplicación, respuestas y errores sanitizados (#243) | Consultas de lectura permitidas, copia y exportación delimitada; sin shell, proxy arbitrario ni cambios de red |
 
-Reservamos ambas rutas sin implementar sus acciones. La administración
+El diagnóstico técnico está implementado y reservado inicialmente a OPERATOR. La administración de identidades conserva su ruta, sin operaciones administrativas habilitadas. La administración
 propia estará disponible a cada usuario; la administración de terceros
 requiere un futuro rol ADMIN con MFA y reautenticación para operaciones
 sensibles. La identidad ADMIN no implica privilegios de root ni permiso
 operacional. El diagnóstico técnico se reserva inicialmente a OPERATOR.
 
-**Diseño adaptable:** desktop en VMware/Windows con barra lateral fija; tarjetas en pantallas estrechas; secciones sin implementación muestran `PENDIENTE` explícitamente, nunca resultados ficticios. Mantener el NOC de la fase 05 accesible durante la migración.
+**Diseño adaptable:** desktop en VMware/Windows con barra lateral fija; tarjetas en pantallas estrechas; secciones sin implementación muestran `PENDIENTE` explícitamente, nunca resultados ficticios. Mantenemos el NOC anterior accesible hasta verificar equivalencia y dependencias.
 
 ## 2. Arquitectura escogida (preferencia práctica)
 
 - **UI:** HTML/CSS/JavaScript con componentes sencillos y gráficas Plotly. Reutilizar modelos y SVG/visuales del `servicios/topologia-s05/index.html`; no crear un segundo NOC desconectado. Dash opcional solo si se acredita beneficio de integración, no necesario para un menú.
-- **Backend:** Python FastAPI + Uvicorn usando entorno virtual de las fases 06–08. Endpoints tipados para estado, series, pruebas, catálogo, ejecuciones y evidencia. Servir API y frontend desde la misma aplicación (sin CORS público).
-- **Fuentes:** adaptadores locales del exportador de la fase 04 `127.0.0.1:9110`, NOC de la fase 05 `127.0.0.1:9130`, Prometheus local `9091` si está activo, histórico SQLite, estados de operación y módulos de las fases 06 y 07.
+- **Backend:** Python FastAPI + Uvicorn usando entorno virtual científico. Endpoints tipados para estado, series, pruebas, catálogo, ejecuciones y evidencia. Servir API y frontend desde la misma aplicación (sin CORS público).
+- **Fuentes:** adaptadores locales del exportador de telemetría `127.0.0.1:9110`, NOC topológico `127.0.0.1:9130`, Prometheus local `9091` si está activo, histórico SQLite, estados de operación y módulos de diagnóstico y AIOps.
 - **Persistencia propia:** SQLite privado bajo `netlab360-bootstrap/s08/` con registros de trabajos/eventos, parámetros validados, acciones, estados previos y posteriores y artefactos; **no** dentro de Git.
 - **Exposición:** por defecto solo `127.0.0.1:9140` en la VM. Demo desde Windows: túnel SSH `ssh -L 9140:127.0.0.1:9140 rc-aa-ec@192.168.47.40`; navegador Windows `http://127.0.0.1:9140`. Acceso externo solo tras revisar controles de autenticación, CSRF y autorizaciones.
 - **Protocolo UI:** peticiones REST + actualización ligera por polling/SSE; límites de frecuencia y tiempo. Evitar WebSockets por defecto si no se justifican.
 
 ### Compatibilidad y dependencias
 
-Conservamos el entorno científico utilizado durante las fases
-06 y 07 como referencia de compatibilidad para la fase 08.
+Conservamos el entorno científico de referencia para la compatibilidad de la consola.
 La comprobación previa se realizó con Python
 3.14.4 sobre Ubuntu 26.04.1 LTS,
 sin instalar ni actualizar paquetes.
@@ -73,7 +72,7 @@ no constituye un lockfile con hashes de distribución ni acredita
 una reconstrucción limpia del entorno.
 
 Comprobamos la consistencia mediante `pip check`, las
-importaciones principales y la suite de inferencia de la fase 06
+importaciones principales y la suite de inferencia histórica
 utilizando su intérprete científico. La prueba de rutas FastAPI
 omitida en la regresión general se ejecutó satisfactoriamente
 en este entorno.
@@ -125,7 +124,7 @@ tests/
 
 **Flujo de un clic:** usuario elige `action_id` + parámetros tipados → backend consulta registro `acciones.yaml` → verifica política/destinos y prechecks → autorización humana si cambia estado → ejecutor con permisos mínimos invoca **script revisado por ruta fija** → almacena resultados y hash → revalida red/NOC → UI presenta métricas y retorno.
 
-**Crítico:** NO pasar cadenas libres a `bash -c`, `shell=True`, `sudo` con rutas de scripts editables por el usuario o interpolaciones del navegador. Los scripts que requieran privilegios deben instalarse como ejecutores **propiedad root, no editables por usuario web**, y recibir únicamente acciones/argumentos autorizados; el observador de la fase 05 permanece read-only. Verificar política de ejecución y pruebas de intrusión antes de conectar botones que produzcan fallos.
+**Crítico:** NO pasar cadenas libres a `bash -c`, `shell=True`, `sudo` con rutas de scripts editables por el usuario o interpolaciones del navegador. Los scripts que requieran privilegios deben instalarse como ejecutores **propiedad root, no editables por usuario web**, y recibir únicamente acciones/argumentos autorizados; el observador de topología permanece read-only. Verificar política de ejecución y pruebas de intrusión antes de conectar botones que produzcan fallos.
 
 ### Contrato de integración y fronteras de confianza
 
@@ -235,17 +234,21 @@ Los límites son **propuestas de diseño**, no capacidades ya desplegadas. `iper
 
 ## 6. Construcción incremental
 
-1. **Esqueleto UI read-only**: inicio + topología de la fase 05 + estado WAN/HA/LACP/SDN + API propia. No modificar el NOC de la fase 05 estable hasta tener pruebas de paridad.
+1. **Esqueleto UI read-only**: inicio + topología multisede + estado WAN/HA/LACP/SDN + API propia. No modificar el NOC topológico estable hasta tener pruebas de paridad.
 2. **Pruebas acotadas**: ping, traceroute, HTTP; luego iperf3 TCP/UDP con límites; gráficas, historial y exportación.
-3. **Integración de la fase 06**: detección experimental, explicación y advertencias con datos propios verificados; pronóstico no demostrado.
-4. **Integración de la fase 07**: catálogo de runbooks, aprobación, ejecución protegida, watchdog y recuperación controlada.
+3. **Integración de diagnóstico inteligente**: detección experimental, explicación y advertencias con datos propios verificados; pronóstico no demostrado.
+4. **Integración de AIOps supervisado**: catálogo de runbooks, aprobación, ejecución protegida, watchdog y recuperación controlada.
 5. **Copiloto RAG (#198)**: corpus autorizado, generación con citas y abstención, evaluación de fidelidad, relevancia y seguridad; sin autorización ni ejecución de cambios.
 6. **Demostración/aceptación**: escenarios de inicio sano → degradación → mediciones → detección/recomendación → autorización → cambio → verificación/retorno; contraste de métricas reales y evidencia.
 7. **Observabilidad de servicio**: Blackbox, SLI/SLO, error budget, burn rate, Alertmanager y evaluación de Grafana especializado.
-8. **Cierre técnico**: recuperación desde apagado, seguridad, regresión y evidencias de la fase 08. La entrega académica definitiva corresponde a la fase 10.
+8. **Cierre técnico**: recuperación desde apagado, seguridad, regresión y evidencias de la consola. La entrega definitiva requiere la evaluación integral.
 
 ## 7. Cobertura académica y auditoría de inicio
 
-La [matriz de cobertura académica](../gestion/cobertura-academica-netlab360.md) establece las capacidades visibles, los componentes de segundo plano, la evidencia histórica y las brechas. Antes de implementar, reanudar y auditar la VM sin modificar la infraestructura. Los escenarios mutadores del catálogo son propuestas: la API de la fase 07 acredita únicamente el costo OSPF delimitado de R-S1/s1b; WAN, HTTP, LACP, SDN y netem requieren aceptación individual de ejecutores y rollback. El navegador y el copiloto no adquieren privilegios de aprobación administrativa. La fase 09 incorpora ampliaciones tecnológicas y la fase 10 amplía la validación científica y consolida la entrega. La fase 08 debe ofrecer puntos de extensión sin presentar esas capacidades como implementadas.
+La [matriz de cobertura académica](../gestion/cobertura-academica-netlab360.md) establece las capacidades visibles, los componentes de segundo plano, la evidencia histórica y las brechas. Antes de implementar, reanudar y auditar la VM sin modificar la infraestructura. Los escenarios mutadores del catálogo son propuestas: la API protegida acredita únicamente el costo OSPF delimitado de R-S1/s1b; WAN, HTTP, LACP, SDN y netem requieren aceptación individual de ejecutores y rollback. El navegador y el copiloto no adquieren privilegios de aprobación administrativa. Las ampliaciones tecnológicas y la evaluación científica requieren sus propias validaciones. La consola ofrece puntos de extensión sin presentar capacidades pendientes como implementadas.
 
 **Principio UX:** el usuario elige **qué comprobar o simular**; la aplicación decide **qué procedimiento autorizado ejecutar** y registra **qué ocurrió realmente**. Nunca se presenta como una consola de comandos arbitrarios.
+
+## Estado de integración de la interfaz
+
+Validamos 204 casos específicos, topología de 18 nodos y 21 enlaces (vista resumida de 15 nodos y 14 enlaces), filtros por sede, selección persistente, zoom, pantalla completa y actualización incremental. Los intervalos de consulta configurables son 5, 10, 15, 30, 60 y 300 segundos; históricos y diagnóstico técnico se consultan manualmente. La documentación Swagger usa la sesión vigente, ambas paletas y consultas GET permitidas. La copia histórica de alertas conserva su procedencia y no equivale a un registro continuo. La equivalencia completa con las interfaces anteriores se comprueba antes de su retiro.

@@ -1,8 +1,8 @@
-# Acta de aceptación técnica — Fase 05
+# Acta de aceptación técnica
 
 ## Descripción
 
-La fase 05 integró alta disponibilidad lógica HTTP, agregación LACP, segmentación SDN y observabilidad sobre la red empresarial multisede desarrollada en NETLAB360.
+Integramos alta disponibilidad lógica HTTP, agregación LACP, segmentación SDN y observabilidad sobre la red empresarial multisede desarrollada en NETLAB360.
 
 ## Resultados verificados
 
@@ -18,7 +18,7 @@ La fase 05 integró alta disponibilidad lógica HTTP, agregación LACP, segmenta
 
 ## Evidencias
 
-Conservamos **71 capturas PNG** de la fase, junto con los registros originales de la prueba de conmutación HTTP. Las imágenes representan configuraciones, estados y pruebas realmente realizados en el laboratorio.
+Conservamos **71 capturas PNG** de las pruebas, junto con los registros originales de la prueba de conmutación HTTP. Las imágenes representan configuraciones, estados y pruebas realmente realizados en el laboratorio.
 
 ## Alcance y limitaciones
 
@@ -26,6 +26,6 @@ Los componentes descritos se comprobaron en un entorno virtualizado. El resultad
 
 ## Resultado
 
-Consideramos **completada la validación técnica de la fase 05**. La integración de estos resultados al informe académico único y las fases 06–08 constituyen actividades posteriores del proyecto.
+Consideramos **completada la validación técnica de disponibilidad y SDN**. Los resultados se incorporan a la documentación de diagnóstico, actuación supervisada y consola integrada.
 
 [Validación técnica](../validacion/s05-integracion-y-aceptacion.md) · [Catálogo gráfico](../../evidencias/capturas/fase5/README.md).

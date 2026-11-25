@@ -1,4 +1,4 @@
-# Topología de referencia FRRouting — Fase 01
+# Topología de referencia FRRouting
 
 ## Descripción
 
@@ -19,8 +19,8 @@ Comprobamos el establecimiento de adyacencias OSPF FULL, el uso preferido del en
 
 ## Limitaciones
 
-El escenario es un prototipo de dos sedes. No representa la integración HQ/S1/S2 desarrollada en la fase 02 ni garantiza disponibilidad continua de enlaces físicos.
+El escenario es un prototipo de dos sedes. No representa la integración HQ/S1/S2 de referencia ni garantiza disponibilidad continua de enlaces físicos.
 
 ## Documentación relacionada
 
-[Topología multisede de la fase 02](../s02-frr/README.md) · [Resultados de las fases 01–04](../../docs/validacion/s01-s04-resultados.md).
+[Topología multisede](../s02-frr/README.md) · [Resultados de entorno, red y observabilidad](../../docs/validacion/s01-s04-resultados.md).

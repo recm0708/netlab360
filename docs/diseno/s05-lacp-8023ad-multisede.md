@@ -1,4 +1,4 @@
-# Diseño de agregación LACP — Fase 05
+# Diseño de agregación LACP
 
 ## Descripción
 
@@ -73,4 +73,4 @@ Las mediciones proceden de interfaces virtuales sobre una VM. No describen el re
 
 ## Documentación relacionada
 
-[Validación de la fase 05](../validacion/s05-integracion-y-aceptacion.md) · [Capturas de la fase 05](../../evidencias/capturas/fase5/README.md).
+[Validación de disponibilidad y SDN](../validacion/s05-integracion-y-aceptacion.md) · [Capturas de disponibilidad y SDN](../../evidencias/capturas/fase5/README.md).

@@ -1,4 +1,4 @@
-# Automatización — Fase 03
+# Automatización
 
 ## Descripción
 

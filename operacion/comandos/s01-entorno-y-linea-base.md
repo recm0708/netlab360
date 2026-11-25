@@ -1,4 +1,4 @@
-# Entorno y línea base — Fase 01
+# Entorno y línea base
 
 ## Descripción
 
@@ -30,7 +30,7 @@ python3 -m unittest discover -s tests -p 'test_s01_*.py' -v
 La instalación de dependencias se realiza mediante
 el procedimiento central de operación.
 
-Conservamos los ensayos históricos de la fase 01
+Conservamos los ensayos históricos del prototipo inicial
 como componentes independientes:
 
 - [Comprobación inicial FRR](../../scripts/laboratorio/b2-frr-smoke-v5-demonios-verificados.sh).
@@ -49,4 +49,4 @@ parte del arranque de la topología multisede vigente.
 - [Instalación general](../README.md).
 - [Topología FRRouting inicial](../../topologias/b2-frr/README.md).
 - [Preparación de Ubuntu](../../docs/infraestructura/ubuntu-desktop-y-ssh.md).
-- [Validación de las fases 01–04](../../docs/validacion/s01-s04-resultados.md).
+- [Validación de entorno, red y observabilidad](../../docs/validacion/s01-s04-resultados.md).

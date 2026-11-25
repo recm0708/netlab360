@@ -1,4 +1,4 @@
-# Telemetría reciente e inferencia exploratoria — Fase 06
+# Telemetría reciente e inferencia exploratoria
 
 ## Descripción
 
@@ -19,7 +19,7 @@ La muestra solo es admisible si acredita esquema, origen HQ, dos destinos exacto
 
 Con consenso binario **NORMAL** de los tres métodos y guardas de la red verificadas se devuelve `operational_state=NORMAL` **acotado al egreso de HQ** y sin afirmar normalidad global; la etiqueta ground truth de la medición permanece `UNKNOWN`. Si un modelo discrepa o todos señalan DEGRADED sin corroboración independiente, se devuelve `operational_state=UNKNOWN` junto con la indicación binaria exploratoria. Nunca se autorizan cambios automáticos.
 
-La API temporal sigue en `127.0.0.1:9145`, sin instalación como servicio ni apertura hacia Windows. No modifica el NOC de la fase 05 actual. Una integración visual con el NOC requerirá un adaptador de lectura específico después de aprobar la adquisición real.
+La API temporal sigue en `127.0.0.1:9145`, sin instalación como servicio ni apertura hacia Windows. No modifica el NOC topológico actual. Una integración visual con el NOC requerirá un adaptador de lectura específico después de aprobar la adquisición real.
 
 ## Procedimiento de validación
 
@@ -41,6 +41,6 @@ Fuente privada: `~/netlab360-bootstrap/s06/telemetria-hq-live/S06_046_HQ_2026112
 
 Las guardas rechazaron una muestra artificialmente envejecida 40 s (`S06_046_FRESHNESS_GATE=OK`), mantuvieron denegadas acciones correctivas, detuvieron API temporal 9145, restauración root `NONE/BASELINE`, `noqueue`, 21 namespaces, cuatro Docker, gestión `ens33 192.168.47.40/24` y gateway `.2`, Prometheus READY y NOC saludable; sin mutaciones de red ni reentrenamiento.
 
-[Evidencias de la fase 06](../../evidencias/capturas/fase6/README.md).
+[Evidencias de diagnóstico inteligente](../../evidencias/capturas/fase6/README.md).
 
 **Continuidad S06-047:** conectar el diagnóstico limitado y conservador al NOC existente por adaptador read-only, conservar comportamiento UNKNOWN si la API IA está detenida o una observación caduca, no tocar el diagrama ni crear un segundo NOC.

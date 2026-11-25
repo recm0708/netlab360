@@ -1,4 +1,4 @@
-# Red multisede — Fase 02
+# Red multisede
 
 ## Descripción
 

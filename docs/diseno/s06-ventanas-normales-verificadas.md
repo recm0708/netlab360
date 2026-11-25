@@ -1,4 +1,4 @@
-# Ventanas normales con etiquetado independiente — Fase 06
+# Ventanas normales con etiquetado independiente
 
 ## Antecedente
 

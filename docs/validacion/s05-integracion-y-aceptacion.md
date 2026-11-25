@@ -1,8 +1,8 @@
-# Validación técnica de la fase 05
+# Validación técnica de disponibilidad y SDN
 
 ## Descripción
 
-La quinta fase integró mecanismos de recuperación lógica y observación de una red empresarial multisede en la infraestructura de HQ, S1 y S2. Las comprobaciones se realizaron en el laboratorio virtual NETLAB360.
+Integramos mecanismos de recuperación lógica y observación de una red empresarial multisede en la infraestructura de HQ, S1 y S2. Las comprobaciones se realizaron en el laboratorio virtual NETLAB360.
 
 ## Componentes validados
 
@@ -24,7 +24,7 @@ El último precheck operativo acreditó **21 namespaces**, **cuatro contenedores
 
 ## Evidencias disponibles
 
-La fase reúne **71 capturas PNG**, organizadas en su [catálogo](../../evidencias/capturas/fase5/README.md), además del registro original del ciclo HTTP y su salida de terminal. Las capturas se seleccionarán en el informe según la relevancia del resultado y su legibilidad.
+La validación reúne **71 capturas PNG**, organizadas en su [catálogo](../../evidencias/capturas/fase5/README.md), además del registro original del ciclo HTTP y su salida de terminal. Las capturas se seleccionarán en el informe según la relevancia del resultado y su legibilidad.
 
 ## Limitaciones
 

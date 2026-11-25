@@ -1,4 +1,4 @@
-# Observabilidad — Fase 04
+# Observabilidad
 
 ## Descripción
 

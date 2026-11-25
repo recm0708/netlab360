@@ -1,4 +1,4 @@
-# Diagnóstico inteligente — Fase 06
+# Diagnóstico inteligente
 
 ## Descripción
 

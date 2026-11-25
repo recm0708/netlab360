@@ -1,4 +1,4 @@
-# Auditoría de muestreo ICMP del corpus histórico — Fase 06
+# Auditoría de muestreo ICMP del corpus histórico
 
 ## Descripción y alcance
 

@@ -1,4 +1,4 @@
-# Auditoría de preparación prospectiva del corpus histórico — Fase 06
+# Auditoría de preparación prospectiva del corpus histórico
 
 ## Descripción
 

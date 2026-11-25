@@ -2,7 +2,7 @@
 
 ## Documentación
 
-Cada documento técnico describe un asunto concreto mediante un título H1 único y descriptivo, seguido de secciones de nivel H2/H3. Utilizar **Descripción**, **Arquitectura o implementación**, **Validación**, **Limitaciones** y **Documentación relacionada** cuando sean pertinentes. Los títulos técnicos de fase siguen la forma «Tema — Fase NN»; los documentos transversales identifican su asunto sin añadir una fase ficticia. Los ADR conservan su identificador.
+Cada documento técnico describe un asunto concreto mediante un título H1 único y descriptivo, seguido de secciones de nivel H2/H3. Utilizar **Descripción**, **Arquitectura o implementación**, **Validación**, **Limitaciones** y **Documentación relacionada** cuando sean pertinentes. Los títulos, índices y textos visibles del producto identifican el asunto técnico sin sufijos de fase ni referencias al orden académico. Conservamos los identificadores funcionales, rutas, contratos y catálogos históricos; la planificación se registra en los espacios de gestión correspondientes. Los ADR conservan su identificador.
 
 La documentación vigente describe el sistema y sus resultados. Las instrucciones de continuidad de conversaciones, estimaciones intermedias y bitácoras administrativas de desarrollo no pertenecen a ella. Los registros históricos útiles se identifican como tales y se conservan sin alterar los datos originales. Los catálogos gráficos contienen la lista de imágenes y su alcance.
 

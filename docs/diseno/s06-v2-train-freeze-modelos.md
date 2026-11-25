@@ -1,4 +1,4 @@
-# Entrenamiento y congelación de modelos V2 — Fase 06
+# Entrenamiento y congelación de modelos V2
 
 ## Prerregistro y entradas
 El estudio V2 ya obtuvo, con fuente independiente de la etiqueta, **40 NORMAL, 8 DEGRADED y 12 RECOVERY por ruta**, todas con exactamente tres paquetes ICMP por ventana. Dos tokens de eventos distintos fueron activados con aprobación humana, restaurados de forma autónoma por watchdog y terminados en qdisc `noqueue` y guardia `NONE/BASELINE`. La carpeta de datos es `~/netlab360-bootstrap/s06/estudio-uniforme-v2`, su índice de sesiones `TRAIN_Manifest.json` y el origen de controles `~/netlab360-bootstrap/s06/experimentos/S06_043_20261123T150227Z_b399ae/manifest.json`.
