@@ -60,9 +60,11 @@ def active(unit):
 
 def stop(unit):
     """Detener únicamente una unidad creada por este piloto."""
-    sudo("/usr/bin/systemctl", "stop", unit, check=False)
-    if active(unit):
-        raise RuntimeError("UNIT_STILL_ACTIVE:" + unit)
+    result = sudo("/usr/bin/systemctl", "stop", unit, check=False)
+    state = run(["/usr/bin/systemctl", "show", unit, "--property=ActiveState", "--value"],
+                check=False).stdout.strip()
+    if state not in ("inactive", "failed") or (result.returncode and state != "inactive"):
+        raise RuntimeError("UNIT_STOP_UNCONFIRMED:" + unit + ":" + state)
 
 
 def unit_args(unit, namespace=None, lifetime=90, root=False):
@@ -122,8 +124,12 @@ def package(stage, name, version, binary_names):
     if len(matches) != 1:
         raise ValueError("PACKAGE_BINARY")
     binary = matches[0]
+    for folder in (extracted, extracted / "usr", extracted / "usr/bin"):
+        folder.chmod(0o755)
+    binary.chmod(0o755)
     print("PAQUETE_EXTRAIDO=" + name + "=" + version, flush=True)
-    print(run([str(binary), "--version"]).stdout.strip(), flush=True)
+    version_result = run([str(binary), "--version"])
+    print((version_result.stdout + version_result.stderr).strip(), flush=True)
     return binary
 
 
@@ -213,11 +219,15 @@ def alertmanager(stage, evidence, prefix, binary):
 
         def do_POST(self):
             size = int(self.headers.get("Content-Length", "0"))
-            if self.path != "/receive" or not 0 < size <= MAX_OUTPUT:
+            self.connection.settimeout(5)
+            if self.path != "/receive" or not 0 < size <= 65536:
                 self.send_error(400)
                 return
             body = json.loads(self.rfile.read(size))
             with guard:
+                if len(received) >= 16:
+                    self.send_error(429)
+                    return
                 received.append(body)
             self.send_response(200)
             self.end_headers()
@@ -321,7 +331,7 @@ def iperf(evidence, prefix):
                     handles.extend((out, err))
                     process = subprocess.Popen(unit_args(unit, endpoint.namespace, seconds + 5)
                                                + ["--wait", "--pipe", *args],
-                                               stdout=out, stderr=err)
+                                               stdin=subprocess.DEVNULL, stdout=out, stderr=err)
                     processes.append(process)
                 observed = [False, False]
                 deadline = time.monotonic() + ct + 10
@@ -373,6 +383,7 @@ def main():
     stage.chmod(0o755)
     prefix = "netlab360-s08-pilot-" + stage.name.split(".")[-1].lower()
     print("ENTORNO_PILOTO=" + str(stage), flush=True)
+    completed = False
     try:
         bb = package(stage, "prometheus-blackbox-exporter", "0.26.0-2",
                      ("prometheus-blackbox-exporter", "blackbox_exporter"))
@@ -381,17 +392,29 @@ def main():
         blackbox(stage, evidence, prefix, bb)
         alertmanager(stage, evidence, prefix, am)
         iperf(evidence, prefix)
-        print("S08_008_PILOTOS=OK", flush=True)
+        completed = True
     finally:
-        # La unidad de Alertmanager ya se detuvo; limpiar solo su estado sintético.
-        state = stage / "alert-state"
-        if state.exists():
-            sudo("/usr/bin/sudo", "-n", "-u", ACCOUNT, "/usr/bin/find",
-                 str(state), "-mindepth", "1", "-delete")
-            state.rmdir()
-        import shutil
-        shutil.rmtree(stage)
-        print("ENTORNO_PILOTO_ELIMINADO=OK", flush=True)
+        units = [prefix + suffix for suffix in
+                 ("-bb-hq", "-bb-s2", "-am", "-tcp-10s-rx", "-tcp-10s-tx",
+                  "-udp-10s-rx", "-udp-10s-tx", "-lock")]
+        if any(active(unit) for unit in units):
+            raise RuntimeError("PILOT_CLEANUP_UNCONFIRMED:" + str(stage))
+        if completed:
+            # Retirar solo el estado sintético de este piloto una vez comprobadas las unidades.
+            state = stage / "alert-state"
+            if state.exists():
+                run(["/usr/bin/sudo", "-n", "-u", ACCOUNT, "--", "/usr/bin/find",
+                     str(state), "-mindepth", "1", "-delete"])
+                state.rmdir()
+            import shutil
+            shutil.rmtree(stage)
+            print("ENTORNO_PILOTO_ELIMINADO=OK", flush=True)
+            print("S08_008_PILOTOS=OK", flush=True)
+        else:
+            print("ENTORNO_PILOTO_CONSERVADO=" + str(stage), flush=True)
+            for unit in units:
+                log = sudo("/usr/bin/journalctl", "-u", unit, "--no-pager", "-n", "60", check=False)
+                (evidence / (unit + ".log")).write_text(log.stdout, encoding="utf-8")
 
 
 if __name__ == "__main__":
