@@ -96,7 +96,7 @@ function createJobsView(context, request, formatDate) {
     text("title","Resultado · "+actionLabel(data.selection));
     text("state",statusLabel(job)+" · "+job.status);
     byId("state").dataset.state=data.execution_quality==="UNCERTAIN"?"warn":job.status==="SUCCEEDED"?"ok":job.status==="FAILED"?"fault":"unknown";
-    text("detail",dateLabel(job.created_at_utc)+" (Panamá) · "+profileLabel(data.selection)+" · "+
+    text("detail",dateLabel(job.created_at_utc)+" · "+profileLabel(data.selection)+" · "+
       (routes[data.selection.route]||data.selection.route)+" · ID: "+job.job_id);
     const transfer = data.selection.action.startsWith("test.iperf.") || data.selection.action === "test.content.tcp";
     byId("transfer-panel").hidden=!transfer;
