@@ -85,8 +85,19 @@ una adquisición concurrente y dos segundos entre solicitudes.
 No conservamos datos históricos en almacenamiento web ni sustituimos
 la base TSDB. Los grupos describen disponibilidad de scrape, existencia
 de contenedores y estado administrativo; no acreditan conectividad.
-La presentación Plotly se integra de forma independiente sobre este
-contrato.
+En /observability representamos muestras con Plotly.js local, bandas por
+recurso, zoom, leyendas y fechas en Panamá. No unimos muestras mediante
+líneas ni sustituimos nulos por ceros. Centramos la leyenda de recursos y
+usamos colores categóricos distintos por tema; la forma, posición y texto
+identifican el estado de cada muestra independientemente de su color.
+En el tema claro utilizamos superficies azul grisáceas suaves, colores
+semánticos y categóricos más profundos y marcadores de siete píxeles.
+La paleta oscura mantiene sus tonos originales. Aplicamos los mismos
+colores semánticos a acceso, navegación, indicadores y tablas.
+El recurso se sirve desde el paquete
+científico instalado y requiere sesión. Limitamos los estilos inline
+necesarios para Plotly a esta vista; los scripts y conexiones conservan
+el origen local y no habilitamos evaluación de código.
 
 ## Explorador técnico
 

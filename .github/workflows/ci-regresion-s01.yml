@@ -94,7 +94,7 @@ jobs:
       - name: Instalar dependencias API segun inventario
         run: |
           python --version
-          python -m pip install --disable-pip-version-check -c requirements-cientifico.txt fastapi uvicorn pydantic httpx
+          python -m pip install --disable-pip-version-check -c requirements-cientifico.txt fastapi uvicorn pydantic httpx plotly
           python -m pip check
           python -c "import fastapi, uvicorn, pydantic, httpx"
 

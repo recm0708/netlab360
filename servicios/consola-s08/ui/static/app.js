@@ -342,6 +342,7 @@ function initializeConsole() {
     session = null;
     resetDebug();
     clearDashboard();
+    clearHistory();
     if (idleDialog.open) idleDialog.close();
     shell.hidden = true;
     recoveryPanel.hidden = false;
@@ -409,6 +410,8 @@ function initializeConsole() {
         updateDashboard().then(() => restoreContentIfUnchanged());
       } else if (location.pathname === "/debug") {
         loadDebug().then(() => restoreContentIfUnchanged());
+      } else if (location.pathname === "/observability") {
+        updateHistory().then(() => restoreContentIfUnchanged());
       }
     }
     authNotice.textContent = "Sesión vigente. Acciones de red deshabilitadas.";
@@ -444,6 +447,7 @@ function initializeConsole() {
     const remaining = Math.ceil(session.expiresAt - serverNow());
     if (remaining <= 0) {
       clearDashboard();
+      clearHistory();
       // Otra pestaña puede haber renovado la misma sesión. Consultamos una vez
       // sin extender el plazo; una respuesta no válida retira la identidad.
       if (!busy) recover();
@@ -557,7 +561,9 @@ function initializeConsole() {
     const home = active.dataset.view === "home";
     document.getElementById("home-view").hidden = !home;
     const debug = active.dataset.view === "debug";
-    document.getElementById("module-view").hidden = home || debug;
+    const history = active.dataset.view === "observability";
+    document.getElementById("module-view").hidden = home || debug || history;
+    document.getElementById("history-view").hidden = !history;
     document.getElementById("debug-view").hidden = !debug;
     const label = active.querySelector(".nav-text").textContent;
     document.getElementById("module-title").textContent = label;
@@ -602,7 +608,7 @@ function initializeConsole() {
     debugNotice.textContent = "Esperando catálogo.";
   }
 
-  async function debugRead(path) {
+  async function debugRead(path, maxBytes = 262144) {
     const response = await fetch(path, {method: "GET", credentials: "same-origin",
       cache: "no-store", redirect: "error", signal: AbortSignal.timeout(15000)});
     if (!response.ok) return {status: response.status, data: null};
@@ -614,7 +620,7 @@ function initializeConsole() {
         const {done, value} = await reader.read();
         if (done) break;
         size += value.byteLength;
-        if (size > 262144) throw new Error("LIMIT");
+        if (size > maxBytes) throw new Error("LIMIT");
         raw += decoder.decode(value, {stream: true});
       }
       raw += decoder.decode();
@@ -857,6 +863,118 @@ function initializeConsole() {
   document.addEventListener("visibilitychange",()=>{
     if(!document.hidden&&dashboardAuto.checked&&dashboardAllowed()) updateDashboard();
   });
+
+  // Las series históricas permanecen en memoria y se descartan al perder la sesión.
+  const historyGroup = document.getElementById("history-group");
+  const historyWindow = document.getElementById("history-window");
+  const historyRun = document.getElementById("history-run");
+  const historyStatus = document.getElementById("history-status");
+  const historyPlot = document.getElementById("history-plot");
+  let historyEpoch = 0, historyBusy = false, historyData = null;
+  let plotlyLoading = null, historyDraw = Promise.resolve();
+
+  function historyAllowed() {
+    return location.pathname === "/observability" && session !== null &&
+      serverNow() < session.expiresAt;
+  }
+
+  function clearHistory() {
+    historyEpoch++;
+    historyData = null;
+    historyBusy = false;
+    historyRun.disabled = false;
+    for (const id of ["history-valid","history-null","history-series","history-scope"])
+      document.getElementById(id).textContent = "—";
+    historyStatus.textContent = "Sin consulta histórica vigente.";
+    historyPlot.hidden = true;
+    // Serializamos el borrado después de cualquier dibujo pendiente.
+    historyDraw = historyDraw.catch(()=>{}).then(()=>{
+      if (window.Plotly) window.Plotly.purge(historyPlot);
+      historyPlot.replaceChildren();
+    });
+  }
+
+  function loadPlotly() {
+    if (window.Plotly) return Promise.resolve(window.Plotly);
+    if (!plotlyLoading) {
+      plotlyLoading = new Promise((resolve,reject)=>{
+        const script=document.createElement("script");
+        script.src="/ui/static/plotly.js";
+        script.onload=()=>window.Plotly?.newPlot?resolve(window.Plotly):reject(new Error("PLOTLY"));
+        script.onerror=()=>reject(new Error("PLOTLY"));
+        document.head.append(script);
+      }).catch(error=>{plotlyLoading=null;throw error;});
+    }
+    return plotlyLoading;
+  }
+
+  function drawHistory(data,epoch) {
+    historyDraw=historyDraw.catch(()=>{}).then(async ()=>{
+      const plotly=await loadPlotly();
+      if(epoch!==historyEpoch||!historyAllowed()||historyData!==data) return;
+      const style=getComputedStyle(document.documentElement);
+      const color=name=>style.getPropertyValue("--"+name).trim();
+      const figure=window.NetlabHistory.figure(data,formatPanama,{
+        theme:document.documentElement.dataset.theme,
+        surface:color("surface"),text:color("text"),line:color("line"),
+        ok:color("ok"),fault:color("fault"),unknown:color("unknown")
+      });
+      historyPlot.hidden=false;
+      await plotly.react(historyPlot,figure.traces,figure.layout,{
+        responsive:true,displaylogo:false,scrollZoom:true,
+        modeBarButtonsToRemove:["lasso2d","select2d","toImage"]
+      });
+      if(epoch!==historyEpoch||!historyAllowed()) historyPlot.hidden=true;
+    });
+    return historyDraw;
+  }
+
+  async function updateHistory() {
+    if(!historyAllowed()||historyBusy||serverNow()>=session.warningAt) return;
+    const group=historyGroup.value, span=historyWindow.value;
+    if(!window.NetlabHistory.allowed(group,span)) return;
+    clearHistory();
+    const epoch=historyEpoch;
+    historyBusy=true;
+    historyRun.disabled=true;
+    historyStatus.textContent="Consultando muestras históricas…";
+    try {
+      const {status,data}=await debugRead("/api/v1/history/"+group+"/"+span,1048576);
+      if(epoch!==historyEpoch||!historyAllowed()) return;
+      if(status===401||status===403) {clearHistory();recover();return;}
+      if(status===429) throw new Error("LIMITED");
+      if(status!==200) throw new Error("UNAVAILABLE");
+      const result=window.NetlabHistory.validate(data,group,span);
+      if(result.transport!=="OK") throw new Error("UNAVAILABLE");
+      historyData=result;
+      const counts=window.NetlabHistory.counts(result);
+      document.getElementById("history-valid").textContent=String(counts.valid);
+      document.getElementById("history-null").textContent=String(counts.missing);
+      document.getElementById("history-series").textContent=counts.series+" / "+result.series.length;
+      document.getElementById("history-scope").textContent=window.NetlabHistory.description(group);
+      if(counts.valid) await drawHistory(result,epoch);
+      if(epoch!==historyEpoch||!historyAllowed()) return;
+      historyStatus.textContent=(counts.valid?"Intervalo consultado: ":"Sin muestras válidas: ")+
+        formatPanama(new Date(result.start_epoch*1000))+" — "+formatPanama(new Date(result.end_epoch*1000));
+    } catch(error) {
+      if(epoch!==historyEpoch) return;
+      clearHistory();
+      historyStatus.textContent=error.message==="LIMITED"?
+        "Consulta ocupada. Intente nuevamente después de dos segundos.":
+        "No fue posible obtener o representar el histórico.";
+    } finally {
+      if(epoch===historyEpoch) {historyBusy=false;historyRun.disabled=false;}
+    }
+  }
+
+  historyRun.addEventListener("click",updateHistory);
+  historyGroup.addEventListener("change",clearHistory);
+  historyWindow.addEventListener("change",clearHistory);
+  new MutationObserver(()=>{
+    if(historyData&&historyAllowed()) drawHistory(historyData,historyEpoch).catch(()=>{
+      clearHistory();historyStatus.textContent="No fue posible actualizar la apariencia del gráfico.";
+    });
+  }).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
 
   // Guardamos exclusivamente preferencias visuales por pestaña, nunca identidad ni CSRF.
   const menuToggle = document.getElementById("menu-toggle");

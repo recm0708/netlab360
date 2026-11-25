@@ -38,7 +38,7 @@ class StructureTests(unittest.TestCase):
     def test_local_resources_and_unique_ids(self):
         parser = PageParser()
         parser.feed((UI / "index.html").read_text(encoding="utf-8"))
-        self.assertEqual(set(parser.resources), {"/ui/static/styles.css", "/ui/static/app.js"})
+        self.assertEqual(set(parser.resources), {"/ui/static/styles.css", "/ui/static/app.js", "/ui/static/history.js"})
         self.assertEqual(len(parser.ids), len(set(parser.ids)))
         self.assertTrue({"main", "refresh", "notice", "api-state", "capabilities", "observed"} <= set(parser.ids))
         self.assertFalse(parser.inline)
@@ -86,7 +86,8 @@ class StructureTests(unittest.TestCase):
         js = (UI / "static/app.js").read_text(encoding="utf-8")
         self.assertIn('debugPaths.has(debugSelect.value)', js)
         self.assertIn('debugRead("/api/v1/debug/probe/" + key)', js)
-        self.assertIn('size > 262144', js)
+        self.assertIn('maxBytes = 262144', js)
+        self.assertIn('size > maxBytes', js)
         self.assertIn('debugEpoch++', js)
         self.assertIn('URL.revokeObjectURL(url)', js)
         self.assertIn('csvCell', js)
@@ -168,9 +169,14 @@ class StructureTests(unittest.TestCase):
             for state in ("ok", "warn", "fault", "recovery", "unknown", "text", "muted"):
                 for background in ("bg", "surface", "sidebar"):
                     with self.subTest(theme=selector, state=state, background=background):
-                        self.assertGreaterEqual(contrast(colors[state], colors[background]), 4.5)
+                        self.assertGreaterEqual(contrast(colors[state], colors[background]),
+                                                4.5 if selector == ":root" else 6.5)
             self.assertGreaterEqual(contrast(colors["button-text"], colors["accent"]), 4.5)
             self.assertGreaterEqual(contrast(colors["accent"], colors["sidebar"]), 3)
+            if selector != ":root":
+                self.assertNotEqual(colors["surface"], "#fff")
+                self.assertNotEqual(colors["surface"], "#ffffff")
+                self.assertGreaterEqual(contrast(colors["button-text"], colors["accent"]), 7)
 
     def test_solid_current_navigation(self):
         css = (UI / "static/styles.css").read_text(encoding="utf-8")
@@ -269,12 +275,42 @@ class UIHttpTests(unittest.TestCase):
     def test_assets(self):
         for path, mime in (("/ui/static/styles.css", "text/css"),
                            ("/ui/static/app.js", "text/javascript"),
-                           ("/ui/static/login.js", "text/javascript")):
+                           ("/ui/static/login.js", "text/javascript"),
+                           ("/ui/static/history.js", "text/javascript")):
             r = self.client.get(path)
             self.assertEqual(r.status_code, 200)
             self.assertIn(mime, r.headers["content-type"])
             self.assertEqual(r.headers["x-content-type-options"], "nosniff")
             self.assertEqual(self.client.post(path).status_code, 405)
+
+    def test_observability_csp_is_delimited(self):
+        self.assertEqual(self.client.get("/ui/static/plotly.js").status_code,401)
+        security.create_user(self.directory,"viewer","synthetic test phrase only","VIEWER")
+        self.client.cookies.set("netlab360_session",sessions.issue(self.directory,"viewer")["token"])
+        for path in ("/home","/debug","/administration"):
+            response=self.client.get(path,follow_redirects=False)
+            self.assertNotIn("unsafe-inline",response.headers["content-security-policy"])
+        response=self.client.get("/observability")
+        self.assertEqual(response.status_code,200)
+        csp=response.headers["content-security-policy"]
+        self.assertIn("style-src 'self' 'unsafe-inline'",csp)
+        self.assertIn("script-src 'self'",csp)
+        self.assertIn("connect-src 'self'",csp)
+        self.assertNotIn("unsafe-eval",csp)
+        self.assertNotIn("https:",csp)
+
+    @unittest.skipUnless(importlib.util.find_spec("plotly") is not None, "Recurso científico Plotly")
+    def test_plotly_asset_is_local_and_authenticated(self):
+        from importlib.resources import files
+        self.assertEqual(self.client.get("/ui/static/plotly.js").status_code,401)
+        security.create_user(self.directory,"viewer","synthetic test phrase only","VIEWER")
+        self.client.cookies.set("netlab360_session",sessions.issue(self.directory,"viewer")["token"])
+        response=self.client.get("/ui/static/plotly.js")
+        self.assertEqual(response.status_code,200)
+        self.assertIn("text/javascript",response.headers["content-type"])
+        self.assertEqual(response.content,files("plotly").joinpath("package_data","plotly.min.js").read_bytes())
+        self.assertEqual(response.headers["cache-control"],"no-store")
+        self.assertEqual(self.client.post("/ui/static/plotly.js").status_code,405)
 
     def test_no_directory_exposure(self):
         for path in ("/ui/", "/ui/static/", "/ui/static/main.py", "/ui/index.html",
