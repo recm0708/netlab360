@@ -243,7 +243,7 @@ def main(evidence):
         from importlib import import_module
         sys.path.insert(0, str(REPO / "servicios/consola-s08"))
         W = import_module("api.slo_window")
-        end = int(time.time())
+        end = round(time.time(), 3)
         observations = []
         for identifier in S.PROBES:
             selector = '{job="' + JOB + '",probe_id="' + identifier + '"}[5m]'
