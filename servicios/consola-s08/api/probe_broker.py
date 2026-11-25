@@ -1,4 +1,4 @@
-"""Frontera Unix del broker S08; solo diagnósticos cortos en esta revisión."""
+"""Frontera Unix del broker S08; diagnósticos y transferencias mediante despacho cerrado."""
 from contextlib import contextmanager
 import fcntl
 import json
@@ -114,18 +114,23 @@ def response(status, result=None):
     return {"schema": "NETLAB360_S08_BROKER_V1", "status": status, "result": result}
 
 
-def handle(conn, allowed_uid, lock_factory=global_lock, executor=run_probe):
+def handle(conn, allowed_uid, lock_factory=global_lock, executor=run_probe, transfer=None):
     """Autorizar al par y reservar la plaza antes de llamar al ejecutor."""
     try:
         if type(allowed_uid) is not int or allowed_uid <= 0 or peer_uid(conn) != allowed_uid:
             return response("DENIED")
         selection = read_request(conn)
-        if selection.action not in probe_executor.ACTIONS:
+        is_probe = selection.action in probe_executor.ACTIONS
+        if not is_probe and transfer is None:
             return response("NOT_ENABLED")
+        expected_schema = ("NETLAB360_S08_PROBE_V1" if is_probe else
+                           "NETLAB360_S08_CONTENT_V1" if selection.action == "test.content.tcp" else
+                           "NETLAB360_S08_TRANSFER_V1")
+        field = "action" if is_probe else "profile"
         with lock_factory():
-            result = executor(selection)
-            if (type(result) is not dict or result.get("schema") != "NETLAB360_S08_PROBE_V1"
-                    or result.get("action") != selection.action or result.get("route") != selection.route
+            result = (executor if is_probe else transfer)(selection)
+            if (type(result) is not dict or result.get("schema") != expected_schema
+                    or result.get(field) != getattr(selection, field) or result.get("route") != selection.route
                     or result.get("transport") not in ("OK", "ERROR", "TIMEOUT")):
                 return response("INVALID_RESULT")
             return response("OK", result)
@@ -135,9 +140,9 @@ def handle(conn, allowed_uid, lock_factory=global_lock, executor=run_probe):
         return response("REJECTED")
 
 
-def serve(conn, allowed_uid):
+def serve(conn, allowed_uid, transfer=None):
     """Una conexión, una respuesta acotada; sin acceso a SQLite ni shell."""
-    result = handle(conn, allowed_uid)
+    result = handle(conn, allowed_uid, transfer=transfer)
     raw = (json.dumps(result, allow_nan=False, ensure_ascii=True) + "\n").encode()
     if len(raw) > MAX_RESPONSE:
         raw = (json.dumps(response("INVALID_RESULT")) + "\n").encode()
