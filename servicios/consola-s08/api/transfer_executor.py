@@ -91,8 +91,12 @@ def parse_results(profile, route, sender, receiver):
         connections = doc["start"]["connected"]
         if len(connections) != 1 or connections[0]["local_host"] != local or connections[0]["remote_host"] != remote:
             raise ValueError("ENDPOINT_MISMATCH")
-    sent, received = sender["end"]["sum_sent"], sender["end"]["sum_received"]
+    sent = sender["end"]["sum_sent"]
+    reported_rx = sender["end"]["sum_received"]
+    received = receiver["end"]["sum_received"]
     tx, rx = count(sent["bytes"]), count(received["bytes"])
+    if count(reported_rx["bytes"]) != rx:
+        raise ValueError("RECEIVER_SUMMARIES_MISMATCH")
     duration = number(received["seconds"])
     if duration <= 0:
         raise ValueError("INVALID_DURATION")
@@ -108,9 +112,19 @@ def parse_results(profile, route, sender, receiver):
         "status": "OK" if tx > 0 and rx > 0 else "INCOMPLETE",
         "content_integrity_verified": False,
     }
-    # Contrastar bytes del resumen del cliente con intervalos del receptor.
-    if sum(row["bytes"] for row in rx_intervals) != rx:
-        raise ValueError("RECEIVER_BYTES_MISMATCH")
+    # Los totales finales y las ventanas de muestreo son contadores distintos.
+    # No inventamos muestras ni convertimos diferencias de intervalos en pérdidas.
+    tx_interval_bytes = sum(row["bytes"] for row in tx_intervals)
+    rx_interval_bytes = sum(row["bytes"] for row in rx_intervals)
+    result["interval_accounting"] = {
+        "status": "MATCH" if tx_interval_bytes == tx and rx_interval_bytes == rx else "DISCREPANT",
+        "sender_interval_bytes": tx_interval_bytes,
+        "receiver_interval_bytes": rx_interval_bytes,
+        "sender_delta_bytes": tx_interval_bytes - tx,
+        "receiver_delta_bytes": rx_interval_bytes - rx,
+    }
+    result["receiver_summary_source"] = "receiver.end.sum_received"
+    result["client_reported_receiver_bytes"] = count(reported_rx["bytes"])
     if protocol == "TCP":
         result["retransmissions"] = count(sent["retransmits"])
         if tx != rx or (volume and not volume <= rx <= volume + 10000):
@@ -118,9 +132,15 @@ def parse_results(profile, route, sender, receiver):
     else:
         lost, packets = count(received["lost_packets"]), count(received["packets"])
         loss = number(received["lost_percent"])
+        if (count(reported_rx["lost_packets"]) != lost
+                or count(reported_rx["packets"]) != packets
+                or not math.isclose(number(reported_rx["lost_percent"]), loss, abs_tol=1e-9)
+                or not math.isclose(number(reported_rx["jitter_ms"]), number(received["jitter_ms"]), abs_tol=1e-9)):
+            raise ValueError("UDP_SUMMARIES_MISMATCH")
         if lost > packets or loss > 100 or not packets or abs(loss - 100 * lost / packets) > 0.11:
             raise ValueError("INVALID_UDP_LOSS")
-        result.update(jitter_ms=number(received["jitter_ms"]), lost_packets=lost, loss_pct=loss)
+        result.update(jitter_ms=number(received["jitter_ms"]), lost_packets=lost, loss_pct=loss,
+                      receiver_packets=packets)
         if lost and result["status"] == "OK":
             result["status"] = "PARTIAL"
     return result
