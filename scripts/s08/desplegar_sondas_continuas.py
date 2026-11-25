@@ -127,10 +127,6 @@ def wait(predicate, timeout=35):
 
 def reload(pid, new):
     """Verificar recarga efectiva, no solo envío de señal."""
-    def last():
-        rows = promql("prometheus_config_last_reload_success_timestamp_seconds")["result"]
-        # Esta instancia no se auto-scrapea; usar el endpoint /metrics.
-        return rows
     # El endpoint /metrics contiene las métricas internas aun sin auto-scrape.
     def state():
         raw = query("/metrics", raw=True).decode()
@@ -170,10 +166,10 @@ def main(evidence):
         raise ValueError("PROMETHEUS_BASELINE")
     if any(PILOT["active"](name) for name in UNITS) or not free(None, 9116):
         raise RuntimeError("OBSERVATION_ALREADY_ACTIVE")
-    if sudo("/usr/bin/test", "-e", str(INSTALL), check=False).returncode == 0:
-        raise RuntimeError("INSTALL_ALREADY_EXISTS")
-    if sudo("/usr/bin/test", "-e", str(RUNTIME), check=False).returncode == 0:
-        raise RuntimeError("RUNTIME_ALREADY_EXISTS")
+    for path in (INSTALL, RUNTIME):
+        if any(sudo("/usr/bin/test", flag, str(path), check=False).returncode == 0
+               for flag in ("-e", "-L")):
+            raise RuntimeError("OBSERVATION_PATH_ALREADY_EXISTS:" + str(path))
     for origin in ("HQ", "S2"):
         if not free(C.ENDPOINTS[origin].namespace, 9115):
             raise RuntimeError("BLACKBOX_PORT_BUSY")
@@ -233,7 +229,7 @@ def main(evidence):
         candidate = render(original.decode()).encode()
         candidate_path = evidence / "prometheus-candidate.yml"
         candidate_path.write_bytes(candidate)
-        run([str(PROMTOOL), "check", "config", str(candidate_path)])
+        print(run([str(PROMTOOL), "check", "config", str(candidate_path)]).stdout, flush=True)
         if CONFIG.read_bytes() != original:
             raise RuntimeError("CONFIG_CHANGED_CONCURRENTLY")
         changed = True
@@ -259,6 +255,7 @@ def main(evidence):
             if row["probe_count"] < 2:
                 raise ValueError("INSUFFICIENT_REAL_SAMPLES")
             observations.append(row)
+            print(f"VENTANA={identifier} MUESTRAS={row['probe_count']} CALIDAD={row['quality']}", flush=True)
         PILOT["write"](evidence / "ventanas-reales.json", {"source": "PROMETHEUS_REAL", "windows": observations})
         rules = query("/api/v1/rules")["groups"]
         if {g["name"]: len(g["rules"]) for g in rules} != {
@@ -272,6 +269,9 @@ def main(evidence):
         print("PROMETHEUS_RELOAD=OK TARGETS=6/6 REGLAS=7/7 VENTANAS_REALES=5/5", flush=True)
         print("SERVICIOS_ADQUISICION=5/5", flush=True)
     except BaseException:
+        for name in created:
+            log = sudo("/usr/bin/journalctl", "-u", name, "--no-pager", "-n", "50", check=False)
+            (evidence / (name + ".log")).write_text(log.stdout)
         if changed:
             write_atomic(CONFIG, original, mode)
             reload(pid, False)
