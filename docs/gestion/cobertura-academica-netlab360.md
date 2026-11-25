@@ -211,3 +211,7 @@ Cada tecnología se clasificará según su evidencia real: implementada y valida
 La ampliación de funcionalidades exige pruebas independientes y no modifica retroactivamente los resultados alcanzados.
 
 [Plan maestro y criterios técnicos](../diseno/s06-s08-plan-maestro-y-criterios.md).
+
+## Actualización de cobertura de la consola
+
+Al 25 de noviembre de 2026, la consola integra observaciones por sede, topología resumida y detallada, estados WAN/VLAN/HA/LACP/SDN, históricos y alertas consultadas, temas y explorador de API con Swagger. Validamos 204 pruebas específicas y consultas reales en navegador. No se acredita todavía disponibilidad extremo a extremo mediante las observaciones administrativas, ni ingestión continua de alertas, diagnóstico activo, SLI de servicio, RAG generativo, intervención desde la consola o MFA. Estos aspectos permanecen sujetos a sus criterios de aceptación.

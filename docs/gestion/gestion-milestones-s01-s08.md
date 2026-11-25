@@ -43,3 +43,7 @@ La fase 06 no acredita pronóstico de fallas futuras, MAE prospectivo, deriva de
 Las ampliaciones tecnológicas se evaluarán conforme a su necesidad, viabilidad y pruebas propias, sin modificar retroactivamente los resultados de las fases cerradas.
 
 [Plan maestro](../diseno/s06-s08-plan-maestro-y-criterios.md) · [Cobertura académica](cobertura-academica-netlab360.md).
+
+## Corte de aceptación de la consola
+
+El backend (#204) y el explorador técnico (#243) están cerrados. La interfaz operacional (#205) conserva dos criterios de equivalencia integral pendientes; los PR funcionales hasta #253 se fusionaron. La regresión específica comprende 204 casos aprobados y la validación de Swagger en ambos temas. Las pruebas de red (#206) y sondas/SLI/SLO (#207) son el siguiente alcance. La administración avanzada (#242), recuperación (#106) y aceptación integral (#211) siguen abiertas.

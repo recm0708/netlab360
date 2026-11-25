@@ -4,9 +4,9 @@
 
 Reunimos en este catálogo las capturas obtenidas durante el desarrollo y las pruebas del laboratorio de redes empresariales multisede. Cada fase tiene su propia carpeta y un único documento `README.md` que enumera las imágenes disponibles.
 
-## Inventario por fase
+## Inventario por componente
 
-| Fase | Descripción | Capturas |
+| Grupo histórico | Descripción | Capturas |
 |---|---|---:|
 | [01](fase1/README.md) | Plataforma y laboratorio de referencia | 83 |
 | [02](fase2/README.md) | Infraestructura de tres sedes y conectividad | 9 |
@@ -15,7 +15,7 @@ Reunimos en este catálogo las capturas obtenidas durante el desarrollo y las pr
 | [05](fase5/README.md) | WAN, LACP, HTTP, SDN y NOC integrados | 71 |
 | [06](fase6/README.md) | Telemetría, diagnóstico inteligente y validación experimental | 11 |
 | [07](fase7/README.md) | AIOps supervisado, RCA, RFC y API controlada | 49 |
-| **Total** | **Fases ejecutadas** | **253** |
+| **Total** | **Grupos documentados** | **253** |
 
 ## Estándar de nomenclatura
 
@@ -41,3 +41,7 @@ Las pruebas de fallas controladas y recuperación se conservan cuando acreditan 
 Las imágenes conservan su denominación técnica y se organizan por fase. En el informe académico utilizaremos únicamente aquellas que respalden directamente los resultados relevantes; la selección y la numeración de figuras dependerán de la estructura de la versión final del documento.
 
 [Volver a NETLAB360](../../README.md).
+
+## Criterios de registro de la consola
+
+Conservamos las 253 imágenes históricas y su nomenclatura. En la consola registramos capturas selectivas cuando demuestran una función visual, un escenario operacional o un resultado que no puede acreditarse únicamente con una salida técnica. Para ajustes menores utilizamos listas de aceptación y regresión; el catálogo definitivo se consolida al completar las funcionalidades.
