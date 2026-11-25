@@ -177,6 +177,23 @@ class StructureTests(unittest.TestCase):
                 self.assertNotEqual(colors["surface"], "#fff")
                 self.assertNotEqual(colors["surface"], "#ffffff")
                 self.assertGreaterEqual(contrast(colors["button-text"], colors["accent"]), 7)
+                for state in ("ok", "warn", "fault", "recovery", "unknown", "text", "muted", "accent"):
+                    for background in ("bg", "surface", "sidebar", "table-head"):
+                        with self.subTest(theme=selector, state=state, background=background):
+                            self.assertGreaterEqual(contrast(colors[state], colors[background]), 7)
+                for state in ("ok", "warn", "fault", "recovery", "unknown"):
+                    self.assertGreaterEqual(contrast(colors[state], colors[state + "-bg"]), 7)
+                for background in ("bg", "surface", "sidebar", "table-head"):
+                    self.assertGreaterEqual(contrast(colors["control-line"], colors[background]), 3)
+
+        self.assertEqual(palette(':root[data-theme="light"]'),
+                         palette(":root:not([data-theme])"))
+        self.assertIn("#network-view td[data-state] { font-weight: var(--state-weight, 400); }", css)
+        self.assertIn(".dashboard-table td[data-state] { font-weight: var(--state-weight, 600); }", css)
+        self.assertIn("background: var(--state-bg, transparent);", css)
+        for state in ("ok", "warn", "fault", "recovery", "unknown"):
+            self.assertIn("--state-bg: var(--" + state + "-bg, transparent);", css)
+        self.assertIn("border-color: var(--control-line, var(--line));", css)
 
     def test_solid_current_navigation(self):
         css = (UI / "static/styles.css").read_text(encoding="utf-8")
