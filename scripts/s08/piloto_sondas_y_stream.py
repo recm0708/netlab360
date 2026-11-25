@@ -290,10 +290,25 @@ def http_json(port, path, payload=None):
         return json.loads(raw) if raw else None
 
 
+def alertmanager_template_args(binary):
+    """Usar la plantilla original del paquete extraído, no rutas globales del host."""
+    root = binary.parent.parent / "share/prometheus/alertmanager"
+    template = root / "default.tmpl"
+    if not template.is_file() or template.is_symlink() or not template.stat().st_size:
+        raise ValueError("ALERTMANAGER_TEMPLATE_MISSING:" + str(template))
+    help_result = run([str(binary), "--help"])
+    help_text = help_result.stdout + help_result.stderr
+    if not re.search(r"--template\.default(?:[=\s]|$)", help_text):
+        raise ValueError("ALERTMANAGER_TEMPLATE_FLAG_UNAVAILABLE")
+    print("ALERTMANAGER_PLANTILLA_LOCAL=" + str(template), flush=True)
+    return ["--template.default=" + str(template)]
+
+
 def alertmanager(stage, evidence, prefix, binary):
     """Validar webhook local agrupado y resuelto con alertas sintéticas explícitas."""
     if not free(None, 9093) or not free(None, 9193):
         raise RuntimeError("ALERTMANAGER_PILOT_PORT_BUSY")
+    template_args = alertmanager_template_args(binary)
     received = []
     guard = threading.Lock()
 
@@ -327,8 +342,10 @@ def alertmanager(stage, evidence, prefix, binary):
         try:
             with service(prefix + "-am", [str(binary), "--config.file=" + str(config),
                          "--storage.path=" + str(state), "--web.listen-address=127.0.0.1:9093",
-                         "--cluster.listen-address="], lifetime=90):
+                         "--cluster.listen-address=", *template_args], lifetime=90):
                 def ready():
+                    if not active(prefix + "-am"):
+                        raise RuntimeError("ALERTMANAGER_EXITED_BEFORE_READY")
                     try:
                         status = http_json(9093, "/api/v2/status")
                         return isinstance(status, dict)
@@ -371,6 +388,13 @@ def alertmanager(stage, evidence, prefix, binary):
         raise RuntimeError("ALERTMANAGER_PORT_NOT_RELEASED")
 
 
+def stream_args(args):
+    """Mantener exclusivamente NDJSON; full-output agrega un documento final multilínea."""
+    return [x for x in args if x not in ("-J", "--json", "--json-stream-full-output",
+                                         "--json-stream", "--forceflush")] + [
+        "--json-stream", "--forceflush"]
+
+
 def events(path, partial=False):
     """Leer tramas reales; no inferir resultados de un formato todavía no integrado."""
     raw = path.read_bytes()
@@ -408,8 +432,7 @@ def iperf(evidence, prefix):
                         units, (dst, src), (server, client), (st, ct), paths):
                     if endpoint == src:
                         wait_for(lambda: not free(dst.namespace, 5201))
-                    args = [x for x in args if x != "-J"] + [
-                        "--json-stream", "--json-stream-full-output", "--forceflush"]
+                    args = stream_args(args)
                     out = path.open("xb")
                     err = path.with_suffix(".stderr").open("xb")
                     handles.extend((out, err))
@@ -460,6 +483,8 @@ def main():
     import argparse
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--evidence", type=Path, required=True)
+    parser.add_argument("--only", choices=("all", "blackbox", "alertmanager", "iperf"),
+                        default="all", help="Reanudar solo un piloto pendiente")
     parser.add_argument("--package-cache", type=Path,
                         help="Entorno anterior con archivos deb completos; verificar contra APT")
     args = parser.parse_args()
@@ -474,13 +499,16 @@ def main():
     print("ENTORNO_PILOTO=" + str(stage), flush=True)
     completed = False
     try:
-        bb = package(stage, "prometheus-blackbox-exporter", "0.26.0-2",
-                     ("prometheus-blackbox-exporter", "blackbox_exporter"), cache)
-        am = package(stage, "prometheus-alertmanager", "0.28.1+ds-3",
-                     ("prometheus-alertmanager", "alertmanager"), cache)
-        blackbox(stage, evidence, prefix, bb)
-        alertmanager(stage, evidence, prefix, am)
-        iperf(evidence, prefix)
+        if args.only in ("all", "blackbox"):
+            bb = package(stage, "prometheus-blackbox-exporter", "0.26.0-2",
+                         ("prometheus-blackbox-exporter", "blackbox_exporter"), cache)
+            blackbox(stage, evidence, prefix, bb)
+        if args.only in ("all", "alertmanager"):
+            am = package(stage, "prometheus-alertmanager", "0.28.1+ds-3",
+                         ("prometheus-alertmanager", "alertmanager"), cache)
+            alertmanager(stage, evidence, prefix, am)
+        if args.only in ("all", "iperf"):
+            iperf(evidence, prefix)
         completed = True
     finally:
         units = [prefix + suffix for suffix in
@@ -497,7 +525,7 @@ def main():
                 state.rmdir()
             shutil.rmtree(stage)
             print("ENTORNO_PILOTO_ELIMINADO=OK", flush=True)
-            print("S08_008_PILOTOS=OK", flush=True)
+            print("S08_008_PILOTO=" + args.only + ":OK", flush=True)
         else:
             print("ENTORNO_PILOTO_CONSERVADO=" + str(stage), flush=True)
             for unit in units:
