@@ -159,7 +159,7 @@
             <div class="history-counts"><p>Muestras válidas: <strong id="history-valid">—</strong></p><p>Muestras nulas: <strong id="history-null">—</strong></p><p>Series con datos: <strong id="history-series">—</strong></p></div>
             <div id="history-plot" aria-label="Gráfico temporal de muestras reales"></div>
             <div class="history-state-key" aria-label="Convenciones de estado"><span><strong aria-hidden="true">●</strong> 1 · Activo / disponible</span><span><strong aria-hidden="true">×</strong> 0 · Inactivo / no disponible</span><span><strong aria-hidden="true">—</strong> Sin muestra válida</span></div>
-            <p class="muted history-explanation">El color identifica el recurso; la forma y posición identifican el estado observado. Cada marcador representa una muestra. No interpolamos huecos. Hora de Panamá (UTC−5).</p>
+            <p class="muted history-explanation">El color identifica el recurso; la forma y posición identifican el estado observado. Cada marcador representa una muestra. No interpolamos huecos.</p>
             </div>
             <div id="alerts-content" hidden>
               <label for="alerts-site">Sede <select id="alerts-site"><option value="all">Todas las sedes</option><option value="HQ">HQ</option><option value="S1">S1</option><option value="S2">S2</option></select></label>
@@ -175,7 +175,8 @@
         <section id="debug-view" hidden>
           <div class="heading"><div><p class="eyebrow">Administración técnica</p><h1>Diagnóstico técnico</h1><p class="muted">Explorador de API de solo lectura. No ejecuta comandos ni cambios de red.</p></div></div>
           <section class="panel">
-            <h2>Catálogo de consultas</h2>
+            <h2>Documentación y consultas</h2>
+            <p><a class="topology-action" href="/docs">Abrir Swagger UI</a> · <a href="/openapi.json" target="_blank" rel="noopener">Especificación OpenAPI</a></p>
             <p class="muted">Las rutas originales conservan sus permisos. La prueba utiliza una proyección técnica delimitada.</p>
             <div id="debug-catalog" class="debug-catalog"></div>
             <label for="debug-select">Consulta autorizada</label>

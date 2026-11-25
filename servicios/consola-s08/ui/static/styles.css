@@ -346,3 +346,9 @@ footer { padding:8px 20px; }
 #alerts-content h2 { margin-top:16px; }
 #alerts-content select { background:var(--surface); color:var(--text); border:1px solid var(--line); border-radius:6px; }
 #alerts-content .dashboard-table-wrap { margin:8px 0 12px; }
+
+/* Separación uniforme de las convenciones bajo las series históricas. */
+.history-state-key { margin:8px 0 0; }
+.history-explanation { margin:8px 0 0; }
+#history-plot .modebar-btn path { fill:var(--muted); }
+#history-plot .modebar-btn:hover path { fill:var(--text); }

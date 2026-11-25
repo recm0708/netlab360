@@ -38,6 +38,18 @@ assert.equal(fig.traces[0].customdata[0][1],"1 · Scrape disponible");
 assert.equal(fig.traces[0].customdata[1][1],"0 · Scrape no disponible");
 assert.equal(fig.layout.legend.x,0.5);
 assert.equal(fig.layout.legend.xanchor,"center");
+assert.equal(fig.layout.xaxis.title,undefined);
+assert.equal(fig.layout.margin.b,78);
+assert.equal(fig.layout.legend.y*(fig.layout.height-90),-36);
+for(const n of [2,3,8,9]){
+ const q={...p,group:({2:"collection",3:"routers",8:"wan",9:"vlan"})[n]};
+ const ids= n===2?["exporter","collector"]:n===3?["R-HQ","R-S1","R-S2"]:n===8?["WAN-END-HQ-s1p","WAN-END-HQ-s1b","WAN-END-HQ-s2p","WAN-END-HQ-s2b","WAN-END-S1-s1p","WAN-END-S1-s1b","WAN-END-S2-s2p","WAN-END-S2-s2b"]:[110,120,130,210,220,230,310,320,330].map(v=>"VLAN-"+v);
+ q.series=ids.map(id=>({id,points:[]}));
+ const f=h.figure(q,d=>d.toISOString(),{surface:"#fff",text:"#111",line:"#aaa"});
+ assert.equal(f.layout.xaxis.title,undefined);
+ assert.equal(f.layout.margin.b,78);
+ assert(Math.abs(f.layout.legend.y*(f.layout.height-90)+36)<1e-9);
+}
 const light=h.figure(p,d=>d.toISOString(),{theme:"light",surface:"#fff",text:"#111",line:"#aaa"});
 assert.notEqual(light.traces[0].marker.color,fig.traces[0].marker.color);
 assert.equal(light.traces[0].marker.size,7);

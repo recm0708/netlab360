@@ -421,3 +421,22 @@ el directorio del servicio. La ruta privada se fija al iniciar la API;
 no aceptamos rutas de archivos ni destinos desde el navegador. El
 historial se filtra por sede y se exporta como CSV. La consulta vacía
 confirmada y la fuente no disponible se presentan por separado.
+
+## Documentación interactiva de la API
+
+Publicamos Swagger UI en `/docs` y la especificación en `/openapi.json`,
+solo para sesiones de operador. La consola documenta las rutas reales;
+la ejecución interactiva se restringe a GET y las rutas mantienen sus
+controles de sesión, alcance y frecuencia. Las operaciones de sesión se
+documentan sin habilitar su ejecución en Swagger. No habilitamos CORS,
+servidores externos, validadores remotos ni acciones de red. Conservamos
+el explorador técnico y sus exportaciones.
+
+Instalamos los archivos locales de Swagger UI 5.34.1 en el directorio
+privado de la instancia con `python -B -m api.swagger_assets install
+--directory RUTA_PRIVADA` desde el servicio. La descarga usa el registro
+npm oficial y verifica la integridad SHA-512 publicada; no ejecutamos
+scripts de npm. Los archivos no forman parte de la base SQLite ni del
+repositorio. Si faltan, la documentación interactiva devuelve 503 y el
+explorador original sigue disponible. La recuperación y el instalador
+integral deben incorporar esta dependencia antes del despliegue final.

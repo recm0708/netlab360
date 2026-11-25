@@ -96,15 +96,16 @@
     const ticks=entries.map((_,i)=>(entries.length-i-1)*3+0.5);
     const span=data.end_epoch-data.start_epoch;
     const times=Array.from({length:5},(_,i)=>data.start_epoch+span*i/4);
+    const plotHeight=Math.max(180,entries.length*56);
     const layout={
-      height:Math.max(320,entries.length*56+160),autosize:true,uirevision:data.group+":"+data.window,
+      height:plotHeight+90,autosize:true,uirevision:data.group+":"+data.window,
       paper_bgcolor:colors.surface,plot_bgcolor:colors.surface,font:{color:colors.text,size:12},
-      margin:{l:130,r:20,t:15,b:115},hovermode:"closest",dragmode:"zoom",
+      margin:{l:130,r:20,t:12,b:78},hovermode:"closest",dragmode:"zoom",
       xaxis:{type:"linear",range:[data.start_epoch,data.end_epoch],tickmode:"array",
-        tickvals:times,ticktext:times.map(t=>format(new Date(t*1000)).slice(11)),title:{text:"Hora de Panamá"},gridcolor:colors.line},
+        tickvals:times,ticktext:times.map(t=>format(new Date(t*1000)).slice(11)),gridcolor:colors.line},
       yaxis:{tickmode:"array",tickvals:ticks,ticktext:entries.map(x=>x[2]),range:[-0.6,entries.length*3-0.8],
         fixedrange:true,gridcolor:colors.line,zeroline:false},
-      legend:{orientation:"h",x:0.5,xanchor:"center",y:-0.25,yanchor:"top"},
+      legend:{orientation:"h",x:0.5,xanchor:"center",y:-36/plotHeight,yanchor:"top"},
       modebar:{color:colors.text,activecolor:palette[0],bgcolor:colors.surface},showlegend:true
     };
     return {traces,layout};
