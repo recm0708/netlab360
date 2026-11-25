@@ -1,4 +1,4 @@
-# Diseño de disponibilidad HTTP — Fase 05
+# Diseño de disponibilidad HTTP
 
 ## Descripción
 
@@ -37,4 +37,4 @@ La conmutación se produce entre instancias de aplicación dentro de una misma V
 
 ## Documentación relacionada
 
-[Arquitectura multisede](../arquitectura/arquitectura-multisede-implementada.md) · [Validación de la fase 05](../validacion/s05-integracion-y-aceptacion.md) · [Capturas de la fase 05](../../evidencias/capturas/fase5/README.md).
+[Arquitectura multisede](../arquitectura/arquitectura-multisede-implementada.md) · [Validación de disponibilidad y SDN](../validacion/s05-integracion-y-aceptacion.md) · [Capturas de disponibilidad y SDN](../../evidencias/capturas/fase5/README.md).

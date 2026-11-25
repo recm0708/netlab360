@@ -1,4 +1,4 @@
-# Dominio SDN con Open vSwitch y Faucet — Fase 05
+# Dominio SDN con Open vSwitch y Faucet
 
 ## Descripción
 
@@ -40,4 +40,4 @@ La arquitectura dispone de un controlador Faucet en un solo entorno virtual. No 
 
 ## Documentación relacionada
 
-[Arquitectura multisede](../arquitectura/arquitectura-multisede-implementada.md) · [Validación de la fase 05](../validacion/s05-integracion-y-aceptacion.md) · [Capturas de la fase 05](../../evidencias/capturas/fase5/README.md).
+[Arquitectura multisede](../arquitectura/arquitectura-multisede-implementada.md) · [Validación de disponibilidad y SDN](../validacion/s05-integracion-y-aceptacion.md) · [Capturas de disponibilidad y SDN](../../evidencias/capturas/fase5/README.md).

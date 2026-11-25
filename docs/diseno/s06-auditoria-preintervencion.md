@@ -1,4 +1,4 @@
-# Auditoría preventiva del cliente HQ — Fase 06
+# Auditoría preventiva del cliente HQ
 
 ## Antecedente
 

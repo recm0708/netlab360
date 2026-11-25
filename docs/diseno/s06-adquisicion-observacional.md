@@ -1,16 +1,16 @@
-# Adquisición observacional de telemetría — Fase 06
+# Adquisición observacional de telemetría
 
 ## Descripción
 
 Utilizamos mediciones **originadas en NETLAB360** para evaluar detección de anomalías y clasificación; la predicción permanece fuera de los resultados acreditados sin reutilizar cifras de ejercicios docentes como si se hubieran observado en la plataforma. El primer capturador es **solo lectura**, no genera fallas ni cambia interfaces y no produce etiquetas de entrenamiento.
 
-Fuente técnica: exportador de la fase 04 (`127.0.0.1:9110`), topología NOC de la fase 05 (`127.0.0.1:9130`), Prometheus de la fase 04 (`127.0.0.1:9091`) y contador de eventos SQLite en modo de solo lectura. El acceso a estas fuentes está restringido a `127.0.0.1` y las rutas de API están fijadas en el programa.
+Fuente técnica: exportador de telemetría (`127.0.0.1:9110`), topología NOC topológico (`127.0.0.1:9130`), Prometheus local (`127.0.0.1:9091`) y contador de eventos SQLite en modo de solo lectura. El acceso a estas fuentes está restringido a `127.0.0.1` y las rutas de API están fijadas en el programa.
 
 ## Fuentes de referencia
 
-- Prometheus versión 3.7.0, cinco familias de métricas de la fase 04: `netlab360_s04_source_up`, `netlab360_s04_router_running`, `netlab360_s04_topology_mode`, `netlab360_s04_vlan_admin_up`, `netlab360_s04_wan_admin_up`.
+- Prometheus versión 3.7.0, cinco familias de métricas del exportador: `netlab360_s04_source_up`, `netlab360_s04_router_running`, `netlab360_s04_topology_mode`, `netlab360_s04_vlan_admin_up`, `netlab360_s04_wan_admin_up`.
 - Prometheus scrape (`up`), NOC con 18 nodos/21 enlaces, routing, estado HTTP HA, LACP por sede y estado SDN.
-- SQLite de la fase 04 con tablas `active` y `events`. Al corte de S06-031, tres eventos en el histórico; cantidad insuficiente para afirmar desempeño ML.
+- SQLite de observabilidad con tablas `active` y `events`. Al corte de S06-031, tres eventos en el histórico; cantidad insuficiente para afirmar desempeño ML.
 - El estado administrativo de una interfaz no demuestra pérdida, latencia, jitter, rendimiento TCP/UDP o estado OSPF FULL; esas variables requerirán **fuentes adicionales y ensayos propios**.
 
 ## Procedimiento
@@ -24,9 +24,9 @@ Fuente técnica: exportador de la fase 04 (`127.0.0.1:9110`), topología NOC de 
 
 La calidad se marca `UNKNOWN` si falta una fuente, no hay scrape, la topología discrepa o el estado de HA/LACP/SDN difiere del escenario de referencia. No convertir `UNKNOWN` en falla de red ni en ejemplo válido de clasificación.
 
-La adquisición complementaria de RTT, pérdida ICMP y HTTP desde namespaces se describe en [Mediciones de rendimiento de la fase 06](s06-mediciones-rendimiento.md). Es un procedimiento de observación independiente, sin fallas inducidas ni etiquetas supervisadas.
+La adquisición complementaria de RTT, pérdida ICMP y HTTP desde namespaces se describe en [Mediciones de rendimiento](s06-mediciones-rendimiento.md). Es un procedimiento de observación independiente, sin fallas inducidas ni etiquetas supervisadas.
 
-La normalización posterior de ambas sesiones se especifica en el documento [Normalización y calidad de la fase 06](s06-normalizacion-y-calidad.md), validada sobre las sesiones originales.
+La normalización posterior de ambas sesiones se especifica en el documento [Normalización y calidad de datos](s06-normalizacion-y-calidad.md), validada sobre las sesiones originales.
 
 ## Validación y limitaciones
 

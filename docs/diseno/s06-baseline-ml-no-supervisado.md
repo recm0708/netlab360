@@ -1,4 +1,4 @@
-# Línea base no supervisada y regla P95 — Fase 06
+# Línea base no supervisada y regla P95
 
 ## Objetivo
 
