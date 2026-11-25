@@ -23,7 +23,6 @@ from api import slo_contract as S, probe_catalog as C
 RUNTIME = Path("/run/netlab360-s08-observacion")
 PORT = 9116
 LIMIT = 65536
-OPEN = build_opener(ProxyHandler({}))
 
 
 def selection(path, origin=None):
@@ -82,7 +81,8 @@ def verify_source(item):
     if actual != [src.address]:
         raise ValueError("SOURCE_ADDRESS")
     route = ip("route", "get", dst.address)
-    if (len(route) != 1 or route[0].get("dev") != src.interface
+    if (len(route) != 1 or route[0].get("dst") != dst.address
+            or route[0].get("dev") != src.interface
             or route[0].get("prefsrc", route[0].get("src")) != src.address
             or route[0].get("gateway") != src.gateway):
         raise ValueError("SOURCE_ROUTE")
@@ -91,7 +91,8 @@ def verify_source(item):
 def probe(item):
     verify_source(item)
     query = urlencode({"module": item["module"], "target": item["target"]})
-    with OPEN.open("http://127.0.0.1:9115/probe?" + query, timeout=4) as response:
+    opener = build_opener(ProxyHandler({}))
+    with opener.open("http://127.0.0.1:9115/probe?" + query, timeout=4) as response:
         return checked_metrics(response.read(LIMIT + 1), item)
 
 
