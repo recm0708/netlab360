@@ -38,7 +38,7 @@ class StructureTests(unittest.TestCase):
     def test_local_resources_and_unique_ids(self):
         parser = PageParser()
         parser.feed((UI / "index.html").read_text(encoding="utf-8"))
-        self.assertEqual(set(parser.resources), {"/ui/static/styles.css", "/ui/static/app.js", "/ui/static/history.js"})
+        self.assertEqual(set(parser.resources), {"/ui/static/styles.css", "/ui/static/app.js", "/ui/static/history.js", "/ui/static/topology.js"})
         self.assertEqual(len(parser.ids), len(set(parser.ids)))
         self.assertTrue({"main", "refresh", "notice", "api-state", "capabilities", "observed"} <= set(parser.ids))
         self.assertFalse(parser.inline)
@@ -276,7 +276,8 @@ class UIHttpTests(unittest.TestCase):
         for path, mime in (("/ui/static/styles.css", "text/css"),
                            ("/ui/static/app.js", "text/javascript"),
                            ("/ui/static/login.js", "text/javascript"),
-                           ("/ui/static/history.js", "text/javascript")):
+                           ("/ui/static/history.js", "text/javascript"),
+                           ("/ui/static/topology.js", "text/javascript")):
             r = self.client.get(path)
             self.assertEqual(r.status_code, 200)
             self.assertIn(mime, r.headers["content-type"])

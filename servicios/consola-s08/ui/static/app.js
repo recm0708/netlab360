@@ -343,6 +343,7 @@ function initializeConsole() {
     resetDebug();
     clearDashboard();
     clearHistory();
+    clearTopology();
     if (idleDialog.open) idleDialog.close();
     shell.hidden = true;
     recoveryPanel.hidden = false;
@@ -412,6 +413,8 @@ function initializeConsole() {
         loadDebug().then(() => restoreContentIfUnchanged());
       } else if (location.pathname === "/observability") {
         updateHistory().then(() => restoreContentIfUnchanged());
+      } else if (location.pathname === "/topology") {
+        updateTopology().then(() => restoreContentIfUnchanged());
       }
     }
     authNotice.textContent = "Sesión vigente. Acciones de red deshabilitadas.";
@@ -448,6 +451,7 @@ function initializeConsole() {
     if (remaining <= 0) {
       clearDashboard();
       clearHistory();
+    clearTopology();
       // Otra pestaña puede haber renovado la misma sesión. Consultamos una vez
       // sin extender el plazo; una respuesta no válida retira la identidad.
       if (!busy) recover();
@@ -562,7 +566,9 @@ function initializeConsole() {
     document.getElementById("home-view").hidden = !home;
     const debug = active.dataset.view === "debug";
     const history = active.dataset.view === "observability";
-    document.getElementById("module-view").hidden = home || debug || history;
+    const topology = active.dataset.view === "topology";
+    document.getElementById("module-view").hidden = home || debug || history || topology;
+    document.getElementById("topology-view").hidden = !topology;
     document.getElementById("history-view").hidden = !history;
     document.getElementById("debug-view").hidden = !debug;
     const label = active.querySelector(".nav-text").textContent;
@@ -864,6 +870,69 @@ function initializeConsole() {
     if(!document.hidden&&dashboardAuto.checked&&dashboardAllowed()) updateDashboard();
   });
 
+  // La topología usa una única consulta fija y elimina datos al vencer la sesión.
+  const topologyMap=document.getElementById("topology-map");
+  const topologyRun=document.getElementById("topology-run");
+  const topologyStatus=document.getElementById("topology-status");
+  const topologyDetails=document.getElementById("topology-details");
+  const topologySelection=document.getElementById("topology-selection");
+  let topologyEpoch=0,topologyBusy=false,topologyData=null,topologySelected=null,topologyReceived=0;
+
+  function topologyAllowed() {
+    return location.pathname==="/topology" && session!==null && serverNow()<session.expiresAt;
+  }
+
+  function clearTopology() {
+    topologyEpoch++;topologyBusy=false;topologyData=null;topologySelected=null;
+    topologyMap.replaceChildren();topologyDetails.replaceChildren();
+    topologySelection.textContent="Seleccione un equipo o enlace.";
+    topologyStatus.textContent="Sin observación topológica vigente.";
+    topologyRun.disabled=false;
+  }
+
+  function renderTopology() {
+    if(!topologyData||!topologyAllowed()) return;
+    window.NetlabTopology.render(topologyMap,topologyData,topologySelected,id=>{
+      topologySelected=topologySelected===id?null:id;
+      renderTopology();
+    });
+    topologyDetails.replaceChildren();
+    const item=[...topologyData.nodes,...topologyData.links].find(x=>x.id===topologySelected);
+    topologySelection.textContent=item?window.NetlabTopology.name(item):"Seleccione un equipo o enlace.";
+    if(item) for(const [key,value] of window.NetlabTopology.details(item)) {
+      const dt=document.createElement("dt"),dd=document.createElement("dd");
+      dt.textContent=key;dd.textContent=value;topologyDetails.append(dt,dd);
+    }
+  }
+
+  async function updateTopology() {
+    if(!topologyAllowed()||topologyBusy||serverNow()>=session.warningAt) return;
+    const epoch=topologyEpoch;
+    topologyBusy=true;topologyRun.disabled=true;
+    try {
+      const {status,data}=await debugRead("/api/v1/topology");
+      if(epoch!==topologyEpoch||!topologyAllowed()) return;
+      if(status===401||status===403) {clearTopology();recover();return;}
+      if(status!==200||!window.NetlabTopology.valid(data)||data.graph.quality!=="VALID") throw new Error("GRAPH");
+      topologyData=data;topologyReceived=performance.now();
+      renderTopology();
+      topologyStatus.textContent="Consulta: "+formatPanama(new Date(data.graph.observed_at_utc))+
+        " · "+data.nodes.length+" equipos y "+data.links.length+" enlaces · "+data.warning_count+" advertencias de origen.";
+    } catch {
+      if(epoch!==topologyEpoch) return;
+      clearTopology();topologyStatus.textContent="No hay una topología vigente disponible.";
+    } finally {
+      if(epoch===topologyEpoch) {topologyBusy=false;topologyRun.disabled=false;}
+    }
+  }
+  topologyRun.addEventListener("click",updateTopology);
+  setInterval(()=>{
+    if(topologyData&&(!topologyAllowed()||performance.now()-topologyReceived>15000)) clearTopology();
+  },1000);
+  setInterval(()=>{
+    if(topologyAllowed()&&!document.hidden) updateTopology();
+  },5000);
+
   // Las series históricas permanecen en memoria y se descartan al perder la sesión.
   const historyGroup = document.getElementById("history-group");
   const historyWindow = document.getElementById("history-window");
@@ -972,7 +1041,8 @@ function initializeConsole() {
   historyWindow.addEventListener("change",clearHistory);
   new MutationObserver(()=>{
     if(historyData&&historyAllowed()) drawHistory(historyData,historyEpoch).catch(()=>{
-      clearHistory();historyStatus.textContent="No fue posible actualizar la apariencia del gráfico.";
+      clearHistory();
+    clearTopology();historyStatus.textContent="No fue posible actualizar la apariencia del gráfico.";
     });
   }).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
 

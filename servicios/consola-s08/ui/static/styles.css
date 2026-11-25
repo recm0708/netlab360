@@ -242,3 +242,27 @@ details.summary > summary { cursor: pointer; font-weight: 600; }
 .history-state-key { display:flex; flex-wrap:wrap; justify-content:center; gap:10px 24px; color:var(--text); font-size:.85rem; }
 .history-state-key strong { font-size:1rem; }
 .history-explanation { text-align:center; }
+
+/* Topología integrada: colores semánticos del tema, selección independiente. */
+.topology-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(220px,280px); gap:14px; align-items:start; }
+.topology-map { overflow:auto; }
+#topology-map { width:100%; min-width:640px; display:block; }
+.topology-site { fill:var(--bg); stroke:var(--line); stroke-width:2; }
+.topology-site-label { fill:var(--text); font-size:17px; font-weight:700; }
+.topology-item { cursor:pointer; --edge:var(--unknown); }
+.topology-item[data-state="ok"] { --edge:var(--ok); }
+.topology-item[data-state="fault"] { --edge:var(--fault); }
+.topology-item[data-state="recovery"] { --edge:var(--recovery); }
+.topology-edge { fill:none; stroke:var(--edge); stroke-width:3; }
+.topology-edge.backup { stroke-dasharray:8 5; }
+.topology-hit { stroke:transparent; stroke-width:18; fill:none; }
+.topology-node-box { fill:var(--surface); stroke:var(--edge); stroke-width:2.5; }
+.topology-node-label { fill:var(--text); font-size:14px; font-weight:700; }
+.topology-node-sub,.topology-edge-label { fill:var(--muted); font-size:11px; }
+.topology-item.selected .topology-node-box,.topology-item:focus-visible .topology-node-box { stroke:var(--accent); stroke-width:5; }
+.topology-item.selected .topology-edge,.topology-item:focus-visible .topology-edge { stroke-width:6; filter:drop-shadow(0 0 2px var(--accent)); }
+.topology-item:hover .topology-node-box { stroke-width:4; }
+.topology-inspector dl { display:block; overflow-wrap:anywhere; }
+.topology-inspector dt { margin-top:10px; color:var(--muted); font-size:.85rem; }
+.topology-inspector dd { margin:2px 0 0; text-align:left; }
+@media(max-width:1100px){.topology-layout{grid-template-columns:minmax(0,1fr);}}
