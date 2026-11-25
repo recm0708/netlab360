@@ -141,5 +141,91 @@ class JobHttpTests(unittest.TestCase):
         self.assertEqual(data["data"]["uncertainty_reason"], "BROKER_UNCONFIRMED")
 
 
+    def test_history_isolation(self):
+        headers = self.login()
+        first = self.client.post(BASE, json=SELECTION, headers=headers).json()
+        history = self.client.get(BASE).json()["jobs"]
+        self.assertEqual([row["job_id"] for row in history], [first["job_id"]])
+        self.assertNotIn("result", history[0])
+        self.login("other")
+        self.assertEqual(self.client.get(BASE).json()["jobs"], [])
+
+    def test_stream_samples_and_final(self):
+        selection = {"action":"test.content.tcp","route":"HQ_A_S1","profile":"content-100mb"}
+        def transport(payload, emit, cancelled):
+            self.assertEqual(payload, selection)
+            self.assertFalse(cancelled())
+            emit({"role":"sender","bytes":10000000,"elapsed_s":1.0})
+            emit({"role":"receiver","bytes":9000000,"elapsed_s":1.0})
+            emit({"role":"receiver","bytes":19000000,"elapsed_s":2.0})
+            return {"kind":"final","status":"OK","cleanup_verified":True,
+                    "result":{"schema":"NETLAB360_S08_CONTENT_V1","route":selection["route"],
+                              "profile":selection["profile"],"transport":"OK","measurement":{"status":"OK"}}}
+        with TestClient(create_app(self.directory, job_transport=self.transport, job_stream=transport),
+                        base_url=ORIGIN) as client:
+            self.client = client
+            headers = self.login()
+            rows = client.get(BASE+"/catalog").json()["selections"]
+            self.assertEqual(sum(row["live_progress"] for row in rows),10)
+            job = client.post(BASE,json=selection,headers=headers).json()
+            result = client.get(BASE+"/"+job["job_id"]).json()
+            self.assertEqual(result["status"],"SUCCEEDED")
+            self.assertEqual([row["mbps"] for row in result["data"]["progress"]],[80.0,72.0,80.0])
+
+    def test_stream_cancellation_requires_confirmation(self):
+        selection = {"action":"test.content.tcp","route":"HQ_A_S1","profile":"content-100mb"}
+        job = jobs.enqueue(self.directory,"operator",selection,stream_enabled=True)
+        identifier = job["job_id"]
+        jobs.claim(self.directory,identifier)
+        self.login("other")
+        # Consultar con el otro operador no revela el trabajo.
+        self.assertEqual(self.client.get(BASE+"/"+identifier).status_code,404)
+        headers = self.login()
+        response = self.client.post(BASE+"/"+identifier+"/cancel",headers=headers)
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.json()["status"],"RUNNING")
+        self.assertTrue(jobs.cancellation_requested(self.directory,identifier))
+        with self.assertRaises(ValueError):
+            jobs.finish_cancelled(self.directory,identifier,cleanup_verified=False)
+        self.assertEqual(jobs.finish_cancelled(self.directory,identifier,cleanup_verified=True)["status"],"CANCELLED")
+
+    def test_progress_rejects_regression(self):
+        selection = {"action":"test.content.tcp","route":"HQ_A_S1","profile":"content-100mb"}
+        job = jobs.enqueue(self.directory,"operator",selection,stream_enabled=True)
+        identifier = job["job_id"]
+        jobs.claim(self.directory,identifier)
+        jobs.append_progress(self.directory,identifier,{"role":"sender","bytes":100,"elapsed_s":1})
+        for event in ({"role":"sender","bytes":99,"elapsed_s":2},
+                      {"role":"receiver","bytes":100000001,"elapsed_s":2},
+                      {"role":"sender","bytes":200,"elapsed_s":1}):
+            with self.assertRaises(ValueError):
+                jobs.append_progress(self.directory,identifier,event)
+        self.assertEqual(len(jobs.get(self.directory,"operator",identifier)["data"]["progress"]),1)
+
+    def test_restart_retains_running_reservation(self):
+        job = jobs.enqueue(self.directory,"operator",SELECTION)
+        jobs.claim(self.directory,job["job_id"])
+        self.assertEqual(jobs.recover_interrupted(self.directory),["RUNNING"])
+        self.assertEqual(jobs.get(self.directory,"operator",job["job_id"])["data"]["execution_quality"],"UNCERTAIN")
+        with self.assertRaises(ValueError):
+            jobs.enqueue(self.directory,"operator",SELECTION)
+
+    def test_restart_cancels_abandoned_queue(self):
+        job = jobs.enqueue(self.directory,"operator",SELECTION)
+        self.assertEqual(jobs.recover_interrupted(self.directory),["CANCELLED"])
+        self.assertEqual(jobs.get(self.directory,"operator",job["job_id"])["status"],"CANCELLED")
+        self.assertEqual(jobs.enqueue(self.directory,"operator",SELECTION)["status"],"QUEUED")
+
+    def test_pilot_origin(self):
+        with TestClient(create_app(self.directory,job_transport=self.transport,console_port=9145),
+                        base_url="http://127.0.0.1:9145") as client:
+            result = client.post("/api/v1/auth/login",json={"username":"operator","password":"synthetic test phrase only"},
+                                 headers={"Origin":"http://127.0.0.1:9145"})
+            self.assertEqual(result.status_code,200)
+            self.assertEqual(client.get("/healthz").json()["mode"],"AUTHENTICATED_JOBS")
+            self.assertEqual(client.get("/ui/static/jobs.js").status_code,200)
+            self.assertIn('id="jobs-view"',client.get("/diagnostics").text)
+
+
 if __name__ == "__main__":
     unittest.main()
