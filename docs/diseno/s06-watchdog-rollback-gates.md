@@ -1,4 +1,4 @@
-# Temporizador independiente y requisitos de rollback — Fase 06
+# Temporizador independiente y requisitos de rollback
 
 ## Precondiciones
 

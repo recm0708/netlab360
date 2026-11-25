@@ -1,4 +1,4 @@
-# Evaluación cronológica V2 con modelos congelados — Fase 06
+# Evaluación cronológica V2 con modelos congelados
 
 ## Entradas y separación cronológica
 

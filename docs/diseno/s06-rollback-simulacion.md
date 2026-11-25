@@ -1,4 +1,4 @@
-# Simulación de seguridad y restauración — Fase 06
+# Simulación de seguridad y restauración
 
 ## Antecedente
 

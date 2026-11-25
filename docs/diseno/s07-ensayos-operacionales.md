@@ -1,4 +1,4 @@
-# Ensayos operacionales y escenarios compuestos — Fase 07
+# Ensayos operacionales y escenarios compuestos
 
 ## Descripción
 

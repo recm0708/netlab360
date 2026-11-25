@@ -1,4 +1,4 @@
-# Preflight privilegiado del orquestador — Fase 07
+# Preflight privilegiado del orquestador
 
 ## Descripción e identidad protegida
 

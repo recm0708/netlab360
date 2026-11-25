@@ -1,4 +1,4 @@
-# Intervención OSPF y recuperación independiente — Fase 07
+# Intervención OSPF y recuperación independiente
 
 ## Descripción
 

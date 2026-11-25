@@ -1,4 +1,4 @@
-# Telemetría reciente e inferencia exploratoria — Fase 06
+# Telemetría reciente e inferencia exploratoria
 
 ## Descripción
 

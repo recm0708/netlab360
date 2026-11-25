@@ -1,4 +1,4 @@
-# Intent Assurance y autorización RFC — Fase 07
+# Intent Assurance y autorización RFC
 
 ## Intención y cumplimiento
 

@@ -1,4 +1,4 @@
-# API local controlada v1 — Fase 07
+# API local controlada v1
 
 ## Arquitectura y frontera de confianza
 

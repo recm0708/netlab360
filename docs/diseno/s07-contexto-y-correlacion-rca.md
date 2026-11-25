@@ -1,4 +1,4 @@
-# Contexto topológico y correlación RCA — Fase 07
+# Contexto topológico y correlación RCA
 
 ## Alcance
 

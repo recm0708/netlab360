@@ -1,4 +1,4 @@
-# Deriva descriptiva y oportunidad de detección V2 — Fase 06
+# Deriva descriptiva y oportunidad de detección V2
 
 ## Alcance del análisis
 
