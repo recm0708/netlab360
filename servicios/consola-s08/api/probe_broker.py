@@ -9,6 +9,7 @@ import socket
 import stat
 import struct
 import subprocess
+import time
 
 from . import probe_executor
 from .job_contract import select
@@ -40,9 +41,13 @@ def decode_request(raw):
 
 def read_request(conn):
     """Limitar bytes y tiempo de lectura; no procesar una segunda solicitud."""
-    conn.settimeout(3)
+    deadline = time.monotonic() + 3
     data = bytearray()
     while len(data) <= MAX_REQUEST:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise TimeoutError("REQUEST_DEADLINE")
+        conn.settimeout(remaining)
         block = conn.recv(min(1024, MAX_REQUEST + 1 - len(data)))
         if not block:
             break
