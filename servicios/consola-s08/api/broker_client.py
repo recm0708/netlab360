@@ -87,8 +87,9 @@ def request_stream(payload, on_sample, cancelled):
         previous = {}
         count = 0
         cancel_sent = False
+        accepted = False
         while time.monotonic() < deadline:
-            if not cancel_sent and cancelled():
+            if accepted and not cancel_sent and cancelled():
                 conn.settimeout(3)
                 conn.sendall(b"CANCEL\n")
                 cancel_sent = True
@@ -108,9 +109,14 @@ def request_stream(payload, on_sample, cancelled):
                 message = json.loads(raw, object_pairs_hook=unique_object)
                 if type(message) is not dict:
                     raise ValueError("STREAM_INVALID")
+                if message == {"kind": "accepted"}:
+                    if accepted:
+                        raise ValueError("STREAM_DUPLICATE_ACCEPTED")
+                    accepted = True
+                    continue
                 if set(message) == {"kind", "sample"} and message["kind"] == "progress":
                     event = message["sample"]
-                    if type(event) is not dict or count >= MAX_EVENTS:
+                    if not accepted or type(event) is not dict or count >= MAX_EVENTS:
                         raise ValueError("STREAM_EVENT_LIMIT")
                     role = event.get("role")
                     if role not in ("sender", "receiver"):
@@ -121,6 +127,7 @@ def request_stream(payload, on_sample, cancelled):
                     continue
                 if (set(message) != {"kind", "status", "result", "cleanup_verified"}
                         or message["kind"] != "final" or buffer
+                        or (message.get("status") in ("OK", "CANCELLED") and not accepted)
                         or message["status"] not in ("OK", "CANCELLED", "BUSY", "UNCERTAIN", "NOT_ENABLED")
                         or type(message["cleanup_verified"]) is not bool
                         or (message["status"] in ("OK", "CANCELLED")) != message["cleanup_verified"]
