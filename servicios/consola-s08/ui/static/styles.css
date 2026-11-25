@@ -352,3 +352,8 @@ footer { padding:8px 20px; }
 .history-explanation { margin:8px 0 0; }
 #history-plot .modebar-btn path { fill:var(--muted); }
 #history-plot .modebar-btn:hover path { fill:var(--text); }
+
+/* La documentación conserva el mismo espacio de trabajo y la navegación. */
+.debug-tabs { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 12px; }
+#debug-docs { padding:0; overflow:hidden; }
+#swagger-frame { display:block; width:100%; height:clamp(440px,72vh,1100px); border:0; background:var(--surface); }

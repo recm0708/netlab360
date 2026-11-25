@@ -24,6 +24,10 @@ function applyTheme() {
     ? (systemTheme.matches ? "dark" : "light")
     : themePreference;
   document.documentElement.dataset.theme = effective;
+  const frame = document.getElementById("swagger-frame");
+  if (frame?.contentDocument?.documentElement) {
+    frame.contentDocument.documentElement.dataset.theme = effective;
+  }
   const selector = document.getElementById("theme-select");
   if (selector) selector.value = themePreference;
 }
@@ -466,6 +470,7 @@ function initializeConsole() {
     if (first) {
       restorePresentation();
       refreshCurrent("initial").then(() => restoreContentIfUnchanged());
+      if (debugAllowed() && new URLSearchParams(location.search).get("tab") === "docs") openSwagger();
     }
     authNotice.textContent = "Sesión vigente. Acciones de red deshabilitadas.";
     controls();
@@ -654,6 +659,7 @@ function initializeConsole() {
   }
 
   function resetDebug() {
+    closeSwagger();
     debugEpoch++;
     debugResult = null;
     debugReady = false;
@@ -667,6 +673,47 @@ function initializeConsole() {
     debugMeta.textContent = "Sin consulta.";
     debugNotice.textContent = "Esperando catálogo.";
   }
+
+  // El documento Swagger comparte origen y sesión, no estilos ni estado de las consultas.
+  const swaggerHost = document.getElementById("swagger-host");
+  const swaggerPanel = document.getElementById("debug-docs");
+  const queryPanel = document.getElementById("debug-queries");
+  const docsTab = document.getElementById("debug-tab-docs");
+  const queriesTab = document.getElementById("debug-tab-queries");
+
+  function closeSwagger() {
+    swaggerHost.replaceChildren();
+    swaggerPanel.hidden = true;
+    queryPanel.hidden = false;
+    docsTab.classList.add("secondary");
+    queriesTab.classList.remove("secondary");
+  }
+
+  function openSwagger() {
+    if (!debugAllowed() || serverNow() >= session.warningAt) return;
+    queryPanel.hidden = true;
+    swaggerPanel.hidden = false;
+    docsTab.classList.remove("secondary");
+    queriesTab.classList.add("secondary");
+    if (swaggerHost.firstElementChild) return;
+    const frame = document.createElement("iframe");
+    frame.id = "swagger-frame";
+    frame.title = "Documentación interactiva de la API";
+    frame.addEventListener("load", () => {
+      const doc = frame.contentDocument;
+      if (!doc || !debugAllowed()) return;
+      doc.documentElement.dataset.theme = document.documentElement.dataset.theme;
+      for (const event of ["pointerdown", "keydown", "wheel", "touchstart"]) {
+        doc.addEventListener(event, recordActivity, {passive: true});
+      }
+    });
+    frame.src = "/docs?embedded=1";
+    swaggerHost.append(frame);
+  }
+
+  docsTab.addEventListener("click", openSwagger);
+  queriesTab.addEventListener("click", closeSwagger);
+  window.addEventListener("pagehide", closeSwagger);
 
   async function debugRead(path, maxBytes = 262144) {
     const response = await fetch(path, {method: "GET", credentials: "same-origin",

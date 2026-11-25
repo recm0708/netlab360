@@ -424,8 +424,13 @@ confirmada y la fuente no disponible se presentan por separado.
 
 ## Documentación interactiva de la API
 
-Publicamos Swagger UI en `/docs` y la especificación en `/openapi.json`,
-solo para sesiones de operador. La consola documenta las rutas reales;
+Integramos Swagger UI en Diagnóstico técnico mediante una pestaña de la
+consola y conservamos la entrada `/docs`, que redirige a esa vista. El
+marco interno comparte el origen, la sesión y la paleta efectiva de la
+aplicación. La especificación `/openapi.json` y los recursos siguen
+reservados a sesiones de operador. No solicitamos claves adicionales ni
+exponemos la cookie HttpOnly. Conservamos los resultados del explorador
+al cambiar de pestaña y retiramos el marco al salir o perder la sesión. La consola documenta las rutas reales;
 la ejecución interactiva se restringe a GET y las rutas mantienen sus
 controles de sesión, alcance y frecuencia. Las operaciones de sesión se
 documentan sin habilitar su ejecución en Swagger. No habilitamos CORS,

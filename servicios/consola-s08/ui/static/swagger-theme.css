@@ -1,0 +1,35 @@
+/* Adaptamos la presentación de Swagger a las variables compartidas del producto. */
+:root { --method-get:#7cc4ff; --method-post:#4ade80; --method-put:#ffb454; --method-delete:#ff7777; --method-patch:#c084fc; --method-other:#b8c4d6; }
+:root[data-theme="light"] { --method-get:#125785; --method-post:#005b25; --method-put:#853500; --method-delete:#a21422; --method-patch:#652894; --method-other:#424b59; }
+html, body { background:var(--surface); color:var(--text); }
+.docs-heading { padding:14px 18px 0; font:inherit; }
+.docs-heading p { margin:6px 0 0; color:var(--muted); font-size:.86rem; }
+.swagger-ui { color:var(--text); font:inherit; }
+.swagger-ui .wrapper { max-width:none; padding:0 18px; }
+.swagger-ui .info { margin:18px 0; }
+.swagger-ui .info .title { font:700 1.45rem system-ui,sans-serif; color:var(--text); }
+.swagger-ui .info a, .swagger-ui a { color:var(--accent); }
+.swagger-ui .scheme-container { background:var(--surface); border-bottom:1px solid var(--line); box-shadow:none; padding:12px 0; }
+.swagger-ui .auth-wrapper, .swagger-ui .authorization__btn { display:none !important; }
+.swagger-ui .opblock-tag, .swagger-ui .opblock-summary, .swagger-ui table thead tr th, .swagger-ui table thead tr td { border-color:var(--line); }
+.swagger-ui .opblock-tag, .swagger-ui .opblock-summary-path, .swagger-ui .opblock-summary-path__deprecated, .swagger-ui .opblock-summary-description, .swagger-ui .opblock-description-wrapper p, .swagger-ui .opblock-external-docs-wrapper p, .swagger-ui .opblock-title_normal, .swagger-ui .response-col_status, .swagger-ui .response-col_description, .swagger-ui .response-col_links, .swagger-ui .parameter__name, .swagger-ui .parameter__type, .swagger-ui .parameter__in, .swagger-ui .parameters-col_description, .swagger-ui .tab li, .swagger-ui .model-title, .swagger-ui .model, .swagger-ui .prop-type, .swagger-ui .prop-format, .swagger-ui .servers-title, .swagger-ui label, .swagger-ui table thead tr th, .swagger-ui table thead tr td, .swagger-ui section.models h4, .swagger-ui .renderedMarkdown p, .swagger-ui .info p, .swagger-ui .info li, .swagger-ui .info hgroup.main a { color:var(--text); }
+.swagger-ui .opblock { border-color:var(--method); background:var(--bg); box-shadow:none; }
+.swagger-ui .opblock.opblock-get { --method:var(--method-get); }
+.swagger-ui .opblock.opblock-post { --method:var(--method-post); }
+.swagger-ui .opblock.opblock-put { --method:var(--method-put); }
+.swagger-ui .opblock.opblock-delete { --method:var(--method-delete); }
+.swagger-ui .opblock.opblock-patch { --method:var(--method-patch); }
+.swagger-ui .opblock.opblock-head, .swagger-ui .opblock.opblock-options { --method:var(--method-other); }
+.swagger-ui .opblock .opblock-summary-method { background:var(--method); color:var(--button-text); font-size:.85rem; min-width:70px; }
+.swagger-ui .opblock .opblock-summary { border-color:var(--method); }
+.swagger-ui .opblock .opblock-section-header, .swagger-ui .model-box, .swagger-ui section.models .model-container, .swagger-ui .model-example { background:var(--surface); box-shadow:none; }
+.swagger-ui .opblock .opblock-section-header h4 { color:var(--text); }
+.swagger-ui input, .swagger-ui select, .swagger-ui textarea { background:var(--bg); color:var(--text); border:1px solid var(--line); box-shadow:none; }
+.swagger-ui .btn { color:var(--text); background:var(--surface); border:1px solid var(--line); box-shadow:none; font-size:.86rem; padding:6px 12px; }
+.swagger-ui .btn.execute { background:var(--accent); color:var(--button-text); border-color:var(--accent); }
+.swagger-ui .btn.cancel { color:var(--fault); border-color:var(--fault); }
+.swagger-ui .opblock-control-arrow svg, .swagger-ui .expand-operation svg { fill:var(--text); }
+.swagger-ui .opblock-body pre, .swagger-ui .highlight-code, .swagger-ui .microlight { background:var(--bg); color:var(--text); }
+.swagger-ui section.models, .swagger-ui .model-container { border-color:var(--line); }
+.swagger-ui .response-col_description__inner div.markdown, .swagger-ui .response-col_description__inner div.renderedMarkdown { color:var(--text); }
+.swagger-ui .errors-wrapper { background:var(--surface); color:var(--fault); border-color:var(--fault); }

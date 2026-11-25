@@ -56,7 +56,8 @@ class DocsTests(unittest.TestCase):
             security.create_user(directory, "viewer", "synthetic test phrase only", "VIEWER")
             security.create_user(directory, "operator", "synthetic test phrase only", "OPERATOR")
             app = create_app(directory)
-            routes = ("/docs", "/openapi.json", "/docs/init.js", "/docs/assets/swagger-ui.css")
+            routes = ("/docs", "/docs?embedded=1", "/openapi.json", "/docs/init.js",
+                      "/docs/theme.css", "/docs/assets/swagger-ui.css")
             with TestClient(app, base_url="http://127.0.0.1:9140") as client:
                 for route in routes:
                     self.assertEqual(client.get(route).status_code, 401)
@@ -64,7 +65,15 @@ class DocsTests(unittest.TestCase):
                 for route in routes:
                     self.assertEqual(client.get(route).status_code, 403)
                 client.cookies.set("netlab360_session", sessions.issue(directory, "operator")["token"])
-                self.assertEqual(client.get("/docs").status_code, 503)
+                entry = client.get("/docs", follow_redirects=False)
+                self.assertEqual((entry.status_code, entry.headers["location"]), (303, "/debug?tab=docs"))
+                self.assertEqual(client.get("/docs?embedded=1").status_code, 503)
+                self.assertEqual(client.get("/docs?embedded=other").status_code, 400)
+                shell = client.get("/debug?tab=docs")
+                self.assertEqual(shell.status_code, 200)
+                self.assertIn('id="swagger-host"', shell.text)
+                self.assertIn("frame-src 'self'", shell.headers["content-security-policy"])
+                self.assertNotIn("frame-src", client.get("/home").headers["content-security-policy"])
                 schema = client.get("/openapi.json").json()
                 self.assertIn("get", schema["paths"]["/api/v1/alerts"])
                 self.assertIn("post", schema["paths"]["/api/v1/auth/login"])
@@ -75,16 +84,29 @@ class DocsTests(unittest.TestCase):
                 self.assertEqual(schema["paths"]["/api/v1/alerts"]["get"]["security"], [{"SessionCookie": []}])
                 self.assertNotIn("security", schema["paths"]["/healthz"]["get"])
                 self.assertIn("no ejecutable", schema["paths"]["/api/v1/auth/login"]["post"]["description"])
+                params = schema["paths"]["/api/v1/history/{group}/{window}"]["get"]["parameters"]
+                options = {item["name"]: item["schema"]["enum"] for item in params}
+                self.assertEqual(set(options["group"]), {"collection", "routers", "wan", "vlan"})
+                self.assertEqual(set(options["window"]), {"5m", "15m", "1h"})
+                self.assertEqual(schema["paths"]["/api/v1/alerts"]["get"]["tags"], ["Observabilidad"])
                 init = client.get("/docs/init.js").text
                 self.assertIn('supportedSubmitMethods: ["get"]', init)
                 self.assertIn("validatorUrl: null", init)
                 self.assertIn("url.origin !== location.origin", init)
                 self.assertEqual(client.get("/docs/assets/unknown").status_code, 404)
                 with patch.object(swagger_assets, "asset", return_value=b"local"):
-                    response = client.get("/docs")
+                    response = client.get("/docs?embedded=1")
                     self.assertEqual(response.status_code, 200)
                     self.assertIn("swagger-ui-bundle.js", response.text)
                     self.assertNotIn("https://", response.text)
                     self.assertIn("connect-src 'self'", response.headers["content-security-policy"])
+                    self.assertIn("frame-ancestors 'self'", response.headers["content-security-policy"])
+                    theme = client.get("/docs/theme.css")
+                    self.assertEqual(theme.status_code, 200)
+                    self.assertIn(".authorization__btn", theme.text)
+                    self.assertIn("var(--text)", theme.text)
                     self.assertEqual(client.get("/docs/assets/swagger-ui.css").content, b"local")
                 self.assertEqual(client.post("/api/v1/alerts").status_code, 405)
+                self.assertEqual(client.get("/api/v1/auth/me").json()["role"], "OPERATOR")
+                self.assertEqual(client.get("/healthz").status_code, 200)
+                self.assertEqual(client.get("/api/v1/history/not-allowed/5m").status_code, 400)
