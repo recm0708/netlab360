@@ -7,6 +7,15 @@ BASE=98c31fc8eba1ddcbe7c9526028a24f8c51f879a5
 TARGET="$(git rev-parse HEAD)"
 DIR="$HOME/netlab360-bootstrap/s08/evidencias/s08-007"
 STAMP="$(date +%Y%m%d_%H%M%S)"
+# La referencia debe proceder de una auditoría aceptada, no del estado leído al arrancar.
+if [[ $# -ne 1 || ! -f "$1" || -L "$1" ]]; then
+    echo "Uso: bash scripts/s08/validar_consola_trabajos.sh REFERENCIA_JSON" >&2
+    exit 2
+fi
+BASELINE="$(realpath -- "$1")"
+test "$(stat -c %u "$BASELINE")" = "$(id -u)"
+BASELINE_HASH="$(sha256sum "$BASELINE" | cut -d" " -f1)"
+echo "REFERENCIA_INTEGRIDAD=$BASELINE"
 PY="$HOME/netlab360-bootstrap/entornos/netlab360-s06-s08/bin/python"
 ACCOUNT=netlab360-s08-api
 INSTALL=/usr/local/libexec/netlab360/s08-broker
@@ -17,7 +26,8 @@ UPDATED=0
 ACCEPTED=0
 
 verify_data() {
-    "$PY" -B - "$DIR/S08-007B_Estado_Antes_20261125_051459.json" <<'PY'
+    test "$(sha256sum "$BASELINE" | cut -d" " -f1)" = "$BASELINE_HASH"
+    "$PY" -B - "$BASELINE" <<'PY'
 from pathlib import Path
 from contextlib import closing
 import hashlib, json, os, sqlite3, sys
@@ -32,12 +42,40 @@ paths = {
     "JSON_DESARROLLO":dev/"alertas-historicas.json",
 }
 baseline = json.loads(Path(sys.argv[1]).read_text())
+assert set(baseline) == set(paths), "INVALID_BASELINE"
+
+def digest(data):
+    return hashlib.sha256(data).hexdigest()
+
+def serialize(value):
+    if isinstance(value, bytes):
+        return {"blob_hex": value.hex()}
+    raise TypeError(type(value).__name__)
+
 for name, path in paths.items():
     assert path.is_file() and not path.is_symlink(), name
-    assert hashlib.sha256(path.read_bytes()).hexdigest() == baseline[name]["file_sha256"], name
+    previous = baseline[name]
+    initial = digest(path.read_bytes())
+    assert initial == previous["file_sha256"], name
+    assert previous["integrity"] == "OK", name
     if path.suffix == ".sqlite3":
-        with closing(sqlite3.connect(path.as_uri()+"?mode=ro",uri=True)) as db:
-            assert db.execute("PRAGMA quick_check").fetchall() == [("ok",)]
+        with closing(sqlite3.connect(path.as_uri()+"?mode=ro",uri=True,timeout=5)) as db:
+            db.execute("PRAGMA query_only=ON")
+            db.execute("BEGIN")
+            assert db.execute("PRAGMA quick_check").fetchall() == [("ok",)], name
+            tables = {}
+            for (table,) in db.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name").fetchall():
+                quoted = '"' + table.replace('"', '""') + '"'
+                rows = [json.dumps(row, default=serialize, ensure_ascii=False, separators=(",",":"))
+                        for row in db.execute(f"SELECT * FROM {quoted}")]
+                tables[table] = {"count":len(rows),
+                                 "sha256":digest(json.dumps(sorted(rows),ensure_ascii=False).encode())}
+            assert tables == previous["tables"], name + ":LOGICAL"
+            db.rollback()
+    else:
+        content = json.loads(path.read_text())
+        assert content["total"] == len(content["records"]) == previous["records"], name
+    assert digest(path.read_bytes()) == initial, name + ":UNSTABLE"
     print(name+"=SIN_CAMBIOS")
 print("ARCHIVOS_PROTEGIDOS_INTACTOS=5/5")
 PY
