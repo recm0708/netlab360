@@ -164,27 +164,25 @@ class StructureTests(unittest.TestCase):
             low, high = sorted((luminance(first), luminance(second)))
             return (high + 0.05) / (low + 0.05)
 
+        history = (UI / "static/history.js").read_text(encoding="utf-8")
         for selector in (":root", ':root[data-theme="light"]', ":root:not([data-theme])"):
             colors = palette(selector)
-            for state in ("ok", "warn", "fault", "recovery", "unknown", "text", "muted"):
-                for background in ("bg", "surface", "sidebar"):
-                    with self.subTest(theme=selector, state=state, background=background):
-                        self.assertGreaterEqual(contrast(colors[state], colors[background]),
-                                                4.5 if selector == ":root" else 6.5)
-            self.assertGreaterEqual(contrast(colors["button-text"], colors["accent"]), 4.5)
-            self.assertGreaterEqual(contrast(colors["accent"], colors["sidebar"]), 3)
-            if selector != ":root":
-                self.assertNotEqual(colors["surface"], "#fff")
-                self.assertNotEqual(colors["surface"], "#ffffff")
-                self.assertGreaterEqual(contrast(colors["button-text"], colors["accent"]), 7)
-                for state in ("ok", "warn", "fault", "recovery", "unknown", "text", "muted", "accent"):
-                    for background in ("bg", "surface", "sidebar", "table-head"):
-                        with self.subTest(theme=selector, state=state, background=background):
-                            self.assertGreaterEqual(contrast(colors[state], colors[background]), 7)
-                for state in ("ok", "warn", "fault", "recovery", "unknown"):
-                    self.assertGreaterEqual(contrast(colors[state], colors[state + "-bg"]), 7)
+            for state in ("ok", "warn", "fault", "recovery", "unknown", "text", "muted", "accent"):
                 for background in ("bg", "surface", "sidebar", "table-head"):
-                    self.assertGreaterEqual(contrast(colors["control-line"], colors[background]), 3)
+                    with self.subTest(theme=selector, state=state, background=background):
+                        self.assertGreaterEqual(contrast(colors[state], colors[background]), 7)
+            self.assertGreaterEqual(contrast(colors["button-text"], colors["accent"]), 7)
+            for state in ("ok", "warn", "fault", "recovery", "unknown"):
+                self.assertGreaterEqual(contrast(colors[state], colors[state + "-bg"]), 7)
+            for background in ("bg", "surface", "sidebar", "table-head"):
+                self.assertGreaterEqual(contrast(colors["control-line"], colors[background]), 3)
+            theme = "dark" if selector == ":root" else "light"
+            series = re.search(theme + r":Object\.freeze\(\[([^]]+)\]\)", history)
+            self.assertIsNotNone(series)
+            markers = re.findall(r"#[0-9a-fA-F]{6}", series.group(1))
+            self.assertEqual(len(set(markers)), 9)
+            for color in markers:
+                self.assertGreaterEqual(contrast(color, colors["surface"]), 4.5)
 
         self.assertEqual(palette(':root[data-theme="light"]'),
                          palette(":root:not([data-theme])"))
