@@ -22,6 +22,10 @@ PROFILES = {
     "tcp-10s": ("TCP", 10, 0, 20_000_000, 20, 25),
     "udp-10s": ("UDP", 10, 0, 20_000_000, 20, 25),
     "tcp-100mb": ("TCP", 0, 100_000_000, 20_000_000, 60, 70),
+    "tcp-500mb": ("TCP", 0, 500_000_000, 100_000_000, 65, 75),
+    "tcp-1gb": ("TCP", 0, 1_000_000_000, 100_000_000, 115, 125),
+    "tcp-2gb": ("TCP", 0, 2_000_000_000, 100_000_000, 220, 230),
+    "tcp-5gb": ("TCP", 0, 5_000_000_000, 100_000_000, 520, 530),
 }
 MAX_JSON = 2_000_000
 
@@ -32,11 +36,13 @@ def commands(profile, route):
         raise ValueError("INVALID_TRANSFER_SELECTION")
     protocol, seconds, volume, bitrate, client_timeout, server_timeout = PROFILES[profile]
     src, dst, limits = resolve("test.iperf." + protocol.lower(), route)
-    if bitrate != limits.bitrate_bps:
+    # Los perfiles extendidos son exclusivamente TCP por volumen y tasa objetivo fija.
+    if bitrate != limits.bitrate_bps and not (protocol == "TCP" and volume >= 500_000_000 and bitrate == 100_000_000):
         raise ValueError("INVALID_TRANSFER_RATE")
-    server = ["/usr/bin/iperf3", "-s", "-1", "-B", dst.address, "-p", str(IPERF_PORT), "-J"]
+    interval = "10" if volume >= 1_000_000_000 else "1"
+    server = ["/usr/bin/iperf3", "-s", "-1", "-B", dst.address, "-p", str(IPERF_PORT), "-i", interval, "-J"]
     client = ["/usr/bin/iperf3", "-c", dst.address, "-B", src.address,
-              "-p", str(IPERF_PORT), "-b", str(bitrate), "-P", "1", "-i", "1",
+              "-p", str(IPERF_PORT), "-b", str(bitrate), "-P", "1", "-i", interval,
               "--connect-timeout", "2000", "-J"]
     if volume:
         client += ["-n", str(volume), "-l", "10000"]
@@ -127,7 +133,14 @@ def parse_results(profile, route, sender, receiver):
     result["client_reported_receiver_bytes"] = count(reported_rx["bytes"])
     if protocol == "TCP":
         result["retransmissions"] = count(sent["retransmits"])
-        if tx != rx or (volume and not volume <= rx <= volume + 10000):
+        # -n es el objetivo de una medición iPerf3, no una garantía de tamaño exacto.
+        # La exactitud estricta pertenece al ejecutor de contenido.
+        if volume:
+            result["volume_target_met"] = rx >= volume
+            result["volume_excess_bytes"] = max(0, rx - volume)
+            result["volume_shortfall_bytes"] = max(0, volume - rx)
+            result["volume_status"] = "SHORT" if rx < volume else "EXACT" if rx == volume else "EXCEEDED"
+        if tx != rx or (volume and rx < volume):
             result["status"] = "INCOMPLETE"
     else:
         lost, packets = count(received["lost_packets"]), count(received["packets"])

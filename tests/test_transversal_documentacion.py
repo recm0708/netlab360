@@ -22,6 +22,17 @@ def nombre_modulo_python_valido(nombre):
     return nombre == "__init__.py" or bool(re.fullmatch(r"[a-z][a-z0-9_]*\.py", nombre))
 
 
+def referencia_administrativa(texto, relativo):
+    """Distinguir el algoritmo funcional de los controles administrativos de evidencias."""
+    if relativo == "docs/diseno/s08-transferencias-rendimiento.md":
+        # Permitimos nombrar el algoritmo de integridad, no publicar hashes concretos.
+        if re.search(r"\b[0-9a-f]{64}\b", texto, flags=re.IGNORECASE):
+            return True
+        texto = re.sub(r"\bSHA-256\b", "", texto)
+    return bool(re.search(r"sha[-_ ]?256|\.sha256|evidencias/manifiestos|\bmanifiestos?\b",
+                          texto, flags=re.IGNORECASE))
+
+
 def documentos_tecnicos():
     """Retorna los documentos incluidos en el proyecto."""
     for documento in ROOT.rglob("*.md"):
@@ -38,8 +49,7 @@ class DocumentacionProyectoTests(unittest.TestCase):
             relativos = doc.relative_to(ROOT).as_posix()
             if sum(bool(re.match(r"^#\s+\S", linea)) for _, linea in markdown_lines(texto)) != 1:
                 fallos.append(f"Título H1 no único: {relativos}")
-            if re.search(r"sha[-_ ]?256|\.sha256|evidencias/manifiestos|\bmanifiestos?\b",
-                         texto, flags=re.IGNORECASE):
+            if referencia_administrativa(texto, relativos):
                 fallos.append(f"Referencia administrativa: {relativos}")
 
             for enlazado in ENLACE.findall(texto):
@@ -55,6 +65,15 @@ class DocumentacionProyectoTests(unittest.TestCase):
                 if not ruta.exists():
                     fallos.append(f"Enlace ausente: {relativos} → {destino}")
         self.assertEqual(fallos, [])
+
+    def test_distincion_integridad_funcional_y_control_administrativo(self):
+        ruta = "docs/diseno/s08-transferencias-rendimiento.md"
+        self.assertFalse(referencia_administrativa("Calculamos SHA-256 en ambos extremos.", ruta))
+        self.assertTrue(referencia_administrativa("SHA-256", "docs/diseno/otro.md"))
+        for texto in ("manifiesto SHA-256", "capturas.sha256", "evidencias/manifiestos",
+                      "SHA-256: " + "a" * 64):
+            with self.subTest(texto=texto):
+                self.assertTrue(referencia_administrativa(texto, ruta))
 
     def test_titulos_neutros(self):
         errores = []

@@ -48,8 +48,18 @@ class TransferTests(unittest.TestCase):
         self.assertNotIn("-t", client)
         self.assertEqual((ct, st), (60, 70))
 
+    def test_extended_volume_profiles(self):
+        for name, size in (("tcp-500mb", 500000000), ("tcp-1gb", 1000000000),
+                           ("tcp-2gb", 2000000000), ("tcp-5gb", 5000000000)):
+            _, _, server, client, ct, st = M.commands(name, "HQ_A_S2")
+            self.assertEqual(client[client.index("-n") + 1], str(size))
+            self.assertEqual(client[client.index("-b") + 1], "100000000")
+            self.assertEqual(client[client.index("-i") + 1], server[server.index("-i") + 1])
+            self.assertLessEqual(ct / int(client[client.index("-i") + 1]), 80)
+            self.assertGreater(st, ct)
+
     def test_invalid_choices(self):
-        for profile, route in [("tcp-5gb", "HQ_A_S1"), ("tcp-10s", "192.168.47.2"),
+        for profile, route in [("tcp-10gb", "HQ_A_S1"), ("tcp-10s", "192.168.47.2"),
                                ("udp-10s", "S2_A_FRONTAL_HQ"), ("tcp-10s;id", "HQ_A_S2")]:
             with self.assertRaises(ValueError):
                 M.commands(profile, route)
@@ -77,7 +87,34 @@ class TransferTests(unittest.TestCase):
 
     def test_volume_complete(self):
         a, b = fixture(volume=100000000)
-        self.assertEqual(M.parse_results("tcp-100mb", "HQ_A_S1", a, b)["status"], "OK")
+        result = M.parse_results("tcp-100mb", "HQ_A_S1", a, b)
+        self.assertEqual(result["status"], "OK")
+        self.assertEqual(result["volume_status"], "EXACT")
+        self.assertTrue(result["volume_target_met"])
+
+    def test_volume_overshoot_observed(self):
+        a, b = fixture(volume=500020000)
+        result = M.parse_results("tcp-500mb", "HQ_A_S1", a, b)
+        self.assertEqual(result["status"], "OK")
+        self.assertEqual(result["volume_status"], "EXCEEDED")
+        self.assertEqual(result["volume_excess_bytes"], 20000)
+        self.assertEqual(result["volume_shortfall_bytes"], 0)
+        self.assertFalse(result["content_integrity_verified"])
+
+    def test_volume_shortfall_reported(self):
+        a, b = fixture(volume=499990000)
+        result = M.parse_results("tcp-500mb", "HQ_A_S1", a, b)
+        self.assertEqual(result["status"], "INCOMPLETE")
+        self.assertEqual(result["volume_status"], "SHORT")
+        self.assertEqual(result["volume_shortfall_bytes"], 10000)
+        self.assertFalse(result["volume_target_met"])
+
+    def test_volume_exceeded_with_unequal_endpoints(self):
+        a, b = fixture(volume=500020000)
+        a["end"]["sum_sent"]["bytes"] += 10000
+        result = M.parse_results("tcp-500mb", "HQ_A_S1", a, b)
+        self.assertEqual(result["status"], "INCOMPLETE")
+        self.assertEqual(result["volume_status"], "EXCEEDED")
 
     def test_reject_wrong_identity(self):
         a, b = fixture()
