@@ -68,9 +68,9 @@ footer { color: var(--muted); padding: 16px 28px; border-top: 1px solid var(--li
   main, .topbar, footer { padding: 18px; }
 }
 /* El tema explícito tiene prioridad sobre la preferencia del sistema. */
-:root[data-theme="light"] { color-scheme: light; --button-text: #fff; --bg: #eef2f7; --surface: #fff; --sidebar: #f7f9fc; --line: #c9d4e2; --text: #17283b; --muted: #485c73; --accent: #176ba3; --ok: #006f24; --warn: #a34508; --fault: #b91c1c; --recovery: #1559ad; --unknown: #555d6b; }
+:root[data-theme="light"] { color-scheme: light; --button-text: #fff; --bg: #e6edf5; --surface: #f8fafc; --sidebar: #f0f5fa; --line: #a6b8ca; --text: #142438; --muted: #36495f; --accent: #125785; --ok: #005b25; --warn: #853500; --fault: #a21422; --recovery: #134d95; --unknown: #424b59; }
 @media (prefers-color-scheme: light) {
-  :root:not([data-theme]) { color-scheme: light; --button-text: #fff; --bg: #eef2f7; --surface: #fff; --sidebar: #f7f9fc; --line: #c9d4e2; --text: #17283b; --muted: #485c73; --accent: #176ba3; --ok: #006f24; --warn: #a34508; --fault: #b91c1c; --recovery: #1559ad; --unknown: #555d6b; }
+  :root:not([data-theme]) { color-scheme: light; --button-text: #fff; --bg: #e6edf5; --surface: #f8fafc; --sidebar: #f0f5fa; --line: #a6b8ca; --text: #142438; --muted: #36495f; --accent: #125785; --ok: #005b25; --warn: #853500; --fault: #a21422; --recovery: #134d95; --unknown: #424b59; }
 }
 
 /* El panel de acceso mantiene el foco visible y se adapta al ancho disponible. */
@@ -140,9 +140,9 @@ nav a:hover { color: var(--accent); background: var(--surface); }
 
 /* Iconos vectoriales locales, barras temáticas y regiones de scroll separadas. */
 :root { scrollbar-color: var(--scroll-thumb, #45617f) var(--scroll-track, #111c2a); scrollbar-width: thin; --scroll-thumb: #45617f; --scroll-track: #111c2a; --scroll-hover: #6588ab; }
-:root[data-theme="light"] { --scroll-thumb: #829fba; --scroll-track: #e3ebf4; --scroll-hover: #52799e; }
+:root[data-theme="light"] { --scroll-thumb: #52728f; --scroll-track: #e0e8f1; --scroll-hover: #355875; }
 @media (prefers-color-scheme: light) {
-  :root:not([data-theme]) { --scroll-thumb: #829fba; --scroll-track: #e3ebf4; --scroll-hover: #52799e; }
+  :root:not([data-theme]) { --scroll-thumb: #52728f; --scroll-track: #e0e8f1; --scroll-hover: #355875; }
 }
 * { scrollbar-color: var(--scroll-thumb) var(--scroll-track); scrollbar-width: thin; }
 ::-webkit-scrollbar { width: 9px; height: 9px; }

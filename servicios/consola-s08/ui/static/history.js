@@ -13,7 +13,7 @@
   // Paletas categóricas por identidad, independientes del significado del estado.
   const palettes=Object.freeze({
     dark:Object.freeze(["#60a5fa","#facc15","#c084fc","#2dd4bf","#f472b6","#fb923c","#a3e635","#94a3b8","#fb7185"]),
-    light:Object.freeze(["#1559ad","#936000","#7c3aad","#00756d","#ad2865","#b34b0a","#467315","#45556f","#a13a36"])
+    light:Object.freeze(["#004c9e","#755000","#652894","#005e58","#922050","#973c00","#375c0a","#37455e","#9b1427"])
   });
 
   function stateLabel(scope,value) {
@@ -76,7 +76,8 @@
   function figure(data,format,colors) {
     const traces=[];
     const entries=catalog[data.group];
-    const palette=palettes[colors.theme === "light" ? "light" : "dark"];
+    const light=colors.theme === "light";
+    const palette=palettes[light ? "light" : "dark"];
     // Eje numérico en epoch: la etiqueta y el hover se formatean en Panamá.
     // Cada serie tiene una banda propia para evitar superposición de estados.
     for(const [index,[id,scope,name]] of entries.entries()) {
@@ -87,7 +88,7 @@
         type:"scatter",mode:"markers",name,
         x:points.map(p=>p[0]),y:points.map(p=>lane+p[1]),
         customdata:points.map(p=>[format(new Date(p[0]*1000)),stateLabel(scope,p[1])]),
-        marker:{size:5,color:palette[index],symbol:points.map(p=>p[1]===1?"circle":"x")},
+        marker:{size:light?7:5,color:palette[index],symbol:points.map(p=>p[1]===1?"circle":"x")},
         hovertemplate:name+"<br>%{customdata[0]}<br>%{customdata[1]}<extra></extra>",
         showlegend:true
       });

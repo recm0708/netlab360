@@ -40,6 +40,8 @@ assert.equal(fig.layout.legend.x,0.5);
 assert.equal(fig.layout.legend.xanchor,"center");
 const light=h.figure(p,d=>d.toISOString(),{theme:"light",surface:"#fff",text:"#111",line:"#aaa"});
 assert.notEqual(light.traces[0].marker.color,fig.traces[0].marker.color);
+assert.equal(light.traces[0].marker.size,7);
+assert.equal(fig.traces[0].marker.size,5);
 assert.equal(light.traces[0].marker.symbol[1],"x");
 for(const change of [
  q=>q.network_mutations_authorized=true,q=>q.series[0].scope="ADMIN_STATE_ONLY",

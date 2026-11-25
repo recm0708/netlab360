@@ -169,9 +169,14 @@ class StructureTests(unittest.TestCase):
             for state in ("ok", "warn", "fault", "recovery", "unknown", "text", "muted"):
                 for background in ("bg", "surface", "sidebar"):
                     with self.subTest(theme=selector, state=state, background=background):
-                        self.assertGreaterEqual(contrast(colors[state], colors[background]), 4.5)
+                        self.assertGreaterEqual(contrast(colors[state], colors[background]),
+                                                4.5 if selector == ":root" else 6.5)
             self.assertGreaterEqual(contrast(colors["button-text"], colors["accent"]), 4.5)
             self.assertGreaterEqual(contrast(colors["accent"], colors["sidebar"]), 3)
+            if selector != ":root":
+                self.assertNotEqual(colors["surface"], "#fff")
+                self.assertNotEqual(colors["surface"], "#ffffff")
+                self.assertGreaterEqual(contrast(colors["button-text"], colors["accent"]), 7)
 
     def test_solid_current_navigation(self):
         css = (UI / "static/styles.css").read_text(encoding="utf-8")

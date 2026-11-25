@@ -90,6 +90,10 @@ recurso, zoom, leyendas y fechas en Panamá. No unimos muestras mediante
 líneas ni sustituimos nulos por ceros. Centramos la leyenda de recursos y
 usamos colores categóricos distintos por tema; la forma, posición y texto
 identifican el estado de cada muestra independientemente de su color.
+En el tema claro utilizamos superficies azul grisáceas suaves, colores
+semánticos y categóricos más profundos y marcadores de siete píxeles.
+La paleta oscura mantiene sus tonos originales. Aplicamos los mismos
+colores semánticos a acceso, navegación, indicadores y tablas.
 El recurso se sirve desde el paquete
 científico instalado y requiere sesión. Limitamos los estilos inline
 necesarios para Plotly a esta vista; los scripts y conexiones conservan
