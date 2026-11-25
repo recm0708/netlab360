@@ -10,6 +10,7 @@ ROOT = Path("/usr/local/libexec/netlab360/s08-broker")
 API_FILES = (
     "__init__.py", "probe_catalog.py", "probe_executor.py", "transfer_executor.py",
     "content_executor.py", "content_worker.py", "job_contract.py", "probe_broker.py", "broker_transfer.py",
+    "broker_stream.py", "stream_protocol.py",
 )
 
 
@@ -44,7 +45,8 @@ def main():
     if min(worker.pw_uid, worker.pw_gid) <= 0 or worker.pw_uid == allowed_uid:
         raise RuntimeError("INVALID_WORKER_IDENTITY")
     with socket.socket(fileno=os.dup(0)) as conn:
-        serve(conn, allowed_uid, transfer=lambda selection: execute(selection, worker.pw_uid, worker.pw_gid))
+        serve(conn, allowed_uid, transfer=lambda selection: execute(selection, worker.pw_uid, worker.pw_gid),
+              worker=(worker.pw_uid, worker.pw_gid))
 
 
 if __name__ == "__main__":
