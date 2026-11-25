@@ -16,10 +16,13 @@ HOST = "127.0.0.1"
 PORT = 9140
 
 
-def create_app(directory: Path | None = None) -> FastAPI:
+def create_app(directory: Path | None = None, *, job_transport=None) -> FastAPI:
     """Crear la API de arranque o habilitar identidades sobre una base v2 explícita."""
     if os.geteuid() == 0:
         raise RuntimeError("S08_ROOT_FORBIDDEN")
+
+    if job_transport is not None and directory is None:
+        raise ValueError("JOB_STORAGE_REQUIRED")
 
     app = FastAPI(title="NETLAB360 API", version="0.1.0",
                   docs_url=None, redoc_url=None, openapi_url=None)
@@ -81,6 +84,9 @@ def create_app(directory: Path | None = None) -> FastAPI:
         register_ui(app, directory)
         from .docs_http import register_docs
         register_docs(app, directory)
+        if job_transport is not None:
+            from .jobs_http import register_jobs
+            register_jobs(app, directory, job_transport)
 
     return app
 
