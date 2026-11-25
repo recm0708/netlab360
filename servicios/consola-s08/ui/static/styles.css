@@ -393,3 +393,16 @@ button.secondary, .topology-action {
 #jobs-view .panel { margin-bottom: 14px; min-width: 0; }
 #jobs-view pre { max-height: 360px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; }
 #jobs-view .metric { overflow-wrap: anywhere; }
+
+/* Vista de pruebas: columnas completas, selección visible y adaptación al espacio. */
+#jobs-view .jobs-endpoints { grid-template-columns: repeat(2,minmax(0,1fr)); }
+#jobs-view .filter-row { display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
+#jobs-view .filter-row label { display:flex; align-items:center; gap:8px; }
+#jobs-view .jobs-table { min-width: 660px; width:100%; }
+#jobs-history tr[data-selected="true"] { background:var(--recovery-bg); }
+#jobs-history tr[data-selected="true"] button { color:var(--accent); }
+#jobs-history td:first-child { white-space:nowrap; font-variant-numeric:tabular-nums; }
+#jobs-result-panel { scroll-margin-top:12px; }
+#jobs-title:focus-visible { text-decoration:underline; text-underline-offset:4px; }
+#jobs-diagnostic-rows { margin:8px 0; padding-inline-start:24px; }
+@media(max-width:700px) { #jobs-view .jobs-endpoints { grid-template-columns:1fr; } }
