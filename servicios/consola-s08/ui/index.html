@@ -43,7 +43,7 @@
         <div class="header-brand"><button id="menu-toggle" class="secondary" type="button" aria-controls="navigation" aria-expanded="true" aria-label="Contraer menú"><svg class="menu-symbol" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path class="menu-line" d="M4 6h16"/><path class="menu-line middle" d="M4 12h16"/><path class="menu-line" d="M4 18h16"/></svg></button><strong class="header-title">CENTRO DE OPERACIONES DE RED</strong></div>
         <div class="header-account">
           <label class="theme-control"><span>Apariencia</span><select id="theme-select" aria-label="Apariencia"><option value="auto">Automático</option><option value="light">Claro</option><option value="dark">Oscuro</option></select></label>
-          <span class="mode">Solo lectura</span>
+          <span class="mode" id="console-mode">Solo lectura</span>
           <details id="session-panel">
             <summary id="identity-label">Comprobando sesión…</summary>
             <div class="account-details panel">
@@ -121,38 +121,41 @@
           <section class="panel">
             <h2>Configurar prueba</h2>
             <div class="filter-row">
-              <label>Acción <select id="jobs-action" disabled></select></label>
+              <label>Tipo de prueba <select id="jobs-action" disabled></select></label>
               <label>Ruta <select id="jobs-route" disabled></select></label>
-              <label>Perfil <select id="jobs-profile" disabled></select></label>
+              <label>Configuración <select id="jobs-profile" disabled></select></label>
             </div>
             <p id="jobs-profile-note" class="muted"></p>
             <button id="jobs-start" type="button" disabled>Iniciar prueba</button>
             <button id="jobs-cancel" type="button" class="secondary" disabled>Cancelar trabajo</button>
           </section>
-          <section class="panel">
-            <h2>Trabajo seleccionado</h2>
+          <section class="panel" id="jobs-result-panel">
+            <h2 id="jobs-title" tabindex="-1">Resultado de la prueba</h2>
             <p id="jobs-state" class="metric" data-state="unknown">Sin trabajo</p>
             <p id="jobs-detail" class="muted"></p>
-            <div class="dashboard-grid">
+            <div id="jobs-transfer-panel" hidden>
+            <div class="dashboard-grid jobs-endpoints">
               <section class="panel"><h2>Emisor</h2><p id="jobs-tx" class="metric">—</p><p id="jobs-tx-rate" class="muted">— Mbit/s</p></section>
               <section class="panel"><h2>Receptor</h2><p id="jobs-rx" class="metric">—</p><p id="jobs-rx-rate" class="muted">— Mbit/s</p></section>
             </div>
             <label for="jobs-progress">Progreso de recepción observado</label>
             <progress id="jobs-progress" value="0" max="100" hidden></progress>
             <p id="jobs-progress-note" class="muted">Sin medición.</p>
-            <p id="jobs-metrics" class="muted"></p>
             <details><summary>Eventos e intervalos registrados</summary><div class="dashboard-table-wrap">
-              <table><thead><tr><th>Extremo</th><th>Tiempo (s)</th><th>Bytes</th><th>Mbit/s</th></tr></thead><tbody id="jobs-events"></tbody></table>
+              <table class="dashboard-table jobs-table"><thead><tr><th>Extremo</th><th>Tiempo (s)</th><th>Bytes</th><th>Mbit/s</th></tr></thead><tbody id="jobs-events"></tbody></table>
             </div></details>
+            </div>
+            <p id="jobs-metrics"></p>
+            <div id="jobs-diagnostic-panel" hidden><p id="jobs-diagnostic-note" class="muted"></p><ul id="jobs-diagnostic-rows"></ul></div>
             <details><summary>Resultado detallado</summary><pre id="jobs-output"></pre></details>
             <button type="button" id="jobs-json" disabled>Exportar JSON</button>
             <button type="button" id="jobs-csv" disabled>Exportar CSV</button>
           </section>
           <section class="panel">
             <h2>Historial propio</h2>
-            <p class="muted">Últimos 50 trabajos, activos primero. Seleccione uno para consultar sus resultados.</p>
+            <p class="muted">Últimas 50 pruebas propias, activas primero. Ver resultado abre el panel superior sin salir de esta página.</p>
             <button type="button" id="jobs-refresh" disabled>Actualizar historial</button>
-            <div class="dashboard-table-wrap"><table><thead><tr><th>Fecha</th><th>Perfil</th><th>Ruta</th><th>Estado</th><th>Consulta</th></tr></thead><tbody id="jobs-history"></tbody></table></div>
+            <div class="dashboard-table-wrap"><table class="dashboard-table jobs-table"><thead><tr><th>Fecha y hora (Panamá)</th><th>Tipo de prueba</th><th>Configuración</th><th>Ruta</th><th>Estado</th><th>Resultado</th></tr></thead><tbody id="jobs-history"></tbody></table></div>
           </section>
         </section>
         <section id="module-view" hidden>
@@ -235,7 +238,7 @@
           </div>
         </section>
       </main>
-      <footer>NETLAB360 · Consola de operaciones · Acciones de red deshabilitadas</footer>
+      <footer>NETLAB360 · Consola de operaciones · Mutaciones de red deshabilitadas</footer>
     </div>
   </div>
   <section id="session-recovery" class="panel recovery-panel" role="status"><h1>Comprobando acceso</h1><p id="recovery-notice">Verificando la sesión.</p><a href="/">Reintentar acceso</a></section>
