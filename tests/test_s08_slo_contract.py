@@ -114,18 +114,31 @@ with tempfile.TemporaryDirectory() as directory:
         code = """
 import runpy, sys, tempfile
 from pathlib import Path
-from types import SimpleNamespace
-resolve = runpy.run_path(sys.argv[1])["alertmanager_template_args"]
+module = runpy.run_path(sys.argv[1])
+resolve = module["alertmanager_share"]
+args = module["unit_args"]
 with tempfile.TemporaryDirectory() as directory:
     root = Path(directory) / "usr"
     binary = root / "bin/prometheus-alertmanager"
-    template = root / "share/prometheus/alertmanager/default.tmpl"
-    template.parent.mkdir(parents=True)
-    template.write_text("test")
-    resolve.__globals__["run"] = lambda args: SimpleNamespace(
-        stdout="  --template.default=PATH", stderr="")
-    assert resolve(binary) == ["--template.default=" + str(template)]
-    template.unlink()
+    templates = root / "share/prometheus/alertmanager"
+    templates.mkdir(parents=True)
+    for name in ("default.tmpl", "email.tmpl"):
+        (templates / name).write_text("test")
+    share = resolve(binary)
+    assert share == root / "share"
+    command = args("pilot-am", share_root=share)
+    assert "--property=PrivateMounts=yes" in command
+    assert "--property=BindReadOnlyPaths=" + str(share) + ":/usr/share" in command
+    assert "--property=CapabilityBoundingSet=" in command
+    for unit, namespace, privileged in (("pilot-am", None, True),
+                                        ("pilot-iperf", None, False),
+                                        ("pilot-am", "nl360-s02-h-hq-120", False)):
+        try:
+            args(unit, namespace, root=privileged, share_root=share)
+        except ValueError:
+            continue
+        raise AssertionError("Mount allowed outside Alertmanager")
+    (templates / "email.tmpl").unlink()
     try:
         resolve(binary)
     except ValueError as exc:
