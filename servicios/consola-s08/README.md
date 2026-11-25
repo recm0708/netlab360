@@ -404,6 +404,20 @@ el mismo filtro sin cambiar la adquisición. Integramos la lectura
 exploratoria de inferencia HQ con sus métodos, RTT, pérdida, vigencia y
 abstención, sin iniciar el servicio de modelos ni confirmar incidentes.
 
-La equivalencia del historial de alertas anterior y el retiro de las
-interfaces independientes requieren una aceptación posterior. Conservamos
+Migramos las alertas activas y una copia explícita de las transiciones
+históricas al módulo de Observabilidad. El retiro de las interfaces
+independientes exige comprobar equivalencia y recuperación; conservamos
 los servicios de adquisición y los registros históricos.
+
+## Alertas e historial migrado
+
+La consulta autenticada GET `/api/v1/alerts` separa alertas vigentes de
+Prometheus y las últimas 200 transiciones registradas en el NOC anterior.
+La copia identifica fecha y cantidad total en el origen; no equivale a
+un registro continuo ni reconstruye eventos no observados. La generamos
+como usuario propietario, sin modificar la base original, mediante
+`python -B -m api.alerts_reader export --directory RUTA_PRIVADA` desde
+el directorio del servicio. La ruta privada se fija al iniciar la API;
+no aceptamos rutas de archivos ni destinos desde el navegador. El
+historial se filtra por sede y se exporta como CSV. La consulta vacía
+confirmada y la fuente no disponible se presentan por separado.

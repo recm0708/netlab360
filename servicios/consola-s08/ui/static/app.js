@@ -1125,7 +1125,87 @@ function initializeConsole() {
   const historyWindow = document.getElementById("history-window");
   const historyStatus = document.getElementById("history-status");
   const historyPlot = document.getElementById("history-plot");
-  let historyEpoch = 0, historyBusy = false, historyData = null;
+  let historyEpoch = 0, historyBusy = false, historyData = null, alertsData=null;
+  const alertsSite=document.getElementById("alerts-site"),alertsExport=document.getElementById("alerts-export");
+  const alertNames=Object.freeze({
+    NETLAB360S04ExporterUnavailable:"Exportador no disponible",NETLAB360S04CollectorUnknown:"Colector sin observación",
+    NETLAB360S04WANAdminDown:"WAN administrativamente inactiva",NETLAB360S04VLANAdminDown:"VLAN administrativamente inactiva"
+  });
+  function clearAlerts(){
+    alertsData=null;alertsExport.disabled=true;
+    for(const id of ["alerts-current-rows","alerts-history-rows"])document.getElementById(id).replaceChildren();
+    for(const id of ["alerts-current-status","alerts-history-status"])document.getElementById(id).textContent="Sin consulta confirmada.";
+  }
+  function validateAlerts(data){
+    if(data?.project!=="NETLAB360"||data.schema_version!==1||data.network_mutations_authorized!==false)throw Error("ALERTS");
+    for(const [batch,max,historical] of [[data.current,50,false],[data.history,200,true]]){
+      if(!batch||!["OK","INVALID","UNAVAILABLE","NOT_STARTED"].includes(batch.transport)||
+         !Array.isArray(batch.records)||batch.records.length>max||(batch.transport!=="OK"&&batch.records.length))throw Error("ALERT_BATCH");
+      if(historical&&batch.transport==="OK"&&(!Number.isSafeInteger(batch.total)||batch.total<batch.records.length||
+          !Number.isFinite(Date.parse(batch.captured_at_utc))))throw Error("ALERT_HISTORY");
+      for(const row of batch.records){
+        if(!Object.hasOwn(alertNames,row.alertname)||!["HQ","S1","S2","GLOBAL"].includes(row.site)||
+           !["pending","firing",...(historical?["resolved"]:[])].includes(row.state)||
+           typeof row.resource!=="string"||row.resource.length>64||
+           !Number.isFinite(Date.parse(historical?row.observed_at_utc:row.active_at_utc))||
+           (historical&&!["verified_G3_terminal_log","prometheus_active_alerts"].includes(row.source)))throw Error("ALERT_RECORD");
+      }
+    }
+    return data;
+  }
+  function alertRows(batch){
+    return batch.records.filter(row=>alertsSite.value==="all"||row.site===alertsSite.value||row.site==="GLOBAL");
+  }
+  function renderAlerts(){
+    if(!alertsData||!historyAllowed())return;
+    for(const [batch,key,historical] of [[alertsData.current,"current",false],[alertsData.history,"history",true]]){
+      const rows=alertRows(batch),body=document.getElementById("alerts-"+key+"-rows");
+      const fragment=document.createDocumentFragment();
+      for(const row of rows){
+        const tr=document.createElement("tr");
+        const values=[alertNames[row.alertname],row.site,row.resource,{pending:"Pendiente",firing:"Activa",resolved:"Resuelta"}[row.state],
+          formatPanama(new Date(historical?row.observed_at_utc:row.active_at_utc))];
+        if(historical)values.push(row.source==="verified_G3_terminal_log"?"Registro de ensayo verificado":"Prometheus");
+        for(const [i,value] of values.entries()){
+          const td=document.createElement("td");td.textContent=value;
+          if(i===3)td.dataset.state={pending:"warn",firing:"fault",resolved:"ok"}[row.state];
+          tr.append(td);
+        }
+        fragment.append(tr);
+      }
+      body.replaceChildren(fragment);
+      const status=document.getElementById("alerts-"+key+"-status");
+      status.textContent=batch.transport!=="OK"?"Fuente no disponible; no equivale a cero alertas.":
+        historical?rows.length+" registros de la copia · "+batch.total+" registrados en origen · Copia: "+formatPanama(new Date(batch.captured_at_utc)):
+        rows.length+" alertas observadas en la vista"+(batch.truncated?" · Resultado limitado":"")+". Consulta: "+formatPanama(new Date(batch.queried_at_utc));
+    }
+    alertsExport.disabled=alertsData.history.transport!=="OK";
+  }
+  alertsSite.addEventListener("change",renderAlerts);
+  alertsExport.addEventListener("click",()=>{
+    if(!alertsData||!historyAllowed()||alertsData.history.transport!=="OK")return;
+    const lines=[["Alerta","Sede","Recurso","Estado","Observado UTC","Origen"],...alertRows(alertsData.history).map(row=>
+      [alertNames[row.alertname],row.site,row.resource,row.state,row.observed_at_utc,row.source])];
+    const cell=value=>'"'+String(value).replace(/^[=+@-]/,"'  let historyEpoch = 0, historyBusy = false, historyData = null;").replaceAll('"','""')+'"';
+    const url=URL.createObjectURL(new Blob([lines.map(row=>row.map(cell).join(",")).join("\n")],{type:"text/csv;charset=utf-8"}));
+    const link=document.createElement("a");link.href=url;link.download="alertas-historicas.csv";link.click();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+  });
+  async function updateAlerts(){
+    if(!historyAllowed()||historyBusy||serverNow()>=session.warningAt)return;
+    const epoch=historyEpoch;historyBusy=true;clearAlerts();
+    historyStatus.textContent="Consultando alertas y transiciones…";
+    try{
+      const {status,data}=await debugRead("/api/v1/alerts");
+      if(epoch!==historyEpoch||!historyAllowed())return;
+      if(status===401||status===403){clearHistory();recover();return;}
+      if(status!==200)throw Error("ALERTS_HTTP");
+      alertsData=validateAlerts(data);renderAlerts();
+      historyStatus.textContent="Consulta de alertas completada.";
+    }catch{
+      if(epoch===historyEpoch){clearAlerts();historyStatus.textContent="No se pudo confirmar la consulta de alertas.";}
+    }finally{if(epoch===historyEpoch)historyBusy=false;}
+  }
   let plotlyLoading = null, historyDraw = Promise.resolve();
 
   function historyAllowed() {
@@ -1136,6 +1216,7 @@ function initializeConsole() {
   function clearHistory() {
     historyEpoch++;
     historyData = null;
+    clearAlerts();
     historyBusy = false;
 
     for (const id of ["history-valid","history-null","history-series","history-scope"])
@@ -1187,6 +1268,7 @@ function initializeConsole() {
   async function updateHistory() {
     if(!historyAllowed()||historyBusy||serverNow()>=session.warningAt) return;
     const group=historyGroup.value, span=historyWindow.value;
+    if(group==="alerts")return updateAlerts();
     if(!window.NetlabHistory.allowed(group,span)) return;
     const epoch=historyEpoch;
     historyBusy=true;
@@ -1226,7 +1308,14 @@ function initializeConsole() {
     }
   }
 
-  function historySelectionChanged(){clearHistory();historyStatus.textContent="Pulse Consultar histórico para obtener el intervalo seleccionado."; }
+  function historySelectionChanged(){
+    clearHistory();
+    const alerts=historyGroup.value==="alerts";
+    document.getElementById("history-chart-content").hidden=alerts;
+    document.getElementById("alerts-content").hidden=!alerts;
+    historyWindow.disabled=alerts;
+    historyStatus.textContent=alerts?"Pulse Consultar histórico para obtener alertas y transiciones.":"Pulse Consultar histórico para obtener el intervalo seleccionado.";
+  }
   historyGroup.addEventListener("change",historySelectionChanged);
   historyWindow.addEventListener("change",historySelectionChanged);
   new MutationObserver(()=>{

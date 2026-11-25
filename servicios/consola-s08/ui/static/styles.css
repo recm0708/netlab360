@@ -342,3 +342,7 @@ footer { padding:8px 20px; }
   .menu-collapsed .sidebar .brand { justify-content:center; padding-inline:0; }
   .menu-collapsed #navigation a { margin-inline:auto; }
 }
+
+#alerts-content h2 { margin-top:16px; }
+#alerts-content select { background:var(--surface); color:var(--text); border:1px solid var(--line); border-radius:6px; }
+#alerts-content .dashboard-table-wrap { margin:8px 0 12px; }
