@@ -4,7 +4,7 @@ Reutilizamos Prometheus S04 y su TSDB. No sustituimos las métricas administrati
 
 ## Contrato de observación
 
-El piloto ejecuta exportadores dentro de los namespaces, exclusivamente en loopback y bajo una identidad sin capacidades. No publica la interfaz genérica de sondas en el host. La integración continua necesitará un colector de destinos fijos que limite los parámetros y preserve la identidad de origen. Se verifican direcciones, ruta y ausencia de puertos ocupados. Una falla de sonda se diferencia de un error de transporte hacia el exporter. El contexto S1 como origen y otros destinos requerirán autorización explícita en el catálogo.
+El piloto ejecuta exportadores dentro de los namespaces, exclusivamente en loopback y bajo una identidad no root. Si el grupo no está autorizado por ping_group_range, concedemos únicamente CAP_NET_RAW a la unidad transitoria Blackbox dentro del namespace autorizado. Verificamos UID, GID, grupos, capacidades, NoNewPrivileges e identidad del namespace del proceso. No cambiamos sysctl, no aplicamos capacidades al archivo ni a la cuenta, y no concedemos capacidades adicionales a Alertmanager o iPerf3. No publica la interfaz genérica de sondas en el host. La integración continua necesitará un colector de destinos fijos que limite los parámetros y preserve la identidad de origen. Se verifican direcciones, ruta y ausencia de puertos ocupados. Una falla de sonda se diferencia de un error de transporte hacia el exporter. El contexto S1 como origen y otros destinos requerirán autorización explícita en el catálogo.
 
 ## Objetivos y calidad
 
