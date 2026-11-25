@@ -4,7 +4,7 @@
 
 Integramos progresivamente las fuentes operacionales del
 laboratorio en una aplicación local, sin sustituir los servicios
-aceptados de las fases anteriores.
+aceptados previamente.
 
 ## Componentes
 
@@ -116,7 +116,7 @@ completamos las funciones operacionales.
 ## Ejecución de desarrollo
 
 Desde `servicios/consola-s08`, con el intérprete del entorno
-científico de las fases 06–08 y sin elevar privilegios:
+científico de referencia y sin elevar privilegios:
 
 ```bash
 "$HOME/netlab360-bootstrap/entornos/netlab360-s06-s08/bin/python" -B -m api.main
@@ -179,7 +179,7 @@ y Plotly se integrarán por separado. La política CSP permite solo scripts, est
 y consultas del mismo origen, sin código inline.
 
 Presentamos NETLAB360 como consola de operaciones: los identificadores
-académicos de fases, lotes e issues se conservan en código y documentación,
+de gestión se conservan únicamente donde sean necesarios para la trazabilidad,
 no en textos, etiquetas, tablas o mensajes visibles. Traducimos los
 identificadores de procedencia a nombres funcionales de las fuentes.
 Mostramos fechas en la zona America/Panama, formato mes/día/año y

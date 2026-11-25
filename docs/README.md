@@ -43,7 +43,7 @@ Organizamos la documentación vigente por responsabilidad. Cada documento descri
 - [Recuperación de veth aislada ante pérdida del controlador](diseno/s06-recuperacion-veth-aislada.md)
 - [Restauración de qdisc en namespace aislado](diseno/s06-restauracion-aislada.md)
 - [Simulación de seguridad y restauración](diseno/s06-rollback-simulacion.md)
-- [Plan maestro y criterios de aceptación — Fases 06–10](diseno/s06-s08-plan-maestro-y-criterios.md)
+- [Plan maestro y criterios de aceptación](diseno/s06-s08-plan-maestro-y-criterios.md)
 - [Telemetría reciente e inferencia exploratoria](diseno/s06-telemetria-reciente-inferencia-hq.md)
 - [Deriva descriptiva y oportunidad de detección V2](diseno/s06-v2-deriva-deteccion-y-limitaciones-finales.md)
 - [Evaluación cronológica V2 con modelos congelados](diseno/s06-v2-evaluacion-cronologica-congelada.md)
@@ -62,8 +62,8 @@ Organizamos la documentación vigente por responsabilidad. Cada documento descri
 
 ## Validación
 
-- [Validación técnica de las fases 01–04](validacion/s01-s04-resultados.md)
-- [Validación técnica de la fase 05](validacion/s05-integracion-y-aceptacion.md)
+- [Validación técnica de entorno, red y observabilidad](validacion/s01-s04-resultados.md)
+- [Validación técnica de disponibilidad y SDN](validacion/s05-integracion-y-aceptacion.md)
 
 ## Evidencias técnicas
 
@@ -73,7 +73,7 @@ Organizamos la documentación vigente por responsabilidad. Cada documento descri
 
 - [Cobertura académica y criterios de aceptación de NETLAB360](gestion/cobertura-academica-netlab360.md)
 - [Convenciones de issues, pull requests y metadatos de GitHub](gestion/convenciones-issues-etiquetas.md)
-- [Gestión y aceptación de hitos de las fases 01–10](gestion/gestion-milestones-s01-s08.md)
+- [Gestión y aceptación de hitos](gestion/gestion-milestones-s01-s08.md)
 - [Acta de aceptación técnica](gestion/s05-acta-aceptacion-tecnica.md)
 
 ## Catálogos y componentes
@@ -84,6 +84,6 @@ Organizamos la documentación vigente por responsabilidad. Cada documento descri
 - [Ansible](../ansible/s03/README.md)
 - [OpenTofu](../iac/s03/README.md)
 - [Observabilidad](../servicios/observabilidad/README.md)
-- [NOC de la fase 04](../servicios/noc-s04/README.md)
-- [NOC de la fase 05](../servicios/topologia-s05/README.md)
+- [NOC de observabilidad](../servicios/noc-s04/README.md)
+- [NOC topológico](../servicios/topologia-s05/README.md)
 - [NOC histórico](../servicios/noc-historico/README.md)

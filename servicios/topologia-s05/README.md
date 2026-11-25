@@ -1,4 +1,4 @@
-# NOC de topología multisede — Fase 05
+# NOC de topología multisede
 
 ## Descripción
 
@@ -22,4 +22,4 @@ La consola consulta fuentes reales, pero no administra directamente rutas ni swi
 
 ## Documentación relacionada
 
-[Validación de la fase 05](../../docs/validacion/s05-integracion-y-aceptacion.md) · [Diseño HTTP](../../docs/diseno/s05-ha-servicios-multisede.md) · [Capturas de la fase 05](../../evidencias/capturas/fase5/README.md).
+[Validación de disponibilidad y SDN](../../docs/validacion/s05-integracion-y-aceptacion.md) · [Diseño HTTP](../../docs/diseno/s05-ha-servicios-multisede.md) · [Capturas de disponibilidad y SDN](../../evidencias/capturas/fase5/README.md).

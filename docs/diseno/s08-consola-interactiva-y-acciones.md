@@ -124,7 +124,7 @@ tests/
 
 **Flujo de un clic:** usuario elige `action_id` + parámetros tipados → backend consulta registro `acciones.yaml` → verifica política/destinos y prechecks → autorización humana si cambia estado → ejecutor con permisos mínimos invoca **script revisado por ruta fija** → almacena resultados y hash → revalida red/NOC → UI presenta métricas y retorno.
 
-**Crítico:** NO pasar cadenas libres a `bash -c`, `shell=True`, `sudo` con rutas de scripts editables por el usuario o interpolaciones del navegador. Los scripts que requieran privilegios deben instalarse como ejecutores **propiedad root, no editables por usuario web**, y recibir únicamente acciones/argumentos autorizados; el observador de la fase 05 permanece read-only. Verificar política de ejecución y pruebas de intrusión antes de conectar botones que produzcan fallos.
+**Crítico:** NO pasar cadenas libres a `bash -c`, `shell=True`, `sudo` con rutas de scripts editables por el usuario o interpolaciones del navegador. Los scripts que requieran privilegios deben instalarse como ejecutores **propiedad root, no editables por usuario web**, y recibir únicamente acciones/argumentos autorizados; el observador de topología permanece read-only. Verificar política de ejecución y pruebas de intrusión antes de conectar botones que produzcan fallos.
 
 ### Contrato de integración y fronteras de confianza
 
@@ -234,18 +234,18 @@ Los límites son **propuestas de diseño**, no capacidades ya desplegadas. `iper
 
 ## 6. Construcción incremental
 
-1. **Esqueleto UI read-only**: inicio + topología de la fase 05 + estado WAN/HA/LACP/SDN + API propia. No modificar el NOC de la fase 05 estable hasta tener pruebas de paridad.
+1. **Esqueleto UI read-only**: inicio + topología multisede + estado WAN/HA/LACP/SDN + API propia. No modificar el NOC topológico estable hasta tener pruebas de paridad.
 2. **Pruebas acotadas**: ping, traceroute, HTTP; luego iperf3 TCP/UDP con límites; gráficas, historial y exportación.
-3. **Integración de la fase 06**: detección experimental, explicación y advertencias con datos propios verificados; pronóstico no demostrado.
-4. **Integración de la fase 07**: catálogo de runbooks, aprobación, ejecución protegida, watchdog y recuperación controlada.
+3. **Integración de diagnóstico inteligente**: detección experimental, explicación y advertencias con datos propios verificados; pronóstico no demostrado.
+4. **Integración de AIOps supervisado**: catálogo de runbooks, aprobación, ejecución protegida, watchdog y recuperación controlada.
 5. **Copiloto RAG (#198)**: corpus autorizado, generación con citas y abstención, evaluación de fidelidad, relevancia y seguridad; sin autorización ni ejecución de cambios.
 6. **Demostración/aceptación**: escenarios de inicio sano → degradación → mediciones → detección/recomendación → autorización → cambio → verificación/retorno; contraste de métricas reales y evidencia.
 7. **Observabilidad de servicio**: Blackbox, SLI/SLO, error budget, burn rate, Alertmanager y evaluación de Grafana especializado.
-8. **Cierre técnico**: recuperación desde apagado, seguridad, regresión y evidencias de la fase 08. La entrega académica definitiva corresponde a la fase 10.
+8. **Cierre técnico**: recuperación desde apagado, seguridad, regresión y evidencias de la consola. La entrega definitiva requiere la evaluación integral.
 
 ## 7. Cobertura académica y auditoría de inicio
 
-La [matriz de cobertura académica](../gestion/cobertura-academica-netlab360.md) establece las capacidades visibles, los componentes de segundo plano, la evidencia histórica y las brechas. Antes de implementar, reanudar y auditar la VM sin modificar la infraestructura. Los escenarios mutadores del catálogo son propuestas: la API de la fase 07 acredita únicamente el costo OSPF delimitado de R-S1/s1b; WAN, HTTP, LACP, SDN y netem requieren aceptación individual de ejecutores y rollback. El navegador y el copiloto no adquieren privilegios de aprobación administrativa. La fase 09 incorpora ampliaciones tecnológicas y la fase 10 amplía la validación científica y consolida la entrega. La fase 08 debe ofrecer puntos de extensión sin presentar esas capacidades como implementadas.
+La [matriz de cobertura académica](../gestion/cobertura-academica-netlab360.md) establece las capacidades visibles, los componentes de segundo plano, la evidencia histórica y las brechas. Antes de implementar, reanudar y auditar la VM sin modificar la infraestructura. Los escenarios mutadores del catálogo son propuestas: la API protegida acredita únicamente el costo OSPF delimitado de R-S1/s1b; WAN, HTTP, LACP, SDN y netem requieren aceptación individual de ejecutores y rollback. El navegador y el copiloto no adquieren privilegios de aprobación administrativa. La fase 09 incorpora ampliaciones tecnológicas y la fase 10 amplía la validación científica y consolida la entrega. La fase 08 debe ofrecer puntos de extensión sin presentar esas capacidades como implementadas.
 
 **Principio UX:** el usuario elige **qué comprobar o simular**; la aplicación decide **qué procedimiento autorizado ejecutar** y registra **qué ocurrió realmente**. Nunca se presenta como una consola de comandos arbitrarios.
 

@@ -24,4 +24,4 @@ Los objetos `terraform_data` representan metadatos; **no crean routers, interfac
 
 ## Documentación relacionada
 
-[Inventario multisede](../../inventario/ipam/topologia-s02.yaml) · [Ansible de la fase 03](../../ansible/s03/README.md) · [Validación de las fases 01–04](../../docs/validacion/s01-s04-resultados.md).
+[Inventario multisede](../../inventario/ipam/topologia-s02.yaml) · [Ansible](../../ansible/s03/README.md) · [Validación de entorno, red y observabilidad](../../docs/validacion/s01-s04-resultados.md).

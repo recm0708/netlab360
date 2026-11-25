@@ -20,7 +20,7 @@ Cada PR, independientemente de su estado, debe tener al menos una etiqueta temá
 Antes de fusionar verificamos los metadatos y las comprobaciones CI; el mantenimiento histórico conserva títulos, estados, autores, cuerpo y criterios no afectados. Consultamos los valores vigentes en GitHub, no en contadores duplicados en documentos.
 
 
-Denominamos los hitos de GitHub «Fase 1» a «Fase 10», conservando sus identificadores numéricos y asignaciones. En la documentación técnica utilizamos «Fase 01» y sucesivas. Los códigos de los ensayos, prefijos técnicos, rutas y registros originales mantienen su nomenclatura.
+Denominamos los hitos de GitHub «Fase 1» a «Fase 10», conservando sus identificadores numéricos y asignaciones. La documentación técnica utiliza nombres funcionales sin numeración académica. Los códigos de los ensayos, prefijos técnicos, rutas y registros originales mantienen su nomenclatura.
 
 ## Validación y mantenimiento
 

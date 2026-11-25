@@ -1,4 +1,4 @@
-# Infraestructura FRRouting multisede — Fase 02
+# Infraestructura FRRouting multisede
 
 ## Descripción
 
@@ -22,4 +22,4 @@ El entorno utiliza `network_mode: none` para los routers, de manera que los enla
 
 ## Documentación relacionada
 
-[Validación de las fases 01–04](../../docs/validacion/s01-s04-resultados.md) · [Ansible de la fase 03](../../ansible/s03/README.md) · [NOC de la fase 04](../../servicios/noc-s04/README.md).
+[Validación de entorno, red y observabilidad](../../docs/validacion/s01-s04-resultados.md) · [Ansible](../../ansible/s03/README.md) · [NOC de observabilidad](../../servicios/noc-s04/README.md).

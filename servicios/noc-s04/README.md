@@ -1,4 +1,4 @@
-# Centro de operaciones multisede — Fase 04
+# Centro de operaciones multisede
 
 ## Descripción
 
@@ -8,7 +8,7 @@ Implementamos un NOC web local para observar las sedes HQ, S1 y S2, consultar su
 
 - [Aplicación NOC](app.py), disponible en `127.0.0.1:9120`.
 - [Historial de incidentes](historial_s04.py) mediante SQLite.
-- [Exportador y métricas](../observabilidad/README.md) en el entorno de la fase 04.
+- [Exportador y métricas](../observabilidad/README.md) en el entorno multisede.
 
 ## Resultados
 
@@ -20,4 +20,4 @@ El sistema distingue entre fuente disponible, entorno desmontado y estado `UNKNO
 
 ## Documentación relacionada
 
-[Resultados de las fases 01–04](../../docs/validacion/s01-s04-resultados.md) · [Capturas de la fase 04](../../evidencias/capturas/fase4/README.md).
+[Resultados de entorno, red y observabilidad](../../docs/validacion/s01-s04-resultados.md) · [Capturas de observabilidad](../../evidencias/capturas/fase4/README.md).

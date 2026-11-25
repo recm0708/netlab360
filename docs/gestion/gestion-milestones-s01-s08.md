@@ -1,10 +1,10 @@
-# Gestión y aceptación de hitos de las fases 01–10
+# Gestión y aceptación de hitos
 
 ## Estado vigente
 
 Las fases 01–07 están cerradas. Las fases 08–10 están abiertas y disponen de alcance, issues y criterios de aceptación propios.
 
-Utilizamos la denominación «Fase 01», «Fase 02» y sucesivas en la documentación técnica. Los títulos de los hitos de GitHub utilizan «Fase 1», «Fase 2» y sucesivos, como convención administrativa. Conservamos los códigos S01, S02 y sucesivos exclusivamente como identificadores técnicos cuando forman parte de rutas, archivos, esquemas, ensayos, prefijos de issues y pull requests o evidencias originales.
+La documentación técnica utiliza títulos y referencias por componente. Los títulos de los hitos de GitHub utilizan «Fase 1», «Fase 2» y sucesivos, como convención administrativa. Conservamos los códigos S01, S02 y sucesivos exclusivamente como identificadores técnicos cuando forman parte de rutas, archivos, esquemas, ensayos, prefijos de issues y pull requests o evidencias originales.
 
 | Hito | Estado | Criterio central |
 |---|---|---|
