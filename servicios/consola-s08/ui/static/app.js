@@ -381,7 +381,12 @@ function initializeConsole() {
   let busy = false;
   let activityTimer = null;
   let lastActivitySent = -Infinity;
-  const jobsView = createJobsView(() => session ? {...session, active: serverNow() < session.warningAt} : null, authRequest);
+  // El proceso previo puede servir archivos nuevos sin tener registrada la ruta del módulo.
+  const jobsView = typeof createJobsView === "function"
+    ? createJobsView(() => session ? {...session, active: serverNow() < session.warningAt} : null, authRequest)
+    : {controls(){}, reset(){}, sync(){
+      if (location.pathname === "/diagnostics") document.getElementById("jobs-notice").textContent = "Ejecución de pruebas no habilitada en esta instancia.";
+    }};
 
   // Los plazos proceden del servidor. El reloj monotónico evita que un
   // cambio del reloj local prolongue la presentación de una sesión vencida.
