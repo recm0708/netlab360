@@ -2,6 +2,7 @@
 import importlib.util
 from pathlib import Path
 import sys
+import subprocess
 import unittest
 
 PACKAGE = Path(__file__).resolve().parents[1] / "servicios/consola-s08/api"
@@ -54,6 +55,36 @@ class SLOTests(unittest.TestCase):
         self.assertEqual(row["nominal_slots"], 90)
         self.assertEqual(row["nominal_shortfall"], 1)
         self.assertIsNone(row["meets_observed_target"])
+
+    def test_pilot_icmp_capability_scope(self):
+        # Importar en otro intérprete para no mezclar el paquete api de los demás tests.
+        pilot = Path(__file__).resolve().parents[1] / "scripts/s08/piloto_sondas_y_stream.py"
+        code = """
+import runpy, sys
+args = runpy.run_path(sys.argv[1])["unit_args"]
+hq = "nl360-s02-h-hq-120"
+s2 = "nl360-s02-h-s2-320"
+for unit, ns in (("pilot-bb-hq", hq), ("pilot-bb-s2", s2)):
+    command = args(unit, ns, icmp_raw=True)
+    assert "--property=CapabilityBoundingSet=CAP_NET_RAW" in command
+    assert "--property=AmbientCapabilities=CAP_NET_RAW" in command
+    assert "--property=NoNewPrivileges=yes" in command
+    assert "--property=User=netlab360-s08-worker" in command
+for unit, ns in (("pilot-am", None), ("pilot-tcp-10s-tx", hq)):
+    command = args(unit, ns)
+    assert "--property=CapabilityBoundingSet=" in command
+    assert "--property=AmbientCapabilities=" in command
+for unit, ns, root in (("pilot-am", hq, False), ("pilot-bb-hq", None, False),
+                       ("pilot-bb-hq", "nl360-s02-h-s1-220", False),
+                       ("pilot-bb-hq", hq, True)):
+    try:
+        args(unit, ns, root=root, icmp_raw=True)
+    except ValueError:
+        continue
+    raise AssertionError("ICMP capability granted outside permitted scope")
+"""
+        subprocess.run([sys.executable, "-I", "-B", "-c", code, str(pilot)],
+                       check=True, timeout=10)
 
     def test_invalid_counts(self):
         for args in ((3, 30, 30, 30, 30), (5, True, 1, 1, 1), (5, 1, 2, 1, 1),
