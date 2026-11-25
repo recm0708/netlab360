@@ -17,6 +17,9 @@ NoNewPrivileges=yes
 ProtectHome=yes
 PrivateTmp=yes
 # Acota la vida de la unidad y termina todos sus procesos al detenerla.
-RuntimeMaxSec=90
+RuntimeMaxSec=700
+# Limitar los archivos temporales de salida de los ejecutores y evitar volcados.
+LimitFSIZE=2097152
+LimitCORE=0
 TimeoutStopSec=3
 KillMode=control-group

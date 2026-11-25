@@ -9,7 +9,7 @@ import sys
 ROOT = Path("/usr/local/libexec/netlab360/s08-broker")
 API_FILES = (
     "__init__.py", "probe_catalog.py", "probe_executor.py", "transfer_executor.py",
-    "content_executor.py", "content_worker.py", "job_contract.py", "probe_broker.py",
+    "content_executor.py", "content_worker.py", "job_contract.py", "probe_broker.py", "broker_transfer.py",
 )
 
 
@@ -35,12 +35,16 @@ def main():
     # El intérprete aislado solo importa desde la copia instalada, nunca desde HOME.
     sys.path.insert(0, str(ROOT))
     from api.probe_broker import serve
+    from api.broker_transfer import execute
 
     allowed_uid = pwd.getpwnam("netlab360-s08-api").pw_uid
     if allowed_uid <= 0:
         raise RuntimeError("INVALID_SERVICE_IDENTITY")
+    worker = pwd.getpwnam("netlab360-s08-worker")
+    if min(worker.pw_uid, worker.pw_gid) <= 0 or worker.pw_uid == allowed_uid:
+        raise RuntimeError("INVALID_WORKER_IDENTITY")
     with socket.socket(fileno=os.dup(0)) as conn:
-        serve(conn, allowed_uid)
+        serve(conn, allowed_uid, transfer=lambda selection: execute(selection, worker.pw_uid, worker.pw_gid))
 
 
 if __name__ == "__main__":
