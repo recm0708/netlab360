@@ -67,7 +67,13 @@ def stop(unit):
         raise RuntimeError("UNIT_STOP_UNCONFIRMED:" + unit + ":" + state)
 
 
-def unit_args(unit, namespace=None, lifetime=90, root=False):
+def unit_args(unit, namespace=None, lifetime=90, root=False, icmp_raw=False):
+    """Conceder capacidad ICMP solo al exporter de los contextos autorizados."""
+    if icmp_raw and (root or namespace not in (
+            catalog.ENDPOINTS["HQ"].namespace, catalog.ENDPOINTS["S2"].namespace)
+            or not unit.endswith(("-bb-hq", "-bb-s2"))):
+        raise ValueError("INVALID_ICMP_PRIVILEGE_SCOPE")
+    capability = "CAP_NET_RAW" if icmp_raw else ""
     command = ["/usr/bin/sudo", "-n", "--", "/usr/bin/systemd-run", "--quiet",
                "--collect", "--unit=" + unit,
                "--property=Type=exec", "--property=NoNewPrivileges=yes",
@@ -76,7 +82,8 @@ def unit_args(unit, namespace=None, lifetime=90, root=False):
                "--property=LimitFSIZE=2097152", "--property=LimitCORE=0"]
     if not root:
         command += [f"--property=User={ACCOUNT}", f"--property=Group={ACCOUNT}",
-                    "--property=CapabilityBoundingSet=", "--property=AmbientCapabilities=",
+                    "--property=CapabilityBoundingSet=" + capability,
+                    "--property=AmbientCapabilities=" + capability,
                     "--property=ProtectHome=yes"]
     if namespace:
         command += ["--property=NetworkNamespacePath=/run/netns/" + namespace]
@@ -84,12 +91,12 @@ def unit_args(unit, namespace=None, lifetime=90, root=False):
 
 
 @contextmanager
-def service(unit, command, namespace=None, lifetime=90, root=False):
+def service(unit, command, namespace=None, lifetime=90, root=False, icmp_raw=False):
     """Confinar duración y retirar la unidad aunque falle una comprobación."""
     if active(unit):
         raise RuntimeError("UNIT_ALREADY_ACTIVE")
     try:
-        run(unit_args(unit, namespace, lifetime, root) + command)
+        run(unit_args(unit, namespace, lifetime, root, icmp_raw) + command)
         yield
     finally:
         stop(unit)
@@ -144,6 +151,35 @@ def metric(raw, name):
     return value
 
 
+def verify_blackbox_privileges(unit, namespace, worker, icmp_raw):
+    """Comprobar la identidad efectiva, namespace y capacidades del proceso real."""
+    pid = int(run(["/usr/bin/systemctl", "show", unit, "--property=MainPID", "--value"]).stdout)
+    if pid <= 1:
+        raise ValueError("BLACKBOX_PID")
+    status = sudo("/usr/bin/cat", f"/proc/{pid}/status").stdout
+    fields = dict(line.split(":", 1) for line in status.splitlines() if ":" in line)
+    for key, expected in (("Uid", worker.pw_uid), ("Gid", worker.pw_gid)):
+        if [int(x) for x in fields[key].split()] != [expected] * 4:
+            raise PermissionError("BLACKBOX_IDENTITY:" + key)
+    if any(int(x) != worker.pw_gid for x in fields["Groups"].split()):
+        raise PermissionError("BLACKBOX_SUPPLEMENTARY_GROUPS")
+    expected = 1 << 13 if icmp_raw else 0
+    for key in ("CapInh", "CapPrm", "CapEff", "CapBnd", "CapAmb"):
+        if int(fields[key].strip(), 16) != expected:
+            raise PermissionError("BLACKBOX_CAPABILITY:" + key)
+    if fields["NoNewPrivs"].strip() != "1":
+        raise PermissionError("BLACKBOX_NO_NEW_PRIVILEGES")
+    actual = sudo("/usr/bin/stat", "-Lc", "%d:%i", f"/proc/{pid}/ns/net").stdout.strip()
+    target = sudo("/usr/bin/stat", "-Lc", "%d:%i", "/run/netns/" + namespace).stdout.strip()
+    if actual != target:
+        raise PermissionError("BLACKBOX_NAMESPACE")
+    print(f"BLACKBOX_PRIVILEGIOS={unit} UID={worker.pw_uid} GID={worker.pw_gid} CAP={expected:016x} NNP=1",
+          flush=True)
+    return {"uid": worker.pw_uid, "gid": worker.pw_gid,
+            "capability": "CAP_NET_RAW" if icmp_raw else "NONE",
+            "no_new_privileges": True, "namespace_verified": True}
+
+
 def blackbox(stage, evidence, prefix, binary):
     config = stage / "blackbox.yml"
     config.write_bytes((REPO / "servicios/observabilidad/blackbox/s08-blackbox.yml").read_bytes())
@@ -157,12 +193,15 @@ def blackbox(stage, evidence, prefix, binary):
         ping_range = netns(namespace, "/usr/sbin/sysctl", "-n", "net.ipv4.ping_group_range").stdout.split()
         low, high = map(int, ping_range)
         print(f"ICMP_GROUP_RANGE={origin}:{low}:{high}:GID={worker.pw_gid}", flush=True)
-        if not low <= worker.pw_gid <= high:
-            raise PermissionError("ICMP_GROUP_NOT_ALLOWED:" + origin)
+        # Un rango vacío impide ping sockets sin privilegios. No modificar sysctl.
+        icmp_raw = not low <= worker.pw_gid <= high
+        print("ICMP_MODO=" + origin + ":" + ("CAP_NET_RAW" if icmp_raw else "PING_GROUP"),
+              flush=True)
         unit = prefix + "-bb-" + origin.lower()
         with service(unit, [str(binary), "--config.file=" + str(config),
-                            "--web.listen-address=127.0.0.1:9115"], namespace):
+                            "--web.listen-address=127.0.0.1:9115"], namespace, icmp_raw=icmp_raw):
             wait_for(lambda: active(unit) and not free(namespace, 9115))
+            privileges = verify_blackbox_privileges(unit, namespace, worker, icmp_raw)
             for identifier in slo.PROBES:
                 item = slo.probe(identifier)
                 if item["origin"] != origin:
@@ -178,7 +217,8 @@ def blackbox(stage, evidence, prefix, binary):
                 (evidence / (identifier + ".prom")).write_text(raw, encoding="utf-8")
                 success = metric(raw, "probe_success")
                 duration = metric(raw, "probe_duration_seconds")
-                row = dict(item, success=success, duration_s=duration)
+                row = dict(item, success=success, duration_s=duration,
+                           privileges=privileges)
                 if item["module"] == "http_service":
                     row["http_status"] = metric(raw, "probe_http_status_code")
                     if row["http_status"] != 200:
@@ -189,6 +229,9 @@ def blackbox(stage, evidence, prefix, binary):
                 print(f"SONDA={identifier} EXITO={success:.0f} DURACION_S={duration:.6f}", flush=True)
         if not free(namespace, 9115):
             raise RuntimeError("BLACKBOX_PORT_NOT_RELEASED")
+        if netns(namespace, "/usr/sbin/sysctl", "-n", "net.ipv4.ping_group_range").stdout.split() != ping_range:
+            raise RuntimeError("ICMP_GROUP_RANGE_CHANGED:" + origin)
+        print("ICMP_GROUP_RANGE_INTACTO=" + origin, flush=True)
     if len(rows) != len(slo.PROBES):
         raise ValueError("BLACKBOX_CATALOG_INCOMPLETE")
     write(evidence / "sondas.json", {"source": "BLACKBOX_REAL", "probes": rows})
