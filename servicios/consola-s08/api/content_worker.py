@@ -4,6 +4,7 @@ import hashlib
 import json
 import os
 import socket
+import sys
 import time
 
 PORT = 5202
@@ -14,7 +15,7 @@ HQ = "10.70.20.20"
 DESTINATIONS = ("10.71.20.20", "10.72.20.20")
 
 
-def send_stream(conn, volume, bitrate, clock=time.monotonic, pause=time.sleep):
+def send_stream(conn, volume, bitrate, clock=time.monotonic, pause=time.sleep, progress=None):
     """Generar bloques deterministas, medir bytes entregados al socket y SHA-256."""
     digest = hashlib.sha256()
     sent = 0
@@ -27,6 +28,8 @@ def send_stream(conn, volume, bitrate, clock=time.monotonic, pause=time.sleep):
         conn.sendall(data)
         digest.update(data)
         sent += size
+        if progress is not None:
+            progress(sent, clock() - start)
         delay = size * 8 / bitrate - (clock() - tick)
         if delay > 0:
             pause(delay)
@@ -34,7 +37,7 @@ def send_stream(conn, volume, bitrate, clock=time.monotonic, pause=time.sleep):
     return {"bytes": sent, "sha256": digest.hexdigest(), "duration_s": clock() - start}
 
 
-def receive_stream(conn, volume, clock=time.monotonic):
+def receive_stream(conn, volume, clock=time.monotonic, progress=None):
     """Calcular el hash de los bytes realmente recibidos y exigir EOF exacto."""
     digest = hashlib.sha256()
     received = 0
@@ -45,6 +48,8 @@ def receive_stream(conn, volume, clock=time.monotonic):
             raise ValueError("PREMATURE_EOF")
         digest.update(data)
         received += len(data)
+        if progress is not None:
+            progress(received, clock() - start)
     if conn.recv(1):
         raise ValueError("EXCESS_CONTENT")
     return {"bytes": received, "sha256": digest.hexdigest(), "duration_s": clock() - start}
@@ -56,7 +61,20 @@ def main():
     parser.add_argument("--role", choices=("sender", "receiver"), required=True)
     parser.add_argument("--site", choices=DESTINATIONS, required=True)
     parser.add_argument("--volume", type=int, choices=VOLUMES, required=True)
+    parser.add_argument("--progress", action="store_true")
     args = parser.parse_args()
+    # Las muestras se escriben en stderr; stdout conserva el resultado final V1.
+    period = 5 if args.volume >= 1_000_000_000 else 1
+    last = 0.0
+
+    def report(total, elapsed):
+        nonlocal last
+        if elapsed - last >= period:
+            print("NL360_PROGRESS " + json.dumps({"role": args.role, "bytes": total,
+                  "elapsed_s": elapsed}, allow_nan=False), file=sys.stderr, flush=True)
+            last = elapsed
+
+    progress = report if args.progress else None
     if os.geteuid() == 0:
         parser.error("ROOT_FORBIDDEN")
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
@@ -64,7 +82,7 @@ def main():
         if args.role == "sender":
             sock.bind((HQ, 0))
             sock.connect((args.site, PORT))
-            result = send_stream(sock, args.volume, BITRATE)
+            result = send_stream(sock, args.volume, BITRATE, progress=progress)
         else:
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             sock.bind((args.site, PORT))
@@ -74,7 +92,7 @@ def main():
                 conn.settimeout(10)
                 if peer[0] != HQ:
                     raise ValueError("UNAUTHORIZED_PEER")
-                result = receive_stream(conn, args.volume)
+                result = receive_stream(conn, args.volume, progress=progress)
     result.update(role=args.role, site=args.site, uid=os.geteuid(), target_bytes=args.volume)
     print(json.dumps(result, allow_nan=False))
 
