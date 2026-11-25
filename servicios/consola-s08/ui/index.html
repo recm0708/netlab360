@@ -126,8 +126,10 @@
               <label>Configuración <select id="jobs-profile" disabled></select></label>
             </div>
             <p id="jobs-profile-note" class="muted"></p>
-            <button id="jobs-start" type="button" disabled>Iniciar prueba</button>
-            <button id="jobs-cancel" type="button" class="secondary" disabled>Cancelar trabajo</button>
+            <div class="action-row">
+              <button id="jobs-start" type="button" disabled>Iniciar prueba</button>
+              <button id="jobs-cancel" type="button" class="secondary" disabled>Cancelar trabajo</button>
+            </div>
           </section>
           <section class="panel" id="jobs-result-panel">
             <h2 id="jobs-title" tabindex="-1">Resultado de la prueba</h2>
@@ -148,13 +150,15 @@
             <p id="jobs-metrics"></p>
             <div id="jobs-diagnostic-panel" hidden><p id="jobs-diagnostic-note" class="muted"></p><ul id="jobs-diagnostic-rows"></ul></div>
             <details><summary>Resultado detallado</summary><pre id="jobs-output"></pre></details>
-            <button type="button" id="jobs-json" disabled>Exportar JSON</button>
-            <button type="button" id="jobs-csv" disabled>Exportar CSV</button>
+            <div class="action-row">
+              <button type="button" id="jobs-json" disabled>Exportar JSON</button>
+              <button type="button" id="jobs-csv" disabled>Exportar CSV</button>
+            </div>
           </section>
           <section class="panel">
             <h2>Historial propio</h2>
             <p class="muted">Últimas 50 pruebas propias, activas primero. Ver resultado abre el panel superior sin salir de esta página.</p>
-            <button type="button" id="jobs-refresh" disabled>Actualizar historial</button>
+            <div class="action-row"><button type="button" id="jobs-refresh" disabled>Actualizar historial</button></div>
             <div class="dashboard-table-wrap"><table class="dashboard-table jobs-table"><thead><tr><th>Fecha y hora</th><th>Tipo de prueba</th><th>Configuración</th><th>Ruta</th><th>Estado</th><th>Resultado</th></tr></thead><tbody id="jobs-history"></tbody></table></div>
           </section>
         </section>
