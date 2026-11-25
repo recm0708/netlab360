@@ -1,4 +1,4 @@
-# Mediciones activas de rendimiento — Fase 06
+# Mediciones activas de rendimiento
 
 ## Descripción
 

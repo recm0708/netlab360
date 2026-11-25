@@ -1,4 +1,4 @@
-# Falla HTTP HQ y etiquetado independiente — Fase 06
+# Falla HTTP HQ y etiquetado independiente
 
 ## Descripción y alcance
 

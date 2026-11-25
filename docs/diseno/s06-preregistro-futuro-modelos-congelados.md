@@ -1,4 +1,4 @@
-# Prerregistro y congelación del estudio histórico — Fase 06
+# Prerregistro y congelación del estudio histórico
 
 ## Descripción
 

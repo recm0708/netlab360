@@ -1,4 +1,4 @@
-# Guardia privilegiada y temporizador sin mutación — Fase 06
+# Guardia privilegiada y temporizador sin mutación
 
 ## Antecedente
 

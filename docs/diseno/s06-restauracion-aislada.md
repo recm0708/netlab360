@@ -1,4 +1,4 @@
-# Restauración de qdisc en namespace aislado — Fase 06
+# Restauración de qdisc en namespace aislado
 
 ## Antecedente
 

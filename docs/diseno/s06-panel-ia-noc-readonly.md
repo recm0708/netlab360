@@ -1,4 +1,4 @@
-# Panel de diagnóstico IA en el NOC — Fase 06
+# Panel de diagnóstico IA en el NOC
 
 ## Descripción y fuentes
 

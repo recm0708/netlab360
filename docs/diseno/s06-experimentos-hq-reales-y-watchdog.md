@@ -1,4 +1,4 @@
-# Intervención controlada y watchdog del cliente HQ — Fase 06
+# Intervención controlada y watchdog del cliente HQ
 
 ## Descripción y alcance
 

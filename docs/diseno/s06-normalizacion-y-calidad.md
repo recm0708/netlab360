@@ -1,4 +1,4 @@
-# Normalización y calidad de datos de telemetría — Fase 06
+# Normalización y calidad de datos de telemetría
 
 ## Descripción
 

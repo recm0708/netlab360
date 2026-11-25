@@ -1,4 +1,4 @@
-# Evaluación binaria exploratoria por sesiones — Fase 06
+# Evaluación binaria exploratoria por sesiones
 
 ## Descripción y alcance
 

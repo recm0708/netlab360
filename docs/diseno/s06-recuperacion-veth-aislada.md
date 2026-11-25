@@ -1,4 +1,4 @@
-# Recuperación de veth aislada ante pérdida del controlador — Fase 06
+# Recuperación de veth aislada ante pérdida del controlador
 
 ## Antecedente
 

@@ -1,4 +1,4 @@
-# Escenarios experimentales y etiquetado verificable — Fase 06
+# Escenarios experimentales y etiquetado verificable
 
 ## Antecedentes observacionales
 

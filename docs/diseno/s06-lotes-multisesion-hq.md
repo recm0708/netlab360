@@ -1,4 +1,4 @@
-# Adquisición experimental multisesión en HQ — Fase 06
+# Adquisición experimental multisesión en HQ
 
 ## Antecedente
 

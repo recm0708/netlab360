@@ -1,4 +1,4 @@
-# Estados de incertidumbre IA y observación LACP/SDN — Fase 06
+# Estados de incertidumbre IA y observación LACP/SDN
 
 ## Alcance
 

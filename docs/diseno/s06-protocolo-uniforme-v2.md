@@ -1,4 +1,4 @@
-# Protocolo experimental uniforme V2 — Fase 06
+# Protocolo experimental uniforme V2
 
 ## Motivación y alcance
 

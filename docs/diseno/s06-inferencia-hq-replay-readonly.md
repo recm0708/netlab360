@@ -1,4 +1,4 @@
-# Inferencia histórica y API de solo lectura — Fase 06
+# Inferencia histórica y API de solo lectura
 
 ## Descripción
 
