@@ -157,3 +157,8 @@ html, body { background:var(--surface); color:var(--text); }
 #swagger-ui .swagger-ui .btn:not(.execute):not(.cancel) {
   border-color:var(--control-line,var(--line));
 }
+
+/* Las tablas del proveedor conservan su distribución semántica; compactamos las celdas. */
+#swagger-ui .swagger-ui table :is(th,td) {
+  vertical-align:middle; text-align:left; padding:5px 9px;
+}
