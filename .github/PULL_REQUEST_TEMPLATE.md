@@ -20,9 +20,9 @@ Describimos el propósito, los componentes modificados, las issues relacionadas 
 
 ## Metadatos
 
-- [ ] Asignar etiquetas pertinentes y responsable cuando corresponda.
-- [ ] Asignar milestone únicamente si el alcance pertenece a un hito inequívoco; dejar vacío para cambios transversales.
+- [ ] Asignar al menos una etiqueta pertinente y un responsable (assignee); ambos son obligatorios.
+- [ ] Asignar milestone si el alcance pertenece a un hito inequívoco; justificar su ausencia para cambios transversales.
 
 ## Observaciones
 
-Adaptamos las tareas al alcance antes de la aceptación; las verificaciones no aplicables se explican en lugar de afirmar que se ejecutaron. No fusionamos un PR con casillas pendientes, CI exigible fallida o evidencia insuficiente. Si una nueva revisión modifica un criterio aprobado, volvemos a validarlo. Las tareas del PR no sustituyen los criterios de sus issues.
+Adaptamos las tareas al alcance antes de la aceptación; las verificaciones no aplicables se explican en lugar de afirmar que se ejecutaron. No fusionamos un PR con casillas pendientes, CI exigible fallida o evidencia insuficiente. Si una nueva revisión modifica un criterio aprobado, volvemos a validarlo. Las tareas del PR no sustituyen los criterios de sus issues. Cada issue requiere etiquetas pertinentes, responsable, milestone y Type nativo cuando GitHub lo permita; las etiquetas tipo:* identifican el dominio técnico, no sustituyen el campo nativo. Una CI histórica fallida se documenta con su resolución y no se presenta como aprobada.
