@@ -89,6 +89,13 @@ const byId=id=>d.links.find(l=>l.id===id);
 assert.equal(m.edgePath(byId("S05-HA-HTTP-PRINCIPAL"),"detailed"),"M276 590 H174");
 assert.equal(m.edgePath(byId("S05-HA-HTTP-RESPALDO"),"detailed"),"M330 613 V690 H905 V360 H1136");
 assert.equal(m.edgePath(byId("S05-HA-ACCESO-FRONTAL"),"detailed"),"M284 390 H439 V590 H384");
+assert.equal(m.viewport("summary").join(" "),"0 0 1250 620");
+assert.equal(m.viewport("detailed","S1").join(" "),"970 5 450 440");
+assert.throws(()=>m.viewport("summary","external"));
+let box=m.moveViewport("summary",m.viewport("summary"),0.8);
+assert(box[2]<1250);assert(box[3]<620);
+box=m.moveViewport("summary",box,1,99,99);
+assert(box[0]+box[2]<=1250);assert(box[1]+box[3]<=620);
 m.reset(svg);assert.equal(svg.children.length,0);
 """
 
@@ -108,6 +115,9 @@ class TopologyVisualTests(unittest.TestCase):
         self.assertIn('id="topology-workspace"', html)
         self.assertIn("topologyWorkspace.requestFullscreen()", js)
         self.assertIn("document.exitFullscreen()", js)
+        self.assertIn('id="topology-site"', html)
+        self.assertIn("applyTopologyBox();", js)
+        self.assertIn("moveViewport(topologyMode", js)
         self.assertIn('if(status===429)', js)
         self.assertIn("scheduleTopology(delay)", js)
         self.assertIn('await debugRead("/api/v1/topology")', js)

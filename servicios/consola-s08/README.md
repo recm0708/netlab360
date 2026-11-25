@@ -364,3 +364,17 @@ la selección durante las consultas. La limitación compartida de frecuencia
 provoca reintentos, no el borrado del inventario. Los estados caducados o
 no disponibles pasan a desconocidos; al perder sesión eliminamos todos
 los datos. La presentación detallada admite pantalla completa nativa.
+
+## Navegación y supervisión por dominio
+
+Aplicamos encuadre por sede, acercamiento, alejamiento, desplazamiento y
+restablecimiento sobre ambas vistas SVG sin modificar el inventario. El
+encuadre se conserva durante las consultas. Retiramos el enlace auxiliar
+de salto y los recuadros adicionales de foco, conservando la selección
+funcional y una indicación discreta para el teclado.
+
+Las vistas WAN, LAN, HTTP/HA, LACP y SDN reutilizan las observaciones
+validadas de la consola, con procedencia y vigencia por recurso. No
+atribuimos adyacencias OSPF, cumplimiento ACL, tráfico ni disponibilidad
+extremo a extremo a muestras administrativas o de control. Esas
+comprobaciones requieren las adquisiciones y pruebas correspondientes.

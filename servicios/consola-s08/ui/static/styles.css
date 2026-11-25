@@ -1,4 +1,4 @@
-/* Sistema visual base: colores semánticos, disposición adaptable y foco visible. */
+/* Sistema visual base: colores semánticos, disposición adaptable y selección funcional. */
 :root {
   color-scheme: dark;
   --button-text: #102137;
@@ -41,7 +41,12 @@ p { margin: 8px 0; }
 .muted { color: var(--muted); font-size: .86rem; }
 button { font: inherit; padding: 9px 15px; color: var(--button-text); background: var(--accent); border: 0; border-radius: 6px; font-weight: 600; cursor: pointer; }
 button:disabled { opacity: .6; cursor: wait; }
-:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+/* Sin recuadro de foco adicional; el teclado conserva una señal discreta. */
+:focus { outline: none; }
+a:focus-visible, button:focus-visible, summary:focus-visible { text-decoration: underline; text-underline-offset: 4px; }
+input:focus-visible, select:focus-visible, textarea:focus-visible { border-bottom-color: var(--accent); box-shadow: inset 0 -2px var(--accent); }
+.topology-item:focus-visible .topology-node-label, .topology-item:focus-visible .topology-edge-label { text-decoration: underline; }
+.topology-item:focus-visible .topology-edge { stroke-width: 4; }
 .status-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 14px; }
 .panel { min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 9px; padding: 20px; margin-bottom: 14px; }
 .status-grid .panel { margin: 0; }
@@ -57,8 +62,6 @@ dt, dd { margin: 0; overflow-wrap: anywhere; }
 dd { text-align: right; color: var(--muted); }
 #notice { font-size: .85rem; }
 footer { color: var(--muted); padding: 16px 28px; border-top: 1px solid var(--line); font-size: .8rem; }
-.skip { position: absolute; left: 12px; top: -60px; background: var(--surface); color: var(--text); padding: 8px; z-index: 5; }
-.skip:focus { top: 8px; }
 @media (max-width: 1000px) { .status-grid { grid-template-columns: 1fr; } }
 @media (max-width: 700px) {
   .shell { grid-template-columns: minmax(0, 1fr); }
@@ -156,13 +159,11 @@ nav a { min-height: 42px; gap: 11px; border: 0; }
   color: var(--button-text);
   border-radius: 8px;
 }
-#navigation a.current:focus-visible { outline-color: var(--button-text); }
 .nav-symbol { display: block; width: 24px; height: 24px; flex: 0 0 24px; }
 .menu-symbol { display: block; width: 23px; height: 23px; }
 #menu-toggle { padding: 8px; }
 #navigation { min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; scrollbar-gutter: stable; padding: 0 5px 8px; }
 #navigation a { position: relative; }
-#navigation a:focus-visible { outline-offset: -3px; }
 @media (min-width: 701px) {
   .shell { height: 100dvh; min-height: 0; overflow: hidden; grid-template-columns: 270px minmax(0, 1fr); }
   .sidebar { position: static; height: auto; min-height: 0; align-self: stretch; overflow: hidden; display: flex; flex-direction: column; padding: 20px 8px 10px; }
@@ -192,7 +193,7 @@ nav a { min-height: 42px; gap: 11px; border: 0; }
 #menu-toggle:hover .menu-line:last-child { transform: translateY(1px); }
 #navigation a { transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease; }
 #navigation .nav-symbol { transition: transform 180ms ease; }
-#navigation a:hover .nav-symbol, #navigation a:focus-visible .nav-symbol { transform: translateY(-1px) scale(1.1); }
+#navigation a:hover .nav-symbol { transform: translateY(-1px) scale(1.1); }
 #navigation a:active .nav-symbol { transform: scale(.93); }
 @keyframes selected-icon { from { transform: scale(.9); } to { transform: scale(1); } }
 #navigation a.current .nav-symbol { animation: selected-icon 180ms ease-out; }
@@ -259,8 +260,8 @@ details.summary > summary { cursor: pointer; font-weight: 600; }
 .topology-node-box { fill:var(--surface); stroke:var(--edge); stroke-width:2.5; }
 .topology-node-label { fill:var(--text); font-size:14px; font-weight:700; }
 .topology-node-sub,.topology-edge-label { fill:var(--muted); font-size:11px; }
-.topology-item.selected .topology-node-box,.topology-item:focus-visible .topology-node-box { stroke:var(--accent); stroke-width:5; }
-.topology-item.selected .topology-edge,.topology-item:focus-visible .topology-edge { stroke-width:6; filter:drop-shadow(0 0 2px var(--accent)); }
+.topology-item.selected .topology-node-box { stroke:var(--accent); stroke-width:5; }
+.topology-item.selected .topology-edge { stroke-width:6; filter:drop-shadow(0 0 2px var(--accent)); }
 .topology-item:hover .topology-node-box { stroke-width:4; }
 .topology-inspector dl { display:block; overflow-wrap:anywhere; }
 .topology-inspector dt { margin-top:10px; color:var(--muted); font-size:.85rem; }
@@ -281,6 +282,13 @@ details.summary > summary { cursor: pointer; font-weight: 600; }
 
 /* El halo de selección no sustituye el color de estado de un enlace o equipo. */
 .topology-highlight { fill:none; stroke:transparent; stroke-width:9; pointer-events:none; }
-.topology-item.selected .topology-highlight,.topology-item:focus-visible .topology-highlight { stroke:var(--accent); }
-.topology-item.selected .topology-edge,.topology-item:focus-visible .topology-edge { stroke-width:3; filter:none; }
-.topology-item.selected .topology-node-box,.topology-item:focus-visible .topology-node-box { stroke:var(--edge); stroke-width:3; filter:drop-shadow(0 0 4px var(--accent)); }
+.topology-item.selected .topology-highlight { stroke:var(--accent); }
+.topology-item.selected .topology-edge { stroke-width:3; filter:none; }
+.topology-item.selected .topology-node-box { stroke:var(--edge); stroke-width:3; filter:drop-shadow(0 0 4px var(--accent)); }
+
+/* Navegación del mapa y tablas de supervisión por dominio. */
+.topology-toolbar { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:10px 0 14px; }
+.topology-toolbar label { display:flex; align-items:center; gap:8px; }
+.topology-toolbar select { font:inherit; background:var(--surface); color:var(--text); border:1px solid var(--line); border-radius:6px; padding:7px; }
+#network-view table { width:100%; border-collapse:collapse; }
+#network-view th,#network-view td { text-align:left; padding:10px; border-bottom:1px solid var(--line); }

@@ -11,7 +11,6 @@
   <script src="/ui/static/topology.js"></script>
 </head>
 <body>
-  <a class="skip" href="#main">Ir al contenido</a>
   <!-- Estructura inicial sin datos privados ni acciones operacionales. -->
   <div class="shell" id="console-shell" hidden>
     <aside class="sidebar" aria-label="Secciones de NETLAB360">
@@ -54,7 +53,7 @@
           <button id="logout" class="secondary" type="button" disabled>Cerrar sesión</button>
         </div>
       </header>
-      <main id="main" tabindex="-1">
+      <main id="main">
         <p id="auth-notice" role="status" aria-live="polite" class="muted"></p>
         <section id="home-view">
         <div class="heading">
@@ -107,12 +106,24 @@
           <h1 id="module-title"></h1>
           <div id="module-placeholder" class="panel"><h2>Función no disponible</h2><p>La vista de este módulo aún no está habilitada. No se han realizado consultas ni acciones.</p><a href="/home">Volver al inicio</a></div>
         </section>
+        <section id="network-view" hidden>
+          <div class="heading"><div><p class="eyebrow">Supervisión</p><h1 id="network-title"></h1><p id="network-scope" class="muted"></p></div><button id="network-refresh" type="button">Actualizar estado</button></div>
+          <p id="network-status" class="muted" role="status">Esperando observaciones autenticadas.</p>
+          <section class="panel"><h2>Observaciones por recurso</h2><div class="dashboard-table-wrap"><table><thead><tr><th>Fuente</th><th>Recurso</th><th>Vigencia</th><th>Estado</th><th>Observación</th><th>Fecha y hora</th></tr></thead><tbody id="network-rows"></tbody></table></div></section>
+          <p><a href="/topology">Consultar topología e inspector</a> · <a href="/observability">Consultar históricos</a></p>
+        </section>
         <section id="topology-view" hidden>
           <div id="topology-workspace">
             <div class="heading"><div><p class="eyebrow">Supervisión</p><h1 id="topology-title">Topología en vivo</h1><p class="muted">Inventario multisede y observaciones reales de red.</p></div>
               <div class="topology-controls"><button id="topology-run" type="button">Actualizar topología</button><a id="topology-expand" class="topology-action" href="/topology?view=detailed" target="_blank" rel="noopener">Abrir diagrama detallado ↗</a><a id="topology-return" class="topology-action" href="/topology" hidden>Vista resumida</a><button id="topology-fullscreen" type="button" hidden>Pantalla completa</button></div>
             </div>
             <p id="topology-status" role="status" aria-live="polite">Esperando sesión.</p>
+            <div class="topology-toolbar">
+              <label>Enfocar sede <select id="topology-site"><option value="all">Todas las sedes</option><option value="HQ">HQ</option><option value="S1">S1</option><option value="S2">S2</option></select></label>
+              <button type="button" class="secondary" id="topology-zoom-in" title="Acercar">+</button><button type="button" class="secondary" id="topology-zoom-out" title="Alejar">−</button>
+              <button type="button" class="secondary" id="topology-left" title="Desplazar a la izquierda">←</button><button type="button" class="secondary" id="topology-up" title="Desplazar arriba">↑</button><button type="button" class="secondary" id="topology-down" title="Desplazar abajo">↓</button><button type="button" class="secondary" id="topology-right" title="Desplazar a la derecha">→</button>
+              <button type="button" class="secondary" id="topology-reset">Restablecer vista</button>
+            </div>
             <div class="topology-layout">
               <section class="panel topology-map"><svg id="topology-map" viewBox="0 0 1250 620" aria-label="Diagrama interactivo multisede"></svg></section>
               <section class="panel topology-inspector"><h2>Inspector</h2><p id="topology-selection" class="muted">Seleccione un equipo o enlace.</p><dl id="topology-details"></dl></section>

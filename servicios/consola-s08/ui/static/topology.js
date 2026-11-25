@@ -206,6 +206,24 @@
       g.setAttribute("aria-pressed",String(active));
     }
   }
+  // El encuadre es local a cada pestaña y no cambia los datos ni la selección.
+  function viewport(mode,site="all"){
+    const {config}=geometry(mode);
+    const [x,y,w,h]=config.box.split(" ").map(Number);
+    if(site==="all")return [x,y,w,h];
+    if(!Object.hasOwn(config.sites,site))throw new Error("SITE");
+    const [sx,sy]=config.sites[site];
+    return [Math.max(0,sx-10),Math.max(0,sy-10),config.width+20,config.height+20];
+  }
+  function moveViewport(mode,box,zoom=1,dx=0,dy=0){
+    const [, ,maxW,maxH]=viewport(mode);
+    const [x,y,w,h]=box;
+    const scale=Math.max(0.2*maxW/w,0.2*maxH/h,Math.min(zoom,maxW/w,maxH/h));
+    const nw=Math.min(maxW,w*scale),nh=Math.min(maxH,h*scale);
+    const nx=Math.min(maxW-nw,Math.max(0,x+(w-nw)/2+dx*w));
+    const ny=Math.min(maxH-nh,Math.max(0,y+(h-nh)/2+dy*h));
+    return [nx,ny,nw,nh];
+  }
   function reset(svg){mounted.delete(svg);svg.replaceChildren();}
-  root.NetlabTopology=Object.freeze({valid,name,details,render,reset,view,aged,isFresh:fresh,logicalState,edgePath,geometry});
+  root.NetlabTopology=Object.freeze({valid,name,details,render,reset,view,aged,isFresh:fresh,logicalState,edgePath,geometry,viewport,moveViewport});
 })(typeof window==="undefined"?globalThis:window);

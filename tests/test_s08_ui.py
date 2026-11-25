@@ -391,3 +391,18 @@ class UIHttpTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class NetworkViewStructureTests(unittest.TestCase):
+    def test_domain_views_and_focus(self):
+        html = (UI / "index.html").read_text(encoding="utf-8")
+        css = (UI / "static/styles.css").read_text(encoding="utf-8")
+        js = (UI / "static/app.js").read_text(encoding="utf-8")
+        self.assertNotIn('class="skip"', html)
+        self.assertNotIn("outline: 3px solid", css)
+        self.assertIn('id="network-rows"', html)
+        for route in ("/wan", "/lan", "/services", "/lacp", "/sdn"):
+            self.assertIn(f'"{route}":{{title:', js)
+        self.assertIn("dashboardBatch(key,data,started)", js)
+        self.assertIn("clearNetwork();", js)
+        self.assertIn("No acredita forwarding ni cumplimiento de ACL", js)

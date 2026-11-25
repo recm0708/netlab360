@@ -344,6 +344,7 @@ function initializeConsole() {
     clearDashboard();
     clearHistory();
     clearTopology();
+    clearNetwork();
     if (idleDialog.open) idleDialog.close();
     shell.hidden = true;
     recoveryPanel.hidden = false;
@@ -413,6 +414,8 @@ function initializeConsole() {
         loadDebug().then(() => restoreContentIfUnchanged());
       } else if (location.pathname === "/observability") {
         updateHistory().then(() => restoreContentIfUnchanged());
+      } else if (networkConfig[location.pathname]) {
+        updateNetwork().then(() => restoreContentIfUnchanged());
       } else if (location.pathname === "/topology") {
         updateTopology().then(() => restoreContentIfUnchanged());
       }
@@ -452,6 +455,7 @@ function initializeConsole() {
       clearDashboard();
       clearHistory();
       clearTopology();
+    clearNetwork();
       // Otra pestaña puede haber renovado la misma sesión. Consultamos una vez
       // sin extender el plazo; una respuesta no válida retira la identidad.
       if (!busy) recover();
@@ -567,7 +571,9 @@ function initializeConsole() {
     const debug = active.dataset.view === "debug";
     const history = active.dataset.view === "observability";
     const topology = active.dataset.view === "topology";
-    document.getElementById("module-view").hidden = home || debug || history || topology;
+    const network = ["/wan","/lan","/services","/lacp","/sdn"].includes(location.pathname);
+    document.getElementById("module-view").hidden = home || debug || history || topology || network;
+    document.getElementById("network-view").hidden = !network;
     document.getElementById("topology-view").hidden = !topology;
     document.getElementById("history-view").hidden = !history;
     document.getElementById("debug-view").hidden = !debug;
@@ -870,6 +876,70 @@ function initializeConsole() {
     if(!document.hidden&&dashboardAuto.checked&&dashboardAllowed()) updateDashboard();
   });
 
+  // Vistas de dominio: reutilizamos los contratos validados del panel inicial.
+  const networkConfig=Object.freeze({
+    "/wan":{title:"WAN / OSPF",key:"metrics",prefix:"WAN-END-",scope:"Estado administrativo de extremos WAN. Adyacencias OSPF y conectividad extremo a extremo aún no verificadas en esta vista."},
+    "/lan":{title:"LAN / VLAN / ACL",key:"metrics",prefix:"VLAN-",scope:"Estado administrativo de subinterfaces VLAN. No acredita forwarding ni cumplimiento de ACL."},
+    "/services":{title:"Servicios HTTP / HA",key:"sources",prefix:"FRONTAL_HQ",scope:"Selección de backend observada desde S2; no acredita disponibilidad desde todas las sedes."},
+    "/lacp":{title:"Agregación LACP",key:"sources",prefix:"LACP-",scope:"Miembros de bond observados en switch y cliente. No acredita capacidad agregada ni tráfico."},
+    "/sdn":{title:"SDN / OVS / Faucet",key:"sources",prefix:"FAUCET",scope:"Conexión al controlador y flujos observados; no acredita forwarding."}
+  });
+  const networkCurrent=networkConfig[location.pathname];
+  const networkBody=document.getElementById("network-rows"),networkStatus=document.getElementById("network-status");
+  const networkRefresh=document.getElementById("network-refresh");
+  let networkEpoch=0,networkBusy=false,networkBatches={},networkSignature="";
+  if(networkCurrent){
+    document.getElementById("network-title").textContent=networkCurrent.title;
+    document.getElementById("network-scope").textContent=networkCurrent.scope;
+  }
+  function networkAllowed(){return !!networkCurrent&&session!==null&&serverNow()<session.expiresAt;}
+  function clearNetwork(){
+    networkEpoch++;networkBusy=false;networkBatches={};networkSignature="";
+    networkBody.replaceChildren();networkStatus.textContent="Sin observaciones autenticadas.";networkRefresh.disabled=false;
+  }
+  function renderNetwork(){
+    if(!networkAllowed())return;
+    const rows=dashboardRows(networkBatches,performance.now()).filter(r=>
+      r.source===(networkCurrent.key==="metrics"?"PROMETHEUS_S04":"NOC_S05")&&r.resource.startsWith(networkCurrent.prefix));
+    const signature=JSON.stringify(rows.map(r=>[r.resource,r.quality,r.state,r.stamp,r.details]));
+    if(signature===networkSignature)return;
+    networkSignature=signature;
+    const fragment=document.createDocumentFragment();
+    for(const row of rows){
+      const tr=document.createElement("tr");
+      for(const [i,value] of [row.label,row.name,qualityLabels[row.quality],stateLabels[row.state],dashboardDetail(row),row.stamp?formatPanama(new Date(row.stamp)):"—"].entries()){
+        const td=document.createElement("td");td.textContent=value;
+        if(i===2)td.dataset.state=row.quality==="VALID"?"ok":row.quality==="STALE"?"warn":"unknown";
+        if(i===3)td.dataset.state=row.state.toLowerCase();
+        tr.append(td);
+      }
+      fragment.append(tr);
+    }
+    networkBody.replaceChildren(fragment);
+  }
+  async function updateNetwork(){
+    if(!networkAllowed()||networkBusy||serverNow()>=session.warningAt)return;
+    const epoch=networkEpoch,key=networkCurrent.key,started=performance.now();
+    networkBusy=true;networkRefresh.disabled=true;
+    try{
+      const {status,data}=await debugRead(dashboardPaths[key]);
+      if(epoch!==networkEpoch||!networkAllowed())return;
+      if(status===401||status===403){clearNetwork();recover();return;}
+      if(status===429){networkStatus.textContent="Consulta compartida ocupada; reintento en la próxima actualización.";return;}
+      networkBatches[key]=status===200?{rows:dashboardBatch(key,data,started)}:{error:"ERROR"};
+      networkStatus.textContent=status===200?"Última consulta: "+formatPanama(new Date(serverNow()*1000)):"Fuente no disponible.";
+    }catch{
+      if(epoch!==networkEpoch)return;
+      networkBatches[key]={error:"ERROR"};networkStatus.textContent="Fuente no disponible.";
+    }finally{
+      if(epoch===networkEpoch){networkBusy=false;networkRefresh.disabled=false;renderNetwork();}
+    }
+  }
+  networkRefresh.addEventListener("click",updateNetwork);
+  setInterval(()=>{if(networkAllowed())renderNetwork();},1000);
+  setInterval(()=>{if(networkAllowed()&&!document.hidden)updateNetwork();},15000);
+  document.addEventListener("visibilitychange",()=>{if(networkAllowed()&&!document.hidden)updateNetwork();});
+
   // Una consulta fija alimenta ambas vistas. Los errores transitorios no borran el mapa.
   const topologyMap=document.getElementById("topology-map");
   const topologyRun=document.getElementById("topology-run");
@@ -882,6 +952,19 @@ function initializeConsole() {
   let topologyEpoch=0,topologyBusy=false,topologyData=null,topologySelected=null;
   let topologyReceived=0,topologyUnavailable=false,topologyTimer=null,topologyInspectorKey="";
   const detailed=topologyMode==="detailed";
+  const topologySite=document.getElementById("topology-site");
+  let topologyBox=window.NetlabTopology.viewport(topologyMode);
+  function applyTopologyBox(){topologyMap.setAttribute("viewBox",topologyBox.join(" "));}
+  function resetTopologyBox(){topologySite.value="all";topologyBox=window.NetlabTopology.viewport(topologyMode);applyTopologyBox();}
+  topologySite.addEventListener("change",()=>{
+    topologyBox=window.NetlabTopology.viewport(topologyMode,topologySite.value);applyTopologyBox();
+  });
+  for(const [id,zoom,dx,dy] of [["zoom-in",0.8,0,0],["zoom-out",1.25,0,0],["left",1,-0.2,0],["right",1,0.2,0],["up",1,0,-0.2],["down",1,0,0.2]]){
+    document.getElementById("topology-"+id).addEventListener("click",()=>{
+      topologyBox=window.NetlabTopology.moveViewport(topologyMode,topologyBox,zoom,dx,dy);applyTopologyBox();
+    });
+  }
+  document.getElementById("topology-reset").addEventListener("click",resetTopologyBox);
   document.getElementById("topology-expand").hidden=detailed;
   document.getElementById("topology-return").hidden=!detailed;
   topologyFull.hidden=!detailed;
@@ -896,6 +979,7 @@ function initializeConsole() {
     topologyUnavailable=false;topologyInspectorKey="";
     clearTimeout(topologyTimer);topologyTimer=null;
     window.NetlabTopology.reset(topologyMap);topologyDetails.replaceChildren();
+    resetTopologyBox();
     topologySelection.textContent="Seleccione un equipo o enlace.";
     topologyStatus.textContent="Sin observación topológica vigente.";
     topologyRun.disabled=false;
@@ -914,6 +998,7 @@ function initializeConsole() {
       topologySelected=topologySelected===id?null:id;
       renderTopology();
     },topologyMode);
+    applyTopologyBox();
     const item=[...display.nodes,...display.links].find(x=>x.id===topologySelected);
     const label=item?model.name(item):"Seleccione un equipo o enlace.";
     const rows=item?model.details(item):[];
