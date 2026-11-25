@@ -81,8 +81,9 @@ class StreamTests(unittest.TestCase):
                 patch.object(B, "global_lock", available), patch.object(S, "run", return_value=S.final("CANCELLED", cleanup=True)) as run:
             left.sendall(json.dumps(dict(PAYLOAD, stream=True)).encode() + b"\n")
             B.serve(right, 997, worker=(994, 971))
-            result = json.loads(left.recv(4096))
-            self.assertEqual(result, S.final("CANCELLED", cleanup=True))
+            with left.makefile("rb") as stream:
+                self.assertEqual(json.loads(stream.readline()), {"kind":"accepted"})
+                self.assertEqual(json.loads(stream.readline()), S.final("CANCELLED", cleanup=True))
             self.assertEqual(run.call_args.args[1], select(PAYLOAD))
             self.assertEqual(run.call_args.args[2:], (994, 971))
 
@@ -103,7 +104,7 @@ class StreamTests(unittest.TestCase):
         conn.getsockopt.return_value = struct.pack("3i", 1, 0, 0)
         frames = (json.dumps({"kind":"progress","sample":EVENT}) + "\n"
                   + json.dumps(S.final("CANCELLED", cleanup=True)) + "\n").encode()
-        conn.recv.side_effect = [frames[:17], frames[17:]]
+        conn.recv.side_effect = [b'{"kind":"accepted"}\n', frames[:17], frames[17:]]
         emit = Mock()
         with patch.object(C, "check_identity"), patch.object(C.socket, "socket", return_value=conn):
             result = C.request_stream(PAYLOAD, emit, lambda: True)
@@ -115,7 +116,7 @@ class StreamTests(unittest.TestCase):
         conn = MagicMock()
         conn.__enter__.return_value = conn
         conn.getsockopt.return_value = struct.pack("3i", 1, 0, 0)
-        conn.recv.return_value = (json.dumps(S.final("CANCELLED", cleanup=True))+"\n").encode()
+        conn.recv.side_effect = [b'{"kind":"accepted"}\n', (json.dumps(S.final("CANCELLED", cleanup=True))+"\n").encode()]
         with patch.object(C,"check_identity"), patch.object(C.socket,"socket",return_value=conn):
             with self.assertRaisesRegex(ValueError,"STREAM_UNREQUESTED_CANCEL"):
                 C.request_stream(PAYLOAD,Mock(),lambda:False)
