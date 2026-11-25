@@ -66,3 +66,70 @@ def request(payload):
             if b"\n" in data:
                 break
         return decode(bytes(data))
+
+
+def request_stream(payload, on_sample, cancelled):
+    """Recibir muestras reales y solicitar cancelación en la conexión propietaria."""
+    from .stream_protocol import MAX_EVENTS, MAX_FRAME, sample
+    selection = select(payload)
+    if selection.action != "test.content.tcp":
+        raise ValueError("STREAM_NOT_ENABLED")
+    check_identity()
+    deadline = time.monotonic() + min(710, selection.deadline_s + 45)
+    with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as conn:
+        conn.settimeout(3)
+        conn.connect(str(SOCKET))
+        credentials = conn.getsockopt(socket.SOL_SOCKET, socket.SO_PEERCRED, struct.calcsize("3i"))
+        if struct.unpack("3i", credentials)[1] != 0:
+            raise ValueError("BROKER_SERVER_IDENTITY")
+        conn.sendall(json.dumps(dict(selection.parameters(), stream=True)).encode() + b"\n")
+        buffer = bytearray()
+        previous = {}
+        count = 0
+        cancel_sent = False
+        while time.monotonic() < deadline:
+            if not cancel_sent and cancelled():
+                conn.settimeout(3)
+                conn.sendall(b"CANCEL\n")
+                cancel_sent = True
+            conn.settimeout(0.25)
+            try:
+                chunk = conn.recv(8192)
+            except TimeoutError:
+                continue
+            if not chunk:
+                raise ValueError("STREAM_DISCONNECTED")
+            buffer.extend(chunk)
+            while b"\n" in buffer:
+                raw, _, tail = buffer.partition(b"\n")
+                buffer = bytearray(tail)
+                if len(raw) + 1 > MAX_FRAME:
+                    raise ValueError("STREAM_FRAME_LIMIT")
+                message = json.loads(raw, object_pairs_hook=unique_object)
+                if type(message) is not dict:
+                    raise ValueError("STREAM_INVALID")
+                if set(message) == {"kind", "sample"} and message["kind"] == "progress":
+                    event = message["sample"]
+                    if type(event) is not dict or count >= MAX_EVENTS:
+                        raise ValueError("STREAM_EVENT_LIMIT")
+                    role = event.get("role")
+                    if role not in ("sender", "receiver"):
+                        raise ValueError("STREAM_ROLE")
+                    previous[role] = sample(event, selection.profile, previous.get(role))
+                    count += 1
+                    on_sample(event)
+                    continue
+                if (set(message) != {"kind", "status", "result", "cleanup_verified"}
+                        or message["kind"] != "final" or buffer
+                        or message["status"] not in ("OK", "CANCELLED", "BUSY", "UNCERTAIN", "NOT_ENABLED")
+                        or type(message["cleanup_verified"]) is not bool
+                        or (message["status"] in ("OK", "CANCELLED")) != message["cleanup_verified"]
+                        or (message["status"] == "OK") != (type(message["result"]) is dict)
+                        or (message["status"] != "OK" and message["result"] is not None)):
+                    raise ValueError("STREAM_FINAL_INVALID")
+                if message["status"] == "CANCELLED" and not cancel_sent:
+                    raise ValueError("STREAM_UNREQUESTED_CANCEL")
+                return message
+            if len(buffer) >= MAX_FRAME:
+                raise ValueError("STREAM_FRAME_LIMIT")
+    raise TimeoutError("STREAM_DEADLINE")
