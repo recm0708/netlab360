@@ -68,13 +68,13 @@ function createJobsView(context, request) {
     text("state",job.status + (data.execution_quality==="UNCERTAIN"?" · INCIERTO":data.cancel_requested&&active(job)?" · Cancelación solicitada":""));
     byId("state").dataset.state=data.execution_quality==="UNCERTAIN"?"warn":job.status==="SUCCEEDED"?"ok":job.status==="FAILED"?"fault":"unknown";
     text("detail",job.job_id+" · "+data.selection.profile+" · "+(routes[data.selection.route]||data.selection.route));
-    text("tx",number(m?.bytes_sent ?? tx?.bytes)+" bytes");
-    text("rx",number(m?.bytes_received ?? rx?.bytes)+" bytes");
+    text("tx",number(m?.bytes_sent ?? (data.progress?.length ? tx?.bytes : undefined))+" bytes");
+    text("rx",number(m?.bytes_received ?? (data.progress?.length ? rx?.bytes : undefined))+" bytes");
     text("tx-rate",number(m?.sender_mbps ?? tx?.rate)+" Mbit/s");
     text("rx-rate",number(m?.receiver_mbps ?? rx?.rate)+" Mbit/s");
     const targets={"content-100mb":100000000,"content-500mb":500000000,"content-1gb":1000000000,"content-2gb":2000000000,"content-5gb":5000000000};
     const target=m?.target_bytes ?? targets[data.selection.profile];
-    const received=m?.bytes_received ?? rx?.bytes;
+    const received=m?.bytes_received ?? (data.progress?.length ? rx?.bytes : undefined);
     const measured=Number.isFinite(target)&&target>0&&Number.isFinite(received);
     byId("progress").hidden=!measured;
     if (measured) byId("progress").value=Math.min(100,received*100/target);
@@ -129,7 +129,12 @@ function createJobsView(context, request) {
     if(pending||!permitted())return;
     const epoch=generation;pending=true;controls();
     try{await work(epoch);}
-    catch(error){if(epoch===generation&&permitted()){notice.textContent="Consulta no confirmada ("+error.message+"). Actualice antes de repetir.";configured=false;loaded=false;}}
+    catch(error){if(epoch===generation&&permitted()){
+      const unavailable=!loaded && error.message==="HTTP 404";
+      if(["HTTP 401","HTTP 403"].includes(error.message)){reset();lastPoll=performance.now()+5000;}
+      else{configured=false;loaded=unavailable;lastPoll=performance.now()+5000;}
+      notice.textContent=unavailable?"Ejecución de pruebas no habilitada en esta instancia.":"Consulta no confirmada ("+error.message+"). No se repite ninguna ejecución.";
+    }}
     finally{if(epoch===generation){pending=false;controls();}}
   }
   async function sync() {
