@@ -98,6 +98,7 @@ class StructureTests(unittest.TestCase):
         self.assertIn("row.map(csvCell)", export)
         self.assertNotIn("const cell=", export)
         self.assertNotIn("let historyEpoch", export)
+        self.assertIn("Copia histórica puntual, sin adquisición continua de transiciones.", html)
 
     def test_vector_icons_and_scroll_layout(self):
         html = (UI / "index.html").read_text(encoding="utf-8")
