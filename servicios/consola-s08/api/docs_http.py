@@ -1,4 +1,6 @@
 """Documentación OpenAPI de operador y recursos Swagger locales."""
+from copy import deepcopy
+
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, Response
 from . import sessions, swagger_assets
@@ -28,6 +30,7 @@ SwaggerUIBundle({
   dom_id: "#swagger-ui",
   deepLinking: true,
   validatorUrl: null,
+  queryConfigEnabled: false,
   persistAuthorization: false,
   supportedSubmitMethods: ["get"],
   tryItOutEnabled: false,
@@ -57,7 +60,27 @@ def register_docs(app: FastAPI, directory):
     def schema(request: Request):
         authorize(request)
         # El esquema describe las rutas registradas, no concede permisos.
-        data = app.openapi()
+        data = deepcopy(app.openapi())
+        data["servers"] = [{"url": "/"}]
+        data.setdefault("components", {}).setdefault("securitySchemes", {})["SessionCookie"] = {
+            "type": "apiKey", "in": "cookie", "name": COOKIE,
+            "description": "Sesión iniciada en NETLAB360; el navegador envía su cookie."
+        }
+        public = {"/healthz", "/api/v1/capabilities", "/api/v1/auth/login"}
+        for path, operations in data["paths"].items():
+            for method, operation in operations.items():
+                if method not in ("get", "post", "put", "patch", "delete", "head", "options"):
+                    continue
+                if path not in public:
+                    operation["security"] = [{"SessionCookie": []}]
+                    responses = operation.setdefault("responses", {})
+                    responses.setdefault("401", {"description": "Sesión no válida"})
+                    responses.setdefault("403", {"description": "Permiso insuficiente"})
+                if method != "get":
+                    operation["description"] = (
+                        operation.get("description", "") +
+                        "\n\nOperación documentada; no ejecutable desde Swagger UI."
+                    ).strip()
         return JSONResponse(data)
 
     @app.get("/docs", include_in_schema=False)

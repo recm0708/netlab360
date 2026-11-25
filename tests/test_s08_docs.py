@@ -71,6 +71,10 @@ class DocsTests(unittest.TestCase):
                 self.assertNotIn("delete", schema["paths"]["/api/v1/alerts"])
                 self.assertNotIn("/docs", schema["paths"])
                 self.assertNotIn("/debug", schema["paths"])
+                self.assertEqual(schema["servers"], [{"url": "/"}])
+                self.assertEqual(schema["paths"]["/api/v1/alerts"]["get"]["security"], [{"SessionCookie": []}])
+                self.assertNotIn("security", schema["paths"]["/healthz"]["get"])
+                self.assertIn("no ejecutable", schema["paths"]["/api/v1/auth/login"]["post"]["description"])
                 init = client.get("/docs/init.js").text
                 self.assertIn('supportedSubmitMethods: ["get"]', init)
                 self.assertIn("validatorUrl: null", init)
