@@ -905,7 +905,10 @@ function initializeConsole() {
   function renderTopology() {
     if(!topologyData||!topologyAllowed()) return;
     const model=window.NetlabTopology;
-    const aged=model.aged(topologyData,(performance.now()-topologyReceived)/1000,topologyUnavailable);
+    const elapsed=(performance.now()-topologyReceived)/1000;
+    const aged=model.aged(topologyData,elapsed,topologyUnavailable);
+    if(!topologyUnavailable&&!model.isFresh(topologyData.graph,elapsed))
+      topologyStatus.textContent="Observación caducada. Inventario conservado sin estados vigentes.";
     const display=model.view(aged,topologyMode);
     model.render(topologyMap,aged,topologySelected,id=>{
       topologySelected=topologySelected===id?null:id;

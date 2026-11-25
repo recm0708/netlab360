@@ -278,3 +278,9 @@ details.summary > summary { cursor: pointer; font-weight: 600; }
 #topology-workspace:fullscreen .topology-layout { grid-template-columns:minmax(0,1fr) minmax(220px,280px); }
 #topology-workspace:fullscreen #topology-map { max-height:calc(100vh - 185px); }
 @media(max-width:900px){#topology-workspace:fullscreen .topology-layout{grid-template-columns:minmax(0,1fr);}}
+
+/* El halo de selección no sustituye el color de estado de un enlace o equipo. */
+.topology-highlight { fill:none; stroke:transparent; stroke-width:9; pointer-events:none; }
+.topology-item.selected .topology-highlight,.topology-item:focus-visible .topology-highlight { stroke:var(--accent); }
+.topology-item.selected .topology-edge,.topology-item:focus-visible .topology-edge { stroke-width:3; filter:none; }
+.topology-item.selected .topology-node-box,.topology-item:focus-visible .topology-node-box { stroke:var(--edge); stroke-width:3; filter:drop-shadow(0 0 4px var(--accent)); }

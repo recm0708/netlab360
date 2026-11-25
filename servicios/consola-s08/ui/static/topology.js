@@ -142,7 +142,7 @@
     }
     // La relación HTTP es lógica, no un cable conectado a una VLAN.
     if(l.id==="S05-HA-HTTP-PRINCIPAL")return "M"+(ax-54)+" "+ay+" H"+(bx+54);
-    if(l.id==="S05-HA-HTTP-RESPALDO")return "M"+(ax+54)+" "+ay+" H905 V"+by+" H"+(bx-54);
+    if(l.id==="S05-HA-HTTP-RESPALDO")return "M"+ax+" "+(ay+23)+" V690 H905 V"+by+" H"+(bx-54);
     return "M"+ax+" "+(ay+23)+" V"+((ay+by)/2)+" H"+bx+" V"+(by-23);
   }
   function state(item){
@@ -165,7 +165,7 @@
   function render(svg,data,selected,onSelect,mode="summary"){
     const {config,layout,groups}=geometry(mode),display=view(data,mode);
     const items=[...display.links,...display.nodes];
-    const key=mode+":"+items.map(i=>i.id).join("|");
+    const key=mode+":"+items.map(i=>i.id).sort().join("|");
     let cache=mounted.get(svg);
     if(!cache||cache.key!==key||!svg.firstChild){
       svg.replaceChildren();
@@ -178,6 +178,7 @@
       for(const item of display.links){
         const d=edgePath(item,mode),g=element("g",{class:"topology-item topology-link"});
         const backup=item.role==="backup"||item.type==="redundancy";
+        g.append(element("path",{d,class:"topology-highlight"}));
         g.append(element("path",{d,class:"topology-edge"+(backup?" backup":"")}));
         g.append(element("path",{d,class:"topology-hit"}));
         if(item.type==="wan"||item.type==="wan-group"){
@@ -206,5 +207,5 @@
     }
   }
   function reset(svg){mounted.delete(svg);svg.replaceChildren();}
-  root.NetlabTopology=Object.freeze({valid,name,details,render,reset,view,aged,logicalState,edgePath,geometry});
+  root.NetlabTopology=Object.freeze({valid,name,details,render,reset,view,aged,isFresh:fresh,logicalState,edgePath,geometry});
 })(typeof window==="undefined"?globalThis:window);
