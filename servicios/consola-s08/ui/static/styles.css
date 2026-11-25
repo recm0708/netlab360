@@ -255,7 +255,7 @@ details.summary > summary { cursor: pointer; font-weight: 600; }
 .topology-item[data-state="recovery"] { --edge:var(--recovery); }
 .topology-edge { fill:none; stroke:var(--edge); stroke-width:3; }
 .topology-edge.backup { stroke-dasharray:8 5; }
-.topology-hit { stroke:transparent; stroke-width:18; fill:none; }
+.topology-hit { stroke:transparent; stroke-width:9; fill:none; }
 .topology-node-box { fill:var(--surface); stroke:var(--edge); stroke-width:2.5; }
 .topology-node-label { fill:var(--text); font-size:14px; font-weight:700; }
 .topology-node-sub,.topology-edge-label { fill:var(--muted); font-size:11px; }

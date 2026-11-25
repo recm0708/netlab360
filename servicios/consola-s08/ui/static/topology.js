@@ -52,9 +52,11 @@
   function edgePath(l){
     const [ax,ay]=layout[l.from],[bx,by]=layout[l.to];
     if(l.type==="wan"){
-      const primary=l.role==="primary", offset=primary?-10:10;
-      const mid=(l.to==="R-S1"?490:680)+(primary?0:28);
-      return "M"+(ax+58)+" "+(ay+offset)+" H"+mid+" V"+(by+offset)+" H"+(bx-58);
+      const primary=l.role==="primary", north=l.to==="R-S1";
+      const startOffset=north?(primary?-17:-6):(primary?6:17);
+      const endOffset=primary?-9:9;
+      const mid=(north?490:680)+(primary?0:28);
+      return "M"+(ax+54)+" "+(ay+startOffset)+" H"+mid+" V"+(by+endOffset)+" H"+(bx-54);
     }
     if(l.type==="redundancy"){
       const y=l.to==="BACKEND_S1"?620:ay+36;
@@ -70,6 +72,7 @@
   }
   function activate(g,item,selected,onSelect){
     g.setAttribute("role","button");g.setAttribute("tabindex","0");
+    g.setAttribute("data-resource",item.id);g.prepend(element("title",{},name(item)));
     g.setAttribute("aria-label",name(item));g.setAttribute("aria-pressed",String(selected===item.id));
     g.addEventListener("click",()=>onSelect(item.id));
     g.addEventListener("keydown",event=>{
@@ -78,6 +81,7 @@
   }
 
   function render(svg,data,selected,onSelect){
+    const focused=svg.contains(document.activeElement)?document.activeElement.getAttribute("data-resource"):null;
     svg.replaceChildren();
     for(const {site,x,y} of groups){
       svg.append(element("rect",{x,y,width:370,height:site==="HQ"?395:385,rx:12,class:"topology-site"}));
@@ -90,9 +94,9 @@
       g.append(element("path",{d,class:"topology-edge"+(backup?" backup":"")}));
       g.append(element("path",{d,class:"topology-hit"}));
       if(item.type==="wan"){
-        const [ax,ay]=layout[item.from], y=ay+(item.role==="primary"?-10:10);
-        const label=item.role==="primary"?"P":"R";
-        g.append(element("text",{x:ax+70,y:y-3,class:"topology-edge-label"},label));
+        const [bx,by]=layout[item.to], y=by+(item.role==="primary"?-9:9);
+        const label=(item.role==="primary"?"Principal":"Respaldo")+" · "+item.to.slice(2);
+        g.append(element("text",{x:bx-65,y:y-4,"text-anchor":"end",class:"topology-edge-label"},label));
       }
       activate(g,item,selected,onSelect);svg.append(g);
     }
@@ -103,6 +107,9 @@
       const sub=item.type==="router"?"FRR":item.type==="switch"?"Bridge L2":item.type==="server"?"HTTP":"Host de prueba";
       g.append(element("text",{x,y:y+13,"text-anchor":"middle",class:"topology-node-sub"},sub));
       activate(g,item,selected,onSelect);svg.append(g);
+    }
+    if(focused) for(const g of svg.querySelectorAll("[data-resource]")) {
+      if(g.getAttribute("data-resource")===focused) {g.focus({preventScroll:true});break;}
     }
   }
   root.NetlabTopology=Object.freeze({valid,name,details,render});

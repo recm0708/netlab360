@@ -94,7 +94,8 @@ def project(payload, received, transport):
             site, kind = NODES[key]
             if (row["site"], row["type"]) != (site, kind):
                 raise ValueError("INVALID_NODE")
-            status = enum(row["status"], ("running", "offline", "namespace-present", "unknown"))
+            status = enum(row["status"], ("running", "offline", "unknown") if kind in ("router", "server")
+                          else ("namespace-present", "offline", "unknown"))
             verified = fresh if kind == "router" else fresh_ha if kind == "server" else current and root["namespaces_observable"] is True
             entry = {"id": key, "site": site, "type": kind, "label": bounded(row["label"], 80),
                      "detail": bounded(row["detail"]), "status": status if verified else "unknown",
@@ -120,6 +121,9 @@ def project(payload, received, transport):
                      "role": bounded(row["role"], 48), "detail": bounded(row["detail"]),
                      "status": "unknown", "scope": "INVENTORY_ONLY"}
             if kind == "wan":
+                expected_role = "primary" if "PRIMARIA" in key else "backup"
+                if row["role"] != expected_role or status not in ("admin-up", "admin-down", "offline", "unknown"):
+                    raise ValueError("INVALID_WAN")
                 entry.update(status=status if fresh else "unknown", scope="ADMIN_STATE_ONLY",
                              a=bounded(row["a"], 45), b=bounded(row["b"], 45))
                 selection = enum(row["route_selection"], ("selected", "standby", "unavailable", "unknown"))
@@ -131,6 +135,8 @@ def project(payload, received, transport):
                 # El texto original incluye afirmaciones de ruta: separamos la parte estática.
                 entry["detail"] = entry["detail"].split(" · ruta", 1)[0]
             elif kind == "redundancy":
+                if status not in ("running", "offline", "unknown"):
+                    raise ValueError("INVALID_HTTP")
                 selection = enum(row["application_selection"], ("selected", "standby", "unknown"))
                 entry.update(status=status if fresh_ha else "unknown", scope="HTTP_FROM_S2",
                              application_selection=selection if fresh_ha else "unknown")

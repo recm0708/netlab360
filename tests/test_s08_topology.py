@@ -93,6 +93,12 @@ class TopologyTests(unittest.TestCase):
         row["route_gateway"] = "10.78.0.6"
         self.assertEqual(reader.project(data, NOW, "OK")["graph"]["quality"], "INVALID")
 
+    def test_inconsistent_role_rejected(self):
+        data = fixture()
+        row = next(x for x in data["links"] if x["id"] == "WAN-PRIMARIA-HQ-S1")
+        row["role"] = "backup"
+        self.assertEqual(reader.project(data, NOW, "OK")["graph"]["quality"], "INVALID")
+
     def test_fixed_source(self):
         with patch.object(reader.readers, "fetch", return_value=(None, NOW, "UNAVAILABLE")) as fetch:
             result = reader.collect()

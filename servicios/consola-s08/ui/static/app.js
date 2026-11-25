@@ -451,7 +451,7 @@ function initializeConsole() {
     if (remaining <= 0) {
       clearDashboard();
       clearHistory();
-    clearTopology();
+      clearTopology();
       // Otra pestaña puede haber renovado la misma sesión. Consultamos una vez
       // sin extender el plazo; una respuesta no válida retira la identidad.
       if (!busy) recover();
@@ -876,7 +876,7 @@ function initializeConsole() {
   const topologyStatus=document.getElementById("topology-status");
   const topologyDetails=document.getElementById("topology-details");
   const topologySelection=document.getElementById("topology-selection");
-  let topologyEpoch=0,topologyBusy=false,topologyData=null,topologySelected=null,topologyReceived=0;
+  let topologyEpoch=0,topologyBusy=false,topologyData=null,topologySelected=null,topologyDeadline=0;
 
   function topologyAllowed() {
     return location.pathname==="/topology" && session!==null && serverNow()<session.expiresAt;
@@ -914,7 +914,10 @@ function initializeConsole() {
       if(epoch!==topologyEpoch||!topologyAllowed()) return;
       if(status===401||status===403) {clearTopology();recover();return;}
       if(status!==200||!window.NetlabTopology.valid(data)||data.graph.quality!=="VALID") throw new Error("GRAPH");
-      topologyData=data;topologyReceived=performance.now();
+      topologyData=data;
+      const remaining=[data.graph,data.telemetry,data.http].filter(m=>m.quality==="VALID")
+        .map(m=>Math.max(0,(m.max_age_seconds-m.age_seconds)*1000));
+      topologyDeadline=performance.now()+Math.min(15000,...remaining);
       renderTopology();
       topologyStatus.textContent="Consulta: "+formatPanama(new Date(data.graph.observed_at_utc))+
         " · "+data.nodes.length+" equipos y "+data.links.length+" enlaces · "+data.warning_count+" advertencias de origen.";
@@ -927,7 +930,7 @@ function initializeConsole() {
   }
   topologyRun.addEventListener("click",updateTopology);
   setInterval(()=>{
-    if(topologyData&&(!topologyAllowed()||performance.now()-topologyReceived>15000)) clearTopology();
+    if(topologyData&&(!topologyAllowed()||performance.now()>=topologyDeadline)) clearTopology();
   },1000);
   setInterval(()=>{
     if(topologyAllowed()&&!document.hidden) updateTopology();
@@ -1041,8 +1044,7 @@ function initializeConsole() {
   historyWindow.addEventListener("change",clearHistory);
   new MutationObserver(()=>{
     if(historyData&&historyAllowed()) drawHistory(historyData,historyEpoch).catch(()=>{
-      clearHistory();
-    clearTopology();historyStatus.textContent="No fue posible actualizar la apariencia del gráfico.";
+      clearHistory();historyStatus.textContent="No fue posible actualizar la apariencia del gráfico.";
     });
   }).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
 
