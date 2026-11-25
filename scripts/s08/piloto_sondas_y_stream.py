@@ -4,11 +4,13 @@ from collections import Counter
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+import hashlib
 import json
 import math
 from pathlib import Path
 import pwd
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -111,16 +113,55 @@ def wait_for(predicate, seconds=10):
     raise TimeoutError("PILOT_WAIT_TIMEOUT")
 
 
-def package(stage, name, version, binary_names):
-    """Descargar por APT y extraer sin instalar ni iniciar unidades del paquete."""
+def package_digest(path, metadata, name, version):
+    """Validar tamaño y resumen contra el índice APT local de versión exacta."""
+    if not path.is_file() or path.is_symlink():
+        raise ValueError("PACKAGE_FILE")
+    entries = []
+    for block in metadata.split("\n\n"):
+        fields = dict(line.split(": ", 1) for line in block.splitlines()
+                      if not line.startswith((" ", "\t")) and ": " in line)
+        if (fields.get("Package"), fields.get("Version"), fields.get("Architecture")) == (name, version, "amd64"):
+            entries.append((fields.get("Size", ""), fields.get("SHA256", "")))
+    unique = set(entries)
+    if len(unique) != 1:
+        raise ValueError("PACKAGE_APT_METADATA")
+    size, expected = unique.pop()
+    if not size.isdecimal() or not re.fullmatch(r"[0-9a-f]{64}", expected):
+        raise ValueError("PACKAGE_APT_DIGEST")
+    if path.stat().st_size != int(size):
+        raise ValueError("PACKAGE_SIZE")
+    with path.open("rb") as handle:
+        actual = hashlib.file_digest(handle, "sha256").hexdigest()
+    if actual != expected:
+        raise ValueError("PACKAGE_DIGEST")
+    return actual
+
+
+def package(stage, name, version, binary_names, cache=None):
+    """Reutilizar un paquete verificado o descargar por APT sin instalar."""
     target = stage / name
     target.mkdir(mode=0o755)
     target.chmod(0o755)
-    run(["/usr/bin/apt-get", "download", f"{name}={version}"], timeout=120, cwd=target)
+    metadata = run(["/usr/bin/apt-cache", "show", f"{name}={version}"]).stdout
+    if cache is None:
+        run(["/usr/bin/apt-get", "download", f"{name}={version}"], timeout=120, cwd=target)
+    else:
+        source = cache / name
+        if source.is_symlink() or not source.is_dir():
+            raise ValueError("PACKAGE_CACHE_DIRECTORY")
+        candidates = list(source.glob("*.deb"))
+        if len(candidates) != 1:
+            raise ValueError("PACKAGE_CACHE_COUNT")
+        package_digest(candidates[0], metadata, name, version)
+        shutil.copyfile(candidates[0], target / candidates[0].name)
+        print("PAQUETE_REUTILIZADO=" + name, flush=True)
     debs = list(target.glob("*.deb"))
     if len(debs) != 1:
         raise ValueError("PACKAGE_COUNT")
     deb = debs[0]
+    package_digest(deb, metadata, name, version)
+    print("PAQUETE_INTEGRIDAD_APT=OK:" + name, flush=True)
     for field, expected in (("Package", name), ("Version", version), ("Architecture", "amd64")):
         if run(["/usr/bin/dpkg-deb", "-f", str(deb), field]).stdout.strip() != expected:
             raise ValueError("PACKAGE_METADATA:" + field)
@@ -419,7 +460,12 @@ def main():
     import argparse
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--evidence", type=Path, required=True)
+    parser.add_argument("--package-cache", type=Path,
+                        help="Entorno anterior con archivos deb completos; verificar contra APT")
     args = parser.parse_args()
+    cache = args.package_cache
+    if cache is not None and (cache.is_symlink() or not cache.is_dir()):
+        raise ValueError("PACKAGE_CACHE_DIRECTORY")
     evidence = args.evidence.resolve()
     evidence.mkdir(mode=0o700)
     stage = Path(tempfile.mkdtemp(prefix="netlab360-s08-observe."))
@@ -429,9 +475,9 @@ def main():
     completed = False
     try:
         bb = package(stage, "prometheus-blackbox-exporter", "0.26.0-2",
-                     ("prometheus-blackbox-exporter", "blackbox_exporter"))
+                     ("prometheus-blackbox-exporter", "blackbox_exporter"), cache)
         am = package(stage, "prometheus-alertmanager", "0.28.1+ds-3",
-                     ("prometheus-alertmanager", "alertmanager"))
+                     ("prometheus-alertmanager", "alertmanager"), cache)
         blackbox(stage, evidence, prefix, bb)
         alertmanager(stage, evidence, prefix, am)
         iperf(evidence, prefix)
@@ -449,7 +495,6 @@ def main():
                 run(["/usr/bin/sudo", "-n", "-u", ACCOUNT, "--", "/usr/bin/find",
                      str(state), "-mindepth", "1", "-delete"])
                 state.rmdir()
-            import shutil
             shutil.rmtree(stage)
             print("ENTORNO_PILOTO_ELIMINADO=OK", flush=True)
             print("S08_008_PILOTOS=OK", flush=True)
