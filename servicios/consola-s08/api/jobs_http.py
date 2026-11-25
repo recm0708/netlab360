@@ -14,7 +14,7 @@ from .probe_broker import unique_object
 LOG = logging.getLogger(__name__)
 
 
-def dispatch(directory, job_id, transport):
+def dispatch(directory, job_id, transport, stream_transport=None):
     """Ejecutar una sola vez; conservar la reserva si no hay confirmación de limpieza."""
     try:
         job = jobs.claim(directory, job_id)
@@ -22,7 +22,21 @@ def dispatch(directory, job_id, transport):
         LOG.warning("No se pudo reclamar el trabajo %s", job_id)
         return
     try:
-        reply = transport(job["data"]["selection"])
+        if job["data"].get("stream_enabled") is True:
+            if stream_transport is None:
+                raise ValueError("STREAM_NOT_CONFIGURED")
+            reply = stream_transport(job["data"]["selection"],
+                lambda event: jobs.append_progress(directory, job_id, event),
+                lambda: jobs.cancellation_requested(directory, job_id))
+            if reply.get("kind") != "final" or reply.get("cleanup_verified") is not True:
+                jobs.note_uncertain(directory, job_id, "BROKER_UNCONFIRMED")
+                return
+            if reply.get("status") == "CANCELLED":
+                jobs.finish_cancelled(directory, job_id, cleanup_verified=True)
+                return
+            reply = dict(reply, schema="NETLAB360_S08_BROKER_V1")
+        else:
+            reply = transport(job["data"]["selection"])
         if (reply.get("schema") != "NETLAB360_S08_BROKER_V1"
                 or reply.get("status") != "OK"
                 or type(reply.get("result")) is not dict):
@@ -72,7 +86,7 @@ async def payload(request):
         raise HTTPException(400) from None
 
 
-def register_jobs(app: FastAPI, directory, transport):
+def register_jobs(app: FastAPI, directory, transport, stream_transport=None):
     """Registrar exclusivamente con transporte explícito; no hay activación implícita."""
     async def operator(request, *, write=False):
         token = request.cookies.get(COOKIE)
@@ -93,18 +107,28 @@ def register_jobs(app: FastAPI, directory, transport):
     @app.get("/api/v1/jobs/catalog")
     async def job_catalog(request: Request):
         await operator(request)
-        return {"selections": catalog(), "transport_configured": True,
+        rows = [dict(row, execution_enabled=True,
+                     live_progress=stream_transport is not None and row["action"] == "test.content.tcp",
+                     active_cancel=stream_transport is not None and row["action"] == "test.content.tcp")
+                for row in catalog()]
+        return {"selections": rows, "transport_configured": True,
                 "network_mutations_authorized": False}
+
+    @app.get("/api/v1/jobs")
+    async def job_history(request: Request):
+        actor = await operator(request)
+        return {"jobs": await run_in_threadpool(jobs.history, directory, actor), "limit": 50}
 
     @app.post("/api/v1/jobs", status_code=202)
     async def submit(request: Request, background: BackgroundTasks):
         actor = await operator(request, write=True)
         selection = await payload(request)
         try:
-            job = await run_in_threadpool(jobs.enqueue, directory, actor, selection)
+            job = await run_in_threadpool(jobs.enqueue, directory, actor, selection,
+                                          stream_enabled=stream_transport is not None)
         except ValueError as exc:
             raise translate(exc) from None
-        background.add_task(dispatch, directory, job["job_id"], transport)
+        background.add_task(dispatch, directory, job["job_id"], transport, stream_transport)
         return job
 
     @app.get("/api/v1/jobs/{job_id}")
@@ -119,6 +143,6 @@ def register_jobs(app: FastAPI, directory, transport):
     async def cancel(job_id: str, request: Request):
         actor = await operator(request, write=True)
         try:
-            return await run_in_threadpool(jobs.cancel_queued, directory, actor, identifier(job_id))
+            return await run_in_threadpool(jobs.request_cancel, directory, actor, identifier(job_id))
         except ValueError as exc:
             raise translate(exc) from None
