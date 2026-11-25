@@ -133,7 +133,14 @@ def parse_results(profile, route, sender, receiver):
     result["client_reported_receiver_bytes"] = count(reported_rx["bytes"])
     if protocol == "TCP":
         result["retransmissions"] = count(sent["retransmits"])
-        if tx != rx or (volume and not volume <= rx <= volume + 10000):
+        # -n es el objetivo de una medición iPerf3, no una garantía de tamaño exacto.
+        # La exactitud estricta pertenece al ejecutor de contenido.
+        if volume:
+            result["volume_target_met"] = rx >= volume
+            result["volume_excess_bytes"] = max(0, rx - volume)
+            result["volume_shortfall_bytes"] = max(0, volume - rx)
+            result["volume_status"] = "SHORT" if rx < volume else "EXACT" if rx == volume else "EXCEEDED"
+        if tx != rx or (volume and rx < volume):
             result["status"] = "INCOMPLETE"
     else:
         lost, packets = count(received["lost_packets"]), count(received["packets"])
