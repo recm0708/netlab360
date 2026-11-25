@@ -1,5 +1,4 @@
 """Pruebas del historial de notificaciones y configuración autorizada."""
-import importlib.util
 from pathlib import Path
 import runpy
 import tempfile
