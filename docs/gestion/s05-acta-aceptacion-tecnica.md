@@ -1,4 +1,4 @@
-# Acta de aceptación técnica — Fase 05
+# Acta de aceptación técnica
 
 ## Descripción
 

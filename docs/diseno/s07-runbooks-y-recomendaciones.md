@@ -1,4 +1,4 @@
-# Runbooks y recomendaciones — Fase 07
+# Runbooks y recomendaciones
 
 ## Alcance y separación
 

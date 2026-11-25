@@ -1,4 +1,4 @@
-# Evidencia GitOps y CI — Fase 03
+# Evidencia GitOps y CI
 
 ## Descripción
 
