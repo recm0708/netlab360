@@ -266,3 +266,15 @@ details.summary > summary { cursor: pointer; font-weight: 600; }
 .topology-inspector dt { margin-top:10px; color:var(--muted); font-size:.85rem; }
 .topology-inspector dd { margin:2px 0 0; text-align:left; }
 @media(max-width:1100px){.topology-layout{grid-template-columns:minmax(0,1fr);}}
+
+/* Controles de las dos vistas y modo de presentación nativo. */
+.topology-controls { display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
+.topology-action { display:inline-block; padding:11px 14px; border:1px solid var(--line); border-radius:6px; color:var(--text); text-decoration:none; background:var(--surface); }
+.topology-action:hover { border-color:var(--accent); }
+.topology-item[data-state="warn"] { --edge:var(--warn); }
+.topology-edge-label { pointer-events:none; }
+.topology-item.selected .topology-edge { filter:drop-shadow(0 0 3px var(--accent)); }
+#topology-workspace:fullscreen { background:var(--bg); color:var(--text); padding:24px; overflow:auto; }
+#topology-workspace:fullscreen .topology-layout { grid-template-columns:minmax(0,1fr) minmax(220px,280px); }
+#topology-workspace:fullscreen #topology-map { max-height:calc(100vh - 185px); }
+@media(max-width:900px){#topology-workspace:fullscreen .topology-layout{grid-template-columns:minmax(0,1fr);}}

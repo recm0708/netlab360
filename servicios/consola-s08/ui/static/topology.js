@@ -2,17 +2,78 @@
 (function(root){
   "use strict";
   const ns="http://www.w3.org/2000/svg";
-  const sites={HQ:[20,215],S1:[850,10],S2:[850,430]};
-  const layout={},groups=[];
-  for(const [site,[x,y]] of Object.entries(sites)){
-    groups.push({site,x,y});
-    layout["R-"+site]=[x+185,y+75];
-    layout["SW-"+site]=[x+185,y+140];
-    const prefix={HQ:1,S1:2,S2:3}[site];
-    [10,20,30].forEach((v,i)=>layout["H-"+site+"-"+(prefix*100+v)]=[x+65+i*120,y+220]);
+  // Ambas vistas comparten los identificadores del contrato NOC.
+  const modes={
+    summary:{box:"0 0 1250 620",width:420,height:285,sites:{HQ:[20,170],S1:[810,15],S2:[810,320]}},
+    detailed:{box:"0 0 1440 955",width:430,height:420,sites:{HQ:[20,245],S1:[980,15],S2:[980,515]}}
+  };
+  function geometry(mode){
+    const config=modes[mode],layout={},groups=[];
+    for(const [site,[x,y]] of Object.entries(config.sites)){
+      groups.push({site,x,y});
+      layout["R-"+site]=[x+210,y+75];
+      layout["SW-"+site]=[x+210,y+145];
+      const prefix={HQ:1,S1:2,S2:3}[site];
+      [10,20,30].forEach((v,i)=>layout["H-"+site+"-"+(prefix*100+v)]=[x+70+i*140,y+225]);
+    }
+    if(mode==="detailed"){
+      layout.BACKEND_HQ=[120,590];layout.FRONTAL_HQ=[330,590];layout.BACKEND_S1=[1190,360];
+    }
+    return {config,layout,groups};
   }
-  layout.BACKEND_HQ=[100,555];layout.FRONTAL_HQ=[275,555];layout.BACKEND_S1=[1035,350];
+  const layout=geometry("detailed").layout;
+  const mounted=new WeakMap();
 
+  // Una observación vencida conserva la geometría, nunca el estado anterior.
+  function fresh(meta,elapsed){
+    return meta?.quality==="VALID"&&Number.isFinite(meta.age_seconds)&&
+      Number.isFinite(meta.max_age_seconds)&&meta.age_seconds>=0&&
+      elapsed>=0&&meta.age_seconds+elapsed<meta.max_age_seconds;
+  }
+  function aged(data,elapsed,unavailable=false){
+    const graph=!unavailable&&fresh(data.graph,elapsed);
+    const tele=graph&&fresh(data.telemetry,elapsed);
+    const http=graph&&fresh(data.http,elapsed);
+    const safe=item=>{
+      const valid=item.scope==="HTTP_FROM_S2"?http:
+        ["ADMIN_STATE_ONLY","CONTAINER_ONLY"].includes(item.scope)?tele:graph;
+      const copy={...item};
+      if(!valid){copy.status="unknown";copy.detail="Sin observación vigente.";}
+      if("vlan_admin" in copy&&!tele)copy.vlan_admin="unknown";
+      if("route_selection" in copy&&!tele){
+        copy.route_selection="unknown";copy.route_gateway=null;
+      }
+      if("application_selection" in copy&&!http)copy.application_selection="unknown";
+      return copy;
+    };
+    return {...data,nodes:data.nodes.map(safe),links:data.links.map(safe)};
+  }
+
+  function view(data,mode){
+    if(mode==="detailed")return {nodes:data.nodes,links:data.links};
+    const nodes=data.nodes.filter(n=>n.type!=="server");
+    const ids=new Set(nodes.map(n=>n.id));
+    const links=data.links.filter(l=>l.type!=="wan"&&ids.has(l.from)&&ids.has(l.to));
+    for(const site of ["S1","S2"]){
+      const primary=data.links.find(l=>l.id==="WAN-PRIMARIA-HQ-"+site);
+      const backup=data.links.find(l=>l.id==="WAN-RESPALDO-HQ-"+site);
+      if(!primary||!backup)continue;
+      links.push({id:"WAN-GENERAL-HQ-"+site,type:"wan-group",from:"R-HQ",to:"R-"+site,
+        role:"logical",members:[primary,backup]});
+    }
+    return {nodes,links};
+  }
+
+  function down(item){return ["offline","admin-down"].includes(item.status);}
+  function logicalState(item){
+    const [p,b]=item.members;
+    const selected=l=>l.route_selection==="selected"&&l.status==="admin-up";
+    if(selected(p)&&selected(b))return "unknown";
+    if(selected(b))return "recovery";
+    if(selected(p))return down(b)?"warn":"ok";
+    if(down(p)&&down(b))return "fault";
+    return "unknown";
+  }
   function valid(data){
     if(data?.project!=="NETLAB360"||data.schema_version!==1||data.source!=="NOC"||
       data.network_mutations_authorized!==false||data.traffic_measured!==false||
@@ -26,11 +87,22 @@
     "admin-up":"Administrativamente habilitada","admin-down":"Administrativamente deshabilitada",unknown:"Sin verificar"};
   const choices={selected:"Seleccionada",standby:"En espera",unavailable:"No disponible",unknown:"Sin verificar"};
   function name(item){
+    if(item.type==="wan-group")return "WAN lógica · HQ ↔ "+item.to.slice(2);
     if(item.label) return item.type==="host"?"VLAN "+item.vlan:item.label;
     if(item.type==="wan") return (item.role==="primary"?"WAN principal":"WAN respaldo")+" · "+item.from+" ↔ "+item.to;
     return item.role+" · "+item.from+" ↔ "+item.to;
   }
   function details(item){
+    if(item.type==="wan-group"){
+      const rows=[["Alcance","Resumen de dos enlaces; no acredita tráfico"]];
+      for(const m of item.members){
+        const label=m.role==="primary"?"Principal":"Respaldo";
+        rows.push([label,statuses[m.status]||"Sin verificar"],
+          ["FIB "+label,choices[m.route_selection]||"Sin verificar"],
+          ["Extremos "+label,m.a+" ↔ "+m.b]);
+      }
+      return rows;
+    }
     const scopes={CONTAINER_ONLY:"Existencia del contenedor",NAMESPACE_ONLY:"Existencia del namespace",
       HTTP_FROM_S2:"HTTP observado desde S2",ADMIN_STATE_ONLY:"Estado administrativo",INVENTORY_ONLY:"Inventario"};
     const rows=[["Tipo",item.type],["Alcance",scopes[item.scope]||"Sin verificar"],
@@ -49,22 +121,32 @@
     if(label!==undefined)e.textContent=label;
     return e;
   }
-  function edgePath(l){
+  function edgePath(l,mode){
+    const {layout,config}=geometry(mode);
     const [ax,ay]=layout[l.from],[bx,by]=layout[l.to];
-    if(l.type==="wan"){
-      const primary=l.role==="primary", north=l.to==="R-S1";
-      const startOffset=north?(primary?-17:-6):(primary?6:17);
-      const endOffset=primary?-9:9;
-      const mid=(north?490:680)+(primary?0:28);
-      return "M"+(ax+54)+" "+(ay+startOffset)+" H"+mid+" V"+(by+endOffset)+" H"+(bx-54);
+    if(l.type==="wan"||l.type==="wan-group"){
+      const north=l.to==="R-S1",primary=l.role==="primary",logical=l.type==="wan-group";
+      const start=logical?(north?-10:10):north?(primary?-17:-6):(primary?6:17);
+      const end=logical?0:primary?-9:9;
+      const mid=(north?510:mode==="summary"?660:735)+(logical||primary?0:28);
+      return "M"+(ax+54)+" "+(ay+start)+" H"+mid+" V"+(by+end)+" H"+(bx-54);
     }
-    if(l.type==="redundancy"){
-      const y=l.to==="BACKEND_S1"?620:ay+36;
-      return "M"+ax+" "+(ay+20)+" V"+y+" H"+bx+" V"+(by+20);
+    // Los accesos a servidores parten del switch, por corredores laterales.
+    if(l.id==="S05-HA-ACCESO-HQ"){
+      const x=config.sites.HQ[0]+7;
+      return "M"+(ax-54)+" "+ay+" H"+x+" V"+by+" H"+(bx-54);
     }
-    return "M"+ax+" "+ay+" V"+((ay+by)/2)+" H"+bx+" V"+by;
+    if(l.id==="S05-HA-ACCESO-FRONTAL"||l.id==="S05-HA-ACCESO-S1"){
+      const site=l.to==="FRONTAL_HQ"?"HQ":"S1",x=config.sites[site][0]+419;
+      return "M"+(ax+54)+" "+ay+" H"+x+" V"+by+" H"+(bx+54);
+    }
+    // La relación HTTP es lógica, no un cable conectado a una VLAN.
+    if(l.id==="S05-HA-HTTP-PRINCIPAL")return "M"+(ax-54)+" "+ay+" H"+(bx+54);
+    if(l.id==="S05-HA-HTTP-RESPALDO")return "M"+(ax+54)+" "+ay+" H905 V"+by+" H"+(bx-54);
+    return "M"+ax+" "+(ay+23)+" V"+((ay+by)/2)+" H"+bx+" V"+(by-23);
   }
   function state(item){
+    if(item.type==="wan-group")return logicalState(item);
     if(["offline","admin-down"].includes(item.status))return "fault";
     if(item.type==="wan"&&item.route_selection==="selected")return item.role==="backup"?"recovery":"ok";
     if(item.type==="wan"||item.type==="redundancy")return item.application_selection==="selected"?"ok":"unknown";
@@ -80,37 +162,49 @@
     });
   }
 
-  function render(svg,data,selected,onSelect){
-    const focused=svg.contains(document.activeElement)?document.activeElement.getAttribute("data-resource"):null;
-    svg.replaceChildren();
-    for(const {site,x,y} of groups){
-      svg.append(element("rect",{x,y,width:370,height:site==="HQ"?395:385,rx:12,class:"topology-site"}));
-      svg.append(element("text",{x:x+18,y:y+30,class:"topology-site-label"},site==="HQ"?"SEDE CENTRAL · HQ":"SUCURSAL · "+site));
-    }
-    for(const item of data.links){
-      const d=edgePath(item);
-      const g=element("g",{class:"topology-item topology-link"+(selected===item.id?" selected":""),"data-state":state(item)});
-      const backup=item.role==="backup"||item.type==="redundancy";
-      g.append(element("path",{d,class:"topology-edge"+(backup?" backup":"")}));
-      g.append(element("path",{d,class:"topology-hit"}));
-      if(item.type==="wan"){
-        const [bx,by]=layout[item.to], y=by+(item.role==="primary"?-9:9);
-        const label=(item.role==="primary"?"Principal":"Respaldo")+" · "+item.to.slice(2);
-        g.append(element("text",{x:bx-65,y:y-4,"text-anchor":"end",class:"topology-edge-label"},label));
+  function render(svg,data,selected,onSelect,mode="summary"){
+    const {config,layout,groups}=geometry(mode),display=view(data,mode);
+    const items=[...display.links,...display.nodes];
+    const key=mode+":"+items.map(i=>i.id).join("|");
+    let cache=mounted.get(svg);
+    if(!cache||cache.key!==key||!svg.firstChild){
+      svg.replaceChildren();
+      svg.setAttribute("viewBox",config.box);
+      const elements=new Map();
+      for(const {site,x,y} of groups){
+        svg.append(element("rect",{x,y,width:config.width,height:config.height,rx:12,class:"topology-site"}));
+        svg.append(element("text",{x:x+18,y:y+30,class:"topology-site-label"},site==="HQ"?"SEDE CENTRAL · HQ":"SUCURSAL · "+site));
       }
-      activate(g,item,selected,onSelect);svg.append(g);
+      for(const item of display.links){
+        const d=edgePath(item,mode),g=element("g",{class:"topology-item topology-link"});
+        const backup=item.role==="backup"||item.type==="redundancy";
+        g.append(element("path",{d,class:"topology-edge"+(backup?" backup":"")}));
+        g.append(element("path",{d,class:"topology-hit"}));
+        if(item.type==="wan"||item.type==="wan-group"){
+          const [bx,by]=layout[item.to],y=by+(item.type==="wan-group"?0:item.role==="primary"?-9:9);
+          const label=item.type==="wan-group"?"WAN · "+item.to.slice(2):(item.role==="primary"?"Principal":"Respaldo")+" · "+item.to.slice(2);
+          g.append(element("text",{x:bx-65,y:y-4,"text-anchor":"end",class:"topology-edge-label"},label));
+        }
+        activate(g,item,selected,onSelect);svg.append(g);elements.set(item.id,g);
+      }
+      for(const item of display.nodes){
+        const [x,y]=layout[item.id],g=element("g",{class:"topology-item topology-node"});
+        g.append(element("rect",{x:x-54,y:y-23,width:108,height:46,rx:8,class:"topology-node-box"}));
+        g.append(element("text",{x,y:y-3,"text-anchor":"middle",class:"topology-node-label"},item.type==="server"?(item.id==="FRONTAL_HQ"?"Frontal HA":"Backend "+item.site):name(item)));
+        const sub=item.type==="router"?"FRR":item.type==="switch"?"Bridge L2":item.type==="server"?"HTTP":"Host de prueba";
+        g.append(element("text",{x,y:y+13,"text-anchor":"middle",class:"topology-node-sub"},sub));
+        activate(g,item,selected,onSelect);svg.append(g);elements.set(item.id,g);
+      }
+      cache={key,elements};mounted.set(svg,cache);
     }
-    for(const item of data.nodes){
-      const [x,y]=layout[item.id],g=element("g",{class:"topology-item topology-node"+(selected===item.id?" selected":""),"data-state":state(item)});
-      g.append(element("rect",{x:x-54,y:y-23,width:108,height:46,rx:8,class:"topology-node-box"}));
-      g.append(element("text",{x,y:y-3,"text-anchor":"middle",class:"topology-node-label"},item.type==="server"?(item.id==="FRONTAL_HQ"?"Frontal HA":"Backend "+item.site):name(item)));
-      const sub=item.type==="router"?"FRR":item.type==="switch"?"Bridge L2":item.type==="server"?"HTTP":"Host de prueba";
-      g.append(element("text",{x,y:y+13,"text-anchor":"middle",class:"topology-node-sub"},sub));
-      activate(g,item,selected,onSelect);svg.append(g);
-    }
-    if(focused) for(const g of svg.querySelectorAll("[data-resource]")) {
-      if(g.getAttribute("data-resource")===focused) {g.focus({preventScroll:true});break;}
+    // Solo cambian atributos de estado y selección; los nodos SVG no se recrean.
+    for(const item of items){
+      const g=cache.elements.get(item.id),active=selected===item.id;
+      g.setAttribute("data-state",state(item));
+      g.classList.toggle("selected",active);
+      g.setAttribute("aria-pressed",String(active));
     }
   }
-  root.NetlabTopology=Object.freeze({valid,name,details,render});
+  function reset(svg){mounted.delete(svg);svg.replaceChildren();}
+  root.NetlabTopology=Object.freeze({valid,name,details,render,reset,view,aged,logicalState,edgePath,geometry});
 })(typeof window==="undefined"?globalThis:window);

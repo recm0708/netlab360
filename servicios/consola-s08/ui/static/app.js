@@ -870,13 +870,22 @@ function initializeConsole() {
     if(!document.hidden&&dashboardAuto.checked&&dashboardAllowed()) updateDashboard();
   });
 
-  // La topología usa una única consulta fija y elimina datos al vencer la sesión.
+  // Una consulta fija alimenta ambas vistas. Los errores transitorios no borran el mapa.
   const topologyMap=document.getElementById("topology-map");
   const topologyRun=document.getElementById("topology-run");
   const topologyStatus=document.getElementById("topology-status");
   const topologyDetails=document.getElementById("topology-details");
   const topologySelection=document.getElementById("topology-selection");
-  let topologyEpoch=0,topologyBusy=false,topologyData=null,topologySelected=null,topologyDeadline=0;
+  const topologyWorkspace=document.getElementById("topology-workspace");
+  const topologyFull=document.getElementById("topology-fullscreen");
+  const topologyMode=new URLSearchParams(location.search).get("view")==="detailed"?"detailed":"summary";
+  let topologyEpoch=0,topologyBusy=false,topologyData=null,topologySelected=null;
+  let topologyReceived=0,topologyUnavailable=false,topologyTimer=null,topologyInspectorKey="";
+  const detailed=topologyMode==="detailed";
+  document.getElementById("topology-expand").hidden=detailed;
+  document.getElementById("topology-return").hidden=!detailed;
+  topologyFull.hidden=!detailed;
+  document.getElementById("topology-title").textContent=detailed?"Topología detallada":"Topología en vivo";
 
   function topologyAllowed() {
     return location.pathname==="/topology" && session!==null && serverNow()<session.expiresAt;
@@ -884,57 +893,88 @@ function initializeConsole() {
 
   function clearTopology() {
     topologyEpoch++;topologyBusy=false;topologyData=null;topologySelected=null;
-    topologyMap.replaceChildren();topologyDetails.replaceChildren();
+    topologyUnavailable=false;topologyInspectorKey="";
+    clearTimeout(topologyTimer);topologyTimer=null;
+    window.NetlabTopology.reset(topologyMap);topologyDetails.replaceChildren();
     topologySelection.textContent="Seleccione un equipo o enlace.";
     topologyStatus.textContent="Sin observación topológica vigente.";
     topologyRun.disabled=false;
+    if(document.fullscreenElement===topologyWorkspace)document.exitFullscreen().catch(()=>{});
   }
 
   function renderTopology() {
     if(!topologyData||!topologyAllowed()) return;
-    window.NetlabTopology.render(topologyMap,topologyData,topologySelected,id=>{
+    const model=window.NetlabTopology;
+    const aged=model.aged(topologyData,(performance.now()-topologyReceived)/1000,topologyUnavailable);
+    const display=model.view(aged,topologyMode);
+    model.render(topologyMap,aged,topologySelected,id=>{
       topologySelected=topologySelected===id?null:id;
       renderTopology();
-    });
-    topologyDetails.replaceChildren();
-    const item=[...topologyData.nodes,...topologyData.links].find(x=>x.id===topologySelected);
-    topologySelection.textContent=item?window.NetlabTopology.name(item):"Seleccione un equipo o enlace.";
-    if(item) for(const [key,value] of window.NetlabTopology.details(item)) {
-      const dt=document.createElement("dt"),dd=document.createElement("dd");
-      dt.textContent=key;dd.textContent=value;topologyDetails.append(dt,dd);
+    },topologyMode);
+    const item=[...display.nodes,...display.links].find(x=>x.id===topologySelected);
+    const label=item?model.name(item):"Seleccione un equipo o enlace.";
+    const rows=item?model.details(item):[];
+    const key=JSON.stringify([label,rows]);
+    if(key!==topologyInspectorKey){
+      topologyInspectorKey=key;topologySelection.textContent=label;
+      topologyDetails.replaceChildren();
+      for(const [name,value] of rows){
+        const dt=document.createElement("dt"),dd=document.createElement("dd");
+        dt.textContent=name;dd.textContent=value;topologyDetails.append(dt,dd);
+      }
     }
   }
 
+  function scheduleTopology(delay=5000+Math.random()*1500){
+    clearTimeout(topologyTimer);
+    if(location.pathname==="/topology")topologyTimer=setTimeout(updateTopology,delay);
+  }
+
   async function updateTopology() {
-    if(!topologyAllowed()||topologyBusy||serverNow()>=session.warningAt) return;
-    const epoch=topologyEpoch;
+    if(!topologyAllowed()||topologyBusy)return;
+    if(document.hidden||serverNow()>=session.warningAt){scheduleTopology();return;}
+    const epoch=topologyEpoch,started=performance.now();
     topologyBusy=true;topologyRun.disabled=true;
+    let delay;
     try {
       const {status,data}=await debugRead("/api/v1/topology");
       if(epoch!==topologyEpoch||!topologyAllowed()) return;
       if(status===401||status===403) {clearTopology();recover();return;}
+      if(status===429){
+        topologyStatus.textContent="Consulta compartida ocupada. Reintentando automáticamente.";
+        delay=2500+Math.random()*1500;
+        return;
+      }
       if(status!==200||!window.NetlabTopology.valid(data)||data.graph.quality!=="VALID") throw new Error("GRAPH");
-      topologyData=data;
-      const remaining=[data.graph,data.telemetry,data.http].filter(m=>m.quality==="VALID")
-        .map(m=>Math.max(0,(m.max_age_seconds-m.age_seconds)*1000));
-      topologyDeadline=performance.now()+Math.min(15000,...remaining);
+      topologyData=data;topologyReceived=started;topologyUnavailable=false;
       renderTopology();
       topologyStatus.textContent="Consulta: "+formatPanama(new Date(data.graph.observed_at_utc))+
-        " · "+data.nodes.length+" equipos y "+data.links.length+" enlaces · "+data.warning_count+" advertencias de origen.";
+        " · "+data.nodes.length+" equipos y "+data.links.length+" enlaces en inventario · "+data.warning_count+" advertencias de origen.";
     } catch {
       if(epoch!==topologyEpoch) return;
-      clearTopology();topologyStatus.textContent="No hay una topología vigente disponible.";
+      topologyUnavailable=true;
+      renderTopology();
+      topologyStatus.textContent="Fuente temporalmente no disponible. Conservamos el inventario sin estados vigentes.";
     } finally {
-      if(epoch===topologyEpoch) {topologyBusy=false;topologyRun.disabled=false;}
+      if(epoch===topologyEpoch) {topologyBusy=false;topologyRun.disabled=false;scheduleTopology(delay);}
     }
   }
   topologyRun.addEventListener("click",updateTopology);
   setInterval(()=>{
-    if(topologyData&&(!topologyAllowed()||performance.now()>=topologyDeadline)) clearTopology();
+    if(topologyData&&topologyAllowed())renderTopology();
   },1000);
-  setInterval(()=>{
-    if(topologyAllowed()&&!document.hidden) updateTopology();
-  },5000);
+  document.addEventListener("visibilitychange",()=>{
+    if(topologyAllowed()&&!document.hidden)updateTopology();
+  });
+  topologyFull.addEventListener("click",async()=>{
+    try {
+      if(document.fullscreenElement===topologyWorkspace)await document.exitFullscreen();
+      else await topologyWorkspace.requestFullscreen();
+    } catch {topologyStatus.textContent="El navegador no permitió cambiar a pantalla completa.";}
+  });
+  document.addEventListener("fullscreenchange",()=>{
+    topologyFull.textContent=document.fullscreenElement===topologyWorkspace?"Salir de pantalla completa":"Pantalla completa";
+  });
 
   // Las series históricas permanecen en memoria y se descartan al perder la sesión.
   const historyGroup = document.getElementById("history-group");
