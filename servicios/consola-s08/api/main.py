@@ -71,6 +71,8 @@ def create_app(directory: Path | None = None) -> FastAPI:
         acquire = register_sources(app, directory)
         from .debug_http import register_debug
         register_debug(app, directory, acquire, health, capabilities)
+        from .history_http import register_history
+        register_history(app, directory)
         from .ui_http import register_ui
         register_ui(app, directory)
 

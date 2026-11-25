@@ -17,6 +17,9 @@ aceptados de las fases anteriores.
 | [Pruebas del asesor](../../tests/test_s08_advisory.py) | Identidad del servidor, vigencia y límites de lectura |
 | [api/inference_reader.py](api/inference_reader.py) | Inferencia exploratoria S06 mediante NOC |
 | [Pruebas de inferencia](../../tests/test_s08_inference.py) | Abstención, vigencia y acceso HTTP |
+| [api/history_reader.py](api/history_reader.py) | Series históricas delimitadas de scrapes reales |
+| [api/history_http.py](api/history_http.py) | Consulta histórica autenticada |
+| [Pruebas de históricos](../../tests/test_s08_history.py) | Límites, procedencia y autorización |
 | [api/prometheus_reader.py](api/prometheus_reader.py) | Métricas de scrapes mediante el adaptador S07 |
 | [Pruebas de métricas](../../tests/test_s08_metrics.py) | Reutilización, vigencia y acceso HTTP |
 | [api/readers.py](api/readers.py) | Lectura fija de exporter S04 y NOC S05 |
@@ -67,6 +70,23 @@ No interpretamos disponibilidad administrativa como conectividad, ni
 inferencias como incidentes confirmados. Conservamos el estado global
 desconocido hasta contar con criterios operacionales específicos.
 Las capacidades técnicas quedan en un panel desplegable.
+
+## Históricos de observabilidad
+
+Incorporamos la ruta autenticada GET /api/v1/history/{group}/{window}.
+Los grupos permitidos son collection, routers, wan y vlan, y las ventanas
+son 5m, 15m y 1h. Consultamos únicamente series del exportador registrado
+en Prometheus por selectores fijos. Conservamos los timestamps reales de
+scrape mediante vectores de rango, no una interpolación de query_range.
+Condicionamos métricas dependientes a scrapes y lecturas válidas del mismo
+instante; los valores no observables se representan como nulos.
+Limitamos a 2000 muestras por serie, 1 MiB de respuesta de origen,
+una adquisición concurrente y dos segundos entre solicitudes.
+No conservamos datos históricos en almacenamiento web ni sustituimos
+la base TSDB. Los grupos describen disponibilidad de scrape, existencia
+de contenedores y estado administrativo; no acreditan conectividad.
+La presentación Plotly se integra de forma independiente sobre este
+contrato.
 
 ## Explorador técnico
 
