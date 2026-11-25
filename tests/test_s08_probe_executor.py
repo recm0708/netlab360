@@ -1,5 +1,5 @@
 """Pruebas offline del ejecutor manual; no requieren sudo ni namespaces."""
-import importlib
+import importlib.util
 import json
 from pathlib import Path
 import subprocess
@@ -7,8 +7,14 @@ import sys
 import unittest
 from unittest.mock import Mock
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "servicios/consola-s08"))
-M = importlib.import_module("api.probe_executor")
+PACKAGE = Path(__file__).resolve().parents[1] / "servicios/consola-s08/api"
+SPEC = importlib.util.spec_from_file_location(
+    "netlab360_s08_probe_executor", PACKAGE / "__init__.py",
+    submodule_search_locations=[str(PACKAGE)])
+MODULE = importlib.util.module_from_spec(SPEC)
+sys.modules[SPEC.name] = MODULE
+SPEC.loader.exec_module(MODULE)
+from netlab360_s08_probe_executor import probe_executor as M
 
 PING = """64 bytes from 10.71.20.20: icmp_seq=1 ttl=62 time=0.072 ms
 64 bytes from 10.71.20.20: icmp_seq=2 ttl=62 time=0.095 ms
