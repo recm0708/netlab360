@@ -69,12 +69,15 @@ def stop(unit):
         raise RuntimeError("UNIT_STOP_UNCONFIRMED:" + unit + ":" + state)
 
 
-def unit_args(unit, namespace=None, lifetime=90, root=False, icmp_raw=False):
+def unit_args(unit, namespace=None, lifetime=90, root=False, icmp_raw=False, share_root=None):
     """Conceder capacidad ICMP solo al exporter de los contextos autorizados."""
     if icmp_raw and (root or namespace not in (
             catalog.ENDPOINTS["HQ"].namespace, catalog.ENDPOINTS["S2"].namespace)
             or not unit.endswith(("-bb-hq", "-bb-s2"))):
         raise ValueError("INVALID_ICMP_PRIVILEGE_SCOPE")
+    if share_root is not None and (root or namespace is not None or icmp_raw
+                                   or not unit.endswith("-am")):
+        raise ValueError("INVALID_ALERTMANAGER_MOUNT_SCOPE")
     capability = "CAP_NET_RAW" if icmp_raw else ""
     command = ["/usr/bin/sudo", "-n", "--", "/usr/bin/systemd-run", "--quiet",
                "--collect", "--unit=" + unit,
@@ -89,16 +92,20 @@ def unit_args(unit, namespace=None, lifetime=90, root=False, icmp_raw=False):
                     "--property=ProtectHome=yes"]
     if namespace:
         command += ["--property=NetworkNamespacePath=/run/netns/" + namespace]
+    if share_root is not None:
+        command += ["--property=PrivateMounts=yes",
+                    "--property=BindReadOnlyPaths=" + str(share_root) + ":/usr/share"]
     return command
 
 
 @contextmanager
-def service(unit, command, namespace=None, lifetime=90, root=False, icmp_raw=False):
+def service(unit, command, namespace=None, lifetime=90, root=False, icmp_raw=False,
+            share_root=None):
     """Confinar duración y retirar la unidad aunque falle una comprobación."""
     if active(unit):
         raise RuntimeError("UNIT_ALREADY_ACTIVE")
     try:
-        run(unit_args(unit, namespace, lifetime, root, icmp_raw) + command)
+        run(unit_args(unit, namespace, lifetime, root, icmp_raw, share_root) + command)
         yield
     finally:
         stop(unit)
@@ -290,25 +297,49 @@ def http_json(port, path, payload=None):
         return json.loads(raw) if raw else None
 
 
-def alertmanager_template_args(binary):
-    """Usar la plantilla original del paquete extraído, no rutas globales del host."""
-    root = binary.parent.parent / "share/prometheus/alertmanager"
-    template = root / "default.tmpl"
-    if not template.is_file() or template.is_symlink() or not template.stat().st_size:
-        raise ValueError("ALERTMANAGER_TEMPLATE_MISSING:" + str(template))
-    help_result = run([str(binary), "--help"])
-    help_text = help_result.stdout + help_result.stderr
-    if not re.search(r"--template\.default(?:[=\s]|$)", help_text):
-        raise ValueError("ALERTMANAGER_TEMPLATE_FLAG_UNAVAILABLE")
-    print("ALERTMANAGER_PLANTILLA_LOCAL=" + str(template), flush=True)
-    return ["--template.default=" + str(template)]
+def alertmanager_share(binary):
+    """Resolver recursos originales de Debian para un montaje privado de solo lectura."""
+    share = binary.parent.parent / "share"
+    root = share / "prometheus/alertmanager"
+    for directory in (share, share / "prometheus", root):
+        if directory.is_symlink() or not directory.is_dir():
+            raise ValueError("ALERTMANAGER_SHARE_MISSING:" + str(directory))
+    for name in ("default.tmpl", "email.tmpl"):
+        template = root / name
+        if not template.is_file() or template.is_symlink() or not template.stat().st_size:
+            raise ValueError("ALERTMANAGER_TEMPLATE_MISSING:" + str(template))
+        print("ALERTMANAGER_PLANTILLA_LOCAL=" + str(template), flush=True)
+    return share
+
+
+def verify_alertmanager_mount(unit, share):
+    """Comprobar que el proceso no comparte el montaje del host y ve ambos recursos."""
+    pid = int(run(["/usr/bin/systemctl", "show", unit, "--property=MainPID", "--value"]).stdout)
+    if pid <= 1:
+        raise ValueError("ALERTMANAGER_PID")
+    actual = sudo("/usr/bin/stat", "-Lc", "%d:%i", f"/proc/{pid}/ns/mnt").stdout.strip()
+    host = sudo("/usr/bin/stat", "-Lc", "%d:%i", "/proc/1/ns/mnt").stdout.strip()
+    if actual == host:
+        raise PermissionError("ALERTMANAGER_MOUNT_NAMESPACE")
+    mountinfo = sudo("/usr/bin/cat", f"/proc/{pid}/mountinfo").stdout
+    rows = [line.split(" - ", 1)[0].split() for line in mountinfo.splitlines()]
+    if not any(len(row) >= 6 and row[4] == "/usr/share" and "ro" in row[5].split(",")
+               for row in rows):
+        raise PermissionError("ALERTMANAGER_MOUNT_NOT_READONLY")
+    for name in ("default.tmpl", "email.tmpl"):
+        relative = "prometheus/alertmanager/" + name
+        source = run(["/usr/bin/sha256sum", str(share / relative)]).stdout.split()[0]
+        target = sudo("/usr/bin/sha256sum", f"/proc/{pid}/root/usr/share/{relative}").stdout.split()[0]
+        if source != target:
+            raise ValueError("ALERTMANAGER_TEMPLATE_DIGEST:" + name)
+    print("ALERTMANAGER_MONTAJE_PRIVADO_RO=OK PLANTILLAS=2/2", flush=True)
 
 
 def alertmanager(stage, evidence, prefix, binary):
     """Validar webhook local agrupado y resuelto con alertas sintéticas explícitas."""
     if not free(None, 9093) or not free(None, 9193):
         raise RuntimeError("ALERTMANAGER_PILOT_PORT_BUSY")
-    template_args = alertmanager_template_args(binary)
+    share = alertmanager_share(binary)
     received = []
     guard = threading.Lock()
 
@@ -342,7 +373,7 @@ def alertmanager(stage, evidence, prefix, binary):
         try:
             with service(prefix + "-am", [str(binary), "--config.file=" + str(config),
                          "--storage.path=" + str(state), "--web.listen-address=127.0.0.1:9093",
-                         "--cluster.listen-address=", *template_args], lifetime=90):
+                         "--cluster.listen-address="], lifetime=90, share_root=share):
                 def ready():
                     if not active(prefix + "-am"):
                         raise RuntimeError("ALERTMANAGER_EXITED_BEFORE_READY")
@@ -352,6 +383,7 @@ def alertmanager(stage, evidence, prefix, binary):
                     except OSError:
                         return False
                 wait_for(ready)
+                verify_alertmanager_mount(prefix + "-am", share)
                 now = datetime.now(timezone.utc)
                 alerts = [{"labels": {"alertname": "NETLAB360S08SyntheticPilot",
                                        "laboratory": "netlab360-pilot", "instance": instance,
