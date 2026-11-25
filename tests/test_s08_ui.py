@@ -52,8 +52,11 @@ class StructureTests(unittest.TestCase):
         self.assertIn('id="jobs-title" tabindex="-1"', html)
         self.assertIn('class="dashboard-table jobs-table"', html)
         css = (UI / "static/styles.css").read_text(encoding="utf-8")
-        self.assertIn("#main table { width:auto; max-width:100%; min-width:0; table-layout:auto;", css)
-        self.assertIn("#main table :is(th,td) { text-align:left; vertical-align:middle; padding:5px 9px;", css)
+        self.assertIn("#main table { width:100%; max-width:100%; min-width:0; table-layout:auto;", css)
+        self.assertIn("#main table :is(th,td) { text-align:left; vertical-align:middle; padding:8px 14px;", css)
+        self.assertIn("#main .dashboard-table-wrap { margin-block:12px 0; }", css)
+        self.assertIn("#main .action-row { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-block:12px; }", css)
+        self.assertIn('class="action-row"><button type="button" id="jobs-refresh"', html)
         self.assertNotIn("#jobs-view .jobs-table { min-width:", css)
         self.assertNotIn("Fecha y hora (Panamá)", html)
 
