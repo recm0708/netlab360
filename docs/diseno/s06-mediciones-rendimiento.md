@@ -4,7 +4,7 @@
 
 Complementamos la primera sesión observacional **S06-032**, validada con 12/12 muestras y 25 series de estado por consulta, con mediciones originales de **RTT, pérdida ICMP y latencia de respuesta HTTP** sobre endpoints reales y permitidos de HQ, S1 y S2. Realizamos estas mediciones con una carga pequeña y sin modificar interfaces, rutas ni servicios.
 
-**Distinción esencial:** las cinco familias de la fase 04 de Prometheus observan principalmente estado y administración; no acreditan pérdida, jitter, throughput ni latencia. Los RTT proceden de sondas ICMP acotadas; **no son equivalentes a latencia de aplicación ni a jitter UDP**.
+**Distinción esencial:** las cinco familias de métricas del exportador de Prometheus observan principalmente estado y administración; no acreditan pérdida, jitter, throughput ni latencia. Los RTT proceden de sondas ICMP acotadas; **no son equivalentes a latencia de aplicación ni a jitter UDP**.
 
 ## Endpoints y límites
 
@@ -15,7 +15,7 @@ Complementamos la primera sesión observacional **S06-032**, validada con 12/12 
 | S2_A_FRONTAL_HQ | nl360-s02-h-s2-320 | 10.70.20.23 | RTT por paquete, pérdida y P95 ICMP |
 | S2_A_FRONTAL_HQ_HTTP | nl360-s02-h-s2-320 | http://10.70.20.23:8080/api/v1/service | Duración de petición, código HTTP y backend HA |
 
-La sonda HTTP reproduce el origen y la URL del ensayo HTTP HA de la fase 05. No se introducen destinos externos ni entrada de IP libre. El script realiza **tres rondas** predeterminadas, **cinco ICMP por destino y por ronda**, y una petición HTTP por ronda. Límites: rondas 1–8, ICMP 2–10 por destino, pausa 0–10 segundos. Las acciones se ejecutan con argumentos enumerados de subprocess, no mediante bash -c o shell libre.
+La sonda HTTP reproduce el origen y la URL del ensayo HTTP HA. No se introducen destinos externos ni entrada de IP libre. El script realiza **tres rondas** predeterminadas, **cinco ICMP por destino y por ronda**, y una petición HTTP por ronda. Límites: rondas 1–8, ICMP 2–10 por destino, pausa 0–10 segundos. Las acciones se ejecutan con argumentos enumerados de subprocess, no mediante bash -c o shell libre.
 
 ## Requisito previo
 

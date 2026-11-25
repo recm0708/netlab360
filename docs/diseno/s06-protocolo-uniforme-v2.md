@@ -42,4 +42,4 @@ El protocolo se ejecutó y validó en la VM. El entrenamiento, matrices de confu
 
 ## Documentación relacionada
 
-[Entrenamiento y congelación](s06-v2-train-freeze-modelos.md) · [Evaluación cronológica](s06-v2-evaluacion-cronologica-congelada.md) · [Deriva descriptiva y detección](s06-v2-deriva-deteccion-y-limitaciones-finales.md) · [Falla HTTP independiente](s06-fault-http-hq-etiquetado-independiente.md) · [Evidencias de la fase 06](../../evidencias/capturas/fase6/README.md).
+[Entrenamiento y congelación](s06-v2-train-freeze-modelos.md) · [Evaluación cronológica](s06-v2-evaluacion-cronologica-congelada.md) · [Deriva descriptiva y detección](s06-v2-deriva-deteccion-y-limitaciones-finales.md) · [Falla HTTP independiente](s06-fault-http-hq-etiquetado-independiente.md) · [Evidencias de diagnóstico inteligente](../../evidencias/capturas/fase6/README.md).

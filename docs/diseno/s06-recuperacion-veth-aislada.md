@@ -23,7 +23,7 @@ La copia ejecutable es root-owned y modo 0750 en `/usr/local/libexec/netlab360/s
 2. `start --crash-controller`: validar el entorno, generar y activar un timer independiente systemd con TTL **25 s** antes de agregar netem handle `140:` y latencia nominal 40 ms solo en `nl360-s06-veth-a/s06va0`. Después de guardar el estado APPLIED, matar deliberadamente **solo el proceso del controlador de este ensayo con SIGKILL**. Esto NO mata SSH, NOC, systemd ni procesos de red.
 3. Medir ICMP desde A hacia B mientras netem está aplicado; observar el cambio de RTT sin presentarlo como degradación de la topología productiva.
 4. Dejar vencer el timer systemd; este espera el lock si es necesario, valida token, identidad de ambos namespaces, interfaz y qdisc propia y restaura `noqueue`; si detecta configuración ajena o no puede restaurar registra `ESCALATED` y conserva estado.
-5. `cleanup`: únicamente al comprobar `RESTORED`, qdisc noqueue y conectividad ICMP, elimina la pareja y **solo** esos dos namespaces; retorno a 21. No borra archivos originales de la fase 06 ni modifica servicios.
+5. `cleanup`: únicamente al comprobar `RESTORED`, qdisc noqueue y conectividad ICMP, elimina la pareja y **solo** esos dos namespaces; retorno a 21. No borra archivos originales de experimentación ni modifica servicios.
 
 ## Condiciones de aborto
 
@@ -38,7 +38,7 @@ El ensayo no produce ground truth de sedes; `ground_truth_verified=false`. Se co
 - Ejecutable protegido e idéntico a la versión de Git.
 - El timer se programa ANTES de tc. SIGKILL afecta solo al controlador temporal; el sistema recupera por vía independiente.
 - Confirmar RTT pre/intervención/post con sondas IP locales, un estado verificable RESTORED, archivo privado, cleanup a 21 namespaces, NOC 18/21, 4 Docker y 0 servicios fallidos.
-- Prohibido habilitar automáticamente las fases 07 y 08 o etiquetas NORMAL/DEGRADED/RECOVERY en producción a partir de este ensayo.
+- Prohibido habilitar automáticamente la actuación supervisada y la consola interactiva o etiquetas NORMAL/DEGRADED/RECOVERY en producción a partir de este ensayo.
 
 El resultado aislado no concede autorización para modificar un cliente real.
 

@@ -4,7 +4,7 @@
 
 Comprobamos S06-041 en Ubuntu: `S06-041_DATASET_Y_ML_VALIDADO=OK`, RC 0, 60 ventanas NORMAL de egreso HQ verificadas (120 mediciones ICMP reales), dos IsolationForest (HQ→S1/S2) entrenados en sesiones A/B con 40 observaciones por destino y evaluados en sesión TEST distinta con 20 observaciones por destino. FPR normal HQ→S1: IF 5 % vs regla P95 15 %; HQ→S2 ambos 5 %. La línea base NORMAL no permite estimar recall/F1 para DEGRADED.
 
-El experimento S06-040B probó un watchdog tras caída SIGKILL en una veth **aislada** y sus recursos ya fueron eliminados. La infraestructura real del proyecto es la topología de las fases 02–05 formada por 21 namespaces, routers FRR, VLANs, WAN, HA/LACP/SDN y clientes con comunicación multisede. Delimitamos el ensayo a la topología existente, sin crear interfaces dummy, namespaces ni enlaces adicionales. S06-042 actúa sobre un **único cliente ya existente** de esa topología: `nl360-s02-h-hq-120/eth0`, IPv4 `10.70.20.20/24`, gateway `10.70.20.1`, peer switch `nl360-s02-sw-hq`. No interviene `ens33`, routers, switches ni otros clientes.
+El experimento S06-040B probó un watchdog tras caída SIGKILL en una veth **aislada** y sus recursos ya fueron eliminados. La infraestructura real del proyecto es la topología multisede integrada formada por 21 namespaces, routers FRR, VLANs, WAN, HA/LACP/SDN y clientes con comunicación multisede. Delimitamos el ensayo a la topología existente, sin crear interfaces dummy, namespaces ni enlaces adicionales. S06-042 actúa sobre un **único cliente ya existente** de esa topología: `nl360-s02-h-hq-120/eth0`, IPv4 `10.70.20.20/24`, gateway `10.70.20.1`, peer switch `nl360-s02-sw-hq`. No interviene `ens33`, routers, switches ni otros clientes.
 
 ## Política de intervención
 
@@ -48,10 +48,10 @@ Las primeras sesiones permitieron observar **DEGRADED/RECOVERY reales del client
 
 ## Validación
 
-El lote completo S06-042 terminó en `S06-042_EXPERIMENTO_REAL_VALIDADO=OK`, RC 0, con fuente `main=2ffe8fd`, script root íntegro, 26 pruebas de guardia y 16 del recolector correctas, CI previa de 644 pruebas. Se verificaron 21 namespaces, cuatro Docker, ausencia de recursos dummy temporales de la fase 06, `ens33 192.168.47.40/24` gateway `.2` y `eth0` de cliente HQ conectado a switch original; 7 servicios y Prometheus siguieron disponibles.
+El lote completo S06-042 terminó en `S06-042_EXPERIMENTO_REAL_VALIDADO=OK`, RC 0, con fuente `main=2ffe8fd`, script root íntegro, 26 pruebas de guardia y 16 del recolector correctas, CI previa de 644 pruebas. Se verificaron 21 namespaces, cuatro Docker, ausencia de recursos dummy temporales de experimentación, `ens33 192.168.47.40/24` gateway `.2` y `eth0` de cliente HQ conectado a switch original; 7 servicios y Prometheus siguieron disponibles.
 
 El token usado `b3484afcd16995a4` solo identifica el **experimento histórico**; no es válido para nuevas sesiones. El timer se armó antes de `netem 40ms` handle `142:`, expiró autónomamente y registró `RESTORED` a `2026-11-23T07:04:20.031+00:00` y `final_qdisc_state=BASELINE`, seguido de `cleanup=OK` y `state=NONE`. El estímulo generó `S06_WINDOW_DEGRADED_20261123T070344Z_984563` con 4/4 ventanas, 8 mediciones ICMP, RTT medio 40.440 ms. La fase posterior `S06_WINDOW_RECOVERY_20261123T070420Z_6c4e05` produjo 6/6 ventanas, 12 ICMP, RTT 0.070 ms. Ninguna de estas ventanas se ha presentado como puntuación F1 o recall sobre test externo.
 
-Los registros originales se conservan fuera del repositorio. [Evidencias de la fase 06](../../evidencias/capturas/fase6/README.md).
+Los registros originales se conservan fuera del repositorio. [Evidencias de diagnóstico inteligente](../../evidencias/capturas/fase6/README.md).
 
 La extensión multisesión se documenta en [adquisición experimental multisesión](s06-lotes-multisesion-hq.md).
