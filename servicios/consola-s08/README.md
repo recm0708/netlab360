@@ -1,4 +1,4 @@
-# Consola interactiva — Fase 08
+# Consola interactiva
 
 ## Descripción
 
@@ -276,8 +276,7 @@ los detalles no vigentes se omiten. Las lecturas utilizan destinos
 loopback fijos, sin redirecciones ni proxies, con cuerpo máximo de
 256 KiB y timeout de socket de tres segundos. Una adquisición concurrente por endpoint (hasta cuatro en el proceso);
 los errores de una fuente no reemplazan los datos de otra. No se aceptan parámetros de consulta.
-La topología gráfica, WAN/VLAN detalladas y la presentación científica
-y asesora de detalle requieren integración posterior. No se expone el grafo bruto.
+La topología y las vistas WAN/VLAN están integradas mediante proyecciones delimitadas. La presentación científica y asesora de detalle requiere validación posterior. No se expone el grafo bruto.
 
 ## Métricas Prometheus
 
@@ -287,7 +286,7 @@ para la consulta fija de 120 segundos y la proyección de 23 observaciones
 con fecha del scrape real. El transporte S08 conserva el límite de
 512 KiB de esta fuente, sin proxy ni redirecciones. El endpoint tiene su propio límite de una adquisición concurrente.
 El estado administrativo de WAN/VLAN no demuestra forwarding u OSPF.
-No exponemos PromQL arbitrario ni series históricas completas.
+No exponemos PromQL arbitrario; los históricos se consultan mediante grupos y ventanas autorizados.
 La clave JSON schema conserva su nombre mediante un alias Pydantic.
 
 ## Diagnóstico exploratorio
@@ -447,3 +446,15 @@ explorador original sigue disponible. La recuperación y el instalador
 integral deben incorporar esta dependencia antes del despliegue final.
 
 La presentación de Swagger utiliza selectores acotados al marco de documentación. Verificamos el contraste de textos, fondos y etiquetas HTTP en ambas paletas; los controles estructurales conservan un estilo neutro distinto de las acciones principales.
+
+### Consultas interactivas verificadas
+
+En el navegador, iniciamos sesión con una cuenta de operador y abrimos `/debug?tab=docs`. Expandimos la operación GET, pulsamos **Try it out** y **Execute**. No introducimos una cookie manualmente.
+
+| Consulta | Resultado comprobado |
+|---|---|
+| `GET /healthz` | HTTP 200, proceso saludable |
+| `GET /api/v1/sources` | HTTP 200, siete observaciones |
+| `GET /api/v1/history/vlan/15m` | HTTP 200, nueve series históricas |
+
+La copia de cURL y JSON, las exportaciones y los controles temáticos se verificaron en el navegador. La regresión específica comprende 204 pruebas aprobadas; el despliegue permanente, la ingestión continua de alertas y la equivalencia integral permanecen pendientes. No se habilitan mutaciones de red.

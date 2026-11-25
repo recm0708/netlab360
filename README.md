@@ -20,23 +20,26 @@ Desarrollamos NETLAB360 para integrar tres sedes (HQ, S1 y S2) en un laboratorio
 | Python y scikit-learn | Análisis experimental de telemetría |
 | SQLite y systemd | Persistencia, autorización, auditoría y recuperación supervisada |
 | API HTTP sobre socket Unix | Consultas y actuaciones RFC con control de acceso |
+| FastAPI, Uvicorn, Plotly y Swagger UI | Consola web autenticada, visualización y documentación de API |
 
 ## Estado de implementación
 
-| Fase | Alcance validado o planificado |
+| Componente | Estado comprobado |
 |---|---|
-| Fase 01 | Preparación del entorno y línea base |
-| Fase 02 | Tres sedes, cuatro enlaces WAN y nueve VLAN |
-| Fase 03 | Automatización, cumplimiento y metadatos OpenTofu |
-| Fase 04 | Observabilidad multisede e incidentes |
-| Fase 05 | HTTP HA, LACP, SDN y NOC integrado |
-| Fase 06 | Detección experimental de anomalías y diagnóstico inteligente |
-| Fase 07 | AIOps supervisado, RCA, Intent Assurance, RFC, watchdog y API controlada |
-| Fase 08 | Plataforma interactiva, observabilidad avanzada, RAG y recuperación: pendiente de implementación |
-| Fase 09 | Ampliación tecnológica, automatización multivendor y observabilidad cloud-native: planificada |
-| Fase 10 | Validación científica, predicción, QoS/QoE, aceptación integral y entrega: planificada |
+| Entorno, direccionamiento y red multisede | Operativo: tres sedes, cuatro WAN, nueve VLAN |
+| Automatización y cumplimiento | Metadatos OpenTofu y reconciliación FRR validados |
+| Observabilidad y supervisión | Prometheus, exportador, históricos y alertas consultables |
+| Disponibilidad y SDN | HTTP HA, LACP y OVS/Faucet comprobados |
+| Diagnóstico inteligente | Modelos históricos congelados e inferencia exploratoria de lectura |
+| AIOps supervisado | RCA, Intent Assurance, RFC, watchdog y API protegida validados en su alcance original |
+| Consola interactiva | FastAPI, SQLite privado, sesiones, topología SVG, vistas operacionales, históricos Plotly y Swagger integrado validados |
+| Pruebas de red y calidad de servicio | Implementación de diagnóstico activo, Blackbox Exporter y SLI/SLO pendiente |
+| Actuación integrada, RAG y gestión de identidades | Integración y aceptación pendientes |
+| Reconstrucción y extensiones | Arranque en frío, instalación limpia, ampliaciones multivendor y evaluación científica pendientes |
 
-La fase 07 cuenta con las ocho issues técnicas cerradas, 49 capturas y regresión de 1258 pruebas (una omitida y ninguna fallida). El informe acumulativo 7.3 (184 páginas) documenta las siete primeras fases; su aceptación documental interna y el cierre se registran en la [issue maestra #7](https://github.com/recm0708/netlab360/issues/7). La [matriz de cobertura](docs/gestion/cobertura-academica-netlab360.md) distingue los resultados validados de las brechas y las demostraciones previstas. Las fases 08, 09 y 10 disponen de hitos y criterios de aceptación propios. Su alcance está aprobado dentro de nuestra planificación; sus funcionalidades permanecen pendientes de implementación y validación.
+La consola utiliza HTML, CSS y JavaScript locales, temas claro y oscuro, filtros por sede, actualización configurable, consultas históricas manuales y exportaciones delimitadas. La topología resumida y detallada comparten las observaciones originales; no se atribuye conectividad a un estado administrativo ni a la existencia de un contenedor.
+
+La regresión específica de la consola comprende 204 casos aprobados en el entorno científico de referencia. Validamos Swagger, consultas GET y exportaciones mediante el navegador. Conservamos las interfaces independientes mientras verificamos equivalencia completa, ingestión de alertas y recuperación. La [matriz de cobertura](docs/gestion/cobertura-academica-netlab360.md) registra los resultados y las brechas de validación.
 
 ## Documentación
 
@@ -47,14 +50,15 @@ Organizamos la documentación por componente. El [índice completo de documentac
 | Arquitectura | [Red multisede](docs/arquitectura/arquitectura-multisede-implementada.md) |
 | Infraestructura | [Virtualización](docs/infraestructura/inventario-host-y-vmware.md) · [Ubuntu y SSH](docs/infraestructura/ubuntu-desktop-y-ssh.md) |
 | Automatización | [Ansible](ansible/s03/README.md) · [OpenTofu](iac/s03/README.md) |
+| Consola | [Aplicación y API](servicios/consola-s08/README.md) |
 | Observabilidad | [Prometheus](servicios/observabilidad/README.md) · [NOC](servicios/topologia-s05/README.md) |
 | Disponibilidad y SDN | [HTTP HA](docs/diseno/s05-ha-servicios-multisede.md) · [LACP](docs/diseno/s05-lacp-8023ad-multisede.md) · [SDN](docs/diseno/s05-dominio-sdn-ovs-faucet.md) |
 | Diagnóstico inteligente | [Protocolo V2](docs/diseno/s06-protocolo-uniforme-v2.md) · [Evaluación](docs/diseno/s06-v2-evaluacion-cronologica-congelada.md) · [Falla HTTP](docs/diseno/s06-fault-http-hq-etiquetado-independiente.md) |
 | AIOps supervisado | [Eventos](docs/diseno/s07-contrato-eventos-e-incidentes.md) · [RCA](docs/diseno/s07-contexto-y-correlacion-rca.md) · [Runbooks](docs/diseno/s07-runbooks-y-recomendaciones.md) |
 | Actuación y API | [Intent Assurance y RFC](docs/diseno/s07-intent-assurance-y-rfc.md) · [Watchdog](docs/diseno/s07-intervencion-ospf-y-watchdog.md) · [API](docs/diseno/s07-api-controlada.md) |
-| Validación | [Fases 01–04](docs/validacion/s01-s04-resultados.md) · [Fase 05](docs/validacion/s05-integracion-y-aceptacion.md) · [Fase 07](docs/diseno/s07-ensayos-operacionales.md) |
+| Validación | [Entorno, redes y observabilidad](docs/validacion/s01-s04-resultados.md) · [Disponibilidad y SDN](docs/validacion/s05-integracion-y-aceptacion.md) · [Ensayos AIOps](docs/diseno/s07-ensayos-operacionales.md) |
 | Evidencias | [Catálogo general](evidencias/capturas/README.md) |
-| Planificación | [Plan maestro](docs/diseno/s06-s08-plan-maestro-y-criterios.md) · [Consola de la fase 08](docs/diseno/s08-consola-interactiva-y-acciones.md) · [Cobertura académica](docs/gestion/cobertura-academica-netlab360.md) |
+| Planificación | [Plan maestro](docs/diseno/s06-s08-plan-maestro-y-criterios.md) · [Consola interactiva](docs/diseno/s08-consola-interactiva-y-acciones.md) · [Cobertura académica](docs/gestion/cobertura-academica-netlab360.md) |
 
 ## Instalación y operación
 
@@ -62,7 +66,7 @@ Centralizamos los requisitos del sistema, las dependencias
 y los procedimientos reproducibles en el
 [directorio de operación](operacion/README.md).
 
-El [catálogo de comandos](operacion/comandos/README.md) organiza los procedimientos de las fases implementadas.
+El [catálogo de comandos](operacion/comandos/README.md) organiza los procedimientos por componente.
 
 La reconstrucción integral desde un sistema limpio y
 la compatibilidad con otras distribuciones Linux requieren
@@ -81,7 +85,7 @@ Las regresiones de software no sustituyen las comprobaciones de la infraestructu
 
 ## Alcance y limitaciones
 
-El laboratorio funciona dentro de una única máquina virtual. La disponibilidad lógica no acredita redundancia física ni disponibilidad continua. Los modelos de la fase 06 se evaluaron bajo un protocolo ICMP controlado; el escenario HTTP es independiente. La fase 07 conserva incertidumbre, autorización humana y alcance acotado, sin remediación autónoma. La reconstrucción automática tras apagado completo y la consola integrada corresponden a la fase 08.
+El laboratorio funciona dentro de una única máquina virtual. La disponibilidad lógica no acredita redundancia física ni disponibilidad continua. Los modelos de diagnóstico inteligente se evaluaron bajo un protocolo ICMP controlado; el escenario HTTP es independiente. La actuación supervisada conserva incertidumbre, autorización humana y alcance acotado, sin remediación autónoma. La reconstrucción automática tras apagado completo y el despliegue permanente de la consola requieren aceptación independiente.
 
 ## Autoría, licencia y contribuciones
 

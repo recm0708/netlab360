@@ -56,6 +56,17 @@ class DocumentacionProyectoTests(unittest.TestCase):
                     fallos.append(f"Enlace ausente: {relativos} → {destino}")
         self.assertEqual(fallos, [])
 
+    def test_titulos_neutros(self):
+        errores = []
+        for doc in documentos_tecnicos():
+            relativo = doc.relative_to(ROOT).as_posix()
+            if relativo.startswith(("docs/gestion/", "evidencias/capturas/")):
+                continue
+            for _, linea in markdown_lines(doc.read_text(encoding="utf-8")):
+                if re.match(r"^#\\s+", linea) and re.search(r"\\s+[—–-]\\s+Fase\\s+\\d+\\s*$", linea, re.I):
+                    errores.append(relativo)
+        self.assertEqual(errores, [])
+
     def test_nomenclatura_versionada(self):
         rutas = subprocess.check_output(["git", "ls-files", "-z"], cwd=ROOT).decode().split("\0")
         errores = []
