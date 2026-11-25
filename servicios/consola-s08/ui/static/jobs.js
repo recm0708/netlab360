@@ -51,7 +51,8 @@ function createJobsView(context, request, formatDate) {
     options(fields[2], [...new Set(relevant.map(x=>x.profile))],
       Object.fromEntries(relevant.map(row=>[row.profile,profileLabel(row)])));
     const row = selection();
-    text("profile-note", row ? (row.live_progress ? "Contadores reales en vivo y cancelación activa de contenido." :
+    const rateNote = row && row.profile !== "default" ? "Tasa objetivo configurada, no rendimiento garantizado. " : "";
+    text("profile-note", row ? rateNote + (row.live_progress ? "Contadores reales en vivo y cancelación activa de contenido." :
       "Seguimiento del estado; métricas de la prueba al finalizar. Cancelación solo en cola.") + " Plazo máximo: " + row.deadline_s + " s." : "");
     controls();
   }
@@ -129,7 +130,7 @@ function createJobsView(context, request, formatDate) {
       ["Integridad de contenido",data.selection.action==="test.content.tcp" && typeof m.content_integrity_verified==="boolean"?(m.content_integrity_verified?"Verificada":"No verificada"):null]]:
       [];
     text("metrics",metrics.filter(x=>x[1]!==null&&x[1]!==undefined).map(x=>x[0]+": "+x[1]).join(" · "));
-    const diagnosticRows = (m?.hops || m?.samples || []).map(item=>{
+    const diagnosticRows = (Array.isArray(m?.hops)?m.hops:Array.isArray(m?.samples)?m.samples:[]).map(item=>{
       const li=document.createElement("li");
       li.textContent=Array.isArray(m.hops)?"Salto "+item.hop+" · "+(item.address ?? "Sin respuesta")+
         (item.rtt_ms==null?"":" · "+number(item.rtt_ms)+" ms")+(item.annotation?" · "+item.annotation:""):
@@ -166,9 +167,11 @@ function createJobsView(context, request, formatDate) {
       const tr=document.createElement("tr");
       tr.dataset.jobId=job.job_id;
       tr.dataset.selected=String(selected?.job_id===job.job_id);
-      for(const value of [dateLabel(job.created_at_utc),actionLabel(job.selection),profileLabel(job.selection),
-          routes[job.selection.route]||job.selection.route,statusLabel(job)]){
-        const td=document.createElement("td");td.textContent=value;tr.append(td);
+      for(const [index,value] of [dateLabel(job.created_at_utc),actionLabel(job.selection),profileLabel(job.selection),
+          routes[job.selection.route]||job.selection.route,statusLabel(job)].entries()){
+        const td=document.createElement("td");td.textContent=value;
+        if(index===4){td.dataset.state=job.execution_quality==="UNCERTAIN"?"warn":job.status==="SUCCEEDED"?"ok":job.status==="FAILED"?"fault":"unknown";td.title=job.status;}
+        tr.append(td);
       }
       const td=document.createElement("td"),button=document.createElement("button");
       button.type="button";button.textContent=selected?.job_id===job.job_id?"Viendo":"Ver resultado";button.className="secondary";
@@ -248,7 +251,12 @@ function createJobsView(context, request, formatDate) {
   }));
   function download(format){
     if(!permitted()||!configured||!selected||active(selected))return;
-    const quote=value=>'"'+String(value??"").replaceAll('"','""')+'"';
+    const quote=value=>{
+      // Neutralizar fórmulas de hojas de cálculo sin modificar el JSON original.
+      let field=String(value??"");
+      if(typeof value==="string"&&/^[\s]*[=+\-@]/.test(field))field="'"+field;
+      return '"'+field.replaceAll('"','""')+'"';
+    };
     const identity=[selected.job_id,selected.created_at_utc,dateLabel(selected.created_at_utc),
       selected.data.selection.action,actionLabel(selected.data.selection),selected.data.selection.profile,
       profileLabel(selected.data.selection),selected.data.selection.route,selected.status];
@@ -260,8 +268,8 @@ function createJobsView(context, request, formatDate) {
       if(value!==null && ["string","number","boolean"].includes(typeof value))
         rows.push([...identity,"RESUMEN","","","","",key,value]);
     }
-    for(const hop of m.hops || [])rows.push([...identity,"SALTO","","","","","salto_"+hop.hop,JSON.stringify(hop)]);
-    for(const packet of m.samples || [])rows.push([...identity,"ICMP","","","","","paquete_"+packet.seq,packet.rtt_ms]);
+    for(const hop of Array.isArray(m.hops)?m.hops:[])rows.push([...identity,"SALTO","","","","","salto_"+hop.hop,JSON.stringify(hop)]);
+    for(const packet of Array.isArray(m.samples)?m.samples:[])rows.push([...identity,"ICMP","","","","","paquete_"+packet.seq,packet.rtt_ms]);
     if(rows.length===1)rows.push([...identity,"SIN_MEDICION","","","","","",""]);
     const data=format==="json"?JSON.stringify(selected,null,2):rows.map(row=>row.map(quote).join(",")).join("\r\n")+"\r\n";
     const url=URL.createObjectURL(new Blob([data],{type:format==="json"?"application/json":"text/csv;charset=utf-8"}));
