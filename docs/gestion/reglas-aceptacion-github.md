@@ -8,7 +8,11 @@ La fusión requiere una lista de tareas completa, evidencia de las comprobacione
 
 ## Issues
 
-Toda issue debe tener título y alcance, criterios de aceptación, etiquetas, al menos un responsable, milestone y Type nativo. Task representa trabajo acotado o validación; Feature, funcionalidad nueva; Bug, defecto reproducible. Usamos los tipos disponibles en GitHub, no creamos tipos nuevos sin una decisión explícita. Las etiquetas tipo:* clasifican el dominio técnico y no sustituyen Type. El cierre como completada exige todos los criterios aplicables; duplicadas o descartadas conservan su motivo real.
+Toda issue debe tener título y alcance, criterios de aceptación, etiquetas, al menos un responsable, milestone y Type nativo. Task representa trabajo acotado o validación; Feature, funcionalidad nueva; Bug, defecto reproducible. Usamos los tipos disponibles en GitHub, no creamos tipos nuevos sin una decisión explícita. Las etiquetas tipo:* clasifican el dominio técnico y no sustituyen Type. El cierre como completada exige todos los criterios aplicables; duplicadas o descartadas conservan su motivo real mientras se revisa su depuración.
+
+## Depuración del seguimiento
+
+Eliminamos una issue duplicada únicamente después de identificar la original, trasladar los criterios o información vigente que falten y corregir las referencias activas. Eliminamos una actividad no planificada solo cuando el equipo confirma que queda definitivamente fuera del alcance; una actividad aplazada se conserva en su hito. Antes de la eliminación definitiva conservamos una copia privada fuera del repositorio y verificamos que no se pierdan tareas vigentes. Las issues completadas y los PR fusionados se conservan. No se reutilizan números ni se elimina documentación técnica propia de los componentes. La eliminación de una issue no equivale a completar sus criterios.
 
 ## Conciliación histórica
 
