@@ -44,6 +44,13 @@ class StructureTests(unittest.TestCase):
         self.assertEqual(len(parser.ids), len(set(parser.ids)))
         self.assertTrue({"main", "refresh", "notice", "api-state", "capabilities", "observed"} <= set(parser.ids))
         self.assertFalse(parser.inline)
+        self.assertTrue({"jobs-title", "jobs-result-panel", "jobs-transfer-panel",
+                         "jobs-diagnostic-panel", "jobs-diagnostic-rows",
+                         "jobs-history", "console-mode"} <= set(parser.ids))
+        html = (UI / "index.html").read_text(encoding="utf-8")
+        self.assertIn("<th>Fecha y hora (Panamá)</th><th>Tipo de prueba</th><th>Configuración</th>", html)
+        self.assertIn('id="jobs-title" tabindex="-1"', html)
+        self.assertIn('class="dashboard-table jobs-table"', html)
 
     def test_separate_login_resources(self):
         parser = PageParser()
@@ -69,6 +76,15 @@ class StructureTests(unittest.TestCase):
         for value in ("innerHTML", "document.cookie", "eval(", "new Function(",
                       "localStorage", "sessionStorage"):
             self.assertNotIn(value, jobs_js)
+        for fragment in ('"test.ping.short":"Ping corto"', '"test.ping.long":"Ping extendido"',
+                         '"test.traceroute":"Traceroute"', '"4 paquetes ICMP"', '"20 paquetes ICMP"',
+                         "dateLabel(job.created_at_utc)", "actionLabel(job.selection)",
+                         "profileLabel(job.selection)", "statusLabel(job)",
+                         'byId("result-panel").scrollIntoView', 'byId("title").focus',
+                         "preferred || selected?.job_id || body.jobs.find(active)?.job_id",
+                         '"fecha_utc","fecha_panama","accion_id","prueba"'):
+            self.assertIn(fragment, jobs_js)
+        self.assertIn("authRequest, formatPanama)", js)
 
     def test_dashboard_structure_and_read_only_polling(self):
         html = (UI / "index.html").read_text(encoding="utf-8")
