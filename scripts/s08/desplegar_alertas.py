@@ -2,6 +2,7 @@
 """Conectar Prometheus a Alertmanager y a un registro local autenticado."""
 import base64
 import ctypes
+import grp
 import hashlib
 import json
 import os
@@ -105,8 +106,13 @@ def account():
         sudo("/usr/sbin/useradd", "--system", "--user-group", "--no-create-home",
              "--home-dir", "/nonexistent", "--shell", "/usr/sbin/nologin", ACCOUNT)
         user = pwd.getpwnam(ACCOUNT)
-    if user.pw_uid <= 0 or user.pw_dir != "/nonexistent" or not user.pw_shell.endswith("/nologin"):
+    if (user.pw_uid <= 0 or user.pw_dir != "/nonexistent" or not user.pw_shell.endswith("/nologin")
+            or grp.getgrnam(ACCOUNT).gr_gid != user.pw_gid
+            or set(os.getgrouplist(ACCOUNT, user.pw_gid)) != {user.pw_gid}):
         raise ValueError("ALERT_ACCOUNT_IDENTITY")
+    status = sudo("/usr/bin/passwd", "-S", ACCOUNT).stdout.split()
+    if len(status) < 2 or status[1] not in ("L", "LK"):
+        raise ValueError("ALERT_ACCOUNT_NOT_LOCKED")
     return user
 
 
@@ -118,13 +124,33 @@ def service(name, command, share=None):
     run(options + command)
 
 
+def verify_identity(name, user):
+    """Comprobar identidad efectiva, capacidades y confinamiento real."""
+    pid = int(run(["/usr/bin/systemctl", "show", name, "--property=MainPID", "--value"]).stdout)
+    if pid <= 1:
+        raise ValueError("ALERT_SERVICE_PID")
+    raw = sudo("/usr/bin/cat", f"/proc/{pid}/status").stdout
+    fields = dict(line.split(":", 1) for line in raw.splitlines() if ":" in line)
+    for key, expected in (("Uid", user.pw_uid), ("Gid", user.pw_gid)):
+        if [int(x) for x in fields[key].split()] != [expected] * 4:
+            raise ValueError("ALERT_SERVICE_IDENTITY")
+    if any(int(fields[key].strip(), 16) for key in ("CapInh", "CapPrm", "CapEff", "CapBnd", "CapAmb")):
+        raise ValueError("ALERT_SERVICE_CAPABILITIES")
+    if fields["NoNewPrivs"].strip() != "1":
+        raise ValueError("ALERT_SERVICE_NNP")
+    print(f"IDENTIDAD_ALERTAS={name} UID={user.pw_uid} GID={user.pw_gid} CAP=0 NNP=1", flush=True)
+
+
 def http(port, path, password=None):
     request = Request(f"http://127.0.0.1:{port}{path}")
     if password is not None:
         request.add_header("Authorization", "Basic " + base64.b64encode(
             ("prometheus:" + password).encode()).decode())
     with OPEN.open(request, timeout=5) as response:
-        return response.read(131073)
+        data = response.read(131073)
+        if len(data) > 131072:
+            raise ValueError("ALERT_RESPONSE_LIMIT")
+        return data
 
 
 def ready(port, path, password=None):
@@ -168,6 +194,7 @@ def check_windows(evidence):
 
 
 def main(evidence):
+    os.umask(0o077)
     evidence.mkdir(mode=0o700)
     original = CONFIG.read_bytes()
     mode = CONFIG.stat().st_mode & 0o777
@@ -198,12 +225,12 @@ def main(evidence):
     stage = Path(tempfile.mkdtemp(prefix="netlab360-s08-alerts."))
     stage.chmod(0o755)
     created = []
-    changed = False
+    applied = None
     try:
         binary = P["package"](stage, "prometheus-alertmanager", "0.28.1+ds-3",
                               ("prometheus-alertmanager", "alertmanager"), CACHE)
         share = P["alertmanager_share"](binary)
-        account()
+        user = account()
         for path in (INSTALL, INSTALL / "share", INSTALL / "share/prometheus",
                      INSTALL / "share/prometheus/alertmanager"):
             mkdir(path)
@@ -231,12 +258,14 @@ def main(evidence):
         service(RECEIVER, ["/usr/bin/python3", "-I", "-B", str(INSTALL / "recibir_alertas.py"),
                             "serve", "--database", str(DB), "--secret", str(INSTALL / "webhook.secret")])
         wait(lambda: ready(9193, "/healthz"))
+        verify_identity(RECEIVER, user)
         created.append(AM)
         service(AM, [str(INSTALL / "alertmanager"), "--config.file=" + str(INSTALL / "alertmanager.yml"),
                      "--storage.path=" + str(STATE / "alertmanager"),
                      "--web.listen-address=127.0.0.1:9093", "--cluster.listen-address=",
                      "--web.config.file=" + str(INSTALL / "web.yml")], INSTALL / "share")
         wait(lambda: ready(9093, "/api/v2/status", password))
+        verify_identity(AM, user)
         P["verify_alertmanager_mount"](AM, INSTALL / "share")
         try:
             http(9093, "/api/v2/status")
@@ -264,8 +293,8 @@ def main(evidence):
             print(run([str(PROMTOOL), "check", "config", str(path)]).stdout, flush=True)
         if CONFIG.read_bytes() != original:
             raise RuntimeError("CONFIG_CHANGED_CONCURRENTLY")
-        changed = True
         D["write_atomic"](CONFIG, candidate, mode)
+        applied = candidate
         reload(pid, True)
         def validation(status):
             data = inspect("validation")
@@ -286,6 +315,7 @@ def main(evidence):
         if CONFIG.read_bytes() != candidate:
             raise RuntimeError("CONFIG_CHANGED_CONCURRENTLY")
         D["write_atomic"](CONFIG, final, mode)
+        applied = final
         reload(pid, True)
         active = query("/api/v1/alertmanagers")["activeAlertmanagers"]
         if len(active) != 1 or active[0]["url"] != "http://127.0.0.1:9093/api/v2/alerts":
@@ -306,7 +336,9 @@ def main(evidence):
         for name in created:
             log = sudo("/usr/bin/journalctl", "-u", name, "--no-pager", "-n", "40", check=False)
             (evidence / (name + ".log")).write_text(log.stdout)
-        if changed:
+        if applied is not None:
+            if CONFIG.read_bytes() != applied:
+                raise RuntimeError("ROLLBACK_CONFIG_CHANGED_CONCURRENTLY")
             D["write_atomic"](CONFIG, original, mode)
             reload(pid, True)
             print("PROMETHEUS_ROLLBACK=OK", flush=True)
