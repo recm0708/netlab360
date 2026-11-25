@@ -229,13 +229,15 @@ nav a { min-height: 42px; gap: 11px; border: 0; }
 .dashboard-grid .panel { margin: 0; }
 .dashboard-grid .metric { font-variant-numeric: tabular-nums; }
 .dashboard-table-wrap { max-height: 60vh; overflow: auto; overscroll-behavior: contain; }
-/* Tablas propias de la consola: dimensiones intrínsecas y alineación común.
-   Las páginas futuras bajo main heredan esta regla, sin obligar a llenar el panel. */
-#main table { width:auto; max-width:100%; min-width:0; table-layout:auto; border-collapse:collapse; font-size:.9rem; }
-#main table :is(th,td) { text-align:left; vertical-align:middle; padding:5px 9px; border-bottom:1px solid var(--line); overflow-wrap:anywhere; }
+#main .dashboard-table-wrap { margin-block:12px 0; }
+#main .action-row { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-block:12px; }
+/* Tablas propias de la consola: ocupan el ancho útil del panel.
+   Las páginas actuales y futuras bajo main heredan la alineación y separación. */
+#main table { width:100%; max-width:100%; min-width:0; table-layout:auto; border-collapse:collapse; font-size:.9rem; }
+#main table :is(th,td) { text-align:left; vertical-align:middle; padding:8px 14px; border-bottom:1px solid var(--line); overflow-wrap:anywhere; }
 #main table th { position:sticky; top:0; background:var(--table-head,var(--surface)); color:var(--text); z-index:1; }
 #main table td { font-variant-numeric:tabular-nums; }
-#main table button { min-height:0; padding:5px 9px; white-space:nowrap; font-size:inherit; }
+#main table button { min-height:30px; padding:5px 10px; white-space:nowrap; font-size:inherit; }
 #main table th:last-child { white-space:nowrap; }
 .dashboard-table td[data-state] { font-weight: 600; }
 details.summary > summary { cursor: pointer; font-weight: 600; }
@@ -353,7 +355,7 @@ footer { padding:8px 20px; }
 
 #alerts-content h2 { margin-top:16px; }
 #alerts-content select { background:var(--surface); color:var(--text); border:1px solid var(--line); border-radius:6px; }
-#alerts-content .dashboard-table-wrap { margin:8px 0 12px; }
+#main #alerts-content .dashboard-table-wrap { margin-block:12px; }
 
 /* Separación uniforme de las convenciones bajo las series históricas. */
 .history-state-key { margin:8px 0 0; }
