@@ -52,14 +52,15 @@
           </details>
           <button id="logout" class="secondary" type="button" disabled>Cerrar sesión</button>
         </div>
-        <div id="refresh-slot" class="refresh-slot"><div id="refresh-controls" class="refresh-controls">
-          <label><input id="refresh-auto" type="checkbox" checked> Actualización automática</label>
-          <label>Intervalo <select id="refresh-interval"><option value="5">5 segundos</option><option value="10">10 segundos</option><option value="15">15 segundos</option><option value="30">30 segundos</option><option value="60">1 minuto</option><option value="300">5 minutos</option></select></label>
-          <button id="refresh" type="button" disabled>Actualizar</button>
-        </div></div>
       </header>
       <main id="main">
-        <p id="auth-notice" role="status" aria-live="polite" class="muted"></p>
+        <div class="content-tools"><p id="auth-notice" role="status" aria-live="polite" class="muted"></p>
+        <div id="refresh-slot" class="refresh-slot"><div id="refresh-controls" class="refresh-controls">
+          <label id="refresh-auto-label"><input id="refresh-auto" type="checkbox" checked> Actualización automática</label>
+          <label id="refresh-interval-label">Intervalo <select id="refresh-interval"><option value="5">5 segundos</option><option value="10">10 segundos</option><option value="15">15 segundos</option><option value="30">30 segundos</option><option value="60">1 minuto</option><option value="300">5 minutos</option></select></label>
+          <button id="refresh" type="button" disabled>Actualizar</button>
+        </div></div>
+        </div>
         <section id="home-view">
         <div class="heading">
           <div>
@@ -76,6 +77,7 @@
         </div>
         <div class="dashboard-toolbar">
           <p id="dashboard-status" role="status" aria-live="polite" class="muted">Esperando observaciones autenticadas.</p>
+          <label for="dashboard-site">Sede <select id="dashboard-site"><option value="all">Todas las sedes</option><option value="HQ">HQ</option><option value="S1">S1</option><option value="S2">S2</option></select></label>
 
         </div>
         <div class="dashboard-grid" aria-label="Indicadores operacionales">
@@ -89,6 +91,11 @@
           <section class="panel"><h2>Diagnóstico inteligente</h2><p id="dash-inference" class="metric" data-state="unknown">Sin datos</p><p id="dash-inference-detail" class="muted">Inferencias exploratorias; no son incidentes confirmados.</p></section>
           <section class="panel"><h2>Consulta asesora</h2><p id="dash-advisory" class="metric" data-state="unknown">Sin datos</p><p id="dash-advisory-detail" class="muted">Resúmenes históricos; no acreditan salud actual.</p></section>
         </div>
+        <section class="panel">
+          <h2>Inventario por sede</h2>
+          <p class="muted">Existencia del router y estado administrativo de interfaces; no demuestra conectividad.</p>
+          <div id="site-overview" class="site-grid"></div>
+        </section>
         <section class="panel">
           <h2>Procedencia y vigencia de las observaciones</h2>
           <p class="muted">Las muestras ausentes, vencidas o inválidas no se presentan como estados normales. Las fechas corresponden a la observación de cada fuente.</p>
@@ -114,6 +121,7 @@
         <section id="network-view" hidden>
           <div class="heading"><div><p class="eyebrow">Supervisión</p><h1 id="network-title"></h1><p id="network-scope" class="muted"></p></div></div>
           <p id="network-status" class="muted" role="status">Esperando observaciones autenticadas.</p>
+          <div id="network-filter" class="filter-row" hidden><label for="network-site">Sede <select id="network-site"><option value="all">Todas las sedes</option><option value="HQ">HQ</option><option value="S1">S1</option><option value="S2">S2</option></select></label></div>
           <section class="panel"><h2>Observaciones por recurso</h2><div class="dashboard-table-wrap"><table><thead><tr><th>Fuente</th><th>Recurso</th><th>Vigencia</th><th>Estado</th><th>Observación</th><th>Fecha y hora</th></tr></thead><tbody id="network-rows"></tbody></table></div></section>
           <p><a href="/topology">Consultar topología e inspector</a> · <a href="/observability">Consultar históricos</a></p>
         </section>
@@ -141,9 +149,11 @@
           <section class="panel">
             <div class="history-controls">
               <label for="history-group">Grupo<select id="history-group"><option value="collection">Recolección de telemetría</option><option value="routers">Contenedores de routers</option><option value="wan">Interfaces WAN</option><option value="vlan">Interfaces VLAN</option></select></label>
-              <label for="history-window">Intervalo<select id="history-window"><option value="5m">5 minutos</option><option value="15m" selected>15 minutos</option><option value="1h">1 hora</option></select></label>
+              <label for="history-window">Intervalo histórico<select id="history-window"><option value="5m">5 minutos</option><option value="15m" selected>15 minutos</option><option value="1h">1 hora</option></select></label>
 
+              <span id="history-refresh-slot"></span>
             </div>
+            <p class="muted">Consulta manual: seleccione el grupo y el intervalo histórico.</p>
             <p id="history-status" role="status" aria-live="polite">Esperando sesión.</p>
             <p id="history-scope" class="muted"></p>
             <div class="history-counts"><p>Muestras válidas: <strong id="history-valid">—</strong></p><p>Muestras nulas: <strong id="history-null">—</strong></p><p>Series con datos: <strong id="history-series">—</strong></p></div>
@@ -159,7 +169,7 @@
             <p class="muted">Las rutas originales conservan sus permisos. La prueba utiliza una proyección técnica delimitada.</p>
             <div id="debug-catalog" class="debug-catalog"></div>
             <label for="debug-select">Consulta autorizada</label>
-            <div class="debug-actions"><select id="debug-select" disabled></select></div>
+            <div class="debug-actions"><select id="debug-select" disabled></select><span id="debug-refresh-slot"></span></div>
             <p id="debug-notice" role="status" aria-live="polite">Esperando catálogo.</p>
           </section>
           <section class="panel">

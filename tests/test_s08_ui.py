@@ -73,8 +73,8 @@ class StructureTests(unittest.TestCase):
         js = (UI / "static/app.js").read_text(encoding="utf-8")
         self.assertIn("dashboardBatch(key,data,started)", js)
         self.assertIn("dashboardEpoch++", js)
-        self.assertIn('if(reason==="auto"&&!refreshPreference.auto)return', js)
-        self.assertIn("scheduler.configure(refreshPreference)", js)
+        self.assertIn('if(reason==="auto"&&(!autoPage||!refreshPreference.auto))return', js)
+        self.assertIn("scheduler.configure({...refreshPreference,auto:autoPage&&refreshPreference.auto})", js)
         self.assertIn("await debugRead(path)", js)
         self.assertIn("clearDashboard();", js)
 
@@ -102,8 +102,8 @@ class StructureTests(unittest.TestCase):
         css = (UI / "static/styles.css").read_text(encoding="utf-8")
         for rule in ("scrollbar-color:", "--scroll-thumb", "height: 100dvh",
                      "overflow-y: auto", "overscroll-behavior: contain",
-                     "width: 24px; height: 24px",
-                     ".menu-collapsed .nav-symbol { width: 24px; height: 24px; flex-basis: 24px; }"):
+                     "width: 22px; height: 22px",
+                     ".menu-collapsed .nav-symbol { width: 22px; height: 22px; flex-basis: 22px; }"):
             self.assertIn(rule, css)
 
     def test_presentation_storage_is_limited(self):
@@ -184,7 +184,7 @@ class StructureTests(unittest.TestCase):
         self.assertNotIn("border-left-color:", css)
         self.assertIn('#navigation a.current, #navigation a[aria-current="page"]', css)
         self.assertIn("background: var(--accent);\n  color: var(--button-text);", css)
-        self.assertIn("width: 48px; height: 48px;", css)
+        self.assertIn("width: 42px; height: 42px;", css)
         self.assertIn('[data-state="unknown"] { color: var(--unknown); }', css)
         self.assertIn('[data-state="fault"] { color: var(--fault); }', css)
 
@@ -417,6 +417,23 @@ class GlobalRefreshTests(unittest.TestCase):
             self.assertNotIn(f'id="{old}"', html)
         self.assertIn('const refreshIntervals=Object.freeze([5,10,15,30,60,300])', js)
         self.assertIn('if(refreshBusy||!refreshAvailable()||document.hidden', js)
-        self.assertIn('if(debugAllowed()&&reason==="auto"&&!debugArmed)return', js)
+        self.assertIn('if(reason==="initial"&&manualHistory)return', js)
         self.assertIn('localStorage.setItem(refreshKey,value)', js)
         self.assertIn('topologyWorkspace.prepend(refreshControls)', js)
+
+
+class CompactConsoleTests(unittest.TestCase):
+    def test_manual_views_and_compact_navigation(self):
+        html = (UI / "index.html").read_text(encoding="utf-8")
+        js = (UI / "static/app.js").read_text(encoding="utf-8")
+        css = (UI / "static/styles.css").read_text(encoding="utf-8")
+        self.assertIn('class="content-tools"', html)
+        self.assertNotIn('id="refresh-slot"', html.split("</header>")[0])
+        self.assertIn('getElementById("history-refresh-slot").append(refreshControls)', js)
+        self.assertIn('getElementById("debug-refresh-slot").append(refreshControls)', js)
+        self.assertIn('scrollbar-gutter:stable both-edges', css)
+        self.assertIn('id="dashboard-site"', html)
+        self.assertIn('id="network-site"', html)
+        self.assertIn('id="site-overview"', html)
+        self.assertIn('"/intelligence":{title:', js)
+        self.assertNotIn('debugArmed', js)

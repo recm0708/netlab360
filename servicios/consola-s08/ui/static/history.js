@@ -98,7 +98,7 @@
     const times=Array.from({length:5},(_,i)=>data.start_epoch+span*i/4);
     const layout={
       height:Math.max(320,entries.length*56+160),autosize:true,uirevision:data.group+":"+data.window,
-      paper_bgcolor:colors.surface,plot_bgcolor:colors.surface,font:{color:colors.text},
+      paper_bgcolor:colors.surface,plot_bgcolor:colors.surface,font:{color:colors.text,size:12},
       margin:{l:130,r:20,t:15,b:115},hovermode:"closest",dragmode:"zoom",
       xaxis:{type:"linear",range:[data.start_epoch,data.end_epoch],tickmode:"array",
         tickvals:times,ticktext:times.map(t=>format(new Date(t*1000)).slice(11)),title:{text:"Hora de Panamá"},gridcolor:colors.line},

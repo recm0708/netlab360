@@ -15,7 +15,7 @@
   --recovery: #7dbbff;
   --unknown: #b8c4d6;
   font-family: system-ui, "Segoe UI", sans-serif;
-  font-size: 15px;
+  font-size: 14px;
 }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--text); line-height: 1.5; }
@@ -35,11 +35,11 @@ nav .pending { color: var(--muted); }
 main { flex: 1; padding: 28px; max-width: 1440px; width: 100%; margin: auto; }
 .heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
 .eyebrow { color: var(--accent); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; margin: 0; }
-h1 { font-size: clamp(1.6rem, 3vw, 2.1rem); margin: 4px 0; }
+h1 { font-size: 1.714rem; margin: 4px 0; }
 h2 { font-size: 1rem; font-weight: 600; margin: 0 0 10px; }
 p { margin: 8px 0; }
 .muted { color: var(--muted); font-size: .86rem; }
-button { font: inherit; padding: 9px 15px; color: var(--button-text); background: var(--accent); border: 0; border-radius: 6px; font-weight: 600; cursor: pointer; }
+button { font: inherit; padding: 6px 11px; color: var(--button-text); background: var(--accent); border: 0; border-radius: 6px; font-weight: 600; cursor: pointer; }
 button:disabled { opacity: .6; cursor: wait; }
 /* Sin recuadro de foco adicional; el teclado conserva una señal discreta. */
 :focus { outline: none; }
@@ -50,7 +50,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { border-botto
 .status-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 14px; }
 .panel { min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 9px; padding: 20px; margin-bottom: 14px; }
 .status-grid .panel { margin: 0; }
-.metric { font-size: 1.35rem; font-weight: 700; overflow-wrap: anywhere; }
+.metric { font-size: 1.357rem; font-weight: 700; overflow-wrap: anywhere; }
 /* El texto y el color expresan estados distintos; UNKNOWN no implica fallo. */
 [data-state="ok"], [data-state="normal"] { color: var(--ok); }
 [data-state="warn"], [data-state="degraded"] { color: var(--warn); }
@@ -159,7 +159,7 @@ nav a { min-height: 42px; gap: 11px; border: 0; }
   color: var(--button-text);
   border-radius: 8px;
 }
-.nav-symbol { display: block; width: 24px; height: 24px; flex: 0 0 24px; }
+.nav-symbol { display: block; width: 22px; height: 22px; flex: 0 0 22px; }
 .menu-symbol { display: block; width: 23px; height: 23px; }
 #menu-toggle { padding: 8px; }
 #navigation { min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; scrollbar-gutter: stable; padding: 0 5px 8px; }
@@ -176,8 +176,8 @@ nav a { min-height: 42px; gap: 11px; border: 0; }
   .menu-collapsed .sidebar { padding: 20px 5px 10px; }
   .menu-collapsed .brand { justify-content: center; padding: 0 0 16px; }
   .menu-collapsed #navigation { padding: 0 2px 8px; }
-  .menu-collapsed nav a { width: 48px; height: 48px; min-height: 48px; margin: 3px auto; padding: 8px 2px; }
-  .menu-collapsed .nav-symbol { width: 24px; height: 24px; flex-basis: 24px; }
+  .menu-collapsed nav a { width: 42px; height: 42px; min-height: 42px; margin: 3px auto; padding: 8px 2px; }
+  .menu-collapsed .nav-symbol { width: 22px; height: 22px; flex-basis: 22px; }
 }
 @media (max-width: 700px) {
   #navigation { max-height: 38dvh; }
@@ -294,7 +294,7 @@ details.summary > summary { cursor: pointer; font-weight: 600; }
 #network-view th,#network-view td { text-align:left; padding:10px; border-bottom:1px solid var(--line); }
 
 /* Control global compartido por toda la consola, también en pantalla completa. */
-.refresh-slot { flex:1 0 100%; min-width:0; }
+.refresh-slot { flex:0 1 auto; min-width:0; }
 .refresh-controls { display:flex; flex-wrap:wrap; justify-content:flex-end; align-items:center; gap:12px; }
 .refresh-controls label { display:flex; align-items:center; gap:7px; font-size:.85rem; color:var(--muted); }
 .refresh-controls input { accent-color:var(--accent); }
@@ -304,3 +304,41 @@ details.summary > summary { cursor: pointer; font-weight: 600; }
 :focus { outline:none !important; }
 :focus:not(:focus-visible) { box-shadow:none !important; }
 @media(max-width:700px){.refresh-controls{justify-content:flex-start;}}
+
+/* Escala compacta común; logo y menú contraído comparten el mismo eje. */
+:root { --size-control:.929rem; --size-secondary:.857rem; }
+body { line-height:1.45; }
+button, select, .topology-action { font-size:var(--size-control); }
+button, .topology-action { min-height:32px; padding:6px 10px; }
+button.secondary { padding:5px 10px; }
+select, .theme-control select, .debug-actions select, .history-controls select,
+.topology-toolbar select, .refresh-controls select { font-size:var(--size-control); min-height:32px; padding:5px 8px; }
+input:not([type="checkbox"]) { font-size:var(--size-control); }
+.topbar { padding:10px 20px; gap:8px; }
+.header-account,.header-brand { gap:8px; }
+#menu-toggle { padding:5px; min-height:32px; }
+#main { padding:18px 20px; }
+.heading { margin-bottom:12px; }
+.panel { padding:14px; margin-bottom:10px; }
+.status-grid,.dashboard-grid,.topology-layout { gap:10px; margin-bottom:10px; }
+.muted,.topology-inspector dt { font-size:var(--size-secondary); }
+.dashboard-table, #network-view table { font-size:1rem; }
+.dashboard-table th,.dashboard-table td,#network-view th,#network-view td { padding:7px 8px; }
+footer { padding:8px 20px; }
+.content-tools { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; margin:0 0 12px; }
+.content-tools #auth-notice { margin:0; }
+.refresh-controls { gap:8px; }
+#history-refresh-slot,#debug-refresh-slot { display:inline-flex; }
+#history-refresh-slot .refresh-controls,#debug-refresh-slot .refresh-controls { justify-content:flex-start; }
+.site-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; }
+.site-card { border:1px solid var(--line); border-radius:7px; padding:10px; background:var(--bg); }
+.site-card h3 { font-size:1rem; margin:0 0 6px; }
+.site-card p { font-size:var(--size-secondary); margin:5px 0; }
+.filter-row { margin:8px 0; }
+.filter-row select,#dashboard-site { background:var(--surface); color:var(--text); border:1px solid var(--line); border-radius:6px; }
+@media(min-width:701px){
+  .menu-collapsed .sidebar { padding-inline:0; }
+  .menu-collapsed #navigation { scrollbar-gutter:stable both-edges; padding-inline:0; }
+  .menu-collapsed .sidebar .brand { justify-content:center; padding-inline:0; }
+  .menu-collapsed #navigation a { margin-inline:auto; }
+}

@@ -386,7 +386,24 @@ pantalla completa. La preferencia contiene solo un interruptor y uno de
 los intervalos 5, 10, 15, 30, 60 o 300 segundos; el valor inicial es cinco
 segundos. Consultamos únicamente la vista activa, sin solicitudes
 superpuestas ni renovación automática de la sesión. Las muestras
-caducan aunque se pause la adquisición. En el explorador técnico la
-repetición automática comienza tras una consulta explícita; cambiar el
-recurso la desarma. Las páginas aún no implementadas no ejecutan
+caducan aunque se pause la adquisición. En Observabilidad y Diagnóstico técnico las consultas de datos son
+exclusivamente manuales; conservamos la preferencia global sin aplicarla
+allí. Las páginas aún no implementadas no ejecutan
 consultas. Conservamos las protecciones y límites del servidor.
+
+## Presentación compacta y vistas por sede
+
+Aplicamos una escala tipográfica común y alineamos el menú contraído
+mediante reservas de desplazamiento simétricas. Los controles de consulta
+se ubican en el área de contenido; en históricos y diagnóstico técnico
+se colocan junto a sus selectores sin temporizador periódico.
+
+La vista de inicio conserva los indicadores globales y permite filtrar
+inventario y observaciones por sede. Las vistas WAN, VLAN y LACP admiten
+el mismo filtro sin cambiar la adquisición. Integramos la lectura
+exploratoria de inferencia HQ con sus métodos, RTT, pérdida, vigencia y
+abstención, sin iniciar el servicio de modelos ni confirmar incidentes.
+
+La equivalencia del historial de alertas anterior y el retiro de las
+interfaces independientes requieren una aceptación posterior. Conservamos
+los servicios de adquisición y los registros históricos.

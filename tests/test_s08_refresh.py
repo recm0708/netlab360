@@ -10,12 +10,22 @@ APP = ROOT / "servicios/consola-s08/ui/static/app.js"
 SCRIPT = r"""
 const fs=require("node:fs"),vm=require("node:vm"),assert=require("node:assert/strict");
 const js=fs.readFileSync(process.argv[1],"utf8");
-const start=js.indexOf("const refreshIntervals=");
+const start=js.indexOf("function observationSite(");
 const end=js.indexOf("/* Fin de preferencias de actualización. */");
 assert(start>=0&&end>start);
 const ctx=vm.createContext({});
-vm.runInContext(js.slice(start,end)+"\nthis.model={parseRefresh,refreshValue,refreshScheduler};",ctx);
+vm.runInContext(js.slice(start,end)+"\nthis.model={parseRefresh,refreshValue,refreshScheduler,automaticPage,observationSite,siteInventory};",ctx);
 const m=ctx.model;
+for(const p of ["/home","/topology","/wan","/lan","/services","/lacp","/sdn","/intelligence"])assert(m.automaticPage(p));
+for(const p of ["/observability","/debug","/diagnostics","/administration","/unknown"])assert(!m.automaticPage(p));
+assert.equal(m.observationSite({resource:"VLAN-230"}),"S1");
+assert.equal(m.observationSite({resource:"WAN-END-HQ-s1p"}),"HQ");
+assert.equal(m.observationSite({resource:"FAUCET"}),null);
+const rows=[{resource:"R-HQ",quality:"VALID",details:{running:1}},{resource:"WAN-END-HQ-s1p",quality:"VALID",details:{admin_up:1}},{resource:"WAN-END-HQ-s1b",quality:"STALE",details:{admin_up:1}}];
+assert.equal(m.siteInventory(rows,"HQ").running,1);
+assert.equal(m.siteInventory(rows,"HQ").wan.up,1);
+assert.equal(m.siteInventory(rows,"HQ").wan.known,1);
+assert.equal(m.siteInventory(rows,"HQ").wan.total,2);
 assert.equal(m.parseRefresh(null).seconds,5);
 assert.equal(m.parseRefresh(null).auto,true);
 for(const seconds of [5,10,15,30,60,300]){

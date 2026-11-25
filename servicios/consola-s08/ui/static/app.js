@@ -212,10 +212,43 @@ function dashboardDetail(row) {
   if ([0,1].includes(d.source_up)) return d.source_up===1?"Lectura disponible":"Lectura fallida";
   if (["active","partial","offline"].includes(d.reported_topology))
     return {active:"Inventario activo",partial:"Inventario parcial",offline:"Inventario inactivo"}[d.reported_topology];
-  return row.source==="IA_S06"?"Inferencia exploratoria":row.source==="ADVISORY_S07"?"Resumen histórico":"Observación delimitada";
+  if(row.source==="IA_S06"){
+    const methods=["P95_RTT","IsolationForest","LogisticRegression"];
+    const labels={NORMAL:"Normal",DEGRADED:"Indicio de degradación",UNKNOWN:"Sin consenso"};
+    if(!methods.every(m=>["NORMAL","DEGRADED"].includes(d[m]))||
+       !Number.isFinite(d.rtt_avg_ms)||!Number.isFinite(d.loss_pct))return "Inferencia sin detalle confirmado";
+    return "RTT "+d.rtt_avg_ms.toFixed(3)+" ms · Pérdida "+d.loss_pct+" % · "+
+      methods.map(m=>m+": "+labels[d[m]]).join(" · ")+" · Consenso: "+(labels[d.consensus]||"Desconocido")+" · Verdad de terreno desconocida";
+  }
+  return row.source==="ADVISORY_S07"?"Resumen histórico":"Observación delimitada";
 }
 
 /* Fin de la proyección pura del dashboard. */
+
+// Los recursos compartidos no se atribuyen a una sede sin evidencia.
+function observationSite(row){
+  const id=row.resource;
+  const direct=/^(?:R-|WAN-END-|LACP-)(HQ|S1|S2)(?:-|$)/.exec(id);
+  if(direct)return direct[1];
+  const vlan=/^VLAN-([123])[123]0$/.exec(id);
+  if(vlan)return ["HQ","S1","S2"][Number(vlan[1])-1];
+  if(id==="FRONTAL_HQ"||/^HQ_A_S[12]$/.test(id))return "HQ";
+  return null;
+}
+function siteInventory(rows,site){
+  const filtered=rows.filter(row=>observationSite(row)===site);
+  const router=filtered.find(row=>row.resource==="R-"+site);
+  const counts=prefix=>{
+    const items=filtered.filter(row=>row.resource.startsWith(prefix));
+    const known=items.filter(row=>row.quality==="VALID"&&[0,1].includes(row.details.admin_up));
+    return {up:known.filter(row=>row.details.admin_up===1).length,known:known.length,total:items.length};
+  };
+  const running=router?.quality==="VALID"&&[0,1].includes(router.details.running)?router.details.running:null;
+  return {running,wan:counts("WAN-END-"),vlan:counts("VLAN-")};
+}
+function automaticPage(path){
+  return ["/home","/topology","/wan","/lan","/services","/lacp","/sdn","/intelligence"].includes(path);
+}
 
 /* Preferencias de actualización global: únicamente valores de presentación. */
 const refreshIntervals=Object.freeze([5,10,15,30,60,300]);
@@ -587,7 +620,7 @@ function initializeConsole() {
     const debug = active.dataset.view === "debug";
     const history = active.dataset.view === "observability";
     const topology = active.dataset.view === "topology";
-    const network = ["/wan","/lan","/services","/lacp","/sdn"].includes(location.pathname);
+    const network = ["/wan","/lan","/services","/lacp","/sdn","/intelligence"].includes(location.pathname);
     document.getElementById("module-view").hidden = home || debug || history || topology || network;
     document.getElementById("network-view").hidden = !network;
     document.getElementById("topology-view").hidden = !topology;
@@ -612,7 +645,7 @@ function initializeConsole() {
   ]);
   let debugEpoch = 0;
   let debugResult = null;
-  let debugReady = false, debugArmed = false;
+  let debugReady = false;
   let debugBusy = false;
 
   function debugAllowed() {
@@ -624,7 +657,6 @@ function initializeConsole() {
     debugEpoch++;
     debugResult = null;
     debugReady = false;
-    debugArmed = false;
     debugBusy = false;
     debugSelect.replaceChildren();
     debugCatalog.replaceChildren();
@@ -692,7 +724,7 @@ function initializeConsole() {
       debugReady = true;
       debugSelect.disabled = false;
 
-      debugNotice.textContent = "Catálogo disponible. Seleccione una consulta y pulse Actualizar.";
+      debugNotice.textContent = "Catálogo disponible. Seleccione una consulta y pulse Ejecutar consulta.";
     } catch {
       if (epoch !== debugEpoch) return;
       resetDebug();
@@ -705,7 +737,6 @@ function initializeConsole() {
     const epoch = debugEpoch;
     const key = debugSelect.value;
     debugBusy = true;
-    debugArmed = true;
     debugSelect.disabled = true;
     debugResult = null;
 
@@ -775,10 +806,10 @@ function initializeConsole() {
   }
 
   debugSelect.addEventListener("change",()=>{
-    debugArmed=false;debugResult=null;
+    debugResult=null;
     exportButtons.forEach(button=>button.disabled=true);
     debugOutput.textContent="Sin resultados.";debugMeta.textContent="Sin consulta.";
-    debugNotice.textContent="Pulse Actualizar para consultar el recurso seleccionado.";
+    debugNotice.textContent="Pulse Ejecutar consulta para consultar el recurso seleccionado.";
   });
   exportButtons[0].addEventListener("click", async () => {
     if (!debugResult || !debugAllowed()) return;
@@ -795,6 +826,8 @@ function initializeConsole() {
   // Las consultas son independientes; no se conserva telemetría en almacenamiento web.
   const dashboardStatus = document.getElementById("dashboard-status");
   const dashboardTable = document.getElementById("dashboard-rows");
+  const dashboardSite = document.getElementById("dashboard-site");
+  const siteOverview = document.getElementById("site-overview");
   const dashboardPaths = {
     sources:"/api/v1/sources",metrics:"/api/v1/metrics",
     diagnostics:"/api/v1/diagnostics",advisory:"/api/v1/advisory"
@@ -811,7 +844,7 @@ function initializeConsole() {
 
   function renderDashboard(force=false) {
     const rows=dashboardRows(dashboardBatches,performance.now());
-    const signature=rows.map(r=>r.quality+":"+r.state).join("|");
+    const signature=JSON.stringify([dashboardSite.value,rows.map(r=>[r.resource,r.quality,r.state,r.stamp,r.details])]);
     if(!force && signature===dashboardSignature) return;
     dashboardSignature=signature;
     const summary=dashboardSummary(rows);
@@ -821,8 +854,26 @@ function initializeConsole() {
       node.dataset.state=value.state;
       document.getElementById("dash-"+id+"-detail").textContent=value.detail;
     }
+    const selected=dashboardSite.value;
+    const sites=selected==="all"?["HQ","S1","S2"]:[selected];
+    const cards=document.createDocumentFragment();
+    for(const site of sites){
+      const inventory=siteInventory(rows,site);
+      const card=document.createElement("article"),title=document.createElement("h3"),router=document.createElement("p");
+      card.className="site-card";title.textContent=site;
+      router.textContent=inventory.running===null?"Router · Sin datos":inventory.running?"Router · Contenedor activo":"Router · Contenedor detenido";
+      router.dataset.state=inventory.running===null?"unknown":inventory.running?"ok":"fault";
+      card.append(title,router);
+      for(const [name,counts] of [["WAN",inventory.wan],["VLAN",inventory.vlan]]){
+        const line=document.createElement("p");
+        line.textContent=name+" · "+counts.up+"/"+counts.total+" administrativamente activas · "+counts.known+" observadas";
+        card.append(line);
+      }
+      cards.append(card);
+    }
+    siteOverview.replaceChildren(cards);
     const fragment=document.createDocumentFragment();
-    for(const row of rows) {
+    for(const row of rows.filter(row=>selected==="all"||observationSite(row)===selected)) {
       const tr=document.createElement("tr");
       const date=row.stamp?formatPanama(new Date(row.stamp)):"—";
       for(const [i,value] of [row.label,row.name,qualityLabels[row.quality],stateLabels[row.state],
@@ -888,6 +939,7 @@ function initializeConsole() {
     }
   }
 
+  dashboardSite.addEventListener("change",()=>{if(dashboardAllowed())renderDashboard(true);});
   setInterval(() => { if(dashboardAllowed()) renderDashboard(); },1000);
 
   // Vistas de dominio: reutilizamos los contratos validados del panel inicial.
@@ -896,10 +948,14 @@ function initializeConsole() {
     "/lan":{title:"LAN / VLAN / ACL",key:"metrics",prefix:"VLAN-",scope:"Estado administrativo de subinterfaces VLAN. No acredita forwarding ni cumplimiento de ACL."},
     "/services":{title:"Servicios HTTP / HA",key:"sources",prefix:"FRONTAL_HQ",scope:"Selección de backend observada desde S2; no acredita disponibilidad desde todas las sedes."},
     "/lacp":{title:"Agregación LACP",key:"sources",prefix:"LACP-",scope:"Miembros de bond observados en switch y cliente. No acredita capacidad agregada ni tráfico."},
-    "/sdn":{title:"SDN / OVS / Faucet",key:"sources",prefix:"FAUCET",scope:"Conexión al controlador y flujos observados; no acredita forwarding."}
+    "/sdn":{title:"SDN / OVS / Faucet",key:"sources",prefix:"FAUCET",scope:"Conexión al controlador y flujos observados; no acredita forwarding."},
+    "/intelligence":{title:"Diagnóstico inteligente",key:"diagnostics",prefix:"HQ_A_",scope:"Inferencia exploratoria del egreso HQ a S1 y S2. Verdad de terreno desconocida; ninguna predicción confirma un incidente ni autoriza cambios."}
   });
   const networkCurrent=networkConfig[location.pathname];
   const networkBody=document.getElementById("network-rows"),networkStatus=document.getElementById("network-status");
+  const networkSite=document.getElementById("network-site");
+  document.getElementById("network-filter").hidden=!["/wan","/lan","/lacp"].includes(location.pathname);
+  networkSite.addEventListener("change",()=>{networkSignature="";renderNetwork();});
   let networkEpoch=0,networkBusy=false,networkBatches={},networkSignature="";
   if(networkCurrent){
     document.getElementById("network-title").textContent=networkCurrent.title;
@@ -913,7 +969,8 @@ function initializeConsole() {
   function renderNetwork(){
     if(!networkAllowed())return;
     const rows=dashboardRows(networkBatches,performance.now()).filter(r=>
-      r.source===(networkCurrent.key==="metrics"?"PROMETHEUS_S04":"NOC_S05")&&r.resource.startsWith(networkCurrent.prefix));
+      r.source===({metrics:"PROMETHEUS_S04",sources:"NOC_S05",diagnostics:"IA_S06"}[networkCurrent.key])&&
+      r.resource.startsWith(networkCurrent.prefix)&&(networkSite.value==="all"||observationSite(r)===networkSite.value));
     const signature=JSON.stringify(rows.map(r=>[r.resource,r.quality,r.state,r.stamp,r.details]));
     if(signature===networkSignature)return;
     networkSignature=signature;
@@ -1169,7 +1226,7 @@ function initializeConsole() {
     }
   }
 
-  function historySelectionChanged(){clearHistory();if(refreshPreference.auto)refreshCurrent("auto");}
+  function historySelectionChanged(){clearHistory();historyStatus.textContent="Pulse Consultar histórico para obtener el intervalo seleccionado."; }
   historyGroup.addEventListener("change",historySelectionChanged);
   historyWindow.addEventListener("change",historySelectionChanged);
   new MutationObserver(()=>{
@@ -1287,17 +1344,26 @@ function initializeConsole() {
   let refreshPreference=parseRefresh(null),refreshBusy=false;
   try{refreshPreference=parseRefresh(localStorage.getItem(refreshKey));}catch{}
   const scheduler=refreshScheduler(refreshCurrent,window);
+  const manualHistory=location.pathname==="/observability",manualDebug=location.pathname==="/debug";
+  const autoPage=automaticPage(location.pathname);
+  const slot=document.getElementById("refresh-slot");
+  if(manualHistory)document.getElementById("history-refresh-slot").append(refreshControls);
+  if(manualDebug)document.getElementById("debug-refresh-slot").append(refreshControls);
+  slot.hidden=!autoPage;
+  document.getElementById("refresh-auto-label").hidden=!autoPage;
+  document.getElementById("refresh-interval-label").hidden=!autoPage;
+  const manualLabel=manualHistory?"Consultar histórico":manualDebug?"Ejecutar consulta":"Actualizar";
   function refreshAvailable(){
     return dashboardAllowed()||topologyAllowed()||networkAllowed()||historyAllowed()||debugAllowed();
   }
   function syncRefreshControls(){
     refresh.disabled=refreshBusy||!refreshAvailable()||!session||serverNow()>=session.warningAt;
-    refresh.textContent=refreshBusy?"Actualizando…":"Actualizar";
+    refresh.textContent=refreshBusy?"Consultando…":manualLabel;
   }
   async function refreshCurrent(reason="manual"){
     if(refreshBusy||!refreshAvailable()||document.hidden||serverNow()>=session.warningAt)return;
-    if(reason==="auto"&&!refreshPreference.auto)return;
-    if(debugAllowed()&&reason==="auto"&&!debugArmed)return;
+    if(reason==="auto"&&(!autoPage||!refreshPreference.auto))return;
+    if(reason==="initial"&&manualHistory)return;
     refreshBusy=true;syncRefreshControls();
     try{
       if(dashboardAllowed())await updateDashboard();
@@ -1314,7 +1380,7 @@ function initializeConsole() {
     refreshAuto.checked=refreshPreference.auto;
     refreshInterval.value=String(refreshPreference.seconds);
     refreshInterval.disabled=!refreshPreference.auto;
-    scheduler.configure(refreshPreference);
+    scheduler.configure({...refreshPreference,auto:autoPage&&refreshPreference.auto});
     syncRefreshControls();
   }
   function saveRefreshPreference(){
@@ -1332,7 +1398,7 @@ function initializeConsole() {
     }
   });
   document.addEventListener("visibilitychange",()=>{
-    if(!document.hidden&&refreshPreference.auto)refreshCurrent("auto");
+    if(!document.hidden&&autoPage&&refreshPreference.auto)refreshCurrent("auto");
   });
   applyRefreshPreference();
   setInterval(tick, 1000);
