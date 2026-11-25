@@ -1,4 +1,4 @@
-"""Persistencia transaccional de trabajos; todavía sin rutas HTTP ni ejecutor."""
+"""Persistencia transaccional de trabajos, progreso e historial de operadores."""
 from contextlib import closing, contextmanager
 from datetime import datetime, timezone
 import json
@@ -63,12 +63,14 @@ def record(db, job_id):
     return result
 
 
-def enqueue(directory, actor, payload):
+def enqueue(directory, actor, payload, *, stream_enabled=False):
     """Reservar una única plaza global para trabajos activos de esta base."""
     selection = select(payload)
     job_id, now = str(uuid.uuid4()), stamp()
     data = {"schema": "NETLAB360_S08_JOB_V1", "selection": selection.parameters(),
-            "deadline_s": selection.deadline_s, "started_at_utc": None, "result": None}
+            "deadline_s": selection.deadline_s, "started_at_utc": None, "result": None,
+            "stream_enabled": stream_enabled is True and selection.action == "test.content.tcp",
+            "cancel_requested": False, "progress": []}
     with transaction(directory) as db:
         operator(db, actor)
         if db.execute("SELECT 1 FROM jobs WHERE status IN ('QUEUED','RUNNING') LIMIT 1").fetchone():
@@ -171,4 +173,89 @@ def note_uncertain(directory, job_id, reason):
         job["data"]["uncertainty_reason"] = reason
         db.execute("UPDATE jobs SET result_json=? WHERE job_id=?", (encode(job["data"]), job_id))
         audit(db, "JOB_UNCERTAIN", job_id, job["actor_id"], stamp())
+        return record(db, job_id)
+
+
+
+def history(directory, actor):
+    """Consultar metadatos propios acotados; priorizar trabajos activos."""
+    path = storage._directory(directory, create=False)
+    with closing(storage._connect(path, readonly=True)) as db:
+        db.execute("BEGIN")
+        operator(db, actor)
+        rows = db.execute("SELECT job_id FROM jobs WHERE actor_id=? "
+                          "ORDER BY CASE WHEN status IN ('QUEUED','RUNNING') THEN 0 ELSE 1 END, "
+                          "created_at_utc DESC, job_id DESC LIMIT 50", (actor,)).fetchall()
+        result = []
+        for (identifier,) in rows:
+            job = record(db, identifier)
+            result.append({key: job[key] for key in ("job_id", "created_at_utc", "status", "finished_at_utc")}
+                          | {"selection": job["data"]["selection"],
+                             "execution_quality": job["data"].get("execution_quality"),
+                             "cancel_requested": job["data"].get("cancel_requested", False)})
+        return result
+
+
+def append_progress(directory, job_id, raw):
+    """Persistir solo muestras reales del transporte de contenido configurado."""
+    from .stream_protocol import MAX_EVENTS, sample
+    with transaction(directory) as db:
+        job = record(db, job_id)
+        data = job["data"]
+        if job["status"] != "RUNNING" or data.get("stream_enabled") is not True:
+            raise ValueError("INVALID_JOB_TRANSITION")
+        events = data["progress"]
+        if len(events) >= MAX_EVENTS:
+            raise ValueError("PROGRESS_EVENT_LIMIT")
+        role = raw.get("role") if type(raw) is dict else None
+        previous = next((item for item in reversed(events) if item["role"] == role), None)
+        events.append(sample(raw, data["selection"]["profile"], previous))
+        db.execute("UPDATE jobs SET result_json=? WHERE job_id=?", (encode(data), job_id))
+
+
+def cancellation_requested(directory, job_id):
+    """Consulta interna del supervisor; no renueva sesiones."""
+    path = storage._directory(directory, create=False)
+    with closing(storage._connect(path, readonly=True)) as db:
+        job = record(db, job_id)
+        return job["status"] == "RUNNING" and job["data"].get("cancel_requested") is True
+
+
+def request_cancel(directory, actor, job_id):
+    """Cancelar en cola o registrar una petición activa de contenido, no su éxito."""
+    with transaction(directory) as db:
+        operator(db, actor)
+        job = record(db, job_id)
+        if job["actor_id"] != actor:
+            raise ValueError("JOB_NOT_FOUND")
+        data = job["data"]
+        now = stamp()
+        if job["status"] == "QUEUED":
+            db.execute("UPDATE jobs SET status='CANCELLED',finished_at_utc=? WHERE job_id=?", (now, job_id))
+            audit(db, "JOB_CANCELLED", job_id, actor, now)
+        elif (job["status"] == "RUNNING" and data.get("stream_enabled") is True
+              and data.get("execution_quality") != "UNCERTAIN"):
+            if data.get("cancel_requested") is not True:
+                data["cancel_requested"] = True
+                db.execute("UPDATE jobs SET result_json=? WHERE job_id=?", (encode(data), job_id))
+                audit(db, "JOB_CANCEL_REQUESTED", job_id, actor, now)
+        else:
+            raise ValueError("INVALID_JOB_TRANSITION")
+        return record(db, job_id)
+
+
+def finish_cancelled(directory, job_id, *, cleanup_verified):
+    """Cerrar solo una cancelación solicitada con confirmación del broker."""
+    if cleanup_verified is not True:
+        raise ValueError("CLEANUP_NOT_VERIFIED")
+    with transaction(directory) as db:
+        job = record(db, job_id)
+        if (job["status"] != "RUNNING" or job["data"].get("cancel_requested") is not True
+                or job["data"].get("stream_enabled") is not True):
+            raise ValueError("INVALID_JOB_TRANSITION")
+        now = stamp()
+        job["data"]["cleanup_verified"] = True
+        db.execute("UPDATE jobs SET status='CANCELLED',finished_at_utc=?,result_json=? WHERE job_id=?",
+                   (now, encode(job["data"]), job_id))
+        audit(db, "JOB_CANCELLED", job_id, job["actor_id"], now)
         return record(db, job_id)
