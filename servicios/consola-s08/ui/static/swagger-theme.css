@@ -1,6 +1,6 @@
 /* Adaptamos la presentación de Swagger a las variables compartidas del producto. */
 :root { --method-get:#7cc4ff; --method-post:#4ade80; --method-put:#ffb454; --method-delete:#ff7777; --method-patch:#c084fc; --method-other:#b8c4d6; }
-:root[data-theme="light"] { --method-get:#125785; --method-post:#005b25; --method-put:#853500; --method-delete:#a21422; --method-patch:#652894; --method-other:#424b59; }
+:root[data-theme="light"] { --method-get:#064571; --method-post:#00491f; --method-put:#713000; --method-delete:#8e1020; --method-patch:#55217c; --method-other:#374151; }
 html, body { background:var(--surface); color:var(--text); }
 .docs-heading { padding:14px 18px 0; font:inherit; }
 .docs-heading p { margin:6px 0 0; color:var(--muted); font-size:.86rem; }
@@ -147,4 +147,10 @@ html, body { background:var(--surface); color:var(--text); }
 /* El fondo temático también sustituía la flecha de los selectores. */
 #swagger-ui .swagger-ui select {
   appearance:auto; padding-right:12px;
+}
+
+/* Los campos y botones secundarios conservan la delimitación del tema común. */
+#swagger-ui .swagger-ui :is(input,select,textarea),
+#swagger-ui .swagger-ui .btn:not(.execute):not(.cancel) {
+  border-color:var(--control-line,var(--line));
 }
