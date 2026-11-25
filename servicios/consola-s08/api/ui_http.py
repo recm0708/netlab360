@@ -1,5 +1,7 @@
 """Rutas visuales explícitas y comprobación de identidad antes de servir la consola."""
 from pathlib import Path
+from importlib.resources import files
+from functools import lru_cache
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import RedirectResponse, Response
@@ -14,15 +16,28 @@ HTML_CSP = ("default-src 'none'; script-src 'self'; style-src 'self'; "
             "frame-ancestors 'none'; object-src 'none'")
 
 
+# Plotly genera estilos SVG/CSS dinámicos. Limitamos esta excepción a observabilidad.
+PLOT_CSP = HTML_CSP.replace("style-src 'self';", "style-src 'self' 'unsafe-inline'; img-src data: blob:;")
+
+@lru_cache(maxsize=1)
+def plotly_asset():
+    """Leer solamente el recurso distribuido con la dependencia científica."""
+    asset = files("plotly").joinpath("package_data", "plotly.min.js")
+    content = asset.read_bytes()
+    if not 0 < len(content) <= 30 * 1024 * 1024:
+        raise ValueError("INVALID_PLOTLY_ASSET")
+    return content
+
+
 def register_ui(app: FastAPI, directory) -> None:
     """Publicar solo páginas y archivos conocidos; ninguna ruta ejecuta acciones."""
     def authenticated(request: Request) -> bool:
         return sessions.resolve(directory, request.cookies.get(COOKIE)) is not None
 
-    def page(filename: str) -> Response:
+    def page(filename: str, csp=HTML_CSP) -> Response:
         return Response((UI / filename).read_text(encoding="utf-8"),
                         media_type="text/html",
-                        headers={"Content-Security-Policy": HTML_CSP})
+                        headers={"Content-Security-Policy": csp})
 
     @app.get("/", include_in_schema=False)
     def index(request: Request):
@@ -41,7 +56,7 @@ def register_ui(app: FastAPI, directory) -> None:
         # La reserva de diagnóstico técnico no amplía los permisos existentes.
         if request.url.path == "/debug" and identity["role"] != "OPERATOR":
             raise HTTPException(403)
-        return page("index.html")
+        return page("index.html", PLOT_CSP if request.url.path == "/observability" else HTML_CSP)
 
     for path in PAGES:
         app.add_api_route(path, console, methods=["GET"], include_in_schema=False)
@@ -59,4 +74,19 @@ def register_ui(app: FastAPI, directory) -> None:
     @app.get("/ui/static/login.js", include_in_schema=False)
     def login_script():
         return Response((UI / "static/login.js").read_text(encoding="utf-8"),
+                        media_type="text/javascript")
+
+    @app.get("/ui/static/plotly.js", include_in_schema=False)
+    def plotly_script(request: Request):
+        if not authenticated(request):
+            raise HTTPException(401)
+        try:
+            content = plotly_asset()
+        except (ImportError, OSError, ValueError):
+            raise HTTPException(503) from None
+        return Response(content, media_type="text/javascript")
+
+    @app.get("/ui/static/history.js", include_in_schema=False)
+    def history_script():
+        return Response((UI / "static/history.js").read_text(encoding="utf-8"),
                         media_type="text/javascript")

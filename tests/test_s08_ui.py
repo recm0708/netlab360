@@ -38,7 +38,7 @@ class StructureTests(unittest.TestCase):
     def test_local_resources_and_unique_ids(self):
         parser = PageParser()
         parser.feed((UI / "index.html").read_text(encoding="utf-8"))
-        self.assertEqual(set(parser.resources), {"/ui/static/styles.css", "/ui/static/app.js"})
+        self.assertEqual(set(parser.resources), {"/ui/static/styles.css", "/ui/static/app.js", "/ui/static/history.js"})
         self.assertEqual(len(parser.ids), len(set(parser.ids)))
         self.assertTrue({"main", "refresh", "notice", "api-state", "capabilities", "observed"} <= set(parser.ids))
         self.assertFalse(parser.inline)
@@ -86,7 +86,8 @@ class StructureTests(unittest.TestCase):
         js = (UI / "static/app.js").read_text(encoding="utf-8")
         self.assertIn('debugPaths.has(debugSelect.value)', js)
         self.assertIn('debugRead("/api/v1/debug/probe/" + key)', js)
-        self.assertIn('size > 262144', js)
+        self.assertIn('maxBytes = 262144', js)
+        self.assertIn('size > maxBytes', js)
         self.assertIn('debugEpoch++', js)
         self.assertIn('URL.revokeObjectURL(url)', js)
         self.assertIn('csvCell', js)

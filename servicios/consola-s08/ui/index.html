@@ -7,6 +7,7 @@
   <title>NETLAB360 | Consola de operaciones</title>
   <link rel="stylesheet" href="/ui/static/styles.css">
   <script src="/ui/static/app.js"></script>
+  <script src="/ui/static/history.js"></script>
 </head>
 <body>
   <a class="skip" href="#main">Ir al contenido</a>
@@ -104,6 +105,21 @@
         <section id="module-view" hidden>
           <h1 id="module-title"></h1>
           <div id="module-placeholder" class="panel"><h2>Función no disponible</h2><p>La vista de este módulo aún no está habilitada. No se han realizado consultas ni acciones.</p><a href="/home">Volver al inicio</a></div>
+        </section>
+        <section id="history-view" hidden>
+          <div class="heading"><div><p class="eyebrow">Observabilidad</p><h1>Históricos de supervisión</h1><p class="muted">Muestras reales de Prometheus. Los estados administrativos no acreditan conectividad.</p></div></div>
+          <section class="panel">
+            <div class="history-controls">
+              <label for="history-group">Grupo<select id="history-group"><option value="collection">Recolección de telemetría</option><option value="routers">Contenedores de routers</option><option value="wan">Interfaces WAN</option><option value="vlan">Interfaces VLAN</option></select></label>
+              <label for="history-window">Intervalo<select id="history-window"><option value="5m">5 minutos</option><option value="15m" selected>15 minutos</option><option value="1h">1 hora</option></select></label>
+              <button id="history-run" type="button">Consultar histórico</button>
+            </div>
+            <p id="history-status" role="status" aria-live="polite">Esperando sesión.</p>
+            <p id="history-scope" class="muted"></p>
+            <div class="history-counts"><p>Muestras válidas: <strong id="history-valid">—</strong></p><p>Muestras nulas: <strong id="history-null">—</strong></p><p>Series con datos: <strong id="history-series">—</strong></p></div>
+            <div id="history-plot" aria-label="Gráfico temporal de muestras reales"></div>
+            <p class="muted">Cada marcador es una muestra observada. Los huecos no se interpolan. Eje temporal y fechas en Panamá (UTC−5).</p>
+          </section>
         </section>
         <section id="debug-view" hidden>
           <div class="heading"><div><p class="eyebrow">Administración técnica</p><h1>Diagnóstico técnico</h1><p class="muted">Explorador de API de solo lectura. No ejecuta comandos ni cambios de red.</p></div></div>
