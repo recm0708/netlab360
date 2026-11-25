@@ -38,6 +38,7 @@ def group(path):
 
 
 def historical_body(pr, files):
+    """Delimitar tareas a los cambios integrados que pueden acreditarse."""
     original = pr.get("body") or ""
     if TASK.search(original) or MARKER in original:
         return None
@@ -74,6 +75,7 @@ def historical_body(pr, files):
 
 
 def main():
+    """Planificar sin escrituras y aplicar solo mediante autorización explícita."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--apply", action="store_true")
     args = parser.parse_args()
