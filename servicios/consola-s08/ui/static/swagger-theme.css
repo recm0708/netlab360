@@ -1,6 +1,9 @@
 /* Adaptamos la presentación de Swagger a las variables compartidas del producto. */
-:root { --method-get:#7cc4ff; --method-post:#4ade80; --method-put:#ffb454; --method-delete:#ff7777; --method-patch:#c084fc; --method-other:#b8c4d6; }
-:root[data-theme="light"] { --method-get:#064571; --method-post:#00491f; --method-put:#713000; --method-delete:#8e1020; --method-patch:#55217c; --method-other:#374151; }
+:root { --method-get:#8acfff; --method-post:#79e6a1; --method-put:#ffd08a; --method-delete:#ffa1a7; --method-patch:#d3b2ff; --method-other:#c4ced8; }
+:root[data-theme="light"] { --method-get:#06436e; --method-post:#00441f; --method-put:#713000; --method-delete:#8b1020; --method-patch:#55217c; --method-other:#354353; }
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) { --method-get:#06436e; --method-post:#00441f; --method-put:#713000; --method-delete:#8b1020; --method-patch:#55217c; --method-other:#354353; }
+}
 html, body { background:var(--surface); color:var(--text); }
 .docs-heading { padding:14px 18px 0; font:inherit; }
 .docs-heading p { margin:6px 0 0; color:var(--muted); font-size:.86rem; }
