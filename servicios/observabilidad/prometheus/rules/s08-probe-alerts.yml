@@ -1,0 +1,32 @@
+# Separar indisponibilidad medida de fallo de adquisición.
+groups:
+  - name: netlab360-s08-sondas
+    interval: 10s
+    rules:
+      - alert: NETLAB360S08ProbeFailed
+        expr: (probe_success{job="netlab360-s08-blackbox"} == 0) and on(job,instance,probe_id) (up{job="netlab360-s08-blackbox"} == 1)
+        for: 20s
+        labels:
+          severity: warning
+          phase: s08
+          observation: service
+        annotations:
+          summary: "Fallo medido de la sonda {{ $labels.probe_id }}"
+      - alert: NETLAB360S08ProbeAcquisitionFailed
+        expr: up{job="netlab360-s08-blackbox"} == 0
+        for: 20s
+        labels:
+          severity: warning
+          phase: s08
+          observation: acquisition
+        annotations:
+          summary: "No se pudo adquirir la sonda {{ $labels.probe_id }}"
+      - alert: NETLAB360S08ProbeMetricMissing
+        expr: (up{job="netlab360-s08-blackbox"} == 1) unless on(job,instance,probe_id) probe_success{job="netlab360-s08-blackbox"}
+        for: 20s
+        labels:
+          severity: warning
+          phase: s08
+          observation: acquisition
+        annotations:
+          summary: "Sonda sin métrica válida {{ $labels.probe_id }}"
