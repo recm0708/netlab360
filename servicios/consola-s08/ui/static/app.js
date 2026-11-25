@@ -1233,8 +1233,7 @@ function initializeConsole() {
     if(!alertsData||!historyAllowed()||alertsData.history.transport!=="OK")return;
     const lines=[["Alerta","Sede","Recurso","Estado","Observado UTC","Origen"],...alertRows(alertsData.history).map(row=>
       [alertNames[row.alertname],row.site,row.resource,row.state,row.observed_at_utc,row.source])];
-    const cell=value=>'"'+String(value).replace(/^[=+@-]/,"'  let historyEpoch = 0, historyBusy = false, historyData = null;").replaceAll('"','""')+'"';
-    const url=URL.createObjectURL(new Blob([lines.map(row=>row.map(cell).join(",")).join("\n")],{type:"text/csv;charset=utf-8"}));
+    const url=URL.createObjectURL(new Blob([lines.map(row=>row.map(csvCell).join(",")).join("\r\n")+"\r\n"],{type:"text/csv;charset=utf-8"}));
     const link=document.createElement("a");link.href=url;link.download="alertas-historicas.csv";link.click();
     setTimeout(()=>URL.revokeObjectURL(url),1000);
   });
