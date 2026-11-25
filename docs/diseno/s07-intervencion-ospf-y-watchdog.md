@@ -37,4 +37,4 @@ Los intervalos derivan del reloj monotónico. La diferencia descriptiva de 78,19
 
 ## Documentación relacionada
 
-[Pruebas de recuperación aislada](../../tests/test_s07_recovery_rehearsal.py) · [Pruebas del ejecutor](../../tests/test_s07_ospf_trial.py) · [Evidencias de la fase 07](../../evidencias/capturas/fase7/README.md).
+[Pruebas de recuperación aislada](../../tests/test_s07_recovery_rehearsal.py) · [Pruebas del ejecutor](../../tests/test_s07_ospf_trial.py) · [Evidencias de AIOps](../../evidencias/capturas/fase7/README.md).

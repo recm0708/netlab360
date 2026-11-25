@@ -14,9 +14,9 @@ La evaluación relaciona las degradaciones controladas de HTTP HA, LACP, WAN y S
 | SDN | Puerto aislado sdna0 | A → B permitido/denegado/permitido, B → C aislado, Faucet conectado |
 | Compuesto | WAN HQ/s1p y backend HTTP HQ | Degradaciones simultáneas y retorno de ambos recursos |
 
-Los [ensayos HTTP y LACP](../../scripts/s07/ensayos_servicios_s07.py) reutilizan los procedimientos de la fase 05. [La guarda WAN](../../scripts/s07/wan_trial_guard.py) fija la identidad del router, su sesión y la interfaz mediante pin, índice, dirección IPv4 y MAC. Se comprueba la identidad antes y después de la lectura. El temporizador independiente de retorno se arma antes del estímulo y el journal protegido registra sus estados. El [supervisor WAN/SDN](../../scripts/s07/ensayos_wan_sdn_s07.py) verifica las sondas y el alcance de los recursos. El [supervisor compuesto](../../scripts/s07/ensayo_compuesto_s07.py) exige dos retornos previamente armados y una ventana común a las dos degradaciones.
+Los [ensayos HTTP y LACP](../../scripts/s07/ensayos_servicios_s07.py) reutilizan los procedimientos de disponibilidad y agregación. [La guarda WAN](../../scripts/s07/wan_trial_guard.py) fija la identidad del router, su sesión y la interfaz mediante pin, índice, dirección IPv4 y MAC. Se comprueba la identidad antes y después de la lectura. El temporizador independiente de retorno se arma antes del estímulo y el journal protegido registra sus estados. El [supervisor WAN/SDN](../../scripts/s07/ensayos_wan_sdn_s07.py) verifica las sondas y el alcance de los recursos. El [supervisor compuesto](../../scripts/s07/ensayo_compuesto_s07.py) exige dos retornos previamente armados y una ventana común a las dos degradaciones.
 
-En cada escenario se adquieren tres ventanas: línea base, degradación y recuperación, con 58 observaciones por ventana. La aceptación exige señales elegibles del recurso, hipótesis y runbook correspondientes cuando la fuente tiene cobertura, y observación posterior al retorno. Se preservan los intentos no coincidentes. El preflight compara costos, FIB, OSPF y gestión; las ventanas se conservan separadas del historial operacional y de los datos de modelos de la fase 06.
+En cada escenario se adquieren tres ventanas: línea base, degradación y recuperación, con 58 observaciones por ventana. La aceptación exige señales elegibles del recurso, hipótesis y runbook correspondientes cuando la fuente tiene cobertura, y observación posterior al retorno. Se preservan los intentos no coincidentes. El preflight compara costos, FIB, OSPF y gestión; las ventanas se conservan separadas del historial operacional y de los datos de los modelos históricos.
 
 ## Validación
 
@@ -35,8 +35,8 @@ El [evaluador histórico](../../scripts/s07/evaluar_ensayos_s07.py) contrasta co
 
 ## Limitaciones
 
-Las 870 observaciones de ventanas no son muestras estadísticamente independientes. La coincidencia de las hipótesis seleccionadas no permite estimar tasas poblacionales de falsas alarmas ni confirmar causalidad. El contrato de la fase 07 observa el controlador SDN, no cada puerto; la falla de sdna0 fue verificada por evidencia directa. Las sondas son puntuales y no demuestran disponibilidad continua. Los mecanismos de retorno dependen del host y del proceso de recuperación operativo; no acreditan tolerancia a la pérdida del host. No se reentrenaron los modelos de la fase 06 ni se autorizan acciones automáticamente.
+Las 870 observaciones de ventanas no son muestras estadísticamente independientes. La coincidencia de las hipótesis seleccionadas no permite estimar tasas poblacionales de falsas alarmas ni confirmar causalidad. El contrato de eventos observa el controlador SDN, no cada puerto; la falla de sdna0 fue verificada por evidencia directa. Las sondas son puntuales y no demuestran disponibilidad continua. Los mecanismos de retorno dependen del host y del proceso de recuperación operativo; no acreditan tolerancia a la pérdida del host. No se reentrenaron los modelos históricos congelados ni se autorizan acciones automáticamente.
 
 ## Documentación relacionada
 
-[Correlación RCA](s07-contexto-y-correlacion-rca.md) · [Recuperación OSPF](s07-intervencion-ospf-y-watchdog.md) · [Evidencias de la fase 07](../../evidencias/capturas/fase7/README.md).
+[Correlación RCA](s07-contexto-y-correlacion-rca.md) · [Recuperación OSPF](s07-intervencion-ospf-y-watchdog.md) · [Evidencias de AIOps](../../evidencias/capturas/fase7/README.md).

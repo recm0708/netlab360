@@ -2,7 +2,7 @@
 
 ## Intención y cumplimiento
 
-El [evaluador](../../scripts/s07/intent_assurance.py) distingue conformidad de los ocho costos OSPF, selección FIB preferida, adyacencias y disponibilidad HTTP observada. La auditoría reutiliza el SoT candidato y el parser de [automatización Ansible de la fase 03](../../ansible/s03/README.md). Una configuración conforme puede coexistir con una ruta alternativa o una adyacencia degradada; no acredita disponibilidad extremo a extremo ni causalidad. La falta de información se mantiene como UNKNOWN.
+El [evaluador](../../scripts/s07/intent_assurance.py) distingue conformidad de los ocho costos OSPF, selección FIB preferida, adyacencias y disponibilidad HTTP observada. La auditoría reutiliza el SoT candidato y el parser de [automatización Ansible](../../ansible/s03/README.md). Una configuración conforme puede coexistir con una ruta alternativa o una adyacencia degradada; no acredita disponibilidad extremo a extremo ni causalidad. La falta de información se mantiene como UNKNOWN.
 
 ## Validación aislada y de lectura
 
