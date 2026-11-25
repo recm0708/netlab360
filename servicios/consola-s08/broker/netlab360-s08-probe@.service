@@ -1,0 +1,22 @@
+# Unidad por conexión Unix: ejecuta únicamente el diagnóstico autorizado desde la copia protegida.
+[Unit]
+Description=NETLAB360 S08 - Diagnostico protegido por conexion
+
+[Service]
+Type=exec
+User=root
+Group=root
+ExecStart=/usr/bin/python3 -I -B /usr/local/libexec/netlab360/s08-broker/entry.py
+# Recibe el descriptor de la conexión aceptada por systemd.
+StandardInput=socket
+StandardOutput=socket
+StandardError=journal
+WorkingDirectory=/
+UMask=0077
+NoNewPrivileges=yes
+ProtectHome=yes
+PrivateTmp=yes
+# Acota la vida de la unidad y termina todos sus procesos al detenerla.
+RuntimeMaxSec=90
+TimeoutStopSec=3
+KillMode=control-group
