@@ -71,9 +71,9 @@ footer { color: var(--muted); padding: 16px 28px; border-top: 1px solid var(--li
   main, .topbar, footer { padding: 18px; }
 }
 /* El tema explícito tiene prioridad sobre la preferencia del sistema. */
-:root[data-theme="light"] { color-scheme: light; --button-text: #fff; --bg: #e6edf5; --surface: #f8fafc; --sidebar: #f0f5fa; --line: #a6b8ca; --text: #142438; --muted: #36495f; --accent: #125785; --ok: #005b25; --warn: #853500; --fault: #a21422; --recovery: #134d95; --unknown: #424b59; }
+:root[data-theme="light"] { color-scheme: light; --button-text: #fff; --bg: #eaf0f6; --surface: #f9fbfd; --sidebar: #e3ebf4; --line: #a4b4c5; --text: #0c1d32; --muted: #30445a; --accent: #064571; --ok: #00491f; --warn: #713000; --fault: #8e1020; --recovery: #123f80; --unknown: #374151; --control-line: #62778c; --table-head: #e1eaf3; --ok-bg: #e0f3e5; --warn-bg: #fff0d6; --fault-bg: #fce4e7; --recovery-bg: #e1edfc; --unknown-bg: #e9edf2; --state-weight: 700; }
 @media (prefers-color-scheme: light) {
-  :root:not([data-theme]) { color-scheme: light; --button-text: #fff; --bg: #e6edf5; --surface: #f8fafc; --sidebar: #f0f5fa; --line: #a6b8ca; --text: #142438; --muted: #36495f; --accent: #125785; --ok: #005b25; --warn: #853500; --fault: #a21422; --recovery: #134d95; --unknown: #424b59; }
+  :root:not([data-theme]) { color-scheme: light; --button-text: #fff; --bg: #eaf0f6; --surface: #f9fbfd; --sidebar: #e3ebf4; --line: #a4b4c5; --text: #0c1d32; --muted: #30445a; --accent: #064571; --ok: #00491f; --warn: #713000; --fault: #8e1020; --recovery: #123f80; --unknown: #374151; --control-line: #62778c; --table-head: #e1eaf3; --ok-bg: #e0f3e5; --warn-bg: #fff0d6; --fault-bg: #fce4e7; --recovery-bg: #e1edfc; --unknown-bg: #e9edf2; --state-weight: 700; }
 }
 
 /* El panel de acceso mantiene el foco visible y se adapta al ancho disponible. */
@@ -357,3 +357,26 @@ footer { padding:8px 20px; }
 .debug-tabs { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 12px; }
 #debug-docs { padding:0; overflow:hidden; }
 #swagger-frame { display:block; width:100%; height:clamp(440px,72vh,1100px); border:0; background:var(--surface); }
+
+/* Refuerzo del contraste en el tema claro. Los estados conservan texto y
+   significado; el fondo tonal y el peso no sustituyen la calidad del dato.
+   Las variables opcionales mantienen la presentación oscura existente. */
+.dashboard-table th, #network-view th {
+  background: var(--table-head, var(--surface));
+}
+.dashboard-table td[data-state], #network-view td[data-state] {
+  background: var(--state-bg, transparent);
+}
+.dashboard-table td[data-state] { font-weight: var(--state-weight, 600); }
+#network-view td[data-state] { font-weight: var(--state-weight, 400); }
+td[data-state="ok"], td[data-state="normal"] { --state-bg: var(--ok-bg, transparent); }
+td[data-state="warn"], td[data-state="degraded"] { --state-bg: var(--warn-bg, transparent); }
+td[data-state="fault"] { --state-bg: var(--fault-bg, transparent); }
+td[data-state="recovery"] { --state-bg: var(--recovery-bg, transparent); }
+td[data-state="unknown"] { --state-bg: var(--unknown-bg, transparent); }
+.login-grid input, .theme-control select, .debug-actions select,
+.history-controls select, .topology-toolbar select, .refresh-controls select,
+.filter-row select, #dashboard-site, #alerts-content select,
+button.secondary, .topology-action {
+  border-color: var(--control-line, var(--line));
+}
