@@ -157,3 +157,18 @@ def finish(directory, job_id, result, *, cleanup_verified):
                    (status, now, encode(job["data"]), job_id))
         audit(db, "JOB_" + status, job_id, job["actor_id"], now)
         return record(db, job_id)
+
+
+def note_uncertain(directory, job_id, reason):
+    """Conservar la plaza activa ante pérdida de confirmación; no liberar por tiempo."""
+    if reason not in ("BROKER_UNCONFIRMED", "EXECUTION_UNCONFIRMED"):
+        raise ValueError("INVALID_UNCERTAINTY")
+    with transaction(directory) as db:
+        job = record(db, job_id)
+        if job["status"] != "RUNNING":
+            raise ValueError("INVALID_JOB_TRANSITION")
+        job["data"]["execution_quality"] = "UNCERTAIN"
+        job["data"]["uncertainty_reason"] = reason
+        db.execute("UPDATE jobs SET result_json=? WHERE job_id=?", (encode(job["data"]), job_id))
+        audit(db, "JOB_UNCERTAIN", job_id, job["actor_id"], stamp())
+        return record(db, job_id)
