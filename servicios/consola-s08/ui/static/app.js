@@ -479,6 +479,7 @@ function initializeConsole() {
     recoveryPanel.hidden = true;
     if (first) {
       restorePresentation();
+      if (location.pathname !== "/home") void update();
       refreshCurrent("initial").then(() => restoreContentIfUnchanged());
       if (debugAllowed() && new URLSearchParams(location.search).get("tab") === "docs") openSwagger();
     }
