@@ -381,6 +381,7 @@ function initializeConsole() {
   let busy = false;
   let activityTimer = null;
   let lastActivitySent = -Infinity;
+  const jobsView = createJobsView(() => session ? {...session, active: serverNow() < session.warningAt} : null, authRequest);
 
   // Los plazos proceden del servidor. El reloj monotónico evita que un
   // cambio del reloj local prolongue la presentación de una sesión vencida.
@@ -390,6 +391,7 @@ function initializeConsole() {
 
   function controls() {
     syncRefreshControls();
+    jobsView.controls();
     logout.disabled = busy || session === null;
     idleLogout.disabled = busy || session === null;
     idleContinue.disabled = busy || session === null ||
@@ -401,6 +403,7 @@ function initializeConsole() {
     activityTimer = null;
     lastActivitySent = -Infinity;
     session = null;
+    jobsView.reset();
     resetDebug();
     clearDashboard();
     clearHistory();
@@ -472,7 +475,7 @@ function initializeConsole() {
       refreshCurrent("initial").then(() => restoreContentIfUnchanged());
       if (debugAllowed() && new URLSearchParams(location.search).get("tab") === "docs") openSwagger();
     }
-    authNotice.textContent = "Sesión vigente. Acciones de red deshabilitadas.";
+    authNotice.textContent = "Sesión vigente. Las mutaciones de red están deshabilitadas.";
     controls();
     tick();
   }
@@ -505,6 +508,7 @@ function initializeConsole() {
     if (!session) return;
     const remaining = Math.ceil(session.expiresAt - serverNow());
     if (remaining <= 0) {
+      jobsView.reset();
       clearDashboard();
       clearHistory();
       clearTopology();
@@ -533,6 +537,7 @@ function initializeConsole() {
       idleDialog.close();
     }
     controls();
+    void jobsView.sync();
   }
 
   async function renew(confirmed) {
@@ -626,7 +631,9 @@ function initializeConsole() {
     const history = active.dataset.view === "observability";
     const topology = active.dataset.view === "topology";
     const network = ["/wan","/lan","/services","/lacp","/sdn","/intelligence"].includes(location.pathname);
-    document.getElementById("module-view").hidden = home || debug || history || topology || network;
+    const jobs = active.dataset.view === "diagnostics";
+    document.getElementById("jobs-view").hidden = !jobs;
+    document.getElementById("module-view").hidden = home || debug || history || topology || network || jobs;
     document.getElementById("network-view").hidden = !network;
     document.getElementById("topology-view").hidden = !topology;
     document.getElementById("history-view").hidden = !history;
