@@ -80,14 +80,14 @@
     const span=data.end_epoch-data.start_epoch;
     const times=Array.from({length:5},(_,i)=>data.start_epoch+span*i/4);
     const layout={
-      height:Math.max(280,entries.length*56+120),autosize:true,
+      height:Math.max(320,entries.length*56+160),autosize:true,
       paper_bgcolor:colors.surface,plot_bgcolor:colors.surface,font:{color:colors.text},
-      margin:{l:130,r:20,t:15,b:75},hovermode:"closest",dragmode:"zoom",
+      margin:{l:130,r:20,t:15,b:115},hovermode:"closest",dragmode:"zoom",
       xaxis:{type:"linear",range:[data.start_epoch,data.end_epoch],tickmode:"array",
         tickvals:times,ticktext:times.map(t=>format(new Date(t*1000)).slice(11)),title:{text:"Hora de Panamá"},gridcolor:colors.line},
       yaxis:{tickmode:"array",tickvals:ticks,ticktext:entries.map(x=>x[2]),range:[-0.6,entries.length*3-0.8],
         fixedrange:true,gridcolor:colors.line,zeroline:false},
-      legend:{orientation:"h",y:1.06},showlegend:true
+      legend:{orientation:"h",y:-0.30},showlegend:true
     };
     return {traces,layout};
   }
