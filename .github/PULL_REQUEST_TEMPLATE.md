@@ -26,4 +26,3 @@ Describimos el propósito, los componentes modificados, las issues relacionadas 
 ## Observaciones
 
 Adaptamos las tareas al alcance antes de la aceptación; las verificaciones no aplicables se explican en lugar de afirmar que se ejecutaron. No fusionamos un PR con casillas pendientes, CI exigible fallida o evidencia insuficiente. Si una nueva revisión modifica un criterio aprobado, volvemos a validarlo. Las tareas del PR no sustituyen los criterios de sus issues.
-
