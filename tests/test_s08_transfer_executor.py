@@ -48,8 +48,18 @@ class TransferTests(unittest.TestCase):
         self.assertNotIn("-t", client)
         self.assertEqual((ct, st), (60, 70))
 
+    def test_extended_volume_profiles(self):
+        for name, size in (("tcp-500mb", 500000000), ("tcp-1gb", 1000000000),
+                           ("tcp-2gb", 2000000000), ("tcp-5gb", 5000000000)):
+            _, _, server, client, ct, st = M.commands(name, "HQ_A_S2")
+            self.assertEqual(client[client.index("-n") + 1], str(size))
+            self.assertEqual(client[client.index("-b") + 1], "100000000")
+            self.assertEqual(client[client.index("-i") + 1], server[server.index("-i") + 1])
+            self.assertLessEqual(ct / int(client[client.index("-i") + 1]), 80)
+            self.assertGreater(st, ct)
+
     def test_invalid_choices(self):
-        for profile, route in [("tcp-5gb", "HQ_A_S1"), ("tcp-10s", "192.168.47.2"),
+        for profile, route in [("tcp-10gb", "HQ_A_S1"), ("tcp-10s", "192.168.47.2"),
                                ("udp-10s", "S2_A_FRONTAL_HQ"), ("tcp-10s;id", "HQ_A_S2")]:
             with self.assertRaises(ValueError):
                 M.commands(profile, route)
