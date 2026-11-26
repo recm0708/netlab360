@@ -424,7 +424,9 @@ button.secondary, .topology-action {
 .obs-chart { min-width:0; border:1px solid var(--line); border-radius:9px; padding:12px; }
 .obs-chart h3,.obs-window h3 { margin:0 0 10px; font-size:.95rem; }
 .obs-chart .obs-scroll { --http-row:29px; max-height:calc(5 * var(--http-row)); overflow:auto; scrollbar-gutter:stable; margin-block:6px 0; }
-.obs-http-heading { font-size:.85rem; margin:12px 0 4px; }
+.obs-http-heading { font-size:.85rem; margin:0; }
+.obs-http-actions { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px 12px; margin-top:10px; }
+.obs-http-actions button { font-size:.78rem; padding:4px 8px; min-height:26px; }
 #obs-panel .obs-scroll :is(th,td) { height:var(--http-row); box-sizing:border-box; padding:4px 8px; font-size:.79rem; line-height:20px; white-space:nowrap; }
 #obs-panel .obs-scroll td:first-child { width:70%; }
 #obs-panel .obs-scroll td[data-state] { background:transparent; }
