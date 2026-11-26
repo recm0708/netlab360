@@ -19,6 +19,7 @@ BASE = "http://127.0.0.1:3000"
 
 
 class NoRedirect(HTTPRedirectHandler):
+    """Impedir redirecciones y mantener las credenciales en el origen local."""
     def redirect_request(self, *args, **kwargs):
         return None
 
@@ -27,6 +28,7 @@ OPEN = build_opener(ProxyHandler({}), NoRedirect())
 
 
 def get(path, password=None):
+    """Consultar la API local sin proxy y limitar el tamaño de la respuesta."""
     req = Request(BASE + path)
     if password is not None:
         req.add_header("Authorization", "Basic " + base64.b64encode(
@@ -36,6 +38,7 @@ def get(path, password=None):
 
 
 def compare(destination, password):
+    """Validar acceso, aprovisionamiento y equivalencia al mismo corte temporal."""
     health = get("/api/health")
     assert health["version"] == "13.3.2" and health["database"] == "ok"
     try:
@@ -55,6 +58,7 @@ def compare(destination, password):
                           for t in p["targets"]] for p in data["panels"]}
     assert contract(dashboard) == contract(expected)
     print("GRAFANA_VERSION=13.3.2 DASHBOARD=10/10 FUENTE=OK", flush=True)
+    # Fijar el corte de NETLAB360 para evitar comparar muestras de instantes distintos.
     snapshot = R.collect()
     assert set(snapshot["transport"].values()) == {"OK"}
     end = snapshot["window_end_unix"]
@@ -67,6 +71,7 @@ def compare(destination, password):
         assert transport == "OK" and actual == direct
         fields[metric] = sum(len(v) for v in actual.values())
         print(f"METRICA={metric} MUESTRAS={fields[metric]} CONTRASTE=MATCH", flush=True)
+    # Contrastar los cinco campos por sonda y ventana sin sustituir datos ausentes.
     windows = []
     selector = '{job="' + R.JOB + '"}'
     for minutes in S.WINDOWS_MIN:
@@ -101,6 +106,7 @@ def compare(destination, password):
                             "fields": {f: v[key] for f, v in values.items()}})
             print(f"SONDA={key} VENTANA={minutes}m CALIDAD={w['quality']} GRAFANA=MATCH")
     assert len(windows) == 15
+    # Crear una evidencia nueva únicamente después de superar todos los contrastes.
     with destination.open("x", encoding="utf-8") as handle:
         json.dump({"version": health["version"], "dashboard_uid": DASH, "datasource_uid": UID,
                    "window_end_unix": end, "series_counts": fields, "windows": windows},
