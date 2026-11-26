@@ -11,6 +11,7 @@ import pwd
 import runpy
 import secrets
 import shutil
+import stat
 import sys
 import tempfile
 import time
@@ -200,12 +201,13 @@ def resume_installation(stage):
     pwd.getpwnam(ACCOUNT)
     user = account()
     def secure(path, uid, gid, permissions, kind):
-        raw = sudo("/usr/bin/stat", "-c", "%u:%g:%a:%F:%h", str(path)).stdout.strip()
-        owner, group, mode, file_type, links = raw.split(":")
+        raw = sudo("/usr/bin/stat", "-c", "%u:%g:%f:%h", str(path)).stdout.strip()
+        owner, group, mode, links = raw.split(":")
+        mode = int(mode, 16)
+        expected = stat.S_IFREG if kind == "regular file" else stat.S_IFDIR
         if (int(owner) != uid or (gid is not None and int(group) != gid)
-                or int(mode, 8) != permissions or file_type != kind
-                or (kind == "regular file" and links != "1")):
-            # GNU stat distingue el archivo regular vacío.
+                or stat.S_IMODE(mode) != permissions or stat.S_IFMT(mode) != expected
+                or (expected == stat.S_IFREG and links != "1")):
             raise ValueError("RESUME_PATH_IDENTITY:" + str(path))
     for path in (INSTALL, INSTALL / "share", INSTALL / "share/prometheus",
                  INSTALL / "share/prometheus/alertmanager"):
