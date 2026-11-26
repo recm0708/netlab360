@@ -18,7 +18,18 @@ STEP = 10
 SPAN = 300
 
 
-def fetch(url, password=None, payload=None, username="netlab360-admin", method=None):
+def decode_payload(raw, expected=dict):
+    """Aceptar listas solamente cuando el contrato del endpoint las exige."""
+    if expected is dict:
+        return readers.decode(raw, 2_097_152)
+    assert expected is list and len(raw) <= 2_097_152
+    data = json.loads(raw, object_pairs_hook=readers.unique_pairs,
+                      parse_constant=readers.reject_constant, parse_float=readers.finite_float)
+    assert isinstance(data, list) and all(isinstance(row, dict) for row in data)
+    return data
+
+
+def fetch(url, password=None, payload=None, username="netlab360-admin", method=None, expected=dict):
     """Consultar únicamente orígenes locales con respuestas acotadas."""
     assert url.startswith((BASE + "/", PROM + "/"))
     assert password is None or (url.startswith(BASE + "/") and ":" not in username)
@@ -29,7 +40,7 @@ def fetch(url, password=None, payload=None, username="netlab360-admin", method=N
         req.add_header("Authorization", "Basic " + base64.b64encode(
             (username + ":" + password).encode()).decode())
     with OPEN.open(req, timeout=20) as response:
-        return readers.decode(response.read(2_097_153), 2_097_152)
+        return decode_payload(response.read(2_097_153), expected)
 
 
 def add_point(points, probe, stamp, value):
