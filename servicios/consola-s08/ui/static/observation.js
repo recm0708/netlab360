@@ -126,7 +126,7 @@
   }
   function create(read,context,format,loadPlotly,number){
     const el=id=>document.getElementById("obs-"+id);
-    const panel=el("panel"), button=el("refresh"), notice=el("notice"), scope=el("scope"), notify=el("notify");
+    const button=el("refresh"), notice=el("notice"), scope=el("scope"), notify=el("notify");
     const charts=["scrape_up","probe_success","duration_seconds"];
     let epoch=0,data=null,busy=false,notifyBusy=false,draw=Promise.resolve();
     const permitted=()=>location.pathname==="/observability"&&context()?.active===true;
@@ -145,7 +145,7 @@
     }
     function clear(){
       epoch++;data=null;busy=false;notifyBusy=false;
-      for(const id of ["latest","windows","http","notifications"])table(id,[]);
+      for(const id of ["latest","windows","http","notifications","cards"])table(id,[]);
       text("source","Sin observación vigente.");text("notice","Consulte las sondas.");
       text("notify-status","Sin consulta de notificaciones.");
       for(const key of charts)el(key).hidden=true;
@@ -170,6 +170,21 @@
           s?.probe_success===1?["Éxito","ok"]:s?.probe_success===0?["Fallo medido","fault"]:["Sin datos","unknown"],
           s?.duration_seconds==null?"—":number(s.duration_seconds*1000,"latency")+" ms"]);
       }));
+      const cards=minutes.map(m=>{
+        const section=document.createElement("section"), title=document.createElement("h3"), grid=document.createElement("div");
+        section.className="obs-window";title.textContent=m+" min";grid.className="obs-card-grid";
+        for(const id of ids){
+          const w=result.probes.find(r=>r.probe.id===id).windows.find(w=>w.window_minutes===m);
+          const card=document.createElement("div"), label=document.createElement("span"), value=document.createElement("strong"), detail=document.createElement("small");
+          card.className="obs-card";label.textContent=names[id];
+          value.textContent=w?.observed_availability_pct==null?"—":number(w.observed_availability_pct,"percentage")+" %";
+          detail.textContent=w?quality[w.quality]+" · "+w.probe_count+"/"+w.nominal_slots+" medidas":"Sin datos";
+          state(card,w?.meets_observed_target===true?"ok":w?.meets_observed_target===false?"fault":"unknown");
+          card.append(label,value,detail);grid.append(card);
+        }
+        section.append(title,grid);return section;
+      });
+      table("cards",cards);
       table("windows",minutes.flatMap(m=>ids.map(id=>{
         const w=result.probes.find(r=>r.probe.id===id).windows.find(w=>w.window_minutes===m);
         if(!w)return rowOf([m+" min",names[id],"—","—","—","—","—","—","—","Sin datos"]);
@@ -213,7 +228,7 @@
         text("notice","Observación al corte indicado; consulte de nuevo para actualizar.");
         await renderPlots();
       }catch(error){
-        if(same(e,actor)){data=null;for(const id of ["latest","windows","http"])table(id,[]);
+        if(same(e,actor)){data=null;for(const id of ["latest","windows","http","cards"])table(id,[]);
           for(const key of charts)el(key).hidden=true;text("source","Sin observación confirmada.");
           text("notice",error.message==="HTTP_429"?"Consulta ocupada. Reintente después de dos segundos.":"No se pudo confirmar la observación.");}
       }finally{if(epoch===e){busy=false;controls();}}
