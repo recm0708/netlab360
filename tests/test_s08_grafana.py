@@ -23,9 +23,19 @@ class GrafanaTests(unittest.TestCase):
                 self.assertNotIn("vector(", target["expr"])
                 self.assertNotEqual(target["instant"], target["range"])
         for minutes in (5, 15, 60):
-            selected = [p for p in dashboard["panels"] if p["title"].endswith(f"{minutes} min")]
+            # Comparar títulos completos para distinguir 5 min de 15 min.
+            expected = {
+                f"SLI observado · {minutes} min": 1,
+                f"Cobertura · {minutes} min": 4,
+            }
+            selected = [p for p in dashboard["panels"] if p["title"] in expected]
             self.assertEqual(len(selected), 2)
-            self.assertEqual(sum(len(p["targets"]) for p in selected), 5)
+            self.assertEqual(
+                {p["title"]: len(p["targets"]) for p in selected}, expected
+            )
+            for panel in selected:
+                for target in panel["targets"]:
+                    self.assertIn(f"[{minutes}m]", target["expr"])
 
     def test_single_source(self):
         text = (CONFIG / "provisioning/datasources/prometheus.yml").read_text()
