@@ -423,7 +423,13 @@ button.secondary, .topology-action {
 .obs-chart-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:12px 0 18px; align-items:start; }
 .obs-chart { min-width:0; border:1px solid var(--line); border-radius:9px; padding:12px; }
 .obs-chart h3,.obs-window h3 { margin:0 0 10px; font-size:.95rem; }
-.obs-chart .obs-scroll { max-height:260px; overflow:auto; }
+.obs-chart .obs-scroll { --http-row:29px; max-height:calc(5 * var(--http-row)); overflow:auto; scrollbar-gutter:stable; margin-block:6px 0; }
+.obs-http-heading { font-size:.85rem; margin:12px 0 4px; }
+#obs-panel .obs-scroll :is(th,td) { height:var(--http-row); box-sizing:border-box; padding:4px 8px; font-size:.79rem; line-height:20px; white-space:nowrap; }
+#obs-panel .obs-scroll td:first-child { width:70%; }
+#obs-panel .obs-scroll td[data-state] { background:transparent; }
+#obs-panel .obs-scroll th { position:sticky; top:0; z-index:1; }
+#main .obs-scroll { margin-block:6px 0; }
 .obs-http-summary { background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:14px; margin-top:12px; }
 .obs-http-summary strong { display:block; font-size:1.85rem; font-variant-numeric:tabular-nums; line-height:1.25; }
 .obs-http-summary small { display:block; color:var(--muted); margin-top:5px; }
@@ -447,10 +453,10 @@ button.secondary, .topology-action {
 #obs-panel .modebar-btn path { fill:var(--muted); }
 #obs-panel .modebar-btn:hover path { fill:var(--text); }
 @media (min-width:1400px) {
-  .obs-chart-grid { grid-template-columns:repeat(6,minmax(0,1fr)); }
-  .obs-chart-grid > :nth-child(-n+2) { grid-column:span 3; }
-  .obs-chart-grid > :nth-child(3) { grid-column:span 4; }
-  .obs-chart-grid > :nth-child(4) { grid-column:span 2; }
+  .obs-chart-grid { grid-template-columns:repeat(20,minmax(0,1fr)); }
+  .obs-chart-grid > :nth-child(-n+2) { grid-column:span 10; }
+  .obs-chart-grid > :nth-child(3) { grid-column:span 14; }
+  .obs-chart-grid > :nth-child(4) { grid-column:span 6; }
   .obs-window-grid { grid-template-columns:repeat(5,minmax(0,1fr)); }
 }
 @media (max-width:1000px) {
