@@ -7,8 +7,8 @@ After=network.target
 Type=exec
 User=netlab360-s08-grafana
 Group=netlab360-s08-grafana
-WorkingDirectory=/opt/netlab360/grafana-13.3.2
-ExecStart=/opt/netlab360/grafana-13.3.2/bin/grafana server --homepath=/opt/netlab360/grafana-13.3.2 --config=/opt/netlab360/grafana-config/grafana.ini
+WorkingDirectory=/opt/netlab360-grafana/grafana-13.3.2
+ExecStart=/opt/netlab360-grafana/grafana-13.3.2/bin/grafana server --homepath=/opt/netlab360-grafana/grafana-13.3.2 --config=/opt/netlab360-grafana/grafana-config/grafana.ini
 LoadCredential=admin-password:/etc/netlab360/grafana/admin-password
 LoadCredential=secret-key:/etc/netlab360/grafana/secret-key
 NoNewPrivileges=yes
