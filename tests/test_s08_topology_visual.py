@@ -160,3 +160,11 @@ class TopologyVisualTests(unittest.TestCase):
         self.assertIn('model.augment(model.aged', js)
         css = (UI / "static/styles.css").read_text(encoding="utf-8")
         self.assertIn(".dashboard-table-wrap { max-height: 60vh; overflow: auto; overscroll-behavior: auto; }", css)
+
+    def test_fullscreen_width_and_inspector_hierarchy(self):
+        css = (UI / "static/styles.css").read_text(encoding="utf-8")
+        self.assertIn("#topology-workspace:fullscreen #topology-map { width:100%; height:auto; max-height:none; }", css)
+        self.assertNotIn("max-height:calc(100vh - 185px)", css)
+        self.assertIn(".topology-inspector dt { color:var(--muted); font-size:.79rem; font-weight:700;", css)
+        self.assertIn(".topology-inspector dd { color:var(--text); font-size:.94rem;", css)
+        self.assertIn("#topology-selection { color:var(--text); font-size:1rem; font-weight:700;", css)
