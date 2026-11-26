@@ -70,9 +70,9 @@ def request(payload):
 
 def request_stream(payload, on_sample, cancelled):
     """Recibir muestras reales y solicitar cancelación en la conexión propietaria."""
-    from .stream_protocol import MAX_EVENTS, MAX_FRAME, sample
+    from .stream_protocol import MAX_EVENTS, MAX_FRAME, STREAM_ACTIONS, sample
     selection = select(payload)
-    if selection.action != "test.content.tcp":
+    if selection.action not in STREAM_ACTIONS:
         raise ValueError("STREAM_NOT_ENABLED")
     check_identity()
     deadline = time.monotonic() + min(710, selection.deadline_s + 45)
