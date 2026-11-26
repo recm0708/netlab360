@@ -99,8 +99,16 @@
     const rows=probe.samples.filter(s=>s.timestamp_unix>data.window_end_unix-span*60).slice().reverse();
     const counts=new Map();
     for(const s of rows)counts.set(s.http_status_code,(counts.get(s.http_status_code)||0)+1);
-    return {latest:probe.latest,quality:probe.quality,rows,
+    return {latest:probe.latest,quality:probe.quality,rows,recent:rows.filter(s=>s.timestamp_unix>data.window_end_unix-120),
       counts:[...counts].sort((a,b)=>(a[0]??Infinity)-(b[0]??Infinity))};
+  }
+  // Exportar el intervalo completo, sin imputar nulos ni redondear mediciones.
+  function httpCsv(data,span){
+    const h=httpHistory(data,span);
+    const fields=["probe_id","window_minutes","window_end_utc","source","quality","http_transport","timestamp_utc","timestamp_unix","scrape_up","probe_success","duration_seconds","http_status_code"];
+    const rows=h.rows.map(s=>["s2-hq-http",span,data.window_end_utc,data.source,h.quality,data.transport.probe_http_status_code,
+      new Date(s.timestamp_unix*1000).toISOString(),s.timestamp_unix,s.scrape_up,s.probe_success,s.duration_seconds,s.http_status_code]);
+    return [fields,...rows].map(row=>row.map(v=>v===null?"":String(v)).join(",")).join("\r\n")+"\r\n";
   }
   function durationStats(data,span){
     requireValue(minutes.includes(span));
@@ -149,7 +157,7 @@
       xaxis:{type:"linear",range:[start,end],tickmode:"array",tickvals:ticks,ticktext:ticks.map(t=>new Intl.DateTimeFormat("es-PA",{timeZone:"America/Panama",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).format(new Date(t*1000))),gridcolor:colors.line},
       yaxis:duration?{title:{text:"Duración (ms)"},rangemode:"tozero",gridcolor:colors.line}:
         {tickmode:"array",tickvals:ids.map((_,i)=>ids.length-1-i),ticktext:ids.map(id=>names[id]),ticklabelstandoff:12,range:[-0.6,4.6],fixedrange:true,gridcolor:colors.line,zeroline:false},
-      legend:{orientation:"h",x:0.5,xanchor:"center",y:-0.24,yanchor:"top",entrywidth:175,entrywidthmode:"pixels",traceorder:"normal"},uirevision:"sondas-"+key+"-"+span,showlegend:duration}};
+      legend:{orientation:"h",x:0.5,xanchor:"center",y:-0.24,yanchor:"top",entrywidth:138,entrywidthmode:"pixels",font:{size:11},traceorder:"normal"},uirevision:"sondas-"+key+"-"+span,showlegend:duration}};
   }
   function create(read,context,format,loadPlotly,number){
     const el=id=>document.getElementById("obs-"+id);
@@ -172,7 +180,8 @@
       return tr;
     }
     function resetSummary(){
-      for(const id of ["fresh","acquired","passed","complete","http-latest","http-detail","http-count"])text(id,"—");
+      for(const id of ["fresh","acquired","passed","complete","http-latest","http-detail","http-count","http-recent-count"])text(id,"—");
+      el("http-export").disabled=true;
       table("http-codes",[]);table("http-distribution",[]);table("duration-stats",[]);
       state(el("http-latest"),"unknown");
     }
@@ -190,6 +199,7 @@
     function controls(){
       const active=permitted();
       scope.disabled=!active;
+      el("http-export").disabled=!active||!data||!httpHistory(data,Number(el("span").value)).rows.length;
       const option=scope.querySelector('option[value="validation"]');
       option.hidden=context()?.role!=="OPERATOR";option.disabled=option.hidden;
       if(option.hidden&&scope.value==="validation"){scope.value="operational";table("notifications",[]);text("notify-status","Esperando notificaciones operacionales.");}
@@ -261,7 +271,9 @@
       });
       table("http-distribution",segments);
       el("http-distribution").setAttribute("aria-label",h.counts.length?h.counts.map(([code,n])=>httpLabel(code)+": "+n).join(", "):"Sin muestras adquiridas");
-      table("http",h.rows.map(s=>rowOf([format(new Date(s.timestamp_unix*1000)),[httpLabel(s.http_status_code),httpState(s.http_status_code)]])));
+      text("http-recent-count",h.recent.length+" muestras");
+      table("http",h.recent.map(s=>rowOf([format(new Date(s.timestamp_unix*1000)),[httpLabel(s.http_status_code),httpState(s.http_status_code)]])));
+      el("http-export").disabled=!permitted()||!h.rows.length;
     }
     function renderPlots(){
       const current=data,e=epoch,actor=context()?.key;
@@ -344,10 +356,21 @@
       }catch(error){if(same(e,actor)&&scope.value===selected&&sequence===notifySequence)text("notify-status",error.message==="HTTP_429"?"Consulta ocupada. Reintente después de dos segundos.":"No se pudo confirmar la fuente.");}
       finally{if(epoch===e)controls();}
     }
+    function downloadHttp(){
+      if(!permitted()||!data)return;
+      const span=Number(el("span").value),h=httpHistory(data,span);
+      if(!h.rows.length)return;
+      const csv=httpCsv(data,span);
+      const url=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));
+      const link=document.createElement("a");
+      link.href=url;link.download="netlab360-http-s2-hq-"+span+"min-"+data.window_end_utc.replace(/[:.]/g,"-")+".csv";
+      link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+    }
+    el("http-export").addEventListener("click",downloadHttp);
     scope.addEventListener("change",refreshNotifications);
     el("span").addEventListener("change",()=>{if(data&&permitted()){renderInterval(data);renderPlots();}});
     new MutationObserver(()=>{if(data&&permitted())renderPlots();}).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
     return {clear,controls,refresh,refreshNotifications};
   }
-  root.NetlabObservation=Object.freeze({names,validate,validateNotifications,httpLabel,httpState,overview,httpHistory,durationStats,figure,create});
+  root.NetlabObservation=Object.freeze({names,validate,validateNotifications,httpLabel,httpState,overview,httpHistory,httpCsv,durationStats,figure,create});
 })(typeof window==="undefined"?globalThis:window);
