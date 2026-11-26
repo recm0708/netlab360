@@ -113,7 +113,13 @@ def execute(selection, operator, other, *, cancel=False):
             assert m["bytes_sent"] == m["bytes_received"] == 100000000
             assert m["content_integrity_verified"] is True and m["sender_sha256"] == m["receiver_sha256"]
         else:
-            assert m["bytes_sent"] == m["bytes_received"] and m["bytes_received"] > 0
+            assert observed_roles == {"sender", "receiver"}
+            assert m["bytes_sent"] > 0 and m["bytes_received"] > 0
+            assert all("interval_bytes" in point for point in data["progress"])
+            for role in ("sender", "receiver"):
+                points = [p for p in data["progress"] if p["role"] == role]
+                assert len(points) == len(m[role + "_intervals"])
+                assert points[-1]["bytes"] == sum(p["bytes"] for p in m[role + "_intervals"])
     emit("real_job", job=job, states=states, roles_observed_while_running=sorted(observed_roles))
     return identifier
 
@@ -122,6 +128,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--deps", type=Path, required=True)
     parser.add_argument("--state", type=Path, required=True)
+    parser.add_argument("--iperf", action="store_true", help="Validar TCP/UDP y cancelación iPerf3")
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[2]
     sys.path.insert(0, str(args.deps))
@@ -144,16 +151,24 @@ def main():
         assert request("GET","/ui/static/jobs.js",html=True)[0] == 200
         status, catalog, _ = request("GET",JOBS+"/catalog",auth=operator)
         assert status == 200 and len(catalog["selections"]) == 34
-        assert sum(row["live_progress"] for row in catalog["selections"]) == 10
+        assert sum(row["live_progress"] for row in catalog["selections"]) == 24
+        assert sum(row["active_cancel"] for row in catalog["selections"]) == 24
         content = {"action":"test.content.tcp","route":"HQ_A_S1","profile":"content-100mb"}
         assert request("POST",JOBS,auth=viewer,body=content)[0] == 403
         assert request("POST",JOBS,auth=operator,body=content,csrf=False)[0] == 403
         assert request("POST",JOBS,auth=operator,body=content,origin="http://127.0.0.1:9140")[0] == 403
         assert request("POST",JOBS,auth=operator,body=dict(content,route="192.168.47.2"))[0] == 400
-        ids = [execute(content,operator,other),
-               execute(dict(content,profile="content-500mb",route="HQ_A_S2"),operator,other,cancel=True),
-               execute({"action":"test.iperf.tcp","route":"HQ_A_S1","profile":"tcp-10s"},operator,other)]
-        assert len(set(ids)) == 3
+        tcp = {"action":"test.iperf.tcp","route":"HQ_A_S1","profile":"tcp-10s"}
+        if args.iperf:
+            ids = [execute(tcp,operator,other),
+                   execute({"action":"test.iperf.udp","route":"HQ_A_S2","profile":"udp-10s"},operator,other),
+                   execute(dict(tcp,profile="tcp-500mb",route="HQ_A_S2"),operator,other,cancel=True),
+                   execute(content,operator,other)]
+        else:
+            ids = [execute(content,operator,other),
+                   execute(dict(content,profile="content-500mb",route="HQ_A_S2"),operator,other,cancel=True),
+                   execute(tcp,operator,other)]
+        assert len(set(ids)) == (4 if args.iperf else 3)
         assert request("GET",JOBS,auth=other)[1]["jobs"] == []
         assert {row["job_id"] for row in request("GET",JOBS,auth=operator)[1]["jobs"]} == set(ids)
         for auth in (operator,other,viewer):
@@ -168,7 +183,7 @@ def main():
         for identifier in ids:
             assert request("GET",JOBS+"/"+identifier,auth=operator)[0] == 200
         assert request("POST","/api/v1/auth/logout",auth=operator)[0] == 200
-    emit("acceptance", real_jobs=3, completed=2, cancelled_under_load=1, history_reopened=3,
+    emit("acceptance", real_jobs=len(ids), completed=len(ids)-1, cancelled_under_load=1, history_reopened=len(ids),
          synthetic_queue_recovery=1, storage=storage.inspect(directory), browser_visual_verified=False)
 
 
