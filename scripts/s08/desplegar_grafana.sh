@@ -95,7 +95,7 @@ sudo -n useradd --system --user-group --no-create-home --home-dir /nonexistent -
 sudo -n install -d -o root -g root -m 0755 "$INSTALL" "$CONFIG"
 sudo -n cp -a -- "$SOURCE/." "$INSTALL/"
 sudo -n chown -hR root:root "$INSTALL"
-sudo -n chmod -R go-w "$INSTALL"
+sudo -n chmod -R a+rX,go-w "$INSTALL"
 sudo -n cp -a servicios/observabilidad/grafana/. "$CONFIG/"
 sudo -n chown -hR root:root "$CONFIG"
 sudo -n chmod -R a+rX,go-w "$CONFIG"
