@@ -144,19 +144,20 @@
     }
     const ticks=Array.from({length:5},(_,i)=>start+(end-start)*(i+0.5)/5);
     return {traces,layout:{height:duration?350:215,autosize:true,paper_bgcolor:colors.surface,plot_bgcolor:colors.surface,
-      font:{color:colors.text,size:12},margin:{l:duration?65:165,r:20,t:12,b:duration?85:40},
+      font:{color:colors.text,size:12},margin:{l:duration?65:185,r:22,t:12,b:duration?100:45},
       hovermode:"closest",dragmode:"zoom",separators:".,",
       xaxis:{type:"linear",range:[start,end],tickmode:"array",tickvals:ticks,ticktext:ticks.map(t=>new Intl.DateTimeFormat("es-PA",{timeZone:"America/Panama",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).format(new Date(t*1000))),gridcolor:colors.line},
       yaxis:duration?{title:{text:"Duración (ms)"},rangemode:"tozero",gridcolor:colors.line}:
-        {tickmode:"array",tickvals:ids.map((_,i)=>ids.length-1-i),ticktext:ids.map(id=>names[id]),range:[-0.6,4.6],fixedrange:true,gridcolor:colors.line,zeroline:false},
-      legend:{orientation:"h",y:-0.23},showlegend:duration}};
+        {tickmode:"array",tickvals:ids.map((_,i)=>ids.length-1-i),ticktext:ids.map(id=>names[id]),ticklabelstandoff:12,range:[-0.6,4.6],fixedrange:true,gridcolor:colors.line,zeroline:false},
+      legend:{orientation:"h",y:-0.27},uirevision:"sondas-"+key+"-"+span,showlegend:duration}};
   }
   function create(read,context,format,loadPlotly,number){
     const el=id=>document.getElementById("obs-"+id);
-    const button=el("refresh"), notice=el("notice"), scope=el("scope"), notify=el("notify");
+    const scope=el("scope");
     const charts=["scrape_up","probe_success","duration_seconds"];
     let epoch=0,data=null,busy=false,notifyBusy=false,draw=Promise.resolve();
-    const permitted=()=>location.pathname==="/observability"&&context()?.active===true;
+    let notifySequence=0,notifyTimer=null,probeTimer=null,notifyRequest=Promise.resolve();
+    const permitted=()=>location.pathname==="/observability"&&context()?.active===true&&!document.hidden;
     const same=(e,actor)=>epoch===e&&permitted()&&context().key===actor;
     const text=(id,value)=>{el(id).textContent=value;};
     const state=(node,value)=>{node.dataset.state=value;};
@@ -172,14 +173,15 @@
     }
     function resetSummary(){
       for(const id of ["fresh","acquired","passed","complete","http-latest","http-detail","http-count"])text(id,"—");
-      table("http-codes",[]);table("duration-stats",[]);
+      table("http-codes",[]);table("http-distribution",[]);table("duration-stats",[]);
       state(el("http-latest"),"unknown");
     }
     function clear(){
-      epoch++;data=null;busy=false;notifyBusy=false;
+      epoch++;data=null;busy=false;notifyBusy=false;notifySequence++;
+      clearTimeout(notifyTimer);clearTimeout(probeTimer);
       for(const id of ["latest","windows","http","notifications","cards"])table(id,[]);
       resetSummary();
-      text("source","Sin observación vigente.");text("notice","Consulte las sondas.");
+      text("source","Sin observación vigente.");text("notice","Esperando observaciones autenticadas.");
       text("notify-status","Sin consulta de notificaciones.");
       for(const key of charts)el(key).hidden=true;
       draw=draw.catch(()=>{}).then(()=>{for(const key of charts){const node=el(key);if(root.Plotly)root.Plotly.purge(node);node.replaceChildren();}});
@@ -187,10 +189,10 @@
     }
     function controls(){
       const active=permitted();
-      button.disabled=!active||busy;notify.disabled=!active||notifyBusy;
+      scope.disabled=!active;
       const option=scope.querySelector('option[value="validation"]');
       option.hidden=context()?.role!=="OPERATOR";option.disabled=option.hidden;
-      if(option.hidden&&scope.value==="validation"){scope.value="operational";table("notifications",[]);text("notify-status","Consulte las notificaciones operacionales.");}
+      if(option.hidden&&scope.value==="validation"){scope.value="operational";table("notifications",[]);text("notify-status","Esperando notificaciones operacionales.");}
     }
     function render(result){
       const summary=overview(result);
@@ -253,6 +255,12 @@
         return tag;
       });
       table("http-codes",tags);
+      const segments=h.counts.map(([code,n])=>{
+        const segment=document.createElement("span");state(segment,httpState(code));
+        segment.style.flexGrow=String(n);segment.title=httpLabel(code)+" · "+n;return segment;
+      });
+      table("http-distribution",segments);
+      el("http-distribution").setAttribute("aria-label",h.counts.length?h.counts.map(([code,n])=>httpLabel(code)+": "+n).join(", "):"Sin muestras adquiridas");
       table("http",h.rows.map(s=>rowOf([format(new Date(s.timestamp_unix*1000)),[httpLabel(s.http_status_code),httpState(s.http_status_code)]])));
     }
     function renderPlots(){
@@ -273,16 +281,21 @@
       }).catch(()=>{if(same(e,actor)){for(const key of charts)el(key).hidden=true;text("notice","Datos recibidos; no se pudo representar el gráfico.");}});
       return draw;
     }
-    async function refresh(){
+    async function refresh(retry=true){
       if(!permitted()||busy)return;
       const e=epoch,actor=context().key;busy=true;controls();
       text("notice","Consultando muestras reales…");
       try{
         const {status,data:result}=await read("/api/v1/observability/probes",1048576);
         if(!same(e,actor))return;
+        if(status===429&&retry){
+          text("notice","Consulta ocupada; reintento acotado. Los datos anteriores conservan su corte.");
+          clearTimeout(probeTimer);probeTimer=setTimeout(()=>{if(same(e,actor))void refresh(false);},2100);
+          return;
+        }
         if(status!==200)throw Error("HTTP_"+status);
         data=validate(result);render(data);
-        text("notice","Observación al corte indicado; consulte de nuevo para actualizar.");
+        text("notice","Observación al corte indicado. La actualización periódica solo consulta las sondas.");
         await renderPlots();
       }catch(error){
         if(same(e,actor)){data=null;for(const id of ["latest","windows","http","cards"])table(id,[]);
@@ -290,30 +303,41 @@
           text("notice",error.message==="HTTP_429"?"Consulta ocupada. Reintente después de dos segundos.":"No se pudo confirmar la observación.");}
       }finally{if(epoch===e){busy=false;controls();}}
     }
-    async function refreshNotifications(){
-      if(!permitted()||notifyBusy)return;
+    function refreshNotifications(){
+      const sequence=++notifySequence;
+      clearTimeout(notifyTimer);
+      table("notifications",[]);text("notify-status","Consultando notificaciones…");
+      notifyRequest=notifyRequest.catch(()=>{}).then(()=>queryNotifications(sequence,true));
+      return notifyRequest;
+    }
+    async function queryNotifications(sequence,retry){
+      if(!permitted()||sequence!==notifySequence)return;
       const e=epoch,actor=context().key,selected=scope.value;
       if(!["operational","validation"].includes(selected)||(selected==="validation"&&context().role!=="OPERATOR"))return;
       notifyBusy=true;controls();table("notifications",[]);text("notify-status","Consultando notificaciones…");
       try{
         const {status,data:result}=await read("/api/v1/alerts/notifications/"+selected,2097152);
-        if(!same(e,actor)||scope.value!==selected)return;
+        if(!same(e,actor)||scope.value!==selected||sequence!==notifySequence)return;
+        if(status===429&&retry){
+          text("notify-status","Consulta ocupada; reintento en dos segundos.");
+          notifyTimer=setTimeout(()=>{if(same(e,actor)&&sequence===notifySequence){notifyRequest=notifyRequest.catch(()=>{}).then(()=>queryNotifications(sequence,false));}},2100);
+          return;
+        }
         if(status!==200)throw Error("HTTP_"+status);
         const batch=validateNotifications(result,selected);
         text("notify-status",batch.transport==="OK"?number(batch.total,"count")+" registros · "+(batch.truncated?"Últimos 200 · ":"")+
           (selected==="validation"?"Validación sintética, no operacional.":batch.total===0?"No hay notificaciones operacionales registradas.":"Notificaciones operacionales."):"Fuente "+batch.transport+"; cantidad no confirmada.");
         table("notifications",batch.records.map(r=>rowOf([r.alertname,names[r.labels?.probe_id]??"—",
-          r.status==="firing"?["Activa","fault"]:["Resuelta","recovery"],
+          r.status==="firing"?["Activación","fault"]:["Resolución","recovery"],
           format(new Date(r.starts_at_utc)),r.ends_at_utc?format(new Date(r.ends_at_utc)):"—",
           format(new Date(r.received_at_utc))])));
-      }catch(error){if(same(e,actor)&&scope.value===selected)text("notify-status",error.message==="HTTP_429"?"Consulta ocupada. Reintente después de dos segundos.":"No se pudo confirmar la fuente.");}
+      }catch(error){if(same(e,actor)&&scope.value===selected&&sequence===notifySequence)text("notify-status",error.message==="HTTP_429"?"Consulta ocupada. Reintente después de dos segundos.":"No se pudo confirmar la fuente.");}
       finally{if(epoch===e){notifyBusy=false;controls();}}
     }
-    button.addEventListener("click",refresh);notify.addEventListener("click",refreshNotifications);
-    scope.addEventListener("change",()=>{table("notifications",[]);text("notify-status","Consulte el ámbito seleccionado.");});
+    scope.addEventListener("change",refreshNotifications);
     el("span").addEventListener("change",()=>{if(data&&permitted()){renderInterval(data);renderPlots();}});
     new MutationObserver(()=>{if(data&&permitted())renderPlots();}).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
-    return {clear,controls};
+    return {clear,controls,refresh,refreshNotifications};
   }
   root.NetlabObservation=Object.freeze({names,validate,validateNotifications,httpLabel,httpState,overview,httpHistory,durationStats,figure,create});
 })(typeof window==="undefined"?globalThis:window);
