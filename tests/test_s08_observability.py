@@ -141,7 +141,7 @@ for(const metric of ["scrape_up","probe_success","duration_seconds"]){
     assert.equal(f.layout.yaxis.rangemode,"tozero");
     assert.equal(f.layout.legend.x,0.5);
     assert.equal(f.layout.legend.xanchor,"center");
-    assert.equal(f.layout.legend.entrywidth,175);
+    assert.equal(f.layout.legend.entrywidth,138);
   }
   for(const t of f.traces){
     assert.equal(t.x.length,30);
@@ -218,6 +218,16 @@ const M=globalThis.NetlabObservation,d=JSON.parse(require("node:fs").readFileSyn
 M.validate(d);
 const h=M.httpHistory(d,5);
 assert.equal(h.rows.length,30);
+assert.equal(h.recent.length,12);
+assert(h.recent.every(s=>s.timestamp_unix>d.window_end_unix-120));
+assert.deepEqual(h.recent.slice(0,4).map(s=>s.http_status_code),[200,503,0,null]);
+const csv=M.httpCsv(d,60).trim().split(String.fromCharCode(13,10));
+assert.equal(csv.length,361);
+assert.equal(csv[0].split(",").at(-1),"http_status_code");
+assert.equal(csv[1].split(",").at(-1),"200");
+assert.equal(csv[3].split(",").at(-1),"0");
+assert.equal(csv[4].split(",").at(-1),"");
+assert.equal(M.httpHistory(d,60).recent.length,12);
 assert.deepEqual(h.counts,[[0,1],[200,1],[503,1],[null,27]]);
 assert.deepEqual(h.rows.slice(0,3).map(s=>s.http_status_code),[200,503,0]);
 assert.equal(h.latest.http_status_code,200);
@@ -245,6 +255,8 @@ assert.equal(M.validateNotifications({...empty,transport:"UNAVAILABLE",total:nul
         panel = html.split("Respuestas HTTP · S2 → FE-HQ", 1)[1].split("</section>", 1)[0]
         self.assertIn('id="obs-http"', panel)
         self.assertEqual(html.count('id="obs-http"'), 1)
+        self.assertIn('id="obs-http-export"', panel)
+        self.assertIn('id="obs-http-recent-count"', panel)
         self.assertIn('tabindex="0" role="region"', panel)
         self.assertIn("max-height:calc(5 * var(--http-row))", css)
         self.assertIn("grid-column:span 14", css)
