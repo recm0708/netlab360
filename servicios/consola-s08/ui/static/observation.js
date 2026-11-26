@@ -143,13 +143,13 @@
       }
     }
     const ticks=Array.from({length:5},(_,i)=>start+(end-start)*(i+0.5)/5);
-    return {traces,layout:{height:duration?350:215,autosize:true,paper_bgcolor:colors.surface,plot_bgcolor:colors.surface,
-      font:{color:colors.text,size:12},margin:{l:duration?65:185,r:22,t:12,b:duration?100:45},
+    return {traces,layout:{height:duration?400:215,autosize:true,paper_bgcolor:colors.surface,plot_bgcolor:colors.surface,
+      font:{color:colors.text,size:12},margin:{l:duration?65:185,r:22,t:12,b:duration?105:45},
       hovermode:"closest",dragmode:"zoom",separators:".,",
       xaxis:{type:"linear",range:[start,end],tickmode:"array",tickvals:ticks,ticktext:ticks.map(t=>new Intl.DateTimeFormat("es-PA",{timeZone:"America/Panama",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).format(new Date(t*1000))),gridcolor:colors.line},
       yaxis:duration?{title:{text:"Duración (ms)"},rangemode:"tozero",gridcolor:colors.line}:
         {tickmode:"array",tickvals:ids.map((_,i)=>ids.length-1-i),ticktext:ids.map(id=>names[id]),ticklabelstandoff:12,range:[-0.6,4.6],fixedrange:true,gridcolor:colors.line,zeroline:false},
-      legend:{orientation:"h",y:-0.27},uirevision:"sondas-"+key+"-"+span,showlegend:duration}};
+      legend:{orientation:"h",x:0.5,xanchor:"center",y:-0.24,yanchor:"top",entrywidth:175,entrywidthmode:"pixels",traceorder:"normal"},uirevision:"sondas-"+key+"-"+span,showlegend:duration}};
   }
   function create(read,context,format,loadPlotly,number){
     const el=id=>document.getElementById("obs-"+id);
