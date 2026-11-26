@@ -20,6 +20,7 @@
     return {config,layout,groups};
   }
   const layout=geometry("detailed").layout;
+  const baseIds=new Set(Object.keys(layout).filter(id=>!id.startsWith("LACP-")&&!id.startsWith("SDN-")&&!["OVS","FAUCET"].includes(id)));
   const mounted=new WeakMap();
 
   // Una observación vencida conserva la geometría, nunca el estado anterior.
@@ -58,7 +59,7 @@
       data.network_mutations_authorized!==false||data.traffic_measured!==false||
       !Array.isArray(data.nodes)||data.nodes.length!==18||!Array.isArray(data.links)||data.links.length!==21) return false;
     const nodes=new Set(data.nodes.map(n=>n.id)),links=new Set(data.links.map(l=>l.id));
-    return nodes.size===18&&links.size===21&&data.nodes.every(n=>Object.hasOwn(layout,n.id)&&typeof n.label==="string")&&
+    return nodes.size===18&&links.size===21&&data.nodes.every(n=>baseIds.has(n.id)&&typeof n.label==="string")&&
       data.links.every(l=>nodes.has(l.from)&&nodes.has(l.to)&&["wan","lan","access","redundancy"].includes(l.type));
   }
 
@@ -133,6 +134,7 @@
         ["Límite","Sin estado individual de cada puerto ni tráfico medido"]);
     }
     if(item.scope==="FLOW_COUNT_ONLY")rows.push(["Flujos observados",Number.isSafeInteger(item.flow_count)?String(item.flow_count):"Sin verificar"]);
+    if(["BOND_MEMBER_STATE","CONTROLLER_ONLY","FLOW_COUNT_ONLY"].includes(item.scope))rows.push(["Fuente","NOC S05 · observaciones autorizadas"]);
     if(item.observed_at_utc&&typeof format==="function")rows.push(["Última observación",format(new Date(item.observed_at_utc))]);
     return rows.filter(row=>typeof row[1]==="string");
   }
