@@ -1,0 +1,7 @@
+# Observabilidad integrada
+
+Consultamos las cinco sondas autorizadas desde el Prometheus existente. El lector obtiene series originales de adquisición, éxito, duración de sonda y código HTTP, con un corte temporal común. Evalúa las ventanas de 5, 15 y 60 minutos sin interpolar muestras y mantiene la distinción entre fallo medido, fallo de adquisición, ausencia y dato inválido. La duración de Blackbox no se identifica como RTT. El endpoint autenticado no admite expresiones PromQL, destinos ni parámetros del cliente; la consulta es de solo lectura, con tamaño y concurrencia limitados.
+
+Contrastamos los contadores de cada ventana con agregaciones nativas de Prometheus en el mismo instante. Las muestras se conservan con sus timestamps y valores originales; los paneles utilizarán el contrato de [formato numérico](s08-formato-numerico.md). No se certifica un objetivo de disponibilidad ante cobertura incompleta. El resultado es una base para la vista propia, no una aceptación de Grafana.
+
+Grafana utilizará la misma fuente Prometheus y un panel especializado, sin duplicar la topología ni el menú principal. Antes de instalarlo comprobamos recursos y opciones de distribución. Los accesos nativos serán opcionales y restringidos. La base de notificaciones se integrará mediante lectura de alcance fijo sin conceder acceso de escritura ni exponer credenciales. El histórico S04 y la instancia oficial se conservan hasta la migración integral.
