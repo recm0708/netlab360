@@ -74,6 +74,28 @@ class GrafanaTests(unittest.TestCase):
         self.assertIn('-g "$ACCOUNT" -m 0750 "$PREFIX"', installer)
         self.assertIn('sudo -n -u "$ACCOUNT" test -x "$INSTALL/bin/grafana"', installer)
 
+    def test_visual_contract(self):
+        dashboard = json.loads((CONFIG / "dashboards/sondas.json").read_text())
+        self.assertEqual(dashboard["timezone"], "America/Panama")
+        panels = {p["id"]: p for p in dashboard["panels"]}
+        for i in (1, 2):
+            self.assertEqual(panels[i]["type"], "state-timeline")
+            self.assertFalse(panels[i]["fieldConfig"]["defaults"]["custom"]["spanNulls"])
+        self.assertEqual(panels[3]["fieldConfig"]["defaults"]["unit"], "ms")
+        for i, nominal in ((6, 30), (8, 90), (10, 360)):
+            p = panels[i]
+            self.assertEqual(p["type"], "table")
+            self.assertTrue(all(t["format"] == "table" for t in p["targets"]))
+            self.assertEqual([t["id"] for t in p["transformations"]], ["merge", "filterFieldsByName", "organize"])
+            self.assertEqual(list(p["transformations"][2]["options"]["renameByName"].values()),
+                             ["Sonda", "Adquiridas", "Adq. correctas", "Medidas", "Éxitos"])
+            steps = p["fieldConfig"]["defaults"]["thresholds"]["steps"]
+            self.assertEqual([(s["value"], s["color"]) for s in steps],
+                             [(None, "orange"), (nominal, "green"), (nominal + 1, "orange")])
+            sli = panels[i - 1]["fieldConfig"]["defaults"]
+            self.assertEqual(sli["unit"], "percent")
+            self.assertEqual(sli["thresholds"]["steps"][-1]["color"], "blue")
+
 
 if __name__ == "__main__":
     unittest.main()
