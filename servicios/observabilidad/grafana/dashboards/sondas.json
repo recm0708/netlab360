@@ -9,7 +9,7 @@
   "timezone": "America/Panama",
   "editable": false,
   "schemaVersion": 39,
-  "version": 5,
+  "version": 6,
   "refresh": "30s",
   "time": {
     "from": "now-1h",
@@ -18,8 +18,8 @@
   "panels": [
     {
       "id": 1,
-      "title": "Disponibilidad de adquisición",
-      "description": "1 = scrape correcto; ausencia no equivale a fallo medido.",
+      "title": "Estado de adquisición de métricas",
+      "description": "1 = scrape correcto; ausencia no equivale a fallo medido. FE-HQ: servicio frontal de la sede central; los identificadores originales se conservan en las consultas.",
       "type": "state-timeline",
       "datasource": {
         "type": "prometheus",
@@ -43,7 +43,8 @@
           },
           "noValue": "Sin datos",
           "color": {
-            "mode": "thresholds"
+            "mode": "fixed",
+            "fixedColor": "gray"
           },
           "mappings": [
             {
@@ -55,7 +56,7 @@
                   "index": 0
                 },
                 "1": {
-                  "text": "Adquisición OK",
+                  "text": "Adquisición correcta",
                   "color": "green",
                   "index": 1
                 }
@@ -86,7 +87,68 @@
             ]
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "hq-s1-icmp"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "HQ → S1 · ICMP"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "hq-s2-icmp"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "HQ → S2 · ICMP"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "s2-hq-http"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "S2 → FE-HQ · HTTP"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "s2-hq-icmp"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "S2 → FE-HQ · ICMP"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "s2-hq-tcp"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "S2 → FE-HQ · TCP"
+              }
+            ]
+          }
+        ]
       },
       "options": {
         "mergeValues": true,
@@ -120,8 +182,8 @@
     },
     {
       "id": 2,
-      "title": "Éxito de sonda",
-      "description": "Resultado de sonda medido; no interpolar ausencias.",
+      "title": "Estado de las sondas",
+      "description": "Resultado de sonda medido; no interpolar ausencias. FE-HQ: servicio frontal de la sede central; los identificadores originales se conservan en las consultas.",
       "type": "state-timeline",
       "datasource": {
         "type": "prometheus",
@@ -145,7 +207,8 @@
           },
           "noValue": "Sin datos",
           "color": {
-            "mode": "thresholds"
+            "mode": "fixed",
+            "fixedColor": "gray"
           },
           "mappings": [
             {
@@ -188,7 +251,68 @@
             ]
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "hq-s1-icmp"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "HQ → S1 · ICMP"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "hq-s2-icmp"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "HQ → S2 · ICMP"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "s2-hq-http"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "S2 → FE-HQ · HTTP"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "s2-hq-icmp"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "S2 → FE-HQ · ICMP"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "s2-hq-tcp"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "S2 → FE-HQ · TCP"
+              }
+            ]
+          }
+        ]
       },
       "options": {
         "mergeValues": true,
@@ -222,8 +346,8 @@
     },
     {
       "id": 3,
-      "title": "Duración de sonda",
-      "description": "Duración total de Blackbox, no RTT.",
+      "title": "Duración de las sondas",
+      "description": "Duración total de Blackbox, no RTT. FE-HQ: servicio frontal de la sede central; los identificadores originales se conservan en las consultas.",
       "type": "timeseries",
       "datasource": {
         "type": "prometheus",
@@ -250,7 +374,68 @@
           },
           "noValue": "Sin datos"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "hq-s1-icmp"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "HQ → S1 · ICMP"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "hq-s2-icmp"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "HQ → S2 · ICMP"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "s2-hq-http"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "S2 → FE-HQ · HTTP"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "s2-hq-icmp"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "S2 → FE-HQ · ICMP"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "s2-hq-tcp"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "S2 → FE-HQ · TCP"
+              }
+            ]
+          }
+        ]
       },
       "options": {
         "legend": {
@@ -285,8 +470,8 @@
     },
     {
       "id": 4,
-      "title": "Código HTTP observado",
-      "description": "Código de respuesta; 0 puede indicar ausencia de respuesta HTTP.",
+      "title": "Código de respuesta HTTP",
+      "description": "Código de respuesta; 0 puede indicar ausencia de respuesta HTTP. FE-HQ: servicio frontal de la sede central; los identificadores originales se conservan en las consultas.",
       "type": "timeseries",
       "datasource": {
         "type": "prometheus",
@@ -374,7 +559,20 @@
             }
           ]
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "s2-hq-http"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "S2 → FE-HQ · HTTP"
+              }
+            ]
+          }
+        ]
       },
       "options": {
         "legend": {
@@ -407,8 +605,8 @@
     },
     {
       "id": 5,
-      "title": "SLI observado · 5 min",
-      "description": "SLI sobre muestras medidas. Azul: ≥99 % (referencia provisional); ámbar: ≥95 % y <99 %; rojo: <95 %. Los colores son bandas visuales, no una declaración de cumplimiento SLO. Consultar la cobertura contigua.",
+      "title": "Éxito observado (SLI) · 5 min",
+      "description": "SLI sobre muestras medidas. Azul: ≥99 % (referencia provisional); ámbar: ≥95 % y <99 %; rojo: <95 %. Los colores son bandas visuales, no una declaración de cumplimiento SLO. Consultar la cobertura de muestras debajo. FE-HQ: servicio frontal de la sede central; los identificadores originales se conservan en las consultas.",
       "type": "stat",
       "datasource": {
         "type": "prometheus",
@@ -472,7 +670,46 @@
             }
           ]
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Metric"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "hq-s1-icmp": {
+                        "text": "HQ → S1 · ICMP",
+                        "index": 0
+                      },
+                      "hq-s2-icmp": {
+                        "text": "HQ → S2 · ICMP",
+                        "index": 1
+                      },
+                      "s2-hq-http": {
+                        "text": "S2 → FE-HQ · HTTP",
+                        "index": 2
+                      },
+                      "s2-hq-icmp": {
+                        "text": "S2 → FE-HQ · ICMP",
+                        "index": 3
+                      },
+                      "s2-hq-tcp": {
+                        "text": "S2 → FE-HQ · TCP",
+                        "index": 4
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       },
       "options": {
         "reduceOptions": {
@@ -528,8 +765,8 @@
     },
     {
       "id": 6,
-      "title": "Cobertura · 5 min",
-      "description": "30 muestras esperadas por sonda (5 min a 10 s). Ámbar: cantidad distinta de la nominal; verde: coincide con la nominal; gris: sin datos. No equivale por sí sola a cumplimiento SLO.",
+      "title": "Cobertura de muestras · 5 min",
+      "description": "30 muestras esperadas por sonda (5 min a 10 s). Ámbar: cantidad distinta de la nominal; verde: coincide con la nominal; gris: sin datos. No equivale por sí sola a cumplimiento SLO. FE-HQ: servicio frontal de la sede central; los identificadores originales se conservan en las consultas.",
       "type": "table",
       "datasource": {
         "type": "prometheus",
@@ -573,7 +810,19 @@
                 "value": 31
               }
             ]
-          }
+          },
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "Sin datos",
+                  "color": "gray"
+                }
+              }
+            }
+          ]
         },
         "overrides": [
           {
@@ -588,7 +837,37 @@
               },
               {
                 "id": "custom.width",
-                "value": 132
+                "value": 156
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "hq-s1-icmp": {
+                        "text": "HQ → S1 · ICMP",
+                        "index": 0
+                      },
+                      "hq-s2-icmp": {
+                        "text": "HQ → S2 · ICMP",
+                        "index": 1
+                      },
+                      "s2-hq-http": {
+                        "text": "S2 → FE-HQ · HTTP",
+                        "index": 2
+                      },
+                      "s2-hq-icmp": {
+                        "text": "S2 → FE-HQ · ICMP",
+                        "index": 3
+                      },
+                      "s2-hq-tcp": {
+                        "text": "S2 → FE-HQ · TCP",
+                        "index": 4
+                      }
+                    }
+                  }
+                ]
               }
             ]
           },
@@ -763,8 +1042,8 @@
     },
     {
       "id": 7,
-      "title": "SLI observado · 15 min",
-      "description": "SLI sobre muestras medidas. Azul: ≥99 % (referencia provisional); ámbar: ≥95 % y <99 %; rojo: <95 %. Los colores son bandas visuales, no una declaración de cumplimiento SLO. Consultar la cobertura contigua.",
+      "title": "Éxito observado (SLI) · 15 min",
+      "description": "SLI sobre muestras medidas. Azul: ≥99 % (referencia provisional); ámbar: ≥95 % y <99 %; rojo: <95 %. Los colores son bandas visuales, no una declaración de cumplimiento SLO. Consultar la cobertura de muestras debajo. FE-HQ: servicio frontal de la sede central; los identificadores originales se conservan en las consultas.",
       "type": "stat",
       "datasource": {
         "type": "prometheus",
@@ -828,7 +1107,46 @@
             }
           ]
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Metric"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "hq-s1-icmp": {
+                        "text": "HQ → S1 · ICMP",
+                        "index": 0
+                      },
+                      "hq-s2-icmp": {
+                        "text": "HQ → S2 · ICMP",
+                        "index": 1
+                      },
+                      "s2-hq-http": {
+                        "text": "S2 → FE-HQ · HTTP",
+                        "index": 2
+                      },
+                      "s2-hq-icmp": {
+                        "text": "S2 → FE-HQ · ICMP",
+                        "index": 3
+                      },
+                      "s2-hq-tcp": {
+                        "text": "S2 → FE-HQ · TCP",
+                        "index": 4
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       },
       "options": {
         "reduceOptions": {
@@ -884,8 +1202,8 @@
     },
     {
       "id": 8,
-      "title": "Cobertura · 15 min",
-      "description": "90 muestras esperadas por sonda (15 min a 10 s). Ámbar: cantidad distinta de la nominal; verde: coincide con la nominal; gris: sin datos. No equivale por sí sola a cumplimiento SLO.",
+      "title": "Cobertura de muestras · 15 min",
+      "description": "90 muestras esperadas por sonda (15 min a 10 s). Ámbar: cantidad distinta de la nominal; verde: coincide con la nominal; gris: sin datos. No equivale por sí sola a cumplimiento SLO. FE-HQ: servicio frontal de la sede central; los identificadores originales se conservan en las consultas.",
       "type": "table",
       "datasource": {
         "type": "prometheus",
@@ -929,7 +1247,19 @@
                 "value": 91
               }
             ]
-          }
+          },
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "Sin datos",
+                  "color": "gray"
+                }
+              }
+            }
+          ]
         },
         "overrides": [
           {
@@ -944,7 +1274,37 @@
               },
               {
                 "id": "custom.width",
-                "value": 132
+                "value": 156
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "hq-s1-icmp": {
+                        "text": "HQ → S1 · ICMP",
+                        "index": 0
+                      },
+                      "hq-s2-icmp": {
+                        "text": "HQ → S2 · ICMP",
+                        "index": 1
+                      },
+                      "s2-hq-http": {
+                        "text": "S2 → FE-HQ · HTTP",
+                        "index": 2
+                      },
+                      "s2-hq-icmp": {
+                        "text": "S2 → FE-HQ · ICMP",
+                        "index": 3
+                      },
+                      "s2-hq-tcp": {
+                        "text": "S2 → FE-HQ · TCP",
+                        "index": 4
+                      }
+                    }
+                  }
+                ]
               }
             ]
           },
@@ -1119,8 +1479,8 @@
     },
     {
       "id": 9,
-      "title": "SLI observado · 60 min",
-      "description": "SLI sobre muestras medidas. Azul: ≥99 % (referencia provisional); ámbar: ≥95 % y <99 %; rojo: <95 %. Los colores son bandas visuales, no una declaración de cumplimiento SLO. Consultar la cobertura contigua.",
+      "title": "Éxito observado (SLI) · 60 min",
+      "description": "SLI sobre muestras medidas. Azul: ≥99 % (referencia provisional); ámbar: ≥95 % y <99 %; rojo: <95 %. Los colores son bandas visuales, no una declaración de cumplimiento SLO. Consultar la cobertura de muestras debajo. FE-HQ: servicio frontal de la sede central; los identificadores originales se conservan en las consultas.",
       "type": "stat",
       "datasource": {
         "type": "prometheus",
@@ -1184,7 +1544,46 @@
             }
           ]
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Metric"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "hq-s1-icmp": {
+                        "text": "HQ → S1 · ICMP",
+                        "index": 0
+                      },
+                      "hq-s2-icmp": {
+                        "text": "HQ → S2 · ICMP",
+                        "index": 1
+                      },
+                      "s2-hq-http": {
+                        "text": "S2 → FE-HQ · HTTP",
+                        "index": 2
+                      },
+                      "s2-hq-icmp": {
+                        "text": "S2 → FE-HQ · ICMP",
+                        "index": 3
+                      },
+                      "s2-hq-tcp": {
+                        "text": "S2 → FE-HQ · TCP",
+                        "index": 4
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       },
       "options": {
         "reduceOptions": {
@@ -1240,8 +1639,8 @@
     },
     {
       "id": 10,
-      "title": "Cobertura · 60 min",
-      "description": "360 muestras esperadas por sonda (60 min a 10 s). Ámbar: cantidad distinta de la nominal; verde: coincide con la nominal; gris: sin datos. No equivale por sí sola a cumplimiento SLO.",
+      "title": "Cobertura de muestras · 60 min",
+      "description": "360 muestras esperadas por sonda (60 min a 10 s). Ámbar: cantidad distinta de la nominal; verde: coincide con la nominal; gris: sin datos. No equivale por sí sola a cumplimiento SLO. FE-HQ: servicio frontal de la sede central; los identificadores originales se conservan en las consultas.",
       "type": "table",
       "datasource": {
         "type": "prometheus",
@@ -1285,7 +1684,19 @@
                 "value": 361
               }
             ]
-          }
+          },
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "Sin datos",
+                  "color": "gray"
+                }
+              }
+            }
+          ]
         },
         "overrides": [
           {
@@ -1300,7 +1711,37 @@
               },
               {
                 "id": "custom.width",
-                "value": 132
+                "value": 156
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "hq-s1-icmp": {
+                        "text": "HQ → S1 · ICMP",
+                        "index": 0
+                      },
+                      "hq-s2-icmp": {
+                        "text": "HQ → S2 · ICMP",
+                        "index": 1
+                      },
+                      "s2-hq-http": {
+                        "text": "S2 → FE-HQ · HTTP",
+                        "index": 2
+                      },
+                      "s2-hq-icmp": {
+                        "text": "S2 → FE-HQ · ICMP",
+                        "index": 3
+                      },
+                      "s2-hq-tcp": {
+                        "text": "S2 → FE-HQ · TCP",
+                        "index": 4
+                      }
+                    }
+                  }
+                ]
               }
             ]
           },
