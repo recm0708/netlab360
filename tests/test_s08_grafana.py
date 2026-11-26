@@ -167,5 +167,27 @@ class GrafanaTests(unittest.TestCase):
                                  "Sin datos")
 
 
+    def test_http_state_history(self):
+        dashboard = json.loads((CONFIG / "dashboards/sondas.json").read_text())
+        panels = {p["id"]: p for p in dashboard["panels"]}
+        duration, http = panels[3], panels[4]
+        self.assertEqual(duration["gridPos"], {"x": 0, "y": 9, "w": 16, "h": 10})
+        self.assertEqual(http["gridPos"], {"x": 16, "y": 9, "w": 8, "h": 10})
+        self.assertEqual(http["type"], "state-timeline")
+        self.assertTrue(http["options"]["mergeValues"])
+        self.assertEqual(http["options"]["showValue"], "always")
+        self.assertFalse(http["options"]["legend"]["showLegend"])
+        defaults = http["fieldConfig"]["defaults"]
+        self.assertFalse(defaults["custom"]["spanNulls"])
+        self.assertEqual(defaults["custom"]["insertNulls"], 15000)
+        self.assertEqual(defaults["mappings"][0]["options"]["0"]["text"], "Sin respuesta HTTP")
+        self.assertEqual(defaults["mappings"][0]["options"]["200"]["text"], "200 OK")
+        self.assertEqual(defaults["mappings"][1]["options"]["result"]["text"], "Sin datos")
+        self.assertEqual(http["targets"][0]["expr"],
+                         'probe_http_status_code{job="netlab360-s08-blackbox"}')
+        self.assertTrue(http["targets"][0]["range"])
+        self.assertFalse(http["targets"][0]["instant"])
+
+
 if __name__ == "__main__":
     unittest.main()
