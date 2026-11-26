@@ -9,7 +9,7 @@
   "timezone": "America/Panama",
   "editable": false,
   "schemaVersion": 39,
-  "version": 3,
+  "version": 4,
   "refresh": "30s",
   "time": {
     "from": "now-1h",
@@ -408,7 +408,7 @@
     {
       "id": 5,
       "title": "SLI observado · 5 min",
-      "description": "SLI sobre muestras medidas. Azul: valor observado ≥99 % (referencia provisional); no implica cobertura completa ni cumplimiento SLO. Consultar cobertura contigua.",
+      "description": "SLI sobre muestras medidas. Azul: ≥99 % (referencia provisional); ámbar: ≥95 % y <99 %; rojo: <95 %. Los colores son bandas visuales, no una declaración de cumplimiento SLO. Consultar la cobertura contigua.",
       "type": "stat",
       "datasource": {
         "type": "prometheus",
@@ -436,11 +436,41 @@
                 "value": null
               },
               {
+                "color": "orange",
+                "value": 95
+              },
+              {
                 "color": "blue",
                 "value": 99
               }
             ]
-          }
+          },
+          "min": 0,
+          "max": 100,
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "Sin datos",
+                  "color": "gray",
+                  "index": 0
+                }
+              }
+            },
+            {
+              "type": "special",
+              "options": {
+                "match": "nan",
+                "result": {
+                  "text": "Sin datos",
+                  "color": "gray",
+                  "index": 1
+                }
+              }
+            }
+          ]
         },
         "overrides": []
       },
@@ -450,17 +480,18 @@
             "last"
           ],
           "fields": "",
-          "values": false
+          "values": true,
+          "limit": 5
         },
-        "orientation": "vertical",
-        "colorMode": "value",
+        "orientation": "horizontal",
+        "colorMode": "background",
         "graphMode": "none",
         "textMode": "value_and_name",
         "justifyMode": "auto",
         "wideLayout": true,
         "text": {
-          "titleSize": 13,
-          "valueSize": 23
+          "titleSize": 15,
+          "valueSize": 22
         }
       },
       "targets": [
@@ -475,6 +506,23 @@
           "instant": true,
           "range": false,
           "editorMode": "code"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "seriesToRows",
+          "options": {}
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Metric",
+                "desc": false
+              }
+            ]
+          }
         }
       ]
     },
@@ -715,7 +763,7 @@
     {
       "id": 7,
       "title": "SLI observado · 15 min",
-      "description": "SLI sobre muestras medidas. Azul: valor observado ≥99 % (referencia provisional); no implica cobertura completa ni cumplimiento SLO. Consultar cobertura contigua.",
+      "description": "SLI sobre muestras medidas. Azul: ≥99 % (referencia provisional); ámbar: ≥95 % y <99 %; rojo: <95 %. Los colores son bandas visuales, no una declaración de cumplimiento SLO. Consultar la cobertura contigua.",
       "type": "stat",
       "datasource": {
         "type": "prometheus",
@@ -743,11 +791,41 @@
                 "value": null
               },
               {
+                "color": "orange",
+                "value": 95
+              },
+              {
                 "color": "blue",
                 "value": 99
               }
             ]
-          }
+          },
+          "min": 0,
+          "max": 100,
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "Sin datos",
+                  "color": "gray",
+                  "index": 0
+                }
+              }
+            },
+            {
+              "type": "special",
+              "options": {
+                "match": "nan",
+                "result": {
+                  "text": "Sin datos",
+                  "color": "gray",
+                  "index": 1
+                }
+              }
+            }
+          ]
         },
         "overrides": []
       },
@@ -757,17 +835,18 @@
             "last"
           ],
           "fields": "",
-          "values": false
+          "values": true,
+          "limit": 5
         },
-        "orientation": "vertical",
-        "colorMode": "value",
+        "orientation": "horizontal",
+        "colorMode": "background",
         "graphMode": "none",
         "textMode": "value_and_name",
         "justifyMode": "auto",
         "wideLayout": true,
         "text": {
-          "titleSize": 13,
-          "valueSize": 23
+          "titleSize": 15,
+          "valueSize": 22
         }
       },
       "targets": [
@@ -782,6 +861,23 @@
           "instant": true,
           "range": false,
           "editorMode": "code"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "seriesToRows",
+          "options": {}
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Metric",
+                "desc": false
+              }
+            ]
+          }
         }
       ]
     },
@@ -1022,7 +1118,7 @@
     {
       "id": 9,
       "title": "SLI observado · 60 min",
-      "description": "SLI sobre muestras medidas. Azul: valor observado ≥99 % (referencia provisional); no implica cobertura completa ni cumplimiento SLO. Consultar cobertura contigua.",
+      "description": "SLI sobre muestras medidas. Azul: ≥99 % (referencia provisional); ámbar: ≥95 % y <99 %; rojo: <95 %. Los colores son bandas visuales, no una declaración de cumplimiento SLO. Consultar la cobertura contigua.",
       "type": "stat",
       "datasource": {
         "type": "prometheus",
@@ -1050,11 +1146,41 @@
                 "value": null
               },
               {
+                "color": "orange",
+                "value": 95
+              },
+              {
                 "color": "blue",
                 "value": 99
               }
             ]
-          }
+          },
+          "min": 0,
+          "max": 100,
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "Sin datos",
+                  "color": "gray",
+                  "index": 0
+                }
+              }
+            },
+            {
+              "type": "special",
+              "options": {
+                "match": "nan",
+                "result": {
+                  "text": "Sin datos",
+                  "color": "gray",
+                  "index": 1
+                }
+              }
+            }
+          ]
         },
         "overrides": []
       },
@@ -1064,17 +1190,18 @@
             "last"
           ],
           "fields": "",
-          "values": false
+          "values": true,
+          "limit": 5
         },
-        "orientation": "vertical",
-        "colorMode": "value",
+        "orientation": "horizontal",
+        "colorMode": "background",
         "graphMode": "none",
         "textMode": "value_and_name",
         "justifyMode": "auto",
         "wideLayout": true,
         "text": {
-          "titleSize": 13,
-          "valueSize": 23
+          "titleSize": 15,
+          "valueSize": 22
         }
       },
       "targets": [
@@ -1089,6 +1216,23 @@
           "instant": true,
           "range": false,
           "editorMode": "code"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "seriesToRows",
+          "options": {}
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Metric",
+                "desc": false
+              }
+            ]
+          }
         }
       ]
     },
