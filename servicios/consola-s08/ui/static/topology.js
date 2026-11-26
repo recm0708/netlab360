@@ -16,7 +16,7 @@
       [10,20,30].forEach((v,i)=>layout["H-"+site+"-"+(prefix*100+v)]=[x+70+i*140,y+225]);
     }
     layout.BACKEND_HQ=[120,590];layout.FRONTAL_HQ=[330,590];layout.BACKEND_S1=[1190,360];
-    Object.assign(layout,{FAUCET:[300,1040],OVS:[720,1040],"SDN-A":[440,1160],"SDN-B":[720,1160],"SDN-C":[1000,1160]});
+    Object.assign(layout,{FAUCET:[300,1050],OVS:[720,1050],"SDN-A":[440,1170],"SDN-B":[720,1170],"SDN-C":[1000,1170]});
     return {config,layout,groups};
   }
   const layout=geometry("detailed").layout;
@@ -121,7 +121,7 @@
     const rows=[["Identificador",item.id],["Tipo",types[item.type]||item.type],["Inventario",item.detail]];
     if(item.role)rows.push(["Función",({primary:"Principal",backup:"Respaldo"})[item.role]||item.role]);
     if(item.from)rows.push(["Origen",item.from],["Destino",item.to]);
-    if(item.site) rows.push(["Sede",item.site]);
+    if(item.site) rows.push([item.site==="SDN"?"Zona":"Sede",item.site]);
     if(item.vlan) rows.push(["VLAN",String(item.vlan)],["Gateway",item.gateway]);
     rows.push(["Alcance observado",scopes[item.scope]||"Sin verificar"],["Estado observado",statuses[item.status]||"Sin verificar"],["Vigencia",item.observation_valid===true?"Fuente vigente":item.observation_valid===false?"Sin observación vigente":"Sin verificar"]);
     if(item.vlan)rows.push(["Estado VLAN",statuses[item.vlan_admin]]);
@@ -129,6 +129,7 @@
       ["Próximo salto",item.route_gateway||"Sin verificar"]);
     if(item.application_selection) rows.push(["Selección HTTP",choices[item.application_selection]]);
     if(item.scope==="BOND_MEMBER_STATE"){
+      rows.push(["Protocolo","IEEE 802.3ad"],["Interfaz switch","s5bond0"],["Interfaz cliente","bond0"]);
       rows.push(["Miembros switch",Number.isInteger(item.switch_members)?item.switch_members+" / 2":"Sin verificar"],
         ["Miembros cliente",Number.isInteger(item.client_members)?item.client_members+" / 2":"Sin verificar"],
         ["Límite","Sin estado individual de cada puerto ni tráfico medido"]);
@@ -153,7 +154,7 @@
       return path(-4)+" "+path(4);
     }
     if(l.type==="control")return "M"+(ax+54)+" "+ay+" H"+(bx-54);
-    if(l.type==="sdn-access")return "M"+ax+" "+(ay+23)+" V1100 H"+bx+" V"+(by-23);
+    if(l.type==="sdn-access")return "M"+ax+" "+(ay+23)+" V1110 H"+bx+" V"+(by-23);
     if(l.type==="wan"){
       const north=l.to==="R-S1",primary=l.role==="primary";
       const start=north?(primary?-17:-6):(primary?6:17);
@@ -212,16 +213,16 @@
       }
       for(const item of display.links){
         const d=edgePath(item,mode),g=element("g",{class:"topology-item topology-link"});
-        const backup=item.role==="backup"||["redundancy","control"].includes(item.type);
+        const pattern=item.type==="control"?" control":item.type==="redundancy"?" service":item.role==="backup"?" backup":"";
         g.append(element("path",{d,class:"topology-highlight"}));
-        g.append(element("path",{d,class:"topology-edge"+(backup?" backup":"")}));
+        g.append(element("path",{d,class:"topology-edge"+pattern}));
         g.append(element("path",{d,class:"topology-hit"}));
         if(item.type==="wan"){
           const [bx,by]=layout[item.to],y=by+(item.role==="primary"?-9:9);
           const label=(item.role==="primary"?"Principal":"Respaldo")+" · "+item.to.slice(2);
           g.append(element("text",{x:bx-65,y:y-4,"text-anchor":"end",class:"topology-edge-label"},label));
         }
-        if(item.type==="lacp")g.append(element("text",{x:layout[item.to][0]-62,y:layout[item.to][1]-12,"text-anchor":"end",class:"topology-edge-label"},"802.3ad"));
+        if(item.type==="lacp")g.append(element("text",{x:layout[item.to][0]-84,y:layout[item.to][1]-5,"text-anchor":"end",class:"topology-edge-label"},"802.3ad"));
         if(item.type==="control")g.append(element("text",{x:(layout[item.from][0]+layout[item.to][0])/2,y:layout[item.from][1]-9,"text-anchor":"middle",class:"topology-edge-label"},"OpenFlow 1.3"));
         activate(g,item,selected,onSelect);svg.append(g);elements.set(item.id,g);
       }
