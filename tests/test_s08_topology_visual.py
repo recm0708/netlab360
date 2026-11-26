@@ -53,6 +53,7 @@ function fixture(){
 }
 const d=fixture();
 assert(m.valid(d));
+const invalid=fixture();invalid.nodes[0]={...invalid.nodes[0],id:"FAUCET"};assert(!m.valid(invalid));
 assert.throws(()=>m.view(d,"summary"));
 assert.equal(m.view(d).nodes.length,18);
 assert.equal(m.view(d).links.length,21);
