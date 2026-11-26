@@ -64,6 +64,29 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /* Proyección del dashboard: inventario explícito y vigencia conservadora. */
+/* Formato de presentación común: las fuentes y exportaciones mantienen sus valores. */
+const NetlabNumbers = (() => {
+  const digits = Object.freeze({count:0,bytes:0,volume:2,rate:3,latency:3,
+    jitter:4,seconds:3,percentage:2,loss:3,burn:3,probability:4,temperature:1});
+  const formats = Array.from({length:5},(_,n)=>new Intl.NumberFormat("en-US",{
+    useGrouping:true,minimumFractionDigits:n,maximumFractionDigits:n
+  }));
+  function format(value, kind) {
+    if(!Object.hasOwn(digits,kind)) throw new RangeError("UNKNOWN_NUMBER_KIND");
+    if(!Number.isFinite(value)) return "—";
+    const n=digits[kind];
+    if((kind==="count"||kind==="bytes")&&!Number.isSafeInteger(value))return "—";
+    if(n>0&&value!==0&&Math.abs(value)<0.5*10**(-n))
+      return (value>0?"<":">")+formats[n].format(Math.sign(value)*10**(-n));
+    return formats[n].format(value===0?0:value);
+  }
+  function axis(kind) {
+    if(!Object.hasOwn(digits,kind))throw new RangeError("UNKNOWN_NUMBER_KIND");
+    return ",."+digits[kind]+"f";
+  }
+  return Object.freeze({format,axis,separators:".,"});
+})();
+
 const dashboardInventory = {
   sources: [
     ["EXPORTER_S04","MULTISEDE","Exportador","Inventario de routers",60],
@@ -164,20 +187,20 @@ function dashboardSummary(rows) {
   const item = (id,text,state,detail) => {result[id]={text,state,detail};};
   const operational = rows.filter(r => !["IA_S06","ADVISORY_S07"].includes(r.source));
   const live = operational.filter(valid).length;
-  item("coverage",live+" / "+operational.length,live===operational.length?"ok":live?"warn":"unknown",
+  item("coverage",NetlabNumbers.format(live,"count")+" / "+NetlabNumbers.format(operational.length,"count"),live===operational.length?"ok":live?"warn":"unknown",
     "Cobertura de observaciones; no equivale a disponibilidad de red.");
   const routers = get("EXPORTER_S04","MULTISEDE");
   const sites = ["R-HQ","R-S1","R-S2"];
   const values = sites.map(k=>routers?.details[k]);
   const present = valid(routers) && values.every(v=>v===0||v===1);
   const running = present ? values.reduce((a,b)=>a+b,0):null;
-  item("routers",present?running+" / 3":"Sin datos","unknown","Contenedores detectados; no acredita OSPF ni forwarding.");
+  item("routers",present?NetlabNumbers.format(running,"count")+" / 3":"Sin datos","unknown","Contenedores detectados; no acredita OSPF ni forwarding.");
   for (const [id,prefix,total] of [["wan","WAN-END-",8],["vlan","VLAN-",9]]) {
     const subset = items("PROMETHEUS_S04",prefix);
     const known = count(subset,r=>[0,1].includes(r.details.admin_up));
     const up = count(subset,r=>r.details.admin_up===1);
-    item(id,known?up+" / "+known+" activas":"Sin datos","unknown",
-      known+" de "+total+" interfaces con muestra administrativa vigente; no acredita conectividad.");
+    item(id,known?NetlabNumbers.format(up,"count")+" / "+NetlabNumbers.format(known,"count")+" activas":"Sin datos","unknown",
+      NetlabNumbers.format(known,"count")+" de "+NetlabNumbers.format(total,"count")+" interfaces con muestra administrativa vigente; no acredita conectividad.");
   }
   const ha = get("NOC_S05","FRONTAL_HQ");
   const backend = {BACKEND_HQ:"HQ · principal",BACKEND_S1:"S1 · respaldo"};
@@ -188,16 +211,16 @@ function dashboardSummary(rows) {
   const n = count(lacp,r=>r.state==="NORMAL"), k=lacp.filter(valid).length;
   const bondState = lacp.some(r=>valid(r)&&r.state==="FAULT")?"fault":
     lacp.some(r=>valid(r)&&r.state==="DEGRADED")?"degraded":n===3?"normal":"unknown";
-  item("lacp",k?n+" / 3 normales":"Sin datos",bondState,k+" de 3 sedes con observación vigente de miembros.");
+  item("lacp",k?NetlabNumbers.format(n,"count")+" / 3 normales":"Sin datos",bondState,NetlabNumbers.format(k,"count")+" de 3 sedes con observación vigente de miembros.");
   const sdn=get("NOC_S05","FAUCET");
   const connected=valid(sdn)&&typeof sdn.details.connected==="boolean";
   item("sdn",connected?(sdn.details.connected?"Conectado":"Desconectado"):"Sin datos",
     connected?sdn.state.toLowerCase():"unknown",
-    connected&&Number.isSafeInteger(sdn.details.flow_count)?sdn.details.flow_count+" flujos observados; no acredita forwarding.":"Estado del controlador, no de la red completa.");
+    connected&&Number.isSafeInteger(sdn.details.flow_count)?NetlabNumbers.format(sdn.details.flow_count,"count")+" flujos observados; no acredita forwarding.":"Estado del controlador, no de la red completa.");
   for (const [id,source,detail] of [["inference","IA_S06","Inferencias exploratorias; no confirman incidentes."],["advisory","ADVISORY_S07","Resúmenes históricos; no acreditan salud actual."]]) {
     const subset=rows.filter(r=>r.source===source);
     const available=subset.filter(valid).length;
-    item(id,available?available+" / "+subset.length+" vigentes":"Sin datos","unknown",detail);
+    item(id,available?NetlabNumbers.format(available,"count")+" / "+NetlabNumbers.format(subset.length,"count")+" vigentes":"Sin datos","unknown",detail);
   }
   return result;
 }
@@ -206,9 +229,9 @@ function dashboardDetail(row) {
   if(row.quality!=="VALID") return "—";
   const d=row.details;
   if (row.resource.startsWith("LACP-") && Number.isInteger(d.switch_members) && Number.isInteger(d.client_members))
-    return "Switch "+d.switch_members+" / cliente "+d.client_members+" miembros";
+    return "Switch "+NetlabNumbers.format(d.switch_members,"count")+" / cliente "+NetlabNumbers.format(d.client_members,"count")+" miembros";
   if (row.resource==="FAUCET" && typeof d.connected==="boolean")
-    return d.connected?"Conectado · "+(Number.isSafeInteger(d.flow_count)?d.flow_count+" flujos":"flujos no disponibles"):"Desconectado";
+    return d.connected?"Conectado · "+(Number.isSafeInteger(d.flow_count)?NetlabNumbers.format(d.flow_count,"count")+" flujos":"flujos no disponibles"):"Desconectado";
   if (row.resource==="FRONTAL_HQ") return {BACKEND_HQ:"HQ · principal",BACKEND_S1:"S1 · respaldo"}[d.active_backend] || "Sin backend confirmado";
   if ([0,1].includes(d.admin_up)) return d.admin_up===1?"Admin. activa":"Admin. inactiva";
   if ([0,1].includes(d.running)) return d.running===1?"Contenedor activo":"Contenedor inactivo";
@@ -221,7 +244,7 @@ function dashboardDetail(row) {
     const labels={NORMAL:"Normal",DEGRADED:"Indicio de degradación",UNKNOWN:"Sin consenso"};
     if(!methods.every(m=>["NORMAL","DEGRADED"].includes(d[m]))||
        !Number.isFinite(d.rtt_avg_ms)||!Number.isFinite(d.loss_pct))return "Inferencia sin detalle confirmado";
-    return "RTT "+d.rtt_avg_ms.toFixed(3)+" ms · Pérdida "+d.loss_pct+" % · "+
+    return "RTT "+NetlabNumbers.format(d.rtt_avg_ms,"latency")+" ms · Pérdida "+NetlabNumbers.format(d.loss_pct,"loss")+" % · "+
       methods.map(m=>m+": "+labels[d[m]]).join(" · ")+" · Consenso: "+(labels[d.consensus]||"Desconocido")+" · Verdad de terreno desconocida";
   }
   return row.source==="ADVISORY_S07"?"Resumen histórico":"Observación delimitada";
@@ -810,7 +833,7 @@ function initializeConsole() {
     try {
       const {status, data} = await debugRead("/api/v1/debug/probe/" + key);
       if (epoch !== debugEpoch || !debugAllowed()) return;
-      debugMeta.textContent = "HTTP " + status + " · " + Math.round(performance.now()-start) + " ms";
+      debugMeta.textContent = "HTTP " + status + " · " + NetlabNumbers.format(performance.now()-start,"latency") + " ms";
       if (status !== 200 || data?.network_mutations_authorized !== false ||
           data.endpoint !== debugPaths.get(key) || !Array.isArray(data.records) ||
           data.records.length > 128 || typeof data.summary !== "object" || data.summary === null ||
@@ -824,7 +847,7 @@ function initializeConsole() {
       debugResult = data;
       debugMeta.textContent += " · " + formatPanama(new Date(data.queried_at_utc));
       debugOutput.textContent = JSON.stringify(data, null, 2);
-      debugNotice.textContent = "Respuesta normalizada: " + data.records.length + " observaciones.";
+      debugNotice.textContent = "Respuesta normalizada: " + NetlabNumbers.format(data.records.length,"count") + " observaciones.";
       exportButtons.forEach(button => button.disabled = false);
     } catch {
       if (epoch !== debugEpoch) return;
@@ -928,7 +951,7 @@ function initializeConsole() {
       card.append(title,router);
       for(const [name,counts] of [["WAN",inventory.wan],["VLAN",inventory.vlan]]){
         const line=document.createElement("p");
-        line.textContent=name+" · "+counts.up+"/"+counts.total+" administrativamente activas · "+counts.known+" observadas";
+        line.textContent=name+" · "+NetlabNumbers.format(counts.up,"count")+"/"+NetlabNumbers.format(counts.total,"count")+" administrativamente activas · "+NetlabNumbers.format(counts.known,"count")+" observadas";
         card.append(line);
       }
       cards.append(card);
@@ -1157,7 +1180,7 @@ function initializeConsole() {
       topologyData=data;topologyReceived=started;topologyUnavailable=false;
       renderTopology();
       topologyStatus.textContent="Consulta: "+formatPanama(new Date(data.graph.observed_at_utc))+
-        " · "+data.nodes.length+" equipos y "+data.links.length+" enlaces en inventario · "+data.warning_count+" advertencias de origen.";
+        " · "+NetlabNumbers.format(data.nodes.length,"count")+" equipos y "+NetlabNumbers.format(data.links.length,"count")+" enlaces en inventario · "+NetlabNumbers.format(data.warning_count,"count")+" advertencias de origen.";
     } catch {
       if(epoch!==topologyEpoch) return;
       topologyUnavailable=true;
@@ -1238,8 +1261,8 @@ function initializeConsole() {
       body.replaceChildren(fragment);
       const status=document.getElementById("alerts-"+key+"-status");
       status.textContent=batch.transport!=="OK"?"Fuente no disponible; no equivale a cero alertas.":
-        historical?rows.length+" registros de la copia · "+batch.total+" registrados en origen · Copia: "+formatPanama(new Date(batch.captured_at_utc)):
-        rows.length+" alertas observadas en la vista"+(batch.truncated?" · Resultado limitado":"")+". Consulta: "+formatPanama(new Date(batch.queried_at_utc));
+        historical?NetlabNumbers.format(rows.length,"count")+" registros de la copia · "+NetlabNumbers.format(batch.total,"count")+" registrados en origen · Copia: "+formatPanama(new Date(batch.captured_at_utc)):
+        NetlabNumbers.format(rows.length,"count")+" alertas observadas en la vista"+(batch.truncated?" · Resultado limitado":"")+". Consulta: "+formatPanama(new Date(batch.queried_at_utc));
     }
     alertsExport.disabled=alertsData.history.transport!=="OK";
   }
@@ -1345,9 +1368,9 @@ function initializeConsole() {
       if(result.transport!=="OK") throw new Error("UNAVAILABLE");
       historyData=result;
       const counts=window.NetlabHistory.counts(result);
-      document.getElementById("history-valid").textContent=String(counts.valid);
-      document.getElementById("history-null").textContent=String(counts.missing);
-      document.getElementById("history-series").textContent=counts.series+" / "+result.series.length;
+      document.getElementById("history-valid").textContent=NetlabNumbers.format(counts.valid,"count");
+      document.getElementById("history-null").textContent=NetlabNumbers.format(counts.missing,"count");
+      document.getElementById("history-series").textContent=NetlabNumbers.format(counts.series,"count")+" / "+NetlabNumbers.format(result.series.length,"count");
       document.getElementById("history-scope").textContent=window.NetlabHistory.description(group);
       if(counts.valid) await drawHistory(result,epoch);
       else {historyPlot.hidden=true;if(window.Plotly)window.Plotly.purge(historyPlot);}
