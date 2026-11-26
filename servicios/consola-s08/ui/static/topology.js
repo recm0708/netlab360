@@ -3,7 +3,7 @@
   "use strict";
   const ns="http://www.w3.org/2000/svg";
   // Un único encuadre conserva todo el inventario del contrato NOC.
-  const config={box:"0 0 1440 955",width:430,height:420,sites:{HQ:[20,245],S1:[980,15],S2:[980,515]}};
+  const config={box:"0 0 1440 1250",width:430,height:420,sites:{HQ:[20,245],S1:[980,15],S2:[980,515]}};
   function geometry(mode){
     if(mode!=="detailed")throw Error("TOPOLOGY_MODE");
     const layout={},groups=[];
@@ -11,10 +11,12 @@
       groups.push({site,x,y});
       layout["R-"+site]=[x+210,y+75];
       layout["SW-"+site]=[x+210,y+145];
+      layout["LACP-"+site]=[x+210,y+285];
       const prefix={HQ:1,S1:2,S2:3}[site];
       [10,20,30].forEach((v,i)=>layout["H-"+site+"-"+(prefix*100+v)]=[x+70+i*140,y+225]);
     }
     layout.BACKEND_HQ=[120,590];layout.FRONTAL_HQ=[330,590];layout.BACKEND_S1=[1190,360];
+    Object.assign(layout,{FAUCET:[300,1040],OVS:[720,1040],"SDN-A":[440,1160],"SDN-B":[720,1160],"SDN-C":[1000,1160]});
     return {config,layout,groups};
   }
   const layout=geometry("detailed").layout;
@@ -60,7 +62,49 @@
       data.links.every(l=>nodes.has(l.from)&&nodes.has(l.to)&&["wan","lan","access","redundancy"].includes(l.type));
   }
 
-  const statuses={running:"En ejecución",offline:"Fuera de línea observado","namespace-present":"Namespace presente",
+  // La composición usa el grafo NOC original y el lote autenticado de fuentes.
+  // Los dos miembros LACP se dibujan como un único recurso agregado: el lector
+  // solo conoce recuentos por extremo, no el estado individual de cada puerto.
+  function augment(data,rows){
+    const nodes=data.nodes.slice(),links=data.links.slice();
+    const read=id=>rows.find(r=>r.source==="NOC_S05"&&r.resource===id&&r.quality==="VALID");
+    for(const [i,site] of ["HQ","S1","S2"].entries()){
+      const id="LACP-"+site,row=read(id),d=row?.details||{};
+      const a=d.switch_members,b=d.client_members;
+      const counts=[a,b].every(n=>Number.isInteger(n)&&n>=0&&n<=2);
+      const expected=counts?(Math.min(a,b)===2?"NORMAL":Math.min(a,b)===1?"DEGRADED":"FAULT"):null;
+      const confirmed=counts&&row.state===expected;
+      const evidence=confirmed?{status:{NORMAL:"bond-normal",DEGRADED:"bond-degraded",FAULT:"bond-down"}[expected],
+        observation_valid:true,switch_members:a,client_members:b,observed_at_utc:row.stamp}:{status:"unknown",observation_valid:false};
+      const vlan=(i+1)*100+20,ip="10."+ (70+i)+".20.40/24";
+      nodes.push({id,site,type:"lacp-client",label:"Cliente LACP",detail:ip+" · VLAN "+vlan+" · bond0",
+        scope:"BOND_MEMBER_STATE",...evidence});
+      links.push({id:"BOND-"+site,from:"SW-"+site,to:id,type:"lacp",role:"Agregado 802.3ad",
+        detail:"s5bond0 ↔ bond0 · s5p1/s5c1 y s5p2/s5c2 · VLAN "+vlan,
+        scope:"BOND_MEMBER_STATE",...evidence});
+    }
+    const row=read("FAUCET"),d=row?.details||{};
+    const connected=d.connected===true&&row.state==="NORMAL"&&Number.isSafeInteger(d.flow_count)&&d.flow_count>0&&d.flow_count<=1e9;
+    const disconnected=d.connected===false&&row.state==="FAULT"&&d.flow_count===null;
+    const known=connected||disconnected;
+    const control={status:connected?"controller-connected":disconnected?"controller-disconnected":"unknown",
+      observation_valid:known,observed_at_utc:known?row.stamp:null};
+    nodes.push({id:"FAUCET",site:"SDN",type:"controller",label:"Faucet",detail:"nl360-s05-faucet · OpenFlow 1.3",scope:"CONTROLLER_ONLY",...control});
+    nodes.push({id:"OVS",site:"SDN",type:"ovs",label:"Open vSwitch",detail:"br-s05-sdn · datapath independiente",scope:"FLOW_COUNT_ONLY",
+      status:connected?"flows-observed":"unknown",observation_valid:connected,flow_count:connected?d.flow_count:null,observed_at_utc:connected?row.stamp:null});
+    links.push({id:"SDN-CONTROL",from:"FAUCET",to:"OVS",type:"control",role:"OpenFlow 1.3",detail:"Relación de control; no representa tráfico de datos",scope:"CONTROLLER_ONLY",...control});
+    for(const [i,suffix] of ["A","B","C"].entries()){
+      const id="SDN-"+suffix,vlan=i===2?420:410,port="sdn"+suffix.toLowerCase()+"0";
+      nodes.push({id,site:"SDN",type:"sdn-host",label:"Host "+suffix,detail:"nl360-s05-sdn-"+suffix.toLowerCase()+" · VLAN "+vlan,
+        scope:"INVENTORY_ONLY",status:"unknown",observation_valid:false});
+      links.push({id:"SDN-ACCESS-"+suffix,from:"OVS",to:id,type:"sdn-access",role:"Acceso VLAN "+vlan,detail:port+" · inventario; sin estado individual observado",
+        scope:"INVENTORY_ONLY",status:"unknown",observation_valid:false});
+    }
+    return {...data,nodes,links};
+  }
+
+  const statuses={ "bond-normal":"Dos miembros por extremo","bond-degraded":"Agregado degradado","bond-down":"Agregado sin miembros en un extremo",
+    "controller-connected":"Controlador conectado","controller-disconnected":"Controlador desconectado","flows-observed":"Flujos observados",running:"En ejecución",offline:"Fuera de línea observado","namespace-present":"Namespace presente",
     "admin-up":"Administrativamente habilitada","admin-down":"Administrativamente deshabilitada",unknown:"Sin verificar"};
   const choices={selected:"Seleccionada",standby:"En espera",unavailable:"No disponible",unknown:"Sin verificar"};
   function name(item){
@@ -68,10 +112,11 @@
     if(item.type==="wan") return (item.role==="primary"?"WAN principal":"WAN respaldo")+" · "+item.from+" ↔ "+item.to;
     return item.role+" · "+item.from+" ↔ "+item.to;
   }
-  function details(item){
+  function details(item,format){
     const scopes={CONTAINER_ONLY:"Existencia del contenedor",NAMESPACE_ONLY:"Existencia del namespace",
-      HTTP_FROM_S2:"HTTP observado desde S2",ADMIN_STATE_ONLY:"Estado administrativo",INVENTORY_ONLY:"Inventario"};
-    const types={router:"Router FRR",switch:"Switch L2",host:"Host de prueba",server:"Servidor HTTP",wan:"Enlace WAN",lan:"Troncal LAN",access:"Acceso LAN",redundancy:"Relación HTTP"};
+      HTTP_FROM_S2:"HTTP observado desde S2",ADMIN_STATE_ONLY:"Estado administrativo",INVENTORY_ONLY:"Inventario",
+      BOND_MEMBER_STATE:"Recuento de miembros por extremo",CONTROLLER_ONLY:"Conexión OpenFlow",FLOW_COUNT_ONLY:"Recuento de flujos; no acredita forwarding"};
+    const types={router:"Router FRR",switch:"Switch L2",host:"Host de prueba",server:"Servidor HTTP",wan:"Enlace WAN",lan:"Troncal LAN",access:"Acceso LAN",redundancy:"Relación HTTP","lacp-client":"Cliente LACP",lacp:"Agregado LACP",controller:"Controlador SDN",ovs:"Datapath OVS","sdn-host":"Host SDN","sdn-access":"Acceso SDN",control:"Relación OpenFlow"};
     const rows=[["Identificador",item.id],["Tipo",types[item.type]||item.type],["Inventario",item.detail]];
     if(item.role)rows.push(["Función",({primary:"Principal",backup:"Respaldo"})[item.role]||item.role]);
     if(item.from)rows.push(["Origen",item.from],["Destino",item.to]);
@@ -82,6 +127,13 @@
     if(item.a) rows.push(["Extremo A",item.a],["Extremo B",item.b],["Selección FIB",choices[item.route_selection]],
       ["Próximo salto",item.route_gateway||"Sin verificar"]);
     if(item.application_selection) rows.push(["Selección HTTP",choices[item.application_selection]]);
+    if(item.scope==="BOND_MEMBER_STATE"){
+      rows.push(["Miembros switch",Number.isInteger(item.switch_members)?item.switch_members+" / 2":"Sin verificar"],
+        ["Miembros cliente",Number.isInteger(item.client_members)?item.client_members+" / 2":"Sin verificar"],
+        ["Límite","Sin estado individual de cada puerto ni tráfico medido"]);
+    }
+    if(item.scope==="FLOW_COUNT_ONLY")rows.push(["Flujos observados",Number.isSafeInteger(item.flow_count)?String(item.flow_count):"Sin verificar"]);
+    if(item.observed_at_utc&&typeof format==="function")rows.push(["Última observación",format(new Date(item.observed_at_utc))]);
     return rows.filter(row=>typeof row[1]==="string");
   }
 
@@ -94,6 +146,12 @@
   function edgePath(l,mode){
     const {layout,config}=geometry(mode);
     const [ax,ay]=layout[l.from],[bx,by]=layout[l.to];
+    if(l.type==="lacp"){
+      const path=offset=>"M"+(ax-54)+" "+(ay+offset)+" H"+(ax-70+offset)+" V"+(by+offset)+" H"+(bx-54);
+      return path(-4)+" "+path(4);
+    }
+    if(l.type==="control")return "M"+(ax+54)+" "+ay+" H"+(bx-54);
+    if(l.type==="sdn-access")return "M"+ax+" "+(ay+23)+" V1100 H"+bx+" V"+(by-23);
     if(l.type==="wan"){
       const north=l.to==="R-S1",primary=l.role==="primary";
       const start=north?(primary?-17:-6):(primary?6:17);
@@ -116,7 +174,9 @@
     return "M"+ax+" "+(ay+23)+" V"+((ay+by)/2)+" H"+bx+" V"+(by-23);
   }
   function state(item){
-    if(["offline","admin-down"].includes(item.status))return "fault";
+    if(["offline","admin-down","bond-down","controller-disconnected"].includes(item.status))return "fault";
+    if(item.status==="bond-degraded")return "warn";
+    if(["bond-normal","controller-connected","flows-observed"].includes(item.status))return "ok";
     if(item.type==="wan"&&item.route_selection==="selected")return item.role==="backup"?"recovery":"ok";
     if(item.type==="wan"||item.type==="redundancy")return item.application_selection==="selected"?"ok":"unknown";
     return ["running","namespace-present"].includes(item.status)?"ok":"unknown";
@@ -144,9 +204,13 @@
         svg.append(element("rect",{x,y,width:config.width,height:config.height,rx:12,class:"topology-site"}));
         svg.append(element("text",{x:x+18,y:y+30,class:"topology-site-label"},site==="HQ"?"SEDE CENTRAL · HQ":"SUCURSAL · "+site));
       }
+      if(display.nodes.some(n=>n.id==="OVS")){
+        svg.append(element("rect",{x:20,y:975,width:1390,height:250,rx:12,class:"topology-site"}));
+        svg.append(element("text",{x:38,y:1005,class:"topology-site-label"},"DOMINIO SDN INDEPENDIENTE · OVS / FAUCET"));
+      }
       for(const item of display.links){
         const d=edgePath(item,mode),g=element("g",{class:"topology-item topology-link"});
-        const backup=item.role==="backup"||item.type==="redundancy";
+        const backup=item.role==="backup"||["redundancy","control"].includes(item.type);
         g.append(element("path",{d,class:"topology-highlight"}));
         g.append(element("path",{d,class:"topology-edge"+(backup?" backup":"")}));
         g.append(element("path",{d,class:"topology-hit"}));
@@ -155,13 +219,15 @@
           const label=(item.role==="primary"?"Principal":"Respaldo")+" · "+item.to.slice(2);
           g.append(element("text",{x:bx-65,y:y-4,"text-anchor":"end",class:"topology-edge-label"},label));
         }
+        if(item.type==="lacp")g.append(element("text",{x:layout[item.to][0]-62,y:layout[item.to][1]-12,"text-anchor":"end",class:"topology-edge-label"},"802.3ad"));
+        if(item.type==="control")g.append(element("text",{x:(layout[item.from][0]+layout[item.to][0])/2,y:layout[item.from][1]-9,"text-anchor":"middle",class:"topology-edge-label"},"OpenFlow 1.3"));
         activate(g,item,selected,onSelect);svg.append(g);elements.set(item.id,g);
       }
       for(const item of display.nodes){
         const [x,y]=layout[item.id],g=element("g",{class:"topology-item topology-node"});
         g.append(element("rect",{x:x-54,y:y-23,width:108,height:46,rx:8,class:"topology-node-box"}));
         g.append(element("text",{x,y:y-3,"text-anchor":"middle",class:"topology-node-label"},item.type==="server"?(item.id==="FRONTAL_HQ"?"Frontal HA":"Backend "+item.site):name(item)));
-        const sub=item.type==="router"?"FRR":item.type==="switch"?"Bridge L2":item.type==="server"?"HTTP":"Host de prueba";
+        const sub=item.type==="router"?"FRR":item.type==="switch"?"Bridge L2":item.type==="server"?"HTTP":item.type==="lacp-client"?"bond0 · VLAN "+({HQ:120,S1:220,S2:320}[item.site]):item.type==="controller"?"OpenFlow 1.3":item.type==="ovs"?"br-s05-sdn":item.type==="sdn-host"?"VLAN "+(item.id==="SDN-C"?420:410):"Host de prueba";
         g.append(element("text",{x,y:y+13,"text-anchor":"middle",class:"topology-node-sub"},sub));
         activate(g,item,selected,onSelect);svg.append(g);elements.set(item.id,g);
       }
@@ -180,6 +246,7 @@
     const {config}=geometry(mode);
     const [x,y,w,h]=config.box.split(" ").map(Number);
     if(site==="all")return [x,y,w,h];
+    if(site==="SDN")return [10,965,1410,270];
     if(!Object.hasOwn(config.sites,site))throw new Error("SITE");
     const [sx,sy]=config.sites[site];
     return [Math.max(0,sx-10),Math.max(0,sy-10),config.width+20,config.height+20];
@@ -194,5 +261,5 @@
     return [nx,ny,nw,nh];
   }
   function reset(svg){mounted.delete(svg);svg.replaceChildren();}
-  root.NetlabTopology=Object.freeze({valid,name,details,render,reset,view,aged,isFresh:fresh,edgePath,geometry,viewport,moveViewport});
+  root.NetlabTopology=Object.freeze({valid,augment,name,details,render,reset,view,aged,isFresh:fresh,edgePath,geometry,viewport,moveViewport});
 })(typeof window==="undefined"?globalThis:window);
