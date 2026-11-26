@@ -5,7 +5,7 @@ import time
 from fastapi import HTTPException, Request
 from starlette.concurrency import run_in_threadpool
 
-from . import alerts_reader, sessions
+from . import alerts_reader, notification_reader, sessions
 from .auth_http import COOKIE
 
 
@@ -30,6 +30,27 @@ def register_alerts(app, directory):
         async with gate:
             last = time.monotonic()
             result = await run_in_threadpool(alerts_reader.collect, directory)
+            if await actor(request) != identity:
+                raise HTTPException(403)
+        return result
+
+
+    notification_gate = asyncio.Lock()
+    notification_last = float("-inf")
+
+    @app.get("/api/v1/alerts/notifications/{scope}")
+    async def notifications(request: Request, scope: str):
+        nonlocal notification_last
+        identity = await actor(request)
+        if request.query_params or scope not in notification_reader.SCOPES:
+            raise HTTPException(400)
+        if scope == "validation" and identity["role"] != "OPERATOR":
+            raise HTTPException(403)
+        if notification_gate.locked() or time.monotonic() - notification_last < 2:
+            raise HTTPException(429, headers={"Retry-After": "2"})
+        async with notification_gate:
+            notification_last = time.monotonic()
+            result = await run_in_threadpool(notification_reader.collect, scope)
             if await actor(request) != identity:
                 raise HTTPException(403)
         return result
