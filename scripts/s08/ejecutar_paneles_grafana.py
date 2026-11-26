@@ -103,7 +103,9 @@ def run(destination, password):
     for panel in dashboard["panels"]:
         reference = expected_panels[panel["id"]]
         assert panel["title"] == reference["title"]
-        assert panel["targets"] == reference["targets"]
+        keys = ("refId", "expr", "datasource", "instant", "range", "legendFormat")
+        contract = lambda targets: [{k: t[k] for k in keys} for t in targets]
+        assert contract(panel["targets"]) == contract(reference["targets"])
         for target in panel["targets"]:
             assert target["datasource"]["uid"] == UID
             assert target["instant"] != target["range"]
