@@ -81,6 +81,8 @@ def create_app(directory: Path | None = None, *, job_transport=None, job_stream=
         register_debug(app, directory, acquire, health, capabilities)
         from .history_http import register_history
         register_history(app, directory)
+        from .observability_http import register_observability
+        register_observability(app, directory)
         from .topology_http import register_topology
         register_topology(app, directory)
         from .alerts_http import register_alerts
