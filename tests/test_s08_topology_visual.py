@@ -85,13 +85,36 @@ const byId=id=>d.links.find(l=>l.id===id);
 assert.equal(m.edgePath(byId("S05-HA-HTTP-PRINCIPAL"),"detailed"),"M276 590 H174");
 assert.equal(m.edgePath(byId("S05-HA-HTTP-RESPALDO"),"detailed"),"M330 613 V690 H905 V360 H1136");
 assert.equal(m.edgePath(byId("S05-HA-ACCESO-FRONTAL"),"detailed"),"M284 390 H439 V590 H384");
-assert.equal(m.viewport("detailed").join(" "),"0 0 1440 955");
+assert.equal(m.viewport("detailed").join(" "),"0 0 1440 1250");
+assert.equal(m.viewport("detailed","SDN").join(" "),"10 965 1410 270");
 assert.equal(m.viewport("detailed","S1").join(" "),"970 5 450 440");
 assert.throws(()=>m.viewport("detailed","external"));
 let box=m.moveViewport("detailed",m.viewport("detailed"),0.8);
-assert(box[2]<1440);assert(box[3]<955);
+assert(box[2]<1440);assert(box[3]<1250);
 box=m.moveViewport("detailed",box,1,99,99);
-assert(box[0]+box[2]<=1440);assert(box[1]+box[3]<=955);
+assert(box[0]+box[2]<=1440);assert(box[1]+box[3]<=1250);
+const rows=[
+  {source:"NOC_S05",resource:"LACP-HQ",quality:"VALID",state:"NORMAL",details:{switch_members:2,client_members:2}},
+  {source:"NOC_S05",resource:"LACP-S1",quality:"VALID",state:"DEGRADED",details:{switch_members:2,client_members:1}},
+  {source:"NOC_S05",resource:"LACP-S2",quality:"STALE",state:"NORMAL",details:{switch_members:2,client_members:2}},
+  {source:"NOC_S05",resource:"FAUCET",quality:"VALID",state:"NORMAL",details:{connected:true,flow_count:27}}
+];
+const full=m.augment(d,rows),find=id=>full.nodes.find(n=>n.id===id);
+assert.equal(full.nodes.length,26);assert.equal(full.links.length,28);
+assert.equal(find("LACP-HQ").status,"bond-normal");
+assert.equal(find("LACP-S1").status,"bond-degraded");
+assert.equal(find("LACP-S2").status,"unknown");
+assert.equal(find("OVS").flow_count,27);
+assert.equal(find("SDN-A").status,"unknown");
+assert.equal(full.links.filter(l=>l.type==="lacp").length,3);
+assert(full.links.filter(l=>l.type==="sdn-access").every(l=>l.status==="unknown"));
+assert.equal(m.augment(d,[]).nodes.find(n=>n.id==="FAUCET").status,"unknown");
+m.render(svg,full,"LACP-HQ",choose);
+assert.equal(svg.children.filter(e=>e.attrs["data-resource"]).length,54);
+assert.equal(svg.children.find(e=>e.attrs["data-resource"]==="LACP-S1").attrs["data-state"],"warn");
+assert.equal(svg.children.find(e=>e.attrs["data-resource"]==="SDN-A").attrs["data-state"],"unknown");
+m.render(svg,m.augment(d,[]),"LACP-HQ",choose);
+assert.equal(svg.children.find(e=>e.attrs["data-resource"]==="LACP-HQ").attrs["data-state"],"unknown");
 m.reset(svg);assert.equal(svg.children.length,0);
 """
 
@@ -119,3 +142,7 @@ class TopologyVisualTests(unittest.TestCase):
         self.assertIn("refreshCurrent", js)
         self.assertNotIn("scheduleTopology(", js)
         self.assertIn('await debugRead("/api/v1/topology")', js)
+        self.assertIn('await debugRead("/api/v1/sources")', js)
+        self.assertIn('model.augment(model.aged', js)
+        css = (UI / "static/styles.css").read_text(encoding="utf-8")
+        self.assertIn(".dashboard-table-wrap { max-height: 60vh; overflow: auto; overscroll-behavior: auto; }", css)
