@@ -102,7 +102,7 @@
       paper_bgcolor:colors.surface,plot_bgcolor:colors.surface,font:{color:colors.text,size:12},
       margin:{l:130,r:20,t:12,b:78},hovermode:"closest",dragmode:"zoom",
       xaxis:{type:"linear",range:[data.start_epoch,data.end_epoch],tickmode:"array",
-        tickvals:times,ticktext:times.map(t=>format(new Date(t*1000)).slice(11)),gridcolor:colors.line},
+        tickvals:times,ticktext:times.map(t=>new Intl.DateTimeFormat("en-US",{timeZone:"America/Panama",hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"}).format(new Date(t*1000))),gridcolor:colors.line},
       yaxis:{tickmode:"array",tickvals:ticks,ticktext:entries.map(x=>x[2]),range:[-0.6,entries.length*3-0.8],
         fixedrange:true,gridcolor:colors.line,zeroline:false},
       legend:{orientation:"h",x:0.5,xanchor:"center",y:-36/plotHeight,yanchor:"top"},

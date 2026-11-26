@@ -100,6 +100,14 @@ class AssetTests(unittest.TestCase):
         self.assertIn(".swagger-ui select {\n  appearance:auto;", css)
         self.assertNotIn(".swagger-ui .copy-to-clipboard {\n  display:none", css)
 
+    def test_ui_reports_missing_local_resources(self):
+        js = (ROOT / "servicios/consola-s08/ui/static/app.js").read_text()
+        self.assertIn('await authRequest("/docs?embedded=1")', js)
+        self.assertIn("response.status===503", js)
+        self.assertIn('epoch!==swaggerEpoch', js)
+        self.assertIn('doc?.getElementById("swagger-ui")', js)
+        self.assertIn('frame.src = "/docs?embedded=1"', js)
+
     def test_no_arbitrary_destination(self):
         with self.assertRaises(ValueError):
             swagger_assets.download("https://example.invalid/file", 10)

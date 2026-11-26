@@ -1,5 +1,8 @@
 """Pruebas de procedencia, cobertura y acceso del lector integrado."""
 import importlib.util
+import json
+import shutil
+import subprocess
 import os
 from pathlib import Path
 import sys
@@ -109,6 +112,166 @@ class ReaderTests(unittest.TestCase):
             return ("OK", {"hq-s1-icmp": {10000000: 1}}) if metric == "probe_success" else data(metric, end)
         with patch.object(R, "fetch", side_effect=unpaired):
             self.assertEqual(R.collect(END)["probes"][0]["quality"], "INVALID")
+
+
+@unittest.skipUnless(shutil.which("node"), "Node para comprobar la proyección visual")
+class ProjectionTests(unittest.TestCase):
+    """Contrastar la presentación con el contrato Python y casos de ausencia."""
+
+    def run_node(self, program, payload):
+        script = ROOT / "servicios/consola-s08/ui/static/observation.js"
+        subprocess.run(["node", "-e", program, str(script)],
+                       input=json.dumps(payload), text=True, check=True, capture_output=True)
+
+    def test_real_contract_shape_and_plot(self):
+        with patch.object(R, "fetch", side_effect=sources):
+            data = R.collect(END)
+        self.run_node("""
+const assert=require("node:assert/strict");
+require(process.argv[1]);
+const M=globalThis.NetlabObservation, d=JSON.parse(require("node:fs").readFileSync(0,"utf8"));
+assert.equal(M.validate(d),d);
+const colors={surface:"#fff",text:"#111",line:"#777",ok:"#004400",fault:"#990000",light:true};
+const fmt=x=>x.toISOString();
+for(const metric of ["scrape_up","probe_success","duration_seconds"]){
+  const f=M.figure(d,metric,fmt,colors,5);
+  assert.equal(f.traces.length,5);
+  if(metric==="duration_seconds"){
+    assert.equal(f.layout.height,400);
+    assert.equal(f.layout.yaxis.rangemode,"tozero");
+    assert.equal(f.layout.legend.x,0.5);
+    assert.equal(f.layout.legend.xanchor,"center");
+    assert.equal(f.layout.legend.entrywidth,138);
+  }
+  for(const t of f.traces){
+    assert.equal(t.x.length,30);
+    if(metric==="duration_seconds"){
+      assert.equal(t.connectgaps,false); assert(t.y.every(n=>n===1));
+    }
+  }
+}
+assert.equal(M.httpLabel(200),"200 OK");
+assert.equal(M.httpLabel(0),"0 · Sin respuesta");
+assert.equal(M.httpLabel(null),"Sin datos");
+assert.equal(M.httpLabel(503),"503");
+assert.equal(M.httpState(503),"fault");
+d.probes[0].windows[0].probe_ok--;
+assert.throws(()=>M.validate(d));
+""", data)
+
+    def test_partial_and_absence_not_success(self):
+        def partial(metric, end):
+            status, rows = sources(metric, end)
+            for points in rows.values():
+                points.pop(int((end - 20) * 1000), None)
+            return status, rows
+        with patch.object(R, "fetch", side_effect=partial):
+            data = R.collect(END)
+        with patch.object(R, "fetch", return_value=("OK", {})):
+            absent = R.collect(END)
+        self.run_node("""
+const assert=require("node:assert/strict");
+require(process.argv[1]);
+const M=globalThis.NetlabObservation, [d,empty]=JSON.parse(require("node:fs").readFileSync(0,"utf8"));
+M.validate(d); M.validate(empty);
+assert.equal(d.probes[0].windows[0].meets_observed_target,null);
+assert.equal(empty.probes[0].windows[0].observed_availability_pct,null);
+const f=M.figure(d,"duration_seconds",x=>x.toISOString(),{light:false},5);
+assert(f.traces.every(t=>t.y.includes(null)));
+assert(M.figure(empty,"probe_success",x=>x.toISOString(),{},5).traces.every(t=>t.x.length===0));
+""", [data, absent])
+
+    def test_overview_preserves_quality_and_counts(self):
+        with patch.object(R, "fetch", side_effect=sources):
+            full = R.collect(END)
+        with patch.object(R, "fetch", return_value=("OK", {})):
+            empty = R.collect(END)
+        self.run_node("""
+const assert=require("node:assert/strict");
+require(process.argv[1]);
+const M=globalThis.NetlabObservation, [full,empty]=JSON.parse(require("node:fs").readFileSync(0,"utf8"));
+assert.deepEqual(M.overview(full),{fresh:5,acquired:5,measured:5,passed:5,complete:15});
+assert.deepEqual(M.overview(empty),{fresh:0,acquired:0,measured:0,passed:0,complete:0});
+full.probes[0].quality="STALE";
+assert.deepEqual(M.overview(full),{fresh:4,acquired:4,measured:4,passed:4,complete:15});
+for(const span of [5,15,60]){
+  const stats=M.durationStats(full,span);
+  assert.equal(stats.length,5);
+  for(const s of stats)assert.deepEqual([s.count,s.last,s.mean,s.max],[span*6,1,1,1]);
+  for(const s of M.durationStats(empty,span))assert.deepEqual([s.count,s.last,s.mean,s.max],[0,null,null,null]);
+}
+""", [full, empty])
+
+    def test_http_distribution_exact_codes_and_interval(self):
+        def mixed(metric, end):
+            if metric == "probe_http_status_code":
+                return "OK", {"s2-hq-http": {
+                    int(end * 1000): 200, int((end-10)*1000): 503,
+                    int((end-20)*1000): 0, int((end-310)*1000): 302}}
+            return sources(metric, end)
+        with patch.object(R, "fetch", side_effect=mixed):
+            result = R.collect(END)
+        self.run_node("""
+const assert=require("node:assert/strict");
+require(process.argv[1]);
+const M=globalThis.NetlabObservation,d=JSON.parse(require("node:fs").readFileSync(0,"utf8"));
+M.validate(d);
+const h=M.httpHistory(d,5);
+assert.equal(h.rows.length,30);
+assert.equal(h.recent.length,12);
+assert(h.recent.every(s=>s.timestamp_unix>d.window_end_unix-120));
+assert.deepEqual(h.recent.slice(0,4).map(s=>s.http_status_code),[200,503,0,null]);
+const csv=M.httpCsv(d,60).trim().split(String.fromCharCode(13,10));
+assert.equal(csv.length,361);
+assert.equal(csv[0].split(",").at(-1),"http_status_code");
+assert.equal(csv[1].split(",").at(-1),"200");
+assert.equal(csv[3].split(",").at(-1),"0");
+assert.equal(csv[4].split(",").at(-1),"");
+assert.equal(M.httpHistory(d,60).recent.length,12);
+assert.deepEqual(h.counts,[[0,1],[200,1],[503,1],[null,27]]);
+assert.deepEqual(h.rows.slice(0,3).map(s=>s.http_status_code),[200,503,0]);
+assert.equal(h.latest.http_status_code,200);
+assert.deepEqual(M.httpHistory(d,15).counts,[[0,1],[200,1],[302,1],[503,1],[null,86]]);
+assert.equal(M.httpHistory(d,60).rows.length,360);
+assert.equal(M.httpHistory(d,60).counts.reduce((n,r)=>n+r[1],0),360);
+""", result)
+
+    def test_notification_scope(self):
+        self.run_node("""
+const assert=require("node:assert/strict");
+require(process.argv[1]);
+const M=globalThis.NetlabObservation;
+const empty={source:"ALERTMANAGER_WEBHOOK",scope:"operational",transport:"OK",total:0,records:[],truncated:false};
+assert.equal(M.validateNotifications(empty,"operational").total,0);
+assert.throws(()=>M.validateNotifications(empty,"validation"));
+assert.throws(()=>M.validateNotifications({...empty,transport:"UNAVAILABLE"},"operational"));
+assert.equal(M.validateNotifications({...empty,transport:"UNAVAILABLE",total:null},"operational").total,null);
+""", None)
+
+    def test_http_samples_compact_panel(self):
+        ui = ROOT / "servicios/consola-s08/ui"
+        html = (ui / "index.html").read_text()
+        css = (ui / "static/styles.css").read_text()
+        panel = html.split("Respuestas HTTP · S2 → FE-HQ", 1)[1].split("</section>", 1)[0]
+        self.assertIn('id="obs-http"', panel)
+        self.assertEqual(html.count('id="obs-http"'), 1)
+        self.assertIn('id="obs-http-export"', panel)
+        self.assertIn('id="obs-http-recent-count"', panel)
+        self.assertIn('tabindex="0" role="region"', panel)
+        self.assertIn("max-height:calc(5 * var(--http-row))", css)
+        self.assertIn("grid-column:span 14", css)
+        self.assertIn("grid-column:span 6", css)
+
+    def test_static_safety(self):
+        ui = ROOT / "servicios/consola-s08/ui"
+        js = (ui / "static/observation.js").read_text()
+        for forbidden in ("innerHTML", "document.cookie", "localStorage", "sessionStorage", "eval("):
+            self.assertNotIn(forbidden, js)
+        self.assertIn('read("/api/v1/observability/probes",1048576)', js)
+        self.assertIn('read("/api/v1/alerts/notifications/"+selected,2097152)', js)
+        self.assertIn('context().role!=="OPERATOR"', js)
+        self.assertIn("observationView.clear();", (ui / "static/app.js").read_text())
+        self.assertIn('rel="noopener noreferrer">Abrir Grafana', (ui / "index.html").read_text())
 
 
 @unittest.skipUnless(AVAILABLE and os.geteuid() != 0, "API con dependencias y usuario sin root")

@@ -37,7 +37,7 @@ Desarrollamos NETLAB360 para integrar tres sedes (HQ, S1 y S2) en un laboratorio
 | Actuación integrada, RAG y gestión de identidades | Integración y aceptación pendientes |
 | Reconstrucción y extensiones | Arranque en frío, instalación limpia, ampliaciones multivendor y evaluación científica pendientes |
 
-La consola utiliza HTML, CSS y JavaScript locales, temas claro y oscuro, filtros por sede, actualización configurable, consultas históricas manuales y exportaciones delimitadas. La topología resumida y detallada comparten las observaciones originales; no se atribuye conectividad a un estado administrativo ni a la existencia de un contenedor.
+La consola utiliza HTML, CSS y JavaScript locales, temas claro y oscuro, filtros por sede, actualización configurable, consultas históricas por selección y exportaciones delimitadas. La topología única conserva el inventario completo de la fuente NOC y sus observaciones originales; no se atribuye conectividad a un estado administrativo ni a la existencia de un contenedor.
 
 La regresión específica de la consola comprende 204 casos aprobados en el entorno científico de referencia. Validamos Swagger, consultas GET y exportaciones mediante el navegador. Conservamos las interfaces independientes mientras verificamos equivalencia completa, ingestión de alertas y recuperación. La [matriz de cobertura](docs/gestion/cobertura-academica-netlab360.md) registra los resultados y las brechas de validación.
 

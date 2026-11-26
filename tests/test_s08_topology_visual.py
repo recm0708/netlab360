@@ -53,49 +53,45 @@ function fixture(){
 }
 const d=fixture();
 assert(m.valid(d));
-assert.equal(m.view(d,"summary").nodes.length,15);
-assert.equal(m.view(d,"summary").links.length,14);
-assert.equal(m.view(d,"detailed").nodes.length,18);
-assert.equal(m.view(d,"detailed").links.length,21);
-const logical=m.view(d,"summary").links.find(l=>l.type==="wan-group");
-assert.equal(m.logicalState(logical),"ok");
-logical.members[1].status="admin-down";
-assert.equal(m.logicalState(logical),"warn");
-logical.members[0].status="admin-down";logical.members[0].route_selection="unavailable";
-assert.equal(m.logicalState(logical),"fault");
-logical.members[1].status="admin-up";logical.members[1].route_selection="selected";
-assert.equal(m.logicalState(logical),"recovery");
+assert.throws(()=>m.view(d,"summary"));
+assert.equal(m.view(d).nodes.length,18);
+assert.equal(m.view(d).links.length,21);
+assert.equal(m.view(d).nodes.filter(n=>n.type==="server").length,3);
+assert.equal(m.view(d).links.filter(l=>l.type==="wan").length,4);
+d.nodes[0].detail="Inventario de prueba";
 const stale=m.aged(d,60);
 assert.equal(stale.nodes[0].status,"unknown");
-assert.equal(m.logicalState(m.view(stale,"summary").links.find(l=>l.type==="wan-group")),"unknown");
+assert.equal(stale.nodes[0].detail,"Inventario de prueba");
+assert(m.details(stale.nodes[0]).some(row=>row[0]==="Identificador"&&row[1]==="R-HQ"));
+assert(m.details(stale.nodes[0]).some(row=>row[0]==="Vigencia"&&row[1]==="Sin observación vigente"));
 const partial=fixture();partial.http={...partial.http,age_seconds:59};
 assert.equal(m.aged(partial,2).nodes.find(n=>n.id==="FRONTAL_HQ").status,"unknown");
 assert.equal(m.aged(partial,2).nodes[0].status,"running");
 assert.equal(m.aged(partial,0,true).nodes[0].status,"unknown");
 const svg=new Element("svg"),calls=[];
 const choose=id=>calls.push(id);
-m.render(svg,d,"R-HQ",choose,"summary");
+m.render(svg,d,"R-HQ",choose,"detailed");
 const first=svg.children.find(e=>e.attrs["data-resource"]==="R-HQ");
 assert(first);assert(first.classes.has("selected"));
-m.render(svg,stale,"R-HQ",choose,"summary");
+m.render(svg,stale,"R-HQ",choose,"detailed");
 assert.equal(svg.children.find(e=>e.attrs["data-resource"]==="R-HQ"),first);
 assert.equal(first.attrs["data-state"],"unknown");
 assert.equal(first.attrs["aria-pressed"],"true");
 first.handlers.click();assert.equal(calls[0],"R-HQ");
-m.render(svg,d,null,choose,"summary");assert(!first.classes.has("selected"));
+m.render(svg,d,null,choose,"detailed");assert(!first.classes.has("selected"));
 m.render(svg,d,null,choose,"detailed");
 assert.equal(svg.children.filter(e=>e.attrs["data-resource"]).length,39);
 const byId=id=>d.links.find(l=>l.id===id);
 assert.equal(m.edgePath(byId("S05-HA-HTTP-PRINCIPAL"),"detailed"),"M276 590 H174");
 assert.equal(m.edgePath(byId("S05-HA-HTTP-RESPALDO"),"detailed"),"M330 613 V690 H905 V360 H1136");
 assert.equal(m.edgePath(byId("S05-HA-ACCESO-FRONTAL"),"detailed"),"M284 390 H439 V590 H384");
-assert.equal(m.viewport("summary").join(" "),"0 0 1250 620");
+assert.equal(m.viewport("detailed").join(" "),"0 0 1440 955");
 assert.equal(m.viewport("detailed","S1").join(" "),"970 5 450 440");
-assert.throws(()=>m.viewport("summary","external"));
-let box=m.moveViewport("summary",m.viewport("summary"),0.8);
-assert(box[2]<1250);assert(box[3]<620);
-box=m.moveViewport("summary",box,1,99,99);
-assert(box[0]+box[2]<=1250);assert(box[1]+box[3]<=620);
+assert.throws(()=>m.viewport("detailed","external"));
+let box=m.moveViewport("detailed",m.viewport("detailed"),0.8);
+assert(box[2]<1440);assert(box[3]<955);
+box=m.moveViewport("detailed",box,1,99,99);
+assert(box[0]+box[2]<=1440);assert(box[1]+box[3]<=955);
 m.reset(svg);assert.equal(svg.children.length,0);
 """
 
@@ -111,7 +107,7 @@ class TopologyVisualTests(unittest.TestCase):
     def test_controller_and_fullscreen(self):
         html = (UI / "index.html").read_text(encoding="utf-8")
         js = (UI / "static/app.js").read_text(encoding="utf-8")
-        self.assertIn('href="/topology?view=detailed">Vista detallada', html)
+        self.assertNotIn('href="/topology?view=detailed"', html)
         self.assertNotIn('href="/topology?view=detailed" target="_blank"', html)
         self.assertIn('id="topology-workspace"', html)
         self.assertIn("topologyWorkspace.requestFullscreen()", js)

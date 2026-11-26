@@ -40,7 +40,7 @@ class StructureTests(unittest.TestCase):
         parser.feed((UI / "index.html").read_text(encoding="utf-8"))
         self.assertEqual(set(parser.resources), {"/ui/static/styles.css", "/ui/static/app.js",
                                                  "/ui/static/history.js", "/ui/static/topology.js",
-                                                 "/ui/static/jobs.js"})
+                                                 "/ui/static/jobs.js", "/ui/static/observation.js"})
         self.assertEqual(len(parser.ids), len(set(parser.ids)))
         self.assertTrue({"main", "refresh", "notice", "api-state", "capabilities", "observed"} <= set(parser.ids))
         self.assertFalse(parser.inline)
@@ -56,7 +56,8 @@ class StructureTests(unittest.TestCase):
         self.assertIn("#main table :is(th,td) { text-align:left; vertical-align:middle; padding:8px 14px;", css)
         self.assertIn("#main .dashboard-table-wrap { margin-block:12px 0; }", css)
         self.assertIn("#main .action-row { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-block:12px; }", css)
-        self.assertIn('class="action-row"><button type="button" id="jobs-refresh"', html)
+        self.assertNotIn('id="jobs-refresh"', html)
+        self.assertIn('id="jobs-history-status"', html)
         self.assertNotIn("#jobs-view .jobs-table { min-width:", css)
         self.assertNotIn("Fecha y hora (Panamá)", html)
 
@@ -88,10 +89,11 @@ class StructureTests(unittest.TestCase):
                          '"test.traceroute":"Traceroute"', '"4 paquetes ICMP"', '"20 paquetes ICMP"',
                          "dateLabel(job.created_at_utc)", "actionLabel(job.selection)",
                          "profileLabel(job.selection)", "statusLabel(job)",
-                         'byId("result-panel").scrollIntoView', 'byId("title").focus',
-                         "preferred || selected?.job_id || body.jobs.find(active)?.job_id",
+                         "mountHistorical()", "historyFingerprint", "row.after(detail)",
+                         "preferred || body.jobs.find(active)?.job_id || selected?.job_id",
                          '"fecha_utc","fecha_panama","accion_id","prueba"'):
             self.assertIn(fragment, jobs_js)
+        self.assertNotIn("scrollIntoView", jobs_js)
         self.assertIn("authRequest, formatPanama)", js)
 
     def test_dashboard_structure_and_read_only_polling(self):
@@ -249,7 +251,10 @@ class StructureTests(unittest.TestCase):
 
     def test_product_labels_and_clock(self):
         html = (UI / "index.html").read_text(encoding="utf-8")
-        self.assertNotRegex(html.lower(), r"\bfase\s*\d+|\bs0[1-9]\b|laboratorio académico")
+        # El UID estable de Grafana es técnico, no una etiqueta visible del producto.
+        destination = 'href="http://127.0.0.1:3000/d/netlab360-s08-observacion"'
+        self.assertEqual(html.count(destination), 1)
+        self.assertNotRegex(html.replace(destination, '').lower(), r"\bfase\s*\d+|\bs0[1-9]\b|laboratorio académico")
         self.assertIn("CENTRO DE OPERACIONES DE RED", html)
         self.assertIn("<dt>Fecha y hora</dt>", html)
         self.assertIn("Vencimiento de la sesión por inactividad o límite máximo.", html)
@@ -257,9 +262,10 @@ class StructureTests(unittest.TestCase):
         self.assertEqual(html.count("data-view="), 15)
         js = (UI / "static/app.js").read_text(encoding="utf-8")
         self.assertIn('timeZone: "America/Panama"', js)
-        self.assertIn('hourCycle: "h12"', js)
+        self.assertIn('hourCycle: "h23"', js)
         self.assertIn('parts.month + "/" + parts.day + "/" + parts.year', js)
-        self.assertIn('parts.second + " " + parts.dayPeriod', js)
+        self.assertIn('parts.year + " · "', js)
+        self.assertNotIn("parts.dayPeriod", js)
         self.assertIn("formatPanama(stamp)", js)
         self.assertIn("formatPanama(new Date(session.expiresAt * 1000))", js)
 
@@ -330,7 +336,8 @@ class UIHttpTests(unittest.TestCase):
                            ("/ui/static/login.js", "text/javascript"),
                            ("/ui/static/history.js", "text/javascript"),
                            ("/ui/static/topology.js", "text/javascript"),
-                           ("/ui/static/jobs.js", "text/javascript")):
+                           ("/ui/static/jobs.js", "text/javascript"),
+                           ("/ui/static/observation.js", "text/javascript")):
             r = self.client.get(path)
             self.assertEqual(r.status_code, 200)
             self.assertIn(mime, r.headers["content-type"])
@@ -470,8 +477,10 @@ class GlobalRefreshTests(unittest.TestCase):
             self.assertNotIn(f'id="{old}"', html)
         self.assertIn('const refreshIntervals=Object.freeze([5,10,15,30,60,300])', js)
         self.assertIn('if(refreshBusy||!refreshAvailable()||document.hidden', js)
-        self.assertIn('if(reason==="initial"&&manualHistory)return', js)
-        self.assertIn('localStorage.setItem(refreshKey,value)', js)
+        self.assertNotIn('if(reason==="initial"&&manualHistory)return', js)
+        self.assertIn("observationView.refreshNotifications(),queueHistory()", js)
+        self.assertIn('else await observationView.refresh()', js)
+        self.assertIn('localStorage.setItem(preferenceKey,value)', js)
         self.assertIn('topologyWorkspace.prepend(refreshControls)', js)
 
 
@@ -482,7 +491,13 @@ class CompactConsoleTests(unittest.TestCase):
         css = (UI / "static/styles.css").read_text(encoding="utf-8")
         self.assertIn('class="content-tools"', html)
         self.assertNotIn('id="refresh-slot"', html.split("</header>")[0])
-        self.assertIn('getElementById("history-refresh-slot").append(refreshControls)', js)
+        self.assertNotIn('id="history-refresh-slot"', html)
+        self.assertNotIn('id="obs-refresh"', html)
+        self.assertNotIn('id="obs-notify"', html)
+        self.assertIn("void queueHistory(epoch)", js)
+        self.assertIn('const topologyMode="detailed";', js)
+        self.assertNotIn('id="topology-expand"', html)
+        self.assertNotIn('id="topology-return"', html)
         self.assertIn('getElementById("debug-refresh-slot").append(refreshControls)', js)
         self.assertIn('scrollbar-gutter:stable both-edges', css)
         self.assertIn('id="dashboard-site"', html)
