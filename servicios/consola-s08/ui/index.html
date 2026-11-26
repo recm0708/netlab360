@@ -199,20 +199,30 @@
             <div class="heading"><div><h2>Sondas y calidad de observación</h2><p class="muted">FE-HQ: servicio frontal de HQ. Duración total Blackbox, no RTT. Hora de Panamá.</p></div><button id="obs-refresh" type="button" disabled>Consultar sondas</button></div>
             <p id="obs-notice" role="status" aria-live="polite">Consulte las sondas.</p>
             <p id="obs-source" class="muted">Sin observación vigente.</p>
-            <div class="dashboard-table-wrap"><table class="dashboard-table"><thead><tr><th>Sonda</th><th>Vigencia al corte</th><th>Última muestra</th><th>Adquisición</th><th>Resultado</th><th>Duración</th></tr></thead><tbody id="obs-latest"></tbody></table></div>
-            <h2>Historial de sondas</h2>
+            <div class="obs-summary-grid" aria-label="Resumen al corte consultado">
+              <article class="obs-kpi"><span>Sondas vigentes</span><strong id="obs-fresh">—</strong><small>De las cinco configuradas</small></article>
+              <article class="obs-kpi"><span>Adquisición correcta</span><strong id="obs-acquired">—</strong><small>Últimas muestras vigentes / catálogo</small></article>
+              <article class="obs-kpi"><span>Sondas exitosas</span><strong id="obs-passed">—</strong><small>Éxitos / mediciones vigentes</small></article>
+              <article class="obs-kpi"><span>Ventanas completas</span><strong id="obs-complete">—</strong><small>5, 15 y 60 minutos</small></article>
+            </div>
+            <details class="obs-disclosure"><summary>Última muestra por sonda</summary>
+            <div class="dashboard-table-wrap"><table class="dashboard-table"><thead><tr><th>Sonda</th><th>Vigencia al corte</th><th>Última muestra</th><th>Adquisición</th><th>Resultado</th><th>Duración</th></tr></thead><tbody id="obs-latest"></tbody></table></div></details>
+            <div class="obs-section-heading"><h2>Historial de sondas</h2><span class="muted">Muestras originales · Panamá</span></div>
             <label for="obs-span">Intervalo de gráficos <select id="obs-span"><option value="5">5 minutos</option><option value="15">15 minutos</option><option value="60" selected>1 hora</option></select></label>
             <p class="muted">● Adquisición correcta / éxito · × Error / fallo medido · hueco: sin evidencia. Cada marcador corresponde a una muestra real.</p>
             <div class="obs-chart-grid">
               <section class="obs-chart"><h3>Estado de adquisición de métricas</h3><div id="obs-scrape_up" hidden aria-label="Histórico de adquisición"></div></section>
               <section class="obs-chart"><h3>Estado de las sondas</h3><div id="obs-probe_success" hidden aria-label="Histórico de éxito de sondas"></div></section>
               <section class="obs-chart obs-duration"><h3>Duración de las sondas</h3><div id="obs-duration_seconds" hidden aria-label="Duración total observada"></div></section>
-              <section class="obs-chart"><h3>Respuestas HTTP · S2 → FE-HQ</h3><p class="muted">Muestras originales de la última hora, más recientes primero. 0: sin respuesta; sin datos: ausencia de evidencia.</p><div class="dashboard-table-wrap obs-scroll"><table class="dashboard-table"><thead><tr><th>Fecha y hora</th><th>Código HTTP</th></tr></thead><tbody id="obs-http"></tbody></table></div></section>
+              <section class="obs-chart"><h3>Respuestas HTTP · S2 → FE-HQ</h3><p class="muted">Código de la última muestra y distribución en el intervalo seleccionado. 0: sin respuesta; sin datos: ausencia de evidencia.</p>
+                <div class="obs-http-summary"><strong id="obs-http-latest">—</strong><small id="obs-http-detail">—</small></div>
+                <p id="obs-http-count" class="muted">—</p><div id="obs-http-codes" class="obs-code-list"></div>
+                <details class="obs-disclosure"><summary>Ver muestras HTTP individuales</summary><div class="dashboard-table-wrap obs-scroll"><table class="dashboard-table"><thead><tr><th>Fecha y hora</th><th>Código HTTP</th></tr></thead><tbody id="obs-http"></tbody></table></div></details></section>
             </div>
-            <h2>Éxito observado (SLI) y cobertura</h2>
+            <div class="obs-section-heading"><h2>Éxito observado (SLI) y cobertura</h2><span class="muted">Comparación por ruta</span></div>
             <p class="muted">Objetivo provisional de laboratorio: 99 %. No es un SLA; una ventana parcial no acredita cumplimiento. Presupuesto en cantidad de fallos y burn rate sobre muestras medidas.</p>
             <div id="obs-cards" class="obs-window-grid"></div>
-            <div class="dashboard-table-wrap"><table class="dashboard-table obs-detail"><thead><tr><th>Ventana</th><th>Sonda</th><th>SLI</th><th>Adquiridas / nominal</th><th>Adq. correctas</th><th>Medidas</th><th>Éxitos</th><th>Presupuesto restante</th><th>Burn rate</th><th>Calidad / evaluación</th></tr></thead><tbody id="obs-windows"></tbody></table></div>
+            <details class="obs-disclosure"><summary>Detalle de cobertura, presupuesto de error y burn rate</summary><div class="dashboard-table-wrap"><table class="dashboard-table obs-detail"><thead><tr><th>Ventana</th><th>Sonda</th><th>SLI</th><th>Adquiridas / nominal</th><th>Adq. correctas</th><th>Medidas</th><th>Éxitos</th><th>Presupuesto restante</th><th>Burn rate</th><th>Calidad / evaluación</th></tr></thead><tbody id="obs-windows"></tbody></table></div></details>
           </section>
           <section class="panel" aria-label="Notificaciones de Alertmanager">
             <h2>Notificaciones de Alertmanager</h2>
