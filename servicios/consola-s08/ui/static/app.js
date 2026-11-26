@@ -727,8 +727,10 @@ function initializeConsole() {
   const queryPanel = document.getElementById("debug-queries");
   const docsTab = document.getElementById("debug-tab-docs");
   const queriesTab = document.getElementById("debug-tab-queries");
+  let swaggerEpoch=0,swaggerPending=false;
 
   function closeSwagger() {
+    swaggerEpoch++;swaggerPending=false;
     swaggerHost.replaceChildren();
     swaggerPanel.hidden = true;
     queryPanel.hidden = false;
@@ -736,19 +738,41 @@ function initializeConsole() {
     queriesTab.classList.remove("secondary");
   }
 
-  function openSwagger() {
+  async function openSwagger() {
     if (!debugAllowed() || serverNow() >= session.warningAt) return;
     queryPanel.hidden = true;
     swaggerPanel.hidden = false;
     docsTab.classList.remove("secondary");
     queriesTab.classList.add("secondary");
-    if (swaggerHost.firstElementChild) return;
+    if (swaggerHost.querySelector("iframe") || swaggerPending) return;
+    const epoch=++swaggerEpoch;
+    const status=document.createElement("p");
+    status.className="swagger-notice muted";status.setAttribute("role","status");
+    status.textContent="Comprobando documentación y recursos locales…";
+    swaggerHost.replaceChildren(status);swaggerPending=true;
+    try{
+      const response=await authRequest("/docs?embedded=1");
+      if(epoch!==swaggerEpoch||!debugAllowed())return;
+      if(!response.ok){
+        status.textContent=response.status===503?"Documentación no disponible: no se pudieron cargar los recursos locales de Swagger.":response.status===401||response.status===403?"La documentación requiere una sesión de operador vigente.":"No se confirmó la documentación (HTTP "+response.status+").";
+        return;
+      }
+      if(!(response.headers.get("content-type")||"").startsWith("text/html"))throw Error("DOCS_CONTENT");
+    }catch{
+      if(epoch===swaggerEpoch)status.textContent="No se pudo consultar la documentación. Seleccione nuevamente la pestaña para reintentar.";
+      return;
+    }finally{if(epoch===swaggerEpoch)swaggerPending=false;}
+    if(epoch!==swaggerEpoch||!debugAllowed()||serverNow()>=session.warningAt)return;
     const frame = document.createElement("iframe");
     frame.id = "swagger-frame";
     frame.title = "Documentación interactiva de la API";
     frame.addEventListener("load", () => {
       const doc = frame.contentDocument;
-      if (!doc || !debugAllowed()) return;
+      if(epoch!==swaggerEpoch||!debugAllowed())return;
+      if(!doc?.getElementById("swagger-ui")){
+        frame.remove();status.textContent="No se pudo representar Swagger. Seleccione nuevamente la pestaña para reintentar.";return;
+      }
+      status.remove();
       doc.documentElement.dataset.theme = document.documentElement.dataset.theme;
       for (const event of ["pointerdown", "keydown", "wheel", "touchstart"]) {
         doc.addEventListener(event, recordActivity, {passive: true});
