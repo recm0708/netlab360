@@ -1,5 +1,7 @@
 """Pruebas del alcance Viewer, respuestas JSON y denegación explícita."""
 from pathlib import Path
+from io import BytesIO
+from unittest.mock import patch
 import sys
 import unittest
 from urllib.error import HTTPError
@@ -49,12 +51,36 @@ class ViewerTests(unittest.TestCase):
 
     def test_denied(self):
         def error(code):
-            raise HTTPError("http://127.0.0.1:3000", code, "", {}, None)
+            raise HTTPError("http://127.0.0.1:3000", code, "", {}, BytesIO(b""))
         self.assertEqual(V.denied(lambda: error(403)), 403)
         with self.assertRaises(HTTPError):
             V.denied(lambda: error(500))
         with self.assertRaises(ValueError):
             V.denied(lambda: {})
+
+    def test_password_validation_codes(self):
+        good = "A" * 20
+        V.validate_password(good, good, "B" * 20)
+        for password, repeated, admin, code in (
+            (good, "different", "", "PASSWORD_MISMATCH"),
+            ("short", "short", "", "PASSWORD_TOO_SHORT"),
+            (good + " ", good + " ", "", "PASSWORD_EDGE_WHITESPACE"),
+            (good, good, good, "PASSWORD_MUST_BE_INDEPENDENT"),
+        ):
+            with self.subTest(code=code), self.assertRaisesRegex(V.PasswordInputError, "^" + code + "$"):
+                V.validate_password(password, repeated, admin)
+
+    def test_retry_password_without_disclosure(self):
+        good = "Z" * 20
+        with patch.object(V.getpass, "getpass", side_effect=["short", "short", good, good]), patch("builtins.print") as output:
+            self.assertEqual(V.password_prompt("admin"), good)
+            self.assertNotIn(good, str(output.call_args_list))
+            self.assertIn("PASSWORD_TOO_SHORT", str(output.call_args_list))
+
+    def test_password_attempt_limit(self):
+        with patch.object(V.getpass, "getpass", return_value="short"), patch("builtins.print"):
+            with self.assertRaisesRegex(V.PasswordInputError, "^PASSWORD_ATTEMPTS_EXHAUSTED$"):
+                V.password_prompt("admin")
 
 
 if __name__ == "__main__":
