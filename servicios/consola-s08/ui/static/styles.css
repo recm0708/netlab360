@@ -425,5 +425,5 @@ button.secondary, .topology-action {
 .obs-card:last-child { grid-column:1/-1; }
 #obs-panel .obs-detail { min-width:880px; }
 #obs-panel .dashboard-table-wrap { overflow-x:auto; }
-@media (min-width:1400px) { .obs-chart-grid { grid-template-columns:2fr 1fr; } .obs-chart-grid > :nth-child(-n+2) { grid-column:auto; } }
+@media (min-width:1400px) { .obs-chart-grid { grid-template-columns:repeat(6,minmax(0,1fr)); } .obs-chart-grid > :nth-child(-n+2) { grid-column:span 3; } .obs-chart-grid > :nth-child(3) { grid-column:span 4; } .obs-chart-grid > :nth-child(4) { grid-column:span 2; } }
 @media (max-width:1000px) { .obs-chart-grid,.obs-window-grid { grid-template-columns:1fr; } }
