@@ -174,6 +174,51 @@ assert(f.traces.every(t=>t.y.includes(null)));
 assert(M.figure(empty,"probe_success",x=>x.toISOString(),{},5).traces.every(t=>t.x.length===0));
 """, [data, absent])
 
+    def test_overview_preserves_quality_and_counts(self):
+        with patch.object(R, "fetch", side_effect=sources):
+            full = R.collect(END)
+        with patch.object(R, "fetch", return_value=("OK", {})):
+            empty = R.collect(END)
+        self.run_node("""
+const assert=require("node:assert/strict");
+require(process.argv[1]);
+const M=globalThis.NetlabObservation, [full,empty]=JSON.parse(require("node:fs").readFileSync(0,"utf8"));
+assert.deepEqual(M.overview(full),{fresh:5,acquired:5,measured:5,passed:5,complete:15});
+assert.deepEqual(M.overview(empty),{fresh:0,acquired:0,measured:0,passed:0,complete:0});
+full.probes[0].quality="STALE";
+assert.deepEqual(M.overview(full),{fresh:4,acquired:4,measured:4,passed:4,complete:15});
+for(const span of [5,15,60]){
+  const stats=M.durationStats(full,span);
+  assert.equal(stats.length,5);
+  for(const s of stats)assert.deepEqual([s.count,s.last,s.mean,s.max],[span*6,1,1,1]);
+  for(const s of M.durationStats(empty,span))assert.deepEqual([s.count,s.last,s.mean,s.max],[0,null,null,null]);
+}
+""", [full, empty])
+
+    def test_http_distribution_exact_codes_and_interval(self):
+        def mixed(metric, end):
+            if metric == "probe_http_status_code":
+                return "OK", {"s2-hq-http": {
+                    int(end * 1000): 200, int((end-10)*1000): 503,
+                    int((end-20)*1000): 0, int((end-310)*1000): 302}}
+            return sources(metric, end)
+        with patch.object(R, "fetch", side_effect=mixed):
+            result = R.collect(END)
+        self.run_node("""
+const assert=require("node:assert/strict");
+require(process.argv[1]);
+const M=globalThis.NetlabObservation,d=JSON.parse(require("node:fs").readFileSync(0,"utf8"));
+M.validate(d);
+const h=M.httpHistory(d,5);
+assert.equal(h.rows.length,30);
+assert.deepEqual(h.counts,[[0,1],[200,1],[503,1],[null,27]]);
+assert.deepEqual(h.rows.slice(0,3).map(s=>s.http_status_code),[200,503,0]);
+assert.equal(h.latest.http_status_code,200);
+assert.deepEqual(M.httpHistory(d,15).counts,[[0,1],[200,1],[302,1],[503,1],[null,86]]);
+assert.equal(M.httpHistory(d,60).rows.length,360);
+assert.equal(M.httpHistory(d,60).counts.reduce((n,r)=>n+r[1],0),360);
+""", result)
+
     def test_notification_scope(self):
         self.run_node("""
 const assert=require("node:assert/strict");
