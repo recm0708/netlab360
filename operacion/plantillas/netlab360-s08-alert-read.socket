@@ -1,0 +1,16 @@
+# Canal interno de solo lectura para la identidad web dedicada.
+[Unit]
+Description=NETLAB360 lectura de notificaciones
+
+[Socket]
+ListenStream=/run/netlab360-s08-alert-read/control.sock
+SocketUser=netlab360-s08-api
+SocketGroup=netlab360-s08-api
+SocketMode=0600
+DirectoryMode=0755
+Accept=yes
+MaxConnections=4
+RemoveOnStop=yes
+
+[Install]
+WantedBy=sockets.target
