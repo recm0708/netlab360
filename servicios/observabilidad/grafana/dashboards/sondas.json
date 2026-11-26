@@ -9,7 +9,7 @@
   "timezone": "America/Panama",
   "editable": false,
   "schemaVersion": 39,
-  "version": 2,
+  "version": 3,
   "refresh": "30s",
   "time": {
     "from": "now-1h",
@@ -481,7 +481,7 @@
     {
       "id": 6,
       "title": "Cobertura · 5 min",
-      "description": "30 muestras esperadas por sonda (5 min a 10 s). Ámbar: cantidad inferior a la nominal; verde: alcanza la nominal; gris: sin datos. No equivale por sí sola a cumplimiento SLO.",
+      "description": "30 muestras esperadas por sonda (5 min a 10 s). Ámbar: cantidad distinta de la nominal; verde: coincide con la nominal; gris: sin datos. No equivale por sí sola a cumplimiento SLO.",
       "type": "table",
       "datasource": {
         "type": "prometheus",
@@ -626,7 +626,7 @@
           "instant": true,
           "range": false,
           "editorMode": "code",
-          "format": "table"
+          "format": "time_series"
         },
         {
           "datasource": {
@@ -639,7 +639,7 @@
           "instant": true,
           "range": false,
           "editorMode": "code",
-          "format": "table"
+          "format": "time_series"
         },
         {
           "datasource": {
@@ -652,7 +652,7 @@
           "instant": true,
           "range": false,
           "editorMode": "code",
-          "format": "table"
+          "format": "time_series"
         },
         {
           "datasource": {
@@ -665,44 +665,48 @@
           "instant": true,
           "range": false,
           "editorMode": "code",
-          "format": "table"
+          "format": "time_series"
         }
       ],
       "transformations": [
         {
-          "id": "merge",
+          "id": "seriesToRows",
           "options": {}
         },
         {
-          "id": "filterFieldsByName",
+          "id": "extractFields",
           "options": {
-            "include": {
-              "names": [
-                "probe_id",
-                "Value #A",
-                "Value #B",
-                "Value #C",
-                "Value #D"
-              ]
-            }
+            "source": "Metric",
+            "format": "regexp",
+            "regExp": "/^(?<Sonda>[a-z0-9-]+) (?<Contador>adquisición correcta|adquisición|medidas|éxitos)$/",
+            "replace": false
+          }
+        },
+        {
+          "id": "groupingToMatrix",
+          "options": {
+            "rowField": "Sonda",
+            "columnField": "Contador",
+            "valueField": "Value",
+            "emptyValue": "null"
           }
         },
         {
           "id": "organize",
           "options": {
             "indexByName": {
-              "probe_id": 0,
-              "Value #A": 1,
-              "Value #B": 2,
-              "Value #C": 3,
-              "Value #D": 4
+              "Sonda\\Contador": 0,
+              "adquisición": 1,
+              "adquisición correcta": 2,
+              "medidas": 3,
+              "éxitos": 4
             },
             "renameByName": {
-              "probe_id": "Sonda",
-              "Value #A": "Adquiridas",
-              "Value #B": "Adq. correctas",
-              "Value #C": "Medidas",
-              "Value #D": "Éxitos"
+              "Sonda\\Contador": "Sonda",
+              "adquisición": "Adquiridas",
+              "adquisición correcta": "Adq. correctas",
+              "medidas": "Medidas",
+              "éxitos": "Éxitos"
             }
           }
         }
@@ -784,7 +788,7 @@
     {
       "id": 8,
       "title": "Cobertura · 15 min",
-      "description": "90 muestras esperadas por sonda (15 min a 10 s). Ámbar: cantidad inferior a la nominal; verde: alcanza la nominal; gris: sin datos. No equivale por sí sola a cumplimiento SLO.",
+      "description": "90 muestras esperadas por sonda (15 min a 10 s). Ámbar: cantidad distinta de la nominal; verde: coincide con la nominal; gris: sin datos. No equivale por sí sola a cumplimiento SLO.",
       "type": "table",
       "datasource": {
         "type": "prometheus",
@@ -929,7 +933,7 @@
           "instant": true,
           "range": false,
           "editorMode": "code",
-          "format": "table"
+          "format": "time_series"
         },
         {
           "datasource": {
@@ -942,7 +946,7 @@
           "instant": true,
           "range": false,
           "editorMode": "code",
-          "format": "table"
+          "format": "time_series"
         },
         {
           "datasource": {
@@ -955,7 +959,7 @@
           "instant": true,
           "range": false,
           "editorMode": "code",
-          "format": "table"
+          "format": "time_series"
         },
         {
           "datasource": {
@@ -968,44 +972,48 @@
           "instant": true,
           "range": false,
           "editorMode": "code",
-          "format": "table"
+          "format": "time_series"
         }
       ],
       "transformations": [
         {
-          "id": "merge",
+          "id": "seriesToRows",
           "options": {}
         },
         {
-          "id": "filterFieldsByName",
+          "id": "extractFields",
           "options": {
-            "include": {
-              "names": [
-                "probe_id",
-                "Value #A",
-                "Value #B",
-                "Value #C",
-                "Value #D"
-              ]
-            }
+            "source": "Metric",
+            "format": "regexp",
+            "regExp": "/^(?<Sonda>[a-z0-9-]+) (?<Contador>adquisición correcta|adquisición|medidas|éxitos)$/",
+            "replace": false
+          }
+        },
+        {
+          "id": "groupingToMatrix",
+          "options": {
+            "rowField": "Sonda",
+            "columnField": "Contador",
+            "valueField": "Value",
+            "emptyValue": "null"
           }
         },
         {
           "id": "organize",
           "options": {
             "indexByName": {
-              "probe_id": 0,
-              "Value #A": 1,
-              "Value #B": 2,
-              "Value #C": 3,
-              "Value #D": 4
+              "Sonda\\Contador": 0,
+              "adquisición": 1,
+              "adquisición correcta": 2,
+              "medidas": 3,
+              "éxitos": 4
             },
             "renameByName": {
-              "probe_id": "Sonda",
-              "Value #A": "Adquiridas",
-              "Value #B": "Adq. correctas",
-              "Value #C": "Medidas",
-              "Value #D": "Éxitos"
+              "Sonda\\Contador": "Sonda",
+              "adquisición": "Adquiridas",
+              "adquisición correcta": "Adq. correctas",
+              "medidas": "Medidas",
+              "éxitos": "Éxitos"
             }
           }
         }
@@ -1087,7 +1095,7 @@
     {
       "id": 10,
       "title": "Cobertura · 60 min",
-      "description": "360 muestras esperadas por sonda (60 min a 10 s). Ámbar: cantidad inferior a la nominal; verde: alcanza la nominal; gris: sin datos. No equivale por sí sola a cumplimiento SLO.",
+      "description": "360 muestras esperadas por sonda (60 min a 10 s). Ámbar: cantidad distinta de la nominal; verde: coincide con la nominal; gris: sin datos. No equivale por sí sola a cumplimiento SLO.",
       "type": "table",
       "datasource": {
         "type": "prometheus",
@@ -1232,7 +1240,7 @@
           "instant": true,
           "range": false,
           "editorMode": "code",
-          "format": "table"
+          "format": "time_series"
         },
         {
           "datasource": {
@@ -1245,7 +1253,7 @@
           "instant": true,
           "range": false,
           "editorMode": "code",
-          "format": "table"
+          "format": "time_series"
         },
         {
           "datasource": {
@@ -1258,7 +1266,7 @@
           "instant": true,
           "range": false,
           "editorMode": "code",
-          "format": "table"
+          "format": "time_series"
         },
         {
           "datasource": {
@@ -1271,44 +1279,48 @@
           "instant": true,
           "range": false,
           "editorMode": "code",
-          "format": "table"
+          "format": "time_series"
         }
       ],
       "transformations": [
         {
-          "id": "merge",
+          "id": "seriesToRows",
           "options": {}
         },
         {
-          "id": "filterFieldsByName",
+          "id": "extractFields",
           "options": {
-            "include": {
-              "names": [
-                "probe_id",
-                "Value #A",
-                "Value #B",
-                "Value #C",
-                "Value #D"
-              ]
-            }
+            "source": "Metric",
+            "format": "regexp",
+            "regExp": "/^(?<Sonda>[a-z0-9-]+) (?<Contador>adquisición correcta|adquisición|medidas|éxitos)$/",
+            "replace": false
+          }
+        },
+        {
+          "id": "groupingToMatrix",
+          "options": {
+            "rowField": "Sonda",
+            "columnField": "Contador",
+            "valueField": "Value",
+            "emptyValue": "null"
           }
         },
         {
           "id": "organize",
           "options": {
             "indexByName": {
-              "probe_id": 0,
-              "Value #A": 1,
-              "Value #B": 2,
-              "Value #C": 3,
-              "Value #D": 4
+              "Sonda\\Contador": 0,
+              "adquisición": 1,
+              "adquisición correcta": 2,
+              "medidas": 3,
+              "éxitos": 4
             },
             "renameByName": {
-              "probe_id": "Sonda",
-              "Value #A": "Adquiridas",
-              "Value #B": "Adq. correctas",
-              "Value #C": "Medidas",
-              "Value #D": "Éxitos"
+              "Sonda\\Contador": "Sonda",
+              "adquisición": "Adquiridas",
+              "adquisición correcta": "Adq. correctas",
+              "medidas": "Medidas",
+              "éxitos": "Éxitos"
             }
           }
         }
