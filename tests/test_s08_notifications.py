@@ -121,6 +121,11 @@ class HttpTests(unittest.TestCase):
                 with patch.object(N, "collect", return_value={"transport": "OK"}) as collect:
                     self.assertEqual(client.get(path + "validation").status_code, 429)
                     collect.assert_not_called()
+            with TestClient(create_app(directory), base_url="http://127.0.0.1:9140") as client:
+                client.cookies.set("netlab360_session", sessions.issue(directory, "operator")["token"])
+                with patch.object(N, "collect", return_value={"transport": "OK"}) as collect:
+                    self.assertEqual(client.get(path + "validation").status_code, 200)
+                    collect.assert_called_once_with("validation")
 
 
 if __name__ == "__main__":
