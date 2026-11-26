@@ -108,10 +108,19 @@ assert.equal(find("LACP-S2").status,"unknown");
 assert.equal(find("OVS").flow_count,27);
 assert.equal(find("SDN-A").status,"unknown");
 assert.equal(full.links.filter(l=>l.type==="lacp").length,3);
+assert(m.details(find("LACP-HQ")).some(r=>r[0]==="Miembros switch"&&r[1]==="2 / 2"));
+assert(m.details(find("OVS")).some(r=>r[0]==="Flujos observados"&&r[1]==="27"));
+assert(m.details(find("SDN-A")).some(r=>r[0]==="Estado observado"&&r[1]==="Sin verificar"));
+assert.equal(m.geometry("detailed").layout.FAUCET[1]-23-1005,22);
 assert(full.links.filter(l=>l.type==="sdn-access").every(l=>l.status==="unknown"));
 assert.equal(m.augment(d,[]).nodes.find(n=>n.id==="FAUCET").status,"unknown");
 m.render(svg,full,"LACP-HQ",choose);
 assert.equal(svg.children.filter(e=>e.attrs["data-resource"]).length,54);
+const bond=svg.children.find(e=>e.attrs["data-resource"]==="BOND-HQ");
+assert.equal(Number(bond.children.find(e=>e.textContent==="802.3ad").attrs.x),m.geometry("detailed").layout["LACP-HQ"][0]-84);
+for(const [id,pattern] of [["SDN-CONTROL","control"],["S05-HA-HTTP-PRINCIPAL","service"]]){
+  assert(svg.children.find(e=>e.attrs["data-resource"]===id).children.some(e=>e.attrs.class==="topology-edge "+pattern));
+}
 assert.equal(svg.children.find(e=>e.attrs["data-resource"]==="LACP-S1").attrs["data-state"],"warn");
 assert.equal(svg.children.find(e=>e.attrs["data-resource"]==="SDN-A").attrs["data-state"],"unknown");
 m.render(svg,m.augment(d,[]),"LACP-HQ",choose);
@@ -138,6 +147,10 @@ class TopologyVisualTests(unittest.TestCase):
         self.assertIn("document.exitFullscreen()", js)
         self.assertIn('id="topology-site"', html)
         self.assertIn("applyTopologyBox();", js)
+        self.assertIn("Todas las zonas", html)
+        self.assertIn('aria-label="Convenciones del diagrama"', html)
+        for state in ("ok", "recovery", "warn", "fault", "unknown"):
+            self.assertIn(f'<strong data-state="{state}">', html)
         self.assertIn("moveViewport(topologyMode", js)
         self.assertIn('if(status===429)', js)
         self.assertIn("refreshCurrent", js)
