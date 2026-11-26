@@ -1,13 +1,13 @@
-"""Canal de progreso y cancelación de contenido; conserva el protocolo V1."""
+"""Canal de progreso y cancelación de transferencias; conserva el protocolo V1."""
 import json
 import os
 import select as io_select
 import time
 from datetime import datetime, timezone
 
-from . import broker_transfer as T, content_executor as C
+from . import broker_transfer as T, content_executor as C, iperf_native as I
 from .probe_executor import verify_identity
-from .stream_protocol import MAX_EVENTS, MAX_FRAME, sample
+from .stream_protocol import MAX_EVENTS, MAX_FRAME, STREAM_ACTIONS, sample
 
 
 class CancelRequested(Exception):
@@ -73,9 +73,54 @@ class Progress:
             self.emit(raw)
 
 
+class NativeProgress:
+    """Leer NDJSON acotado y conservar únicamente intervalos completos observados."""
+    def __init__(self, role, selection, emit):
+        self.parser = I.NativeStream(selection.profile, selection.route, role)
+        self.profile, self.emit = selection.profile, emit
+        self.offset, self.pending, self.previous, self.count = 0, b"", None, 0
+
+    def poll(self, handle, complete=False):
+        while True:
+            chunk = os.pread(handle.fileno(), 65536, self.offset)
+            if not chunk:
+                break
+            self.offset += len(chunk)
+            if self.offset > T.perf.MAX_JSON:
+                raise ValueError("NATIVE_OUTPUT_LIMIT")
+            lines = (self.pending + chunk).split(b"\n")
+            self.pending = lines.pop()
+            if len(self.pending) > MAX_FRAME:
+                raise ValueError("NATIVE_FRAME_LIMIT")
+            for line in lines:
+                if not line.strip():
+                    continue
+                if len(line) > MAX_FRAME:
+                    raise ValueError("NATIVE_FRAME_LIMIT")
+                event = self.parser.feed(json.loads(line))
+                if event is not None:
+                    if self.count >= MAX_EVENTS // 2:
+                        raise ValueError("NATIVE_EVENT_LIMIT")
+                    self.previous = sample(event, self.profile, self.previous)
+                    self.count += 1
+                    self.emit(event)
+        if complete and self.pending.strip():
+            raise ValueError("NATIVE_INCOMPLETE_FRAME")
+
+    def finish(self):
+        return self.parser.finish()
+
+
+def native_args(args):
+    """No combinar JSON tradicional ni documento completo con flujo NDJSON."""
+    return [x for x in args if x not in ("-J", "--json", "--json-stream",
+                                         "--json-stream-full-output", "--forceflush")] + [
+        "--json-stream", "--forceflush"]
+
+
 def run(conn, selection, uid, gid):
     """Supervisar ambos workers, comprobar liberación antes de confirmar cancelación."""
-    if selection.action != "test.content.tcp":
+    if selection.action not in STREAM_ACTIONS:
         return final("NOT_ENABLED")
     src, dst, server, client, ct, st, port = T.plan(selection, uid, gid)
     control = Control(conn)
@@ -83,8 +128,22 @@ def run(conn, selection, uid, gid):
     stamp = datetime.now(timezone.utc).isoformat()
     def emit(raw):
         frame(conn, {"kind": "progress", "sample": raw})
-    tx = Progress("sender", selection.profile, emit)
-    rx = Progress("receiver", selection.profile, emit)
+    content = selection.action == "test.content.tcp"
+    if content:
+        tx = Progress("sender", selection.profile, emit)
+        rx = Progress("receiver", selection.profile, emit)
+        server, client = server + ["--progress"], client + ["--progress"]
+    else:
+        tx = NativeProgress("sender", selection, emit)
+        rx = NativeProgress("receiver", selection, emit)
+        server, client = native_args(server), native_args(client)
+    def poll(tx_handle, rx_handle, complete=False):
+        if content:
+            tx.poll(tx_handle)
+            rx.poll(rx_handle)
+        else:
+            tx.poll(tx_handle, complete)
+            rx.poll(rx_handle, complete)
     cancelled = False
     try:
         verify_identity(src, dst, T.invoke)
@@ -93,7 +152,7 @@ def run(conn, selection, uid, gid):
             return final("UNCERTAIN")
         try:
             control.check()
-            with T.managed(dst.namespace, server + ["--progress"], st) as (receiver, out_rx, err_rx):
+            with T.managed(dst.namespace, server, st) as (receiver, out_rx, err_rx):
                 for _ in range(30):
                     control.check()
                     if receiver.poll() is not None:
@@ -104,24 +163,26 @@ def run(conn, selection, uid, gid):
                 else:
                     raise ValueError("RECEIVER_NOT_READY")
                 control.check()
-                with T.managed(src.namespace, client + ["--progress"], ct) as (sender, out_tx, err_tx):
+                with T.managed(src.namespace, client, ct) as (sender, out_tx, err_tx):
                     deadline = time.monotonic() + ct + 5
                     while sender.poll() is None or receiver.poll() is None:
                         control.check()
-                        tx.poll(err_tx)
-                        rx.poll(err_rx)
+                        poll(err_tx if content else out_tx, err_rx if content else out_rx)
                         if time.monotonic() >= deadline:
                             raise TimeoutError("TRANSFER_DEADLINE")
                         if sender.poll() not in (None, 0) or receiver.poll() not in (None, 0):
                             raise ValueError("WORKER_FAILED")
                         time.sleep(0.15)
                     control.check()
-                    tx.poll(err_tx)
-                    rx.poll(err_rx)
+                    poll(err_tx if content else out_tx, err_rx if content else out_rx, complete=True)
                     if sender.returncode or receiver.returncode:
                         raise ValueError("WORKER_FAILED")
-                    measurement = C.reconcile(selection.profile, selection.route,
-                        json.loads(T.read_output(out_tx)), json.loads(T.read_output(out_rx)), uid)
+                    if content:
+                        measurement = C.reconcile(selection.profile, selection.route,
+                            json.loads(T.read_output(out_tx)), json.loads(T.read_output(out_rx)), uid)
+                    else:
+                        measurement = T.perf.parse_results(selection.profile, selection.route,
+                                                          tx.finish(), rx.finish())
         except CancelRequested:
             cancelled = True
         finally:
@@ -129,9 +190,10 @@ def run(conn, selection, uid, gid):
                 raise ValueError("PORT_NOT_RELEASED")
         if cancelled:
             return final("CANCELLED", cleanup=True)
-        return final("OK", {"schema": "NETLAB360_S08_CONTENT_V1", "profile": selection.profile,
+        return final("OK", {"schema": "NETLAB360_S08_CONTENT_V1" if content else "NETLAB360_S08_TRANSFER_V1",
+                     "profile": selection.profile,
                      "route": selection.route, "origin": src.address, "destination": dst.address,
                      "observed_at_utc": stamp, "transport": "OK", "measurement": measurement,
                      "error": None, "elapsed_ms": round((time.monotonic() - started) * 1000, 3)}, True)
-    except (ValueError, OSError, KeyError, TypeError, TimeoutError):
+    except (ValueError, OSError, KeyError, TypeError, IndexError, TimeoutError):
         return final("UNCERTAIN")
