@@ -16,8 +16,9 @@ DIGEST=e6f06cf4ad96a4809294c2e78d3ebe6bc42a79bff36ffe35eefbe502fc19aa87
 URL="https://dl.grafana.com/grafana/release/$VERSION/$FILE"
 ACCOUNT=netlab360-s08-grafana
 UNIT=netlab360-s08-grafana.service
-INSTALL="/opt/netlab360/grafana-$VERSION"
-CONFIG=/opt/netlab360/grafana-config
+PREFIX=/opt/netlab360-grafana
+INSTALL="$PREFIX/grafana-$VERSION"
+CONFIG="$PREFIX/grafana-config"
 STATE=/var/lib/netlab360/grafana
 SECRETS=/etc/netlab360/grafana
 STAGE="$(mktemp -d "$CACHE/.grafana.XXXXXX")"
@@ -50,7 +51,7 @@ if getent passwd "$ACCOUNT" >/dev/null || getent group "$ACCOUNT" >/dev/null; th
     exit 1
 fi
 sudo -v
-for f in "$INSTALL" "$CONFIG" "$STATE" "$SECRETS" "/run/systemd/system/$UNIT"; do
+for f in "$PREFIX" "$STATE" "$SECRETS" "/run/systemd/system/$UNIT"; do
     sudo -n test ! -e "$f"
     sudo -n test ! -L "$f"
 done
@@ -92,6 +93,8 @@ echo "EXTRACCION_Y_BINARIO=OK"
 echo "========== 1014 APROVISIONAR GRAFANA =========="
 sudo -v
 sudo -n useradd --system --user-group --no-create-home --home-dir /nonexistent --shell /usr/sbin/nologin "$ACCOUNT"
+# Mantener intacta la frontera privada de /opt/netlab360.
+sudo -n install -d -o root -g "$ACCOUNT" -m 0750 "$PREFIX"
 sudo -n install -d -o root -g root -m 0755 "$INSTALL" "$CONFIG"
 sudo -n cp -a -- "$SOURCE/." "$INSTALL/"
 sudo -n chown -hR root:root "$INSTALL"
@@ -112,6 +115,13 @@ for name in ("admin-password", "secret-key"):
     with os.fdopen(fd, "w") as handle:
         handle.write(secrets.token_urlsafe(48))
 PY
+# Comprobar el acceso efectivo antes de iniciar el proceso sin privilegios.
+sudo -n -u "$ACCOUNT" /bin/sh -c 'cd "$1"' sh "$INSTALL"
+sudo -n -u "$ACCOUNT" test -x "$INSTALL/bin/grafana"
+sudo -n -u "$ACCOUNT" test -r "$CONFIG/grafana.ini"
+sudo -n -u "$ACCOUNT" test -r "$CONFIG/provisioning/dashboards/netlab360.yml"
+sudo -n -u "$ACCOUNT" test -w "$STATE/data"
+echo "RUTAS_GRAFANA_ACCESIBLES=OK"
 sudo -n install -o root -g root -m 0644 "operacion/plantillas/$UNIT" "/run/systemd/system/$UNIT"
 sudo -n systemd-analyze verify "/run/systemd/system/$UNIT"
 sudo -n systemctl daemon-reload
