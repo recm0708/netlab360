@@ -85,13 +85,36 @@ assert "password_file: /private/secret" in final
 temporary = m["render"](original, Path("/private/secret"), Path("/tmp/test.yml"))
 assert "  - /tmp/test.yml" in temporary
 assert "  - /tmp/test.yml" not in final
-assert 'synthetic: "true"' in m["validation_rule"]("1234567890abcdef", 1000)
+rule = m["validation_rule"]("1234567890abcdef", 1000)
+assert 'synthetic: "true"' in rule
+assert "for: 10s" in rule
+assert "vector(time()) < 1000" in rule
 try:
     m["render"](final, Path("/private/secret"))
 except ValueError:
     pass
 else:
     raise AssertionError("Duplicate alerting accepted")
+"""
+        subprocess.run([sys.executable, "-I", "-B", "-c", code, str(path)],
+                       check=True, timeout=10)
+
+    def test_destination_discovery(self):
+        path = ROOT / "scripts/s08/desplegar_alertas.py"
+        import subprocess
+        import sys
+        code = """
+import runpy, sys
+m = runpy.run_path(sys.argv[1])
+ready = m["destination_ready"]
+for rows, expected in (
+    ([], False),
+    ([{"url": "http://127.0.0.1:9093/api/v2/alerts"}], True),
+    ([{"url": "http://127.0.0.1:9999/api/v2/alerts"}], False),
+    ([{"url": "http://127.0.0.1:9093/api/v2/alerts"}] * 2, False),
+):
+    ready.__globals__["query"] = lambda path: {"activeAlertmanagers": rows}
+    assert ready() is expected
 """
         subprocess.run([sys.executable, "-I", "-B", "-c", code, str(path)],
                        check=True, timeout=10)
