@@ -16,6 +16,7 @@ import tempfile
 import time
 from urllib.error import HTTPError, URLError
 from urllib.request import Request
+import re
 
 REPO = Path(__file__).resolve().parents[2]
 D = runpy.run_path(str(REPO / "scripts/s08/desplegar_sondas_continuas.py"))
@@ -79,6 +80,7 @@ def validation_rule(run_id, deadline):
         "    rules:\n"
         "      - alert: NETLAB360S08Validation\n"
         f"        expr: vector(time()) < {deadline}\n"
+        "        for: 10s\n"
         "        labels:\n"
         "          phase: validation\n"
         '          synthetic: "true"\n'
@@ -193,7 +195,89 @@ def check_windows(evidence):
     print("VENTANAS_REALES=15/15", flush=True)
 
 
-def main(evidence):
+def resume_installation(stage):
+    """Verificar el aprovisionamiento anterior sin sustituir recursos ni secretos."""
+    pwd.getpwnam(ACCOUNT)
+    user = account()
+    def secure(path, uid, gid, permissions, kind):
+        raw = sudo("/usr/bin/stat", "-c", "%u:%g:%a:%F:%h", str(path)).stdout.strip()
+        owner, group, mode, file_type, links = raw.split(":")
+        if (int(owner) != uid or (gid is not None and int(group) != gid)
+                or int(mode, 8) != permissions or file_type != kind
+                or (kind == "regular file" and links != "1")):
+            # GNU stat distingue el archivo regular vacío.
+            raise ValueError("RESUME_PATH_IDENTITY:" + str(path))
+    for path in (INSTALL, INSTALL / "share", INSTALL / "share/prometheus",
+                 INSTALL / "share/prometheus/alertmanager"):
+        secure(path, 0, 0, 0o755, "directory")
+    for path in (STATE, STATE / "alertmanager"):
+        secure(path, user.pw_uid, user.pw_gid, 0o700, "directory")
+    secure(DB, user.pw_uid, user.pw_gid, 0o600, "regular file")
+    secure(PROM_SECRET, os.getuid(), None, 0o600, "regular file")
+    for name in ("webhook.secret", "web.yml", "alertmanager.yml"):
+        secure(INSTALL / name, 0, user.pw_gid, 0o640, "regular file")
+    binary = P["package"](stage, "prometheus-alertmanager", "0.28.1+ds-3",
+                          ("prometheus-alertmanager", "alertmanager"), CACHE)
+    share = P["alertmanager_share"](binary)
+    mapping = {INSTALL / "alertmanager": (binary, 0o755),
+               INSTALL / "recibir_alertas.py": (REPO / "scripts/s08/recibir_alertas.py", 0o644),
+               INSTALL / "alertmanager.yml": (
+                   REPO / "servicios/observabilidad/alertmanager/s08-operacional.yml", 0o640)}
+    for name in ("default.tmpl", "email.tmpl"):
+        relative = Path("prometheus/alertmanager") / name
+        mapping[INSTALL / "share" / relative] = (share / relative, 0o644)
+    for destination, (source, permissions) in mapping.items():
+        secure(destination, 0, user.pw_gid if permissions == 0o640 else 0,
+               permissions, "regular file")
+        actual = sudo("/usr/bin/sha256sum", str(destination)).stdout.split()[0]
+        if actual != hashlib.sha256(source.read_bytes()).hexdigest():
+            raise ValueError("RESUME_INSTALL_DIGEST:" + str(destination))
+    for scope in ("operational", "validation"):
+        previous = inspect(scope)
+        print("HISTORIAL_PREVIO=" + scope + ":" + str(previous["total"]), flush=True)
+    password = PROM_SECRET.read_text().strip()
+    if not re.fullmatch("[A-Za-z0-9_-]{32,128}", password):
+        raise ValueError("RESUME_SECRET_FORMAT")
+    print("APROVISIONAMIENTO_PREVIO_VERIFICADO=OK", flush=True)
+    return user, password
+
+
+def destination_ready():
+    active = query("/api/v1/alertmanagers")["activeAlertmanagers"]
+    return len(active) == 1 and active[0]["url"] == "http://127.0.0.1:9093/api/v2/alerts"
+
+
+def delivery_diagnostics(password, run_id=None):
+    """Recoger indicadores de transporte sin exponer credenciales ni otros incidentes."""
+    result = {"destination": query("/api/v1/alertmanagers")}
+    prefixes = ("prometheus_notifications_", "alertmanager_notifications_",
+                "alertmanager_alerts_received", "alertmanager_alerts_invalid")
+    for port in (9091, 9093):
+        request = Request(f"http://127.0.0.1:{port}/metrics")
+        if port == 9093:
+            request.add_header("Authorization", "Basic " + base64.b64encode(
+                ("prometheus:" + password).encode()).decode())
+        with OPEN.open(request, timeout=5) as response:
+            raw = response.read(2_000_001)
+        if len(raw) > 2_000_000:
+            raise ValueError("DELIVERY_METRICS_LIMIT")
+        result[str(port)] = [line for line in raw.decode().splitlines()
+                             if line.startswith(prefixes)]
+    if run_id is not None:
+        expression = 'ALERTS{alertname="NETLAB360S08Validation",run_id="' + run_id + '"}'
+        result["prometheus_validation"] = promql(expression)["result"]
+        alerts = json.loads(http(9093, "/api/v2/alerts", password))
+        result["alertmanager_validation"] = [
+            {"state": row.get("status", {}).get("state"), "startsAt": row.get("startsAt"),
+             "endsAt": row.get("endsAt")}
+            for row in alerts if row.get("labels", {}).get("run_id") == run_id]
+        result["sqlite_validation"] = [
+            row for row in inspect("validation")["records"]
+            if json.loads(row["labels_json"]).get("run_id") == run_id]
+    return result
+
+
+def main(evidence, resume=False):
     os.umask(0o077)
     evidence.mkdir(mode=0o700)
     original = CONFIG.read_bytes()
@@ -213,13 +297,13 @@ def main(evidence):
         raise RuntimeError("SERVICE_BASELINE")
     if not free(None, 9093) or not free(None, 9193):
         raise RuntimeError("ALERT_PORT_BUSY")
-    for path in (INSTALL, STATE, PROM_SECRET):
-        if any(sudo("/usr/bin/test", flag, str(path), check=False).returncode == 0
-               for flag in ("-e", "-L")):
-            raise RuntimeError("ALERT_PATH_ALREADY_EXISTS:" + str(path))
-    password = secrets.token_urlsafe(32)
-    webhook = secrets.token_urlsafe(32)
-    digest = bcrypt_hash(password)
+    if not resume:
+        for path in (INSTALL, STATE, PROM_SECRET):
+            if any(sudo("/usr/bin/test", flag, str(path), check=False).returncode == 0
+                   for flag in ("-e", "-L")):
+                raise RuntimeError("ALERT_PATH_ALREADY_EXISTS:" + str(path))
+    password = None
+    run_id = None
     final = render(original.decode(), PROM_SECRET).encode()
     (evidence / "prometheus-original.yml").write_bytes(original)
     stage = Path(tempfile.mkdtemp(prefix="netlab360-s08-alerts."))
@@ -227,33 +311,39 @@ def main(evidence):
     created = []
     applied = None
     try:
-        binary = P["package"](stage, "prometheus-alertmanager", "0.28.1+ds-3",
+        if resume:
+            user, password = resume_installation(stage)
+        else:
+            password = secrets.token_urlsafe(32)
+            webhook = secrets.token_urlsafe(32)
+            digest = bcrypt_hash(password)
+            binary = P["package"](stage, "prometheus-alertmanager", "0.28.1+ds-3",
                               ("prometheus-alertmanager", "alertmanager"), CACHE)
-        share = P["alertmanager_share"](binary)
-        user = account()
-        for path in (INSTALL, INSTALL / "share", INSTALL / "share/prometheus",
-                     INSTALL / "share/prometheus/alertmanager"):
-            mkdir(path)
-        mkdir(STATE, ACCOUNT, ACCOUNT, "0700")
-        mkdir(STATE / "alertmanager", ACCOUNT, ACCOUNT, "0700")
-        install(binary, INSTALL / "alertmanager", "0755")
-        install(REPO / "scripts/s08/recibir_alertas.py", INSTALL / "recibir_alertas.py")
-        for name in ("default.tmpl", "email.tmpl"):
-            relative = Path("prometheus/alertmanager") / name
-            install(share / relative, INSTALL / "share" / relative)
-        files = {
-            "webhook.secret": webhook + "\n",
-            "web.yml": "basic_auth_users:\n  prometheus: '" + digest + "'\n",
-            "alertmanager.yml": (REPO / "servicios/observabilidad/alertmanager/s08-operacional.yml").read_text(),
-        }
-        for name, content in files.items():
-            source = stage / name
-            with source.open("x") as handle:
-                handle.write(content)
-            install(source, INSTALL / name, "0640", ACCOUNT)
-        with PROM_SECRET.open("x") as handle:
-            handle.write(password + "\n")
-        PROM_SECRET.chmod(0o600)
+            share = P["alertmanager_share"](binary)
+            user = account()
+            for path in (INSTALL, INSTALL / "share", INSTALL / "share/prometheus",
+                         INSTALL / "share/prometheus/alertmanager"):
+                mkdir(path)
+            mkdir(STATE, ACCOUNT, ACCOUNT, "0700")
+            mkdir(STATE / "alertmanager", ACCOUNT, ACCOUNT, "0700")
+            install(binary, INSTALL / "alertmanager", "0755")
+            install(REPO / "scripts/s08/recibir_alertas.py", INSTALL / "recibir_alertas.py")
+            for name in ("default.tmpl", "email.tmpl"):
+                relative = Path("prometheus/alertmanager") / name
+                install(share / relative, INSTALL / "share" / relative)
+            files = {
+                "webhook.secret": webhook + "\n",
+                "web.yml": "basic_auth_users:\n  prometheus: '" + digest + "'\n",
+                "alertmanager.yml": (REPO / "servicios/observabilidad/alertmanager/s08-operacional.yml").read_text(),
+            }
+            for name, content in files.items():
+                source = stage / name
+                with source.open("x") as handle:
+                    handle.write(content)
+                install(source, INSTALL / name, "0640", ACCOUNT)
+            with PROM_SECRET.open("x") as handle:
+                handle.write(password + "\n")
+            PROM_SECRET.chmod(0o600)
         created.append(RECEIVER)
         service(RECEIVER, ["/usr/bin/python3", "-I", "-B", str(INSTALL / "recibir_alertas.py"),
                             "serve", "--database", str(DB), "--secret", str(INSTALL / "webhook.secret")])
@@ -283,26 +373,41 @@ def main(evidence):
         else:
             raise RuntimeError("UNAUTHENTICATED_WEBHOOK")
         print("AUTENTICACION_ALERTMANAGER_Y_WEBHOOK=OK", flush=True)
+        final_path = evidence / "prometheus-final.yml"
+        final_path.write_bytes(final)
+        print(run([str(PROMTOOL), "check", "config", str(final_path)]).stdout, flush=True)
+        if CONFIG.read_bytes() != original:
+            raise RuntimeError("CONFIG_CHANGED_CONCURRENTLY")
+        D["write_atomic"](CONFIG, final, mode)
+        applied = final
+        reload(pid, True)
+        wait(destination_ready, timeout=45)
+        print("ALERTMANAGER_DESTINO_DESCUBIERTO=OK", flush=True)
+        P["write"](evidence / "transporte-antes.json", delivery_diagnostics(password))
         run_id = secrets.token_hex(8)
         rule = evidence / "validacion-sintetica.yml"
-        rule.write_text(validation_rule(run_id, int(time.time()) + 55))
+        # Mantener la condición más allá del reenvío predeterminado de un minuto.
+        rule.write_text(validation_rule(run_id, int(time.time()) + 150))
         candidate = render(original.decode(), PROM_SECRET, rule).encode()
-        for name, data in (("prometheus-candidate.yml", candidate), ("prometheus-final.yml", final)):
-            path = evidence / name
-            path.write_bytes(data)
-            print(run([str(PROMTOOL), "check", "config", str(path)]).stdout, flush=True)
-        if CONFIG.read_bytes() != original:
+        candidate_path = evidence / "prometheus-candidate.yml"
+        candidate_path.write_bytes(candidate)
+        print(run([str(PROMTOOL), "check", "config", str(candidate_path)]).stdout, flush=True)
+        if CONFIG.read_bytes() != final:
             raise RuntimeError("CONFIG_CHANGED_CONCURRENTLY")
         D["write_atomic"](CONFIG, candidate, mode)
         applied = candidate
         reload(pid, True)
+        wait(destination_ready, timeout=45)
+        print("ALERTMANAGER_DESTINO_ACTIVO_CON_REGLA=OK", flush=True)
         def validation(status):
             data = inspect("validation")
             return any(row["status"] == status and json.loads(row["labels_json"]).get("run_id") == run_id
                        for row in data["records"])
-        wait(lambda: validation("firing"), timeout=40)
+        wait(lambda: validation("firing"), timeout=100)
+        P["write"](evidence / "transporte-firing.json", delivery_diagnostics(password, run_id))
         print("PROMETHEUS_ALERTMANAGER_WEBHOOK_FIRING=OK", flush=True)
-        wait(lambda: validation("resolved"), timeout=100)
+        wait(lambda: validation("resolved"), timeout=220)
+        P["write"](evidence / "transporte-resolved.json", delivery_diagnostics(password, run_id))
         history = inspect("validation")
         records = [row for row in history["records"]
                    if json.loads(row["labels_json"]).get("run_id") == run_id]
@@ -317,9 +422,7 @@ def main(evidence):
         D["write_atomic"](CONFIG, final, mode)
         applied = final
         reload(pid, True)
-        active = query("/api/v1/alertmanagers")["activeAlertmanagers"]
-        if len(active) != 1 or active[0]["url"] != "http://127.0.0.1:9093/api/v2/alerts":
-            raise ValueError("ALERTMANAGER_DISCOVERY")
+        wait(destination_ready, timeout=45)
         rules = query("/api/v1/rules")["groups"]
         if {g["name"]: len(g["rules"]) for g in rules} != {
                 "netlab360-s04-seguridad-de-observacion": 4, "netlab360-s08-sondas": 3}:
@@ -333,7 +436,12 @@ def main(evidence):
             raise RuntimeError("SERVICE_EXITED")
         print("ALERTMANAGER_OPERACIONAL=OK REGLAS=7/7 TARGETS=6/6", flush=True)
     except BaseException:
-        for name in created:
+        if password is not None and P["active"](AM):
+            try:
+                P["write"](evidence / "transporte-error.json", delivery_diagnostics(password, run_id))
+            except Exception as error:
+                print("DIAGNOSTICO_TRANSPORTE_NO_DISPONIBLE=" + type(error).__name__, flush=True)
+        for name in (*created, "netlab360-s04-prometheus"):
             log = sudo("/usr/bin/journalctl", "-u", name, "--no-pager", "-n", "40", check=False)
             (evidence / (name + ".log")).write_text(log.stdout)
         if applied is not None:
@@ -350,6 +458,6 @@ def main(evidence):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        raise SystemExit("Uso: desplegar_alertas.py EVIDENCIAS")
-    main(Path(sys.argv[1]))
+    if len(sys.argv) not in (2, 3) or (len(sys.argv) == 3 and sys.argv[2] != "--resume"):
+        raise SystemExit("Uso: desplegar_alertas.py EVIDENCIAS [--resume]")
+    main(Path(sys.argv[1]), resume=len(sys.argv) == 3)
