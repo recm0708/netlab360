@@ -354,7 +354,7 @@ o vigencia; la API no acepta destinos arbitrarios. Conservamos la
 interfaz previa hasta completar y validar la equivalencia funcional.
 
 Mantenemos un único diagrama completo en /topology, sin selector de
-vista resumida o detallada. Conservamos los 18 nodos y 21 enlaces,
+vista resumida o detallada. Conservamos los 18 nodos y 21 enlaces del contrato NOC,
 incluidas las relaciones HTTP. Separamos físicamente el dibujo de las
 conexiones de acceso y las relaciones lógicas de servicio. Actualizamos
 atributos de los elementos SVG existentes, no su geometría, y mantenemos
@@ -462,3 +462,11 @@ En el navegador, iniciamos sesión con una cuenta de operador y abrimos `/debug?
 | `GET /api/v1/history/vlan/15m` | HTTP 200, nueve series históricas |
 
 La copia de cURL y JSON, las exportaciones y los controles temáticos se verificaron en el navegador. La regresión específica comprende 204 pruebas aprobadas; el despliegue permanente, la ingestión continua de alertas y la equivalencia integral permanecen pendientes. No se habilitan mutaciones de red.
+
+### Inventario gráfico complementario
+
+En el mismo SVG añadimos tres clientes LACP de VLAN 120/220/320, sus tres relaciones agregadas de dos miembros, el bridge OVS, Faucet y tres hosts del dominio SDN independiente. Proyectamos 26 nodos y 28 relaciones a partir del grafo original y `/api/v1/sources`, con vigencia independiente. La doble línea LACP representa los dos miembros de inventario, no su estado individual; mostramos los recuentos por extremo. Las conexiones SDN de acceso conservan estado desconocido: la conexión de Faucet y el recuento OpenFlow no acreditan forwarding ni disponibilidad de hosts. No modificamos los contratos HTTP ni las fuentes privilegiadas. Las tablas permiten propagar el desplazamiento vertical al documento al carecer de recorrido interno o llegar a sus extremos.
+
+Uniformamos la separación entre encabezados y equipos, apartamos las etiquetas 802.3ad de los trazos y distinguimos las relaciones HTTP y OpenFlow mediante patrones propios. La leyenda enumera los estados y patrones con los mismos colores de la interfaz. El inspector conserva su posición durante el desplazamiento en pantallas anchas; no se altera la selección, el inventario ni la adquisición.
+
+En pantalla completa ajustamos el SVG al ancho disponible sin limitar su altura ni deformar la geometría; el documento conserva el desplazamiento vertical. El inspector distingue etiquetas en negrita de valores de mayor contraste y conserva los colores del tema, sin alterar el contrato ni la selección.
