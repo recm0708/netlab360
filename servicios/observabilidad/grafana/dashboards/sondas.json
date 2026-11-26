@@ -1,15 +1,15 @@
 {
   "uid": "netlab360-s08-observacion",
   "title": "NETLAB360 · Observabilidad de sondas",
-  "description": "Vista especializada de la fuente Prometheus. No sustituye el portal operacional ni su evaluación de calidad.",
+  "description": "Vista especializada de Prometheus. Hora de Panamá (UTC−5). SLI observado y cobertura se interpretan por separado; no sustituye el portal operacional.",
   "tags": [
     "netlab360",
     "observabilidad"
   ],
-  "timezone": "utc",
+  "timezone": "America/Panama",
   "editable": false,
   "schemaVersion": 39,
-  "version": 1,
+  "version": 2,
   "refresh": "30s",
   "time": {
     "from": "now-1h",
@@ -20,7 +20,7 @@
       "id": 1,
       "title": "Disponibilidad de adquisición",
       "description": "1 = scrape correcto; ausencia no equivale a fallo medido.",
-      "type": "timeseries",
+      "type": "state-timeline",
       "datasource": {
         "type": "prometheus",
         "uid": "netlab360-prometheus"
@@ -29,29 +29,77 @@
         "x": 0,
         "y": 0,
         "w": 12,
-        "h": 8
+        "h": 9
       },
       "fieldConfig": {
         "defaults": {
           "unit": "none",
           "decimals": 0,
           "custom": {
-            "drawStyle": "line",
-            "lineWidth": 1,
+            "fillOpacity": 75,
+            "lineWidth": 0,
             "spanNulls": false,
-            "showPoints": "auto"
+            "insertNulls": 15000
+          },
+          "noValue": "Sin datos",
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "Error de adquisición",
+                  "color": "red",
+                  "index": 0
+                },
+                "1": {
+                  "text": "Adquisición OK",
+                  "color": "green",
+                  "index": 1
+                }
+              }
+            },
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "Sin datos",
+                  "color": "gray"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
           }
         },
         "overrides": []
       },
       "options": {
+        "mergeValues": true,
+        "showValue": "never",
+        "alignValue": "center",
+        "rowHeight": 0.75,
         "legend": {
+          "showLegend": true,
           "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
+          "placement": "bottom"
         },
         "tooltip": {
-          "mode": "multi",
+          "mode": "single",
           "sort": "none"
         }
       },
@@ -74,7 +122,7 @@
       "id": 2,
       "title": "Éxito de sonda",
       "description": "Resultado de sonda medido; no interpolar ausencias.",
-      "type": "timeseries",
+      "type": "state-timeline",
       "datasource": {
         "type": "prometheus",
         "uid": "netlab360-prometheus"
@@ -83,29 +131,77 @@
         "x": 12,
         "y": 0,
         "w": 12,
-        "h": 8
+        "h": 9
       },
       "fieldConfig": {
         "defaults": {
           "unit": "none",
           "decimals": 0,
           "custom": {
-            "drawStyle": "line",
-            "lineWidth": 1,
+            "fillOpacity": 75,
+            "lineWidth": 0,
             "spanNulls": false,
-            "showPoints": "auto"
+            "insertNulls": 15000
+          },
+          "noValue": "Sin datos",
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "Fallo medido",
+                  "color": "red",
+                  "index": 0
+                },
+                "1": {
+                  "text": "Éxito",
+                  "color": "green",
+                  "index": 1
+                }
+              }
+            },
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "Sin datos",
+                  "color": "gray"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
           }
         },
         "overrides": []
       },
       "options": {
+        "mergeValues": true,
+        "showValue": "never",
+        "alignValue": "center",
+        "rowHeight": 0.75,
         "legend": {
+          "showLegend": true,
           "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
+          "placement": "bottom"
         },
         "tooltip": {
-          "mode": "multi",
+          "mode": "single",
           "sort": "none"
         }
       },
@@ -135,32 +231,41 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 8,
+        "y": 9,
         "w": 12,
-        "h": 8
+        "h": 10
       },
       "fieldConfig": {
         "defaults": {
           "unit": "ms",
-          "decimals": 3,
+          "decimals": 2,
           "custom": {
             "drawStyle": "line",
-            "lineWidth": 1,
+            "lineWidth": 2,
             "spanNulls": false,
-            "showPoints": "auto"
-          }
+            "insertNulls": 15000,
+            "showPoints": "never",
+            "fillOpacity": 8,
+            "axisSoftMin": 0
+          },
+          "noValue": "Sin datos"
         },
         "overrides": []
       },
       "options": {
         "legend": {
-          "displayMode": "list",
+          "displayMode": "table",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": true,
+          "calcs": [
+            "last",
+            "mean",
+            "max"
+          ]
         },
         "tooltip": {
           "mode": "multi",
-          "sort": "none"
+          "sort": "desc"
         }
       },
       "targets": [
@@ -189,9 +294,9 @@
       },
       "gridPos": {
         "x": 12,
-        "y": 8,
+        "y": 9,
         "w": 12,
-        "h": 8
+        "h": 10
       },
       "fieldConfig": {
         "defaults": {
@@ -199,22 +304,90 @@
           "decimals": 0,
           "custom": {
             "drawStyle": "line",
-            "lineWidth": 1,
+            "lineWidth": 2,
             "spanNulls": false,
-            "showPoints": "auto"
-          }
+            "insertNulls": 15000,
+            "showPoints": "never",
+            "fillOpacity": 0,
+            "axisSoftMin": 0,
+            "lineInterpolation": "stepAfter",
+            "axisSoftMax": 500
+          },
+          "noValue": "Sin datos",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "gray",
+                "value": null
+              },
+              {
+                "color": "blue",
+                "value": 100
+              },
+              {
+                "color": "green",
+                "value": 200
+              },
+              {
+                "color": "blue",
+                "value": 300
+              },
+              {
+                "color": "orange",
+                "value": 400
+              },
+              {
+                "color": "red",
+                "value": 500
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "Sin respuesta HTTP",
+                  "color": "gray",
+                  "index": 0
+                },
+                "200": {
+                  "text": "200 OK",
+                  "color": "green",
+                  "index": 1
+                }
+              }
+            },
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "Sin datos",
+                  "color": "gray"
+                }
+              }
+            }
+          ]
         },
         "overrides": []
       },
       "options": {
         "legend": {
-          "displayMode": "list",
+          "displayMode": "table",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": true,
+          "calcs": [
+            "last"
+          ]
         },
         "tooltip": {
           "mode": "multi",
-          "sort": "none"
+          "sort": "desc"
         }
       },
       "targets": [
@@ -235,7 +408,7 @@
     {
       "id": 5,
       "title": "SLI observado · 5 min",
-      "description": "Porcentaje sobre muestras medidas; no certifica cobertura ni cumplimiento SLO.",
+      "description": "SLI sobre muestras medidas. Azul: valor observado ≥99 % (referencia provisional); no implica cobertura completa ni cumplimiento SLO. Consultar cobertura contigua.",
       "type": "stat",
       "datasource": {
         "type": "prometheus",
@@ -243,28 +416,52 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 16,
-        "w": 12,
-        "h": 8
+        "y": 19,
+        "w": 8,
+        "h": 10
       },
       "fieldConfig": {
         "defaults": {
           "unit": "percent",
-          "decimals": 2
+          "decimals": 2,
+          "noValue": "Sin datos",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "blue",
+                "value": 99
+              }
+            ]
+          }
         },
         "overrides": []
       },
       "options": {
         "reduceOptions": {
           "calcs": [
-            "lastNotNull"
+            "last"
           ],
           "fields": "",
           "values": false
         },
-        "colorMode": "none",
+        "orientation": "vertical",
+        "colorMode": "value",
         "graphMode": "none",
-        "textMode": "value_and_name"
+        "textMode": "value_and_name",
+        "justifyMode": "auto",
+        "wideLayout": true,
+        "text": {
+          "titleSize": 13,
+          "valueSize": 23
+        }
       },
       "targets": [
         {
@@ -284,36 +481,138 @@
     {
       "id": 6,
       "title": "Cobertura · 5 min",
-      "description": "Muestras originales frente a 30 esperadas por sonda.",
-      "type": "stat",
+      "description": "30 muestras esperadas por sonda (5 min a 10 s). Ámbar: cantidad inferior a la nominal; verde: alcanza la nominal; gris: sin datos. No equivale por sí sola a cumplimiento SLO.",
+      "type": "table",
       "datasource": {
         "type": "prometheus",
         "uid": "netlab360-prometheus"
       },
       "gridPos": {
-        "x": 12,
-        "y": 16,
-        "w": 12,
-        "h": 8
+        "x": 8,
+        "y": 19,
+        "w": 16,
+        "h": 10
       },
       "fieldConfig": {
         "defaults": {
           "unit": "none",
-          "decimals": 0
+          "decimals": 0,
+          "noValue": "Sin datos",
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "orange",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 30
+              },
+              {
+                "color": "orange",
+                "value": 31
+              }
+            ]
+          }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Sonda"
+            },
+            "properties": [
+              {
+                "id": "custom.align",
+                "value": "left"
+              },
+              {
+                "id": "custom.width",
+                "value": 180
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Adquiridas"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Adq. correctas"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Medidas"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Éxitos"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          }
+        ]
       },
       "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
+        "showHeader": true,
+        "cellHeight": "md",
+        "footer": {
+          "show": false
         },
-        "colorMode": "none",
-        "graphMode": "none",
-        "textMode": "value_and_name"
+        "sortBy": [
+          {
+            "displayName": "Sonda",
+            "desc": false
+          }
+        ]
       },
       "targets": [
         {
@@ -326,7 +625,8 @@
           "legendFormat": "{{probe_id}} adquisición",
           "instant": true,
           "range": false,
-          "editorMode": "code"
+          "editorMode": "code",
+          "format": "table"
         },
         {
           "datasource": {
@@ -338,7 +638,8 @@
           "legendFormat": "{{probe_id}} adquisición correcta",
           "instant": true,
           "range": false,
-          "editorMode": "code"
+          "editorMode": "code",
+          "format": "table"
         },
         {
           "datasource": {
@@ -350,7 +651,8 @@
           "legendFormat": "{{probe_id}} medidas",
           "instant": true,
           "range": false,
-          "editorMode": "code"
+          "editorMode": "code",
+          "format": "table"
         },
         {
           "datasource": {
@@ -362,14 +664,54 @@
           "legendFormat": "{{probe_id}} éxitos",
           "instant": true,
           "range": false,
-          "editorMode": "code"
+          "editorMode": "code",
+          "format": "table"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "probe_id",
+                "Value #A",
+                "Value #B",
+                "Value #C",
+                "Value #D"
+              ]
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "probe_id": 0,
+              "Value #A": 1,
+              "Value #B": 2,
+              "Value #C": 3,
+              "Value #D": 4
+            },
+            "renameByName": {
+              "probe_id": "Sonda",
+              "Value #A": "Adquiridas",
+              "Value #B": "Adq. correctas",
+              "Value #C": "Medidas",
+              "Value #D": "Éxitos"
+            }
+          }
         }
       ]
     },
     {
       "id": 7,
       "title": "SLI observado · 15 min",
-      "description": "Porcentaje sobre muestras medidas; no certifica cobertura ni cumplimiento SLO.",
+      "description": "SLI sobre muestras medidas. Azul: valor observado ≥99 % (referencia provisional); no implica cobertura completa ni cumplimiento SLO. Consultar cobertura contigua.",
       "type": "stat",
       "datasource": {
         "type": "prometheus",
@@ -377,28 +719,52 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 24,
-        "w": 12,
-        "h": 8
+        "y": 29,
+        "w": 8,
+        "h": 10
       },
       "fieldConfig": {
         "defaults": {
           "unit": "percent",
-          "decimals": 2
+          "decimals": 2,
+          "noValue": "Sin datos",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "blue",
+                "value": 99
+              }
+            ]
+          }
         },
         "overrides": []
       },
       "options": {
         "reduceOptions": {
           "calcs": [
-            "lastNotNull"
+            "last"
           ],
           "fields": "",
           "values": false
         },
-        "colorMode": "none",
+        "orientation": "vertical",
+        "colorMode": "value",
         "graphMode": "none",
-        "textMode": "value_and_name"
+        "textMode": "value_and_name",
+        "justifyMode": "auto",
+        "wideLayout": true,
+        "text": {
+          "titleSize": 13,
+          "valueSize": 23
+        }
       },
       "targets": [
         {
@@ -418,36 +784,138 @@
     {
       "id": 8,
       "title": "Cobertura · 15 min",
-      "description": "Muestras originales frente a 90 esperadas por sonda.",
-      "type": "stat",
+      "description": "90 muestras esperadas por sonda (15 min a 10 s). Ámbar: cantidad inferior a la nominal; verde: alcanza la nominal; gris: sin datos. No equivale por sí sola a cumplimiento SLO.",
+      "type": "table",
       "datasource": {
         "type": "prometheus",
         "uid": "netlab360-prometheus"
       },
       "gridPos": {
-        "x": 12,
-        "y": 24,
-        "w": 12,
-        "h": 8
+        "x": 8,
+        "y": 29,
+        "w": 16,
+        "h": 10
       },
       "fieldConfig": {
         "defaults": {
           "unit": "none",
-          "decimals": 0
+          "decimals": 0,
+          "noValue": "Sin datos",
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "orange",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 90
+              },
+              {
+                "color": "orange",
+                "value": 91
+              }
+            ]
+          }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Sonda"
+            },
+            "properties": [
+              {
+                "id": "custom.align",
+                "value": "left"
+              },
+              {
+                "id": "custom.width",
+                "value": 180
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Adquiridas"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Adq. correctas"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Medidas"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Éxitos"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          }
+        ]
       },
       "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
+        "showHeader": true,
+        "cellHeight": "md",
+        "footer": {
+          "show": false
         },
-        "colorMode": "none",
-        "graphMode": "none",
-        "textMode": "value_and_name"
+        "sortBy": [
+          {
+            "displayName": "Sonda",
+            "desc": false
+          }
+        ]
       },
       "targets": [
         {
@@ -460,7 +928,8 @@
           "legendFormat": "{{probe_id}} adquisición",
           "instant": true,
           "range": false,
-          "editorMode": "code"
+          "editorMode": "code",
+          "format": "table"
         },
         {
           "datasource": {
@@ -472,7 +941,8 @@
           "legendFormat": "{{probe_id}} adquisición correcta",
           "instant": true,
           "range": false,
-          "editorMode": "code"
+          "editorMode": "code",
+          "format": "table"
         },
         {
           "datasource": {
@@ -484,7 +954,8 @@
           "legendFormat": "{{probe_id}} medidas",
           "instant": true,
           "range": false,
-          "editorMode": "code"
+          "editorMode": "code",
+          "format": "table"
         },
         {
           "datasource": {
@@ -496,14 +967,54 @@
           "legendFormat": "{{probe_id}} éxitos",
           "instant": true,
           "range": false,
-          "editorMode": "code"
+          "editorMode": "code",
+          "format": "table"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "probe_id",
+                "Value #A",
+                "Value #B",
+                "Value #C",
+                "Value #D"
+              ]
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "probe_id": 0,
+              "Value #A": 1,
+              "Value #B": 2,
+              "Value #C": 3,
+              "Value #D": 4
+            },
+            "renameByName": {
+              "probe_id": "Sonda",
+              "Value #A": "Adquiridas",
+              "Value #B": "Adq. correctas",
+              "Value #C": "Medidas",
+              "Value #D": "Éxitos"
+            }
+          }
         }
       ]
     },
     {
       "id": 9,
       "title": "SLI observado · 60 min",
-      "description": "Porcentaje sobre muestras medidas; no certifica cobertura ni cumplimiento SLO.",
+      "description": "SLI sobre muestras medidas. Azul: valor observado ≥99 % (referencia provisional); no implica cobertura completa ni cumplimiento SLO. Consultar cobertura contigua.",
       "type": "stat",
       "datasource": {
         "type": "prometheus",
@@ -511,28 +1022,52 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 32,
-        "w": 12,
-        "h": 8
+        "y": 39,
+        "w": 8,
+        "h": 10
       },
       "fieldConfig": {
         "defaults": {
           "unit": "percent",
-          "decimals": 2
+          "decimals": 2,
+          "noValue": "Sin datos",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "blue",
+                "value": 99
+              }
+            ]
+          }
         },
         "overrides": []
       },
       "options": {
         "reduceOptions": {
           "calcs": [
-            "lastNotNull"
+            "last"
           ],
           "fields": "",
           "values": false
         },
-        "colorMode": "none",
+        "orientation": "vertical",
+        "colorMode": "value",
         "graphMode": "none",
-        "textMode": "value_and_name"
+        "textMode": "value_and_name",
+        "justifyMode": "auto",
+        "wideLayout": true,
+        "text": {
+          "titleSize": 13,
+          "valueSize": 23
+        }
       },
       "targets": [
         {
@@ -552,36 +1087,138 @@
     {
       "id": 10,
       "title": "Cobertura · 60 min",
-      "description": "Muestras originales frente a 360 esperadas por sonda.",
-      "type": "stat",
+      "description": "360 muestras esperadas por sonda (60 min a 10 s). Ámbar: cantidad inferior a la nominal; verde: alcanza la nominal; gris: sin datos. No equivale por sí sola a cumplimiento SLO.",
+      "type": "table",
       "datasource": {
         "type": "prometheus",
         "uid": "netlab360-prometheus"
       },
       "gridPos": {
-        "x": 12,
-        "y": 32,
-        "w": 12,
-        "h": 8
+        "x": 8,
+        "y": 39,
+        "w": 16,
+        "h": 10
       },
       "fieldConfig": {
         "defaults": {
           "unit": "none",
-          "decimals": 0
+          "decimals": 0,
+          "noValue": "Sin datos",
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "orange",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 360
+              },
+              {
+                "color": "orange",
+                "value": 361
+              }
+            ]
+          }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Sonda"
+            },
+            "properties": [
+              {
+                "id": "custom.align",
+                "value": "left"
+              },
+              {
+                "id": "custom.width",
+                "value": 180
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Adquiridas"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Adq. correctas"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Medidas"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Éxitos"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          }
+        ]
       },
       "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
+        "showHeader": true,
+        "cellHeight": "md",
+        "footer": {
+          "show": false
         },
-        "colorMode": "none",
-        "graphMode": "none",
-        "textMode": "value_and_name"
+        "sortBy": [
+          {
+            "displayName": "Sonda",
+            "desc": false
+          }
+        ]
       },
       "targets": [
         {
@@ -594,7 +1231,8 @@
           "legendFormat": "{{probe_id}} adquisición",
           "instant": true,
           "range": false,
-          "editorMode": "code"
+          "editorMode": "code",
+          "format": "table"
         },
         {
           "datasource": {
@@ -606,7 +1244,8 @@
           "legendFormat": "{{probe_id}} adquisición correcta",
           "instant": true,
           "range": false,
-          "editorMode": "code"
+          "editorMode": "code",
+          "format": "table"
         },
         {
           "datasource": {
@@ -618,7 +1257,8 @@
           "legendFormat": "{{probe_id}} medidas",
           "instant": true,
           "range": false,
-          "editorMode": "code"
+          "editorMode": "code",
+          "format": "table"
         },
         {
           "datasource": {
@@ -630,7 +1270,47 @@
           "legendFormat": "{{probe_id}} éxitos",
           "instant": true,
           "range": false,
-          "editorMode": "code"
+          "editorMode": "code",
+          "format": "table"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "probe_id",
+                "Value #A",
+                "Value #B",
+                "Value #C",
+                "Value #D"
+              ]
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "probe_id": 0,
+              "Value #A": 1,
+              "Value #B": 2,
+              "Value #C": 3,
+              "Value #D": 4
+            },
+            "renameByName": {
+              "probe_id": "Sonda",
+              "Value #A": "Adquiridas",
+              "Value #B": "Adq. correctas",
+              "Value #C": "Medidas",
+              "Value #D": "Éxitos"
+            }
+          }
         }
       ]
     }
