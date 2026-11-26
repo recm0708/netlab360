@@ -85,10 +85,14 @@ class GrafanaTests(unittest.TestCase):
         for i, nominal in ((6, 30), (8, 90), (10, 360)):
             p = panels[i]
             self.assertEqual(p["type"], "table")
-            self.assertTrue(all(t["format"] == "table" for t in p["targets"]))
-            self.assertEqual([t["id"] for t in p["transformations"]], ["merge", "filterFieldsByName", "organize"])
-            self.assertEqual(list(p["transformations"][2]["options"]["renameByName"].values()),
+            self.assertTrue(all(t["format"] == "time_series" for t in p["targets"]))
+            self.assertEqual([t["id"] for t in p["transformations"]], ["seriesToRows", "extractFields", "groupingToMatrix", "organize"])
+            self.assertEqual(list(p["transformations"][3]["options"]["renameByName"].values()),
                              ["Sonda", "Adquiridas", "Adq. correctas", "Medidas", "Éxitos"])
+            matrix = p["transformations"][2]["options"]
+            self.assertEqual(matrix, {"rowField": "Sonda", "columnField": "Contador",
+                                      "valueField": "Value", "emptyValue": "null"})
+            self.assertEqual(p["transformations"][1]["options"]["source"], "Metric")
             steps = p["fieldConfig"]["defaults"]["thresholds"]["steps"]
             self.assertEqual([(s["value"], s["color"]) for s in steps],
                              [(None, "orange"), (nominal, "green"), (nominal + 1, "orange")])
