@@ -2,13 +2,11 @@
 (function(root){
   "use strict";
   const ns="http://www.w3.org/2000/svg";
-  // Ambas vistas comparten los identificadores del contrato NOC.
-  const modes={
-    summary:{box:"0 0 1250 620",width:420,height:285,sites:{HQ:[20,170],S1:[810,15],S2:[810,320]}},
-    detailed:{box:"0 0 1440 955",width:430,height:420,sites:{HQ:[20,245],S1:[980,15],S2:[980,515]}}
-  };
+  // Un único encuadre conserva todo el inventario del contrato NOC.
+  const config={box:"0 0 1440 955",width:430,height:420,sites:{HQ:[20,245],S1:[980,15],S2:[980,515]}};
   function geometry(mode){
-    const config=modes[mode],layout={},groups=[];
+    if(mode!=="detailed")throw Error("TOPOLOGY_MODE");
+    const layout={},groups=[];
     for(const [site,[x,y]] of Object.entries(config.sites)){
       groups.push({site,x,y});
       layout["R-"+site]=[x+210,y+75];
@@ -16,9 +14,7 @@
       const prefix={HQ:1,S1:2,S2:3}[site];
       [10,20,30].forEach((v,i)=>layout["H-"+site+"-"+(prefix*100+v)]=[x+70+i*140,y+225]);
     }
-    if(mode==="detailed"){
-      layout.BACKEND_HQ=[120,590];layout.FRONTAL_HQ=[330,590];layout.BACKEND_S1=[1190,360];
-    }
+    layout.BACKEND_HQ=[120,590];layout.FRONTAL_HQ=[330,590];layout.BACKEND_S1=[1190,360];
     return {config,layout,groups};
   }
   const layout=geometry("detailed").layout;
@@ -38,7 +34,8 @@
       const valid=item.scope==="HTTP_FROM_S2"?http:
         ["ADMIN_STATE_ONLY","CONTAINER_ONLY"].includes(item.scope)?tele:graph;
       const copy={...item};
-      if(!valid){copy.status="unknown";copy.detail="Sin observación vigente.";}
+      if(!valid)copy.status="unknown";
+      copy.observation_valid=valid;
       if("vlan_admin" in copy&&!tele)copy.vlan_admin="unknown";
       if("route_selection" in copy&&!tele){
         copy.route_selection="unknown";copy.route_gateway=null;
@@ -49,31 +46,11 @@
     return {...data,nodes:data.nodes.map(safe),links:data.links.map(safe)};
   }
 
-  function view(data,mode){
-    if(mode==="detailed")return {nodes:data.nodes,links:data.links};
-    const nodes=data.nodes.filter(n=>n.type!=="server");
-    const ids=new Set(nodes.map(n=>n.id));
-    const links=data.links.filter(l=>l.type!=="wan"&&ids.has(l.from)&&ids.has(l.to));
-    for(const site of ["S1","S2"]){
-      const primary=data.links.find(l=>l.id==="WAN-PRIMARIA-HQ-"+site);
-      const backup=data.links.find(l=>l.id==="WAN-RESPALDO-HQ-"+site);
-      if(!primary||!backup)continue;
-      links.push({id:"WAN-GENERAL-HQ-"+site,type:"wan-group",from:"R-HQ",to:"R-"+site,
-        role:"logical",members:[primary,backup]});
-    }
-    return {nodes,links};
+  function view(data,mode="detailed"){
+    if(mode!=="detailed")throw Error("TOPOLOGY_MODE");
+    return {nodes:data.nodes,links:data.links};
   }
 
-  function down(item){return ["offline","admin-down"].includes(item.status);}
-  function logicalState(item){
-    const [p,b]=item.members;
-    const selected=l=>l.route_selection==="selected"&&l.status==="admin-up";
-    if(selected(p)&&selected(b))return "unknown";
-    if(selected(b))return "recovery";
-    if(selected(p))return down(b)?"warn":"ok";
-    if(down(p)&&down(b))return "fault";
-    return "unknown";
-  }
   function valid(data){
     if(data?.project!=="NETLAB360"||data.schema_version!==1||data.source!=="NOC"||
       data.network_mutations_authorized!==false||data.traffic_measured!==false||
@@ -87,28 +64,21 @@
     "admin-up":"Administrativamente habilitada","admin-down":"Administrativamente deshabilitada",unknown:"Sin verificar"};
   const choices={selected:"Seleccionada",standby:"En espera",unavailable:"No disponible",unknown:"Sin verificar"};
   function name(item){
-    if(item.type==="wan-group")return "WAN lógica · HQ ↔ "+item.to.slice(2);
     if(item.label) return item.type==="host"?"VLAN "+item.vlan:item.label;
     if(item.type==="wan") return (item.role==="primary"?"WAN principal":"WAN respaldo")+" · "+item.from+" ↔ "+item.to;
     return item.role+" · "+item.from+" ↔ "+item.to;
   }
   function details(item){
-    if(item.type==="wan-group"){
-      const rows=[["Alcance","Resumen de dos enlaces; no acredita tráfico"]];
-      for(const m of item.members){
-        const label=m.role==="primary"?"Principal":"Respaldo";
-        rows.push([label,statuses[m.status]||"Sin verificar"],
-          ["FIB "+label,choices[m.route_selection]||"Sin verificar"],
-          ["Extremos "+label,m.a+" ↔ "+m.b]);
-      }
-      return rows;
-    }
     const scopes={CONTAINER_ONLY:"Existencia del contenedor",NAMESPACE_ONLY:"Existencia del namespace",
       HTTP_FROM_S2:"HTTP observado desde S2",ADMIN_STATE_ONLY:"Estado administrativo",INVENTORY_ONLY:"Inventario"};
-    const rows=[["Tipo",item.type],["Alcance",scopes[item.scope]||"Sin verificar"],
-      ["Estado",statuses[item.status]||"Sin verificar"],["Detalle",item.detail]];
+    const types={router:"Router FRR",switch:"Switch L2",host:"Host de prueba",server:"Servidor HTTP",wan:"Enlace WAN",lan:"Troncal LAN",access:"Acceso LAN",redundancy:"Relación HTTP"};
+    const rows=[["Identificador",item.id],["Tipo",types[item.type]||item.type],["Inventario",item.detail]];
+    if(item.role)rows.push(["Función",({primary:"Principal",backup:"Respaldo"})[item.role]||item.role]);
+    if(item.from)rows.push(["Origen",item.from],["Destino",item.to]);
     if(item.site) rows.push(["Sede",item.site]);
-    if(item.vlan) rows.push(["VLAN",String(item.vlan)],["Gateway",item.gateway],["Estado VLAN",statuses[item.vlan_admin]]);
+    if(item.vlan) rows.push(["VLAN",String(item.vlan)],["Gateway",item.gateway]);
+    rows.push(["Alcance observado",scopes[item.scope]||"Sin verificar"],["Estado observado",statuses[item.status]||"Sin verificar"],["Vigencia",item.observation_valid===true?"Fuente vigente":item.observation_valid===false?"Sin observación vigente":"Sin verificar"]);
+    if(item.vlan)rows.push(["Estado VLAN",statuses[item.vlan_admin]]);
     if(item.a) rows.push(["Extremo A",item.a],["Extremo B",item.b],["Selección FIB",choices[item.route_selection]],
       ["Próximo salto",item.route_gateway||"Sin verificar"]);
     if(item.application_selection) rows.push(["Selección HTTP",choices[item.application_selection]]);
@@ -124,11 +94,11 @@
   function edgePath(l,mode){
     const {layout,config}=geometry(mode);
     const [ax,ay]=layout[l.from],[bx,by]=layout[l.to];
-    if(l.type==="wan"||l.type==="wan-group"){
-      const north=l.to==="R-S1",primary=l.role==="primary",logical=l.type==="wan-group";
-      const start=logical?(north?-10:10):north?(primary?-17:-6):(primary?6:17);
-      const end=logical?0:primary?-9:9;
-      const mid=(north?510:mode==="summary"?660:735)+(logical||primary?0:28);
+    if(l.type==="wan"){
+      const north=l.to==="R-S1",primary=l.role==="primary";
+      const start=north?(primary?-17:-6):(primary?6:17);
+      const end=primary?-9:9;
+      const mid=(north?510:735)+(primary?0:28);
       return "M"+(ax+54)+" "+(ay+start)+" H"+mid+" V"+(by+end)+" H"+(bx-54);
     }
     // Los accesos a servidores parten del switch, por corredores laterales.
@@ -146,7 +116,6 @@
     return "M"+ax+" "+(ay+23)+" V"+((ay+by)/2)+" H"+bx+" V"+(by-23);
   }
   function state(item){
-    if(item.type==="wan-group")return logicalState(item);
     if(["offline","admin-down"].includes(item.status))return "fault";
     if(item.type==="wan"&&item.route_selection==="selected")return item.role==="backup"?"recovery":"ok";
     if(item.type==="wan"||item.type==="redundancy")return item.application_selection==="selected"?"ok":"unknown";
@@ -162,7 +131,7 @@
     });
   }
 
-  function render(svg,data,selected,onSelect,mode="summary"){
+  function render(svg,data,selected,onSelect,mode="detailed"){
     const {config,layout,groups}=geometry(mode),display=view(data,mode);
     const items=[...display.links,...display.nodes];
     const key=mode+":"+items.map(i=>i.id).sort().join("|");
@@ -181,9 +150,9 @@
         g.append(element("path",{d,class:"topology-highlight"}));
         g.append(element("path",{d,class:"topology-edge"+(backup?" backup":"")}));
         g.append(element("path",{d,class:"topology-hit"}));
-        if(item.type==="wan"||item.type==="wan-group"){
-          const [bx,by]=layout[item.to],y=by+(item.type==="wan-group"?0:item.role==="primary"?-9:9);
-          const label=item.type==="wan-group"?"WAN · "+item.to.slice(2):(item.role==="primary"?"Principal":"Respaldo")+" · "+item.to.slice(2);
+        if(item.type==="wan"){
+          const [bx,by]=layout[item.to],y=by+(item.role==="primary"?-9:9);
+          const label=(item.role==="primary"?"Principal":"Respaldo")+" · "+item.to.slice(2);
           g.append(element("text",{x:bx-65,y:y-4,"text-anchor":"end",class:"topology-edge-label"},label));
         }
         activate(g,item,selected,onSelect);svg.append(g);elements.set(item.id,g);
@@ -225,5 +194,5 @@
     return [nx,ny,nw,nh];
   }
   function reset(svg){mounted.delete(svg);svg.replaceChildren();}
-  root.NetlabTopology=Object.freeze({valid,name,details,render,reset,view,aged,isFresh:fresh,logicalState,edgePath,geometry,viewport,moveViewport});
+  root.NetlabTopology=Object.freeze({valid,name,details,render,reset,view,aged,isFresh:fresh,edgePath,geometry,viewport,moveViewport});
 })(typeof window==="undefined"?globalThis:window);
