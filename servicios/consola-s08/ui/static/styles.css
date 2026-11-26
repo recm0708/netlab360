@@ -269,7 +269,9 @@ details.summary > summary { cursor: pointer; font-weight: 600; }
 .topology-item[data-state="fault"] { --edge:var(--fault); }
 .topology-item[data-state="recovery"] { --edge:var(--recovery); }
 .topology-edge { fill:none; stroke:var(--edge); stroke-width:3; }
-.topology-edge.backup { stroke-dasharray:8 5; }
+.topology-edge.backup, .topology-legend-line .backup { stroke-dasharray:8 5; }
+.topology-edge.service, .topology-legend-line .service { stroke-dasharray:2 5; stroke-linecap:round; }
+.topology-edge.control, .topology-legend-line .control { stroke-dasharray:10 4 2 4; }
 .topology-hit { stroke:transparent; stroke-width:9; fill:none; }
 .topology-node-box { fill:var(--surface); stroke:var(--edge); stroke-width:2.5; }
 .topology-node-label { fill:var(--text); font-size:14px; font-weight:700; }
@@ -488,3 +490,17 @@ button.secondary, .topology-action {
 @media (min-width:1001px) {
   .obs-chart-grid > :nth-child(n+3) { align-self:stretch; }
 }
+
+/* Convenciones y panel lateral de topología: mismos tokens que el SVG. */
+.topology-legend-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px 28px; }
+.topology-legend-grid h3 { margin:6px 0 10px; font-size:.9rem; }
+.topology-legend-grid ul { list-style:none; margin:0; padding:0; display:grid; gap:9px; }
+.topology-legend-grid li { display:grid; grid-template-columns:minmax(105px,135px) minmax(0,1fr); gap:10px; align-items:baseline; font-size:var(--size-secondary); }
+.topology-legend-grid strong { display:flex; align-items:center; gap:7px; font-weight:700; }
+.topology-legend-dot { display:inline-block; width:10px; height:10px; flex:0 0 10px; border-radius:50%; background:currentColor; }
+.topology-legend-line { width:30px; height:12px; flex:0 0 30px; }
+.topology-legend-line path { fill:none; stroke:currentColor; stroke-width:2.5; }
+.topology-legend-selection { color:var(--accent); }
+.topology-legend-note { margin:16px 0 0; padding-top:12px; border-top:1px solid var(--line); }
+@media(min-width:1101px){.topology-inspector { position:sticky; top:12px; max-height:calc(100dvh - 100px); overflow-y:auto; overscroll-behavior:auto; }}
+@media(max-width:900px){.topology-legend-grid { grid-template-columns:1fr; }}
