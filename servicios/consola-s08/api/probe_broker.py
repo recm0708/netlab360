@@ -156,8 +156,9 @@ def serve(conn, allowed_uid, transfer=None, worker=None):
             data = json.loads(raw_request.decode("utf-8"), object_pairs_hook=unique_object)
             if type(data) is dict and data.get("stream") is True:
                 from . import broker_stream
+                from .stream_protocol import STREAM_ACTIONS
                 selection = select({k: v for k, v in data.items() if k != "stream"})
-                if worker is None or selection.action != "test.content.tcp":
+                if worker is None or selection.action not in STREAM_ACTIONS:
                     broker_stream.frame(conn, broker_stream.final("NOT_ENABLED"))
                     return
                 try:

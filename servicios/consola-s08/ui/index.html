@@ -144,12 +144,12 @@
             <progress id="jobs-progress" value="0" max="100" hidden></progress>
             <p id="jobs-progress-note" class="muted">Sin medición.</p>
             <details><summary>Eventos e intervalos registrados</summary><div class="dashboard-table-wrap">
-              <table class="dashboard-table jobs-table"><thead><tr><th>Extremo</th><th>Tiempo (s)</th><th>Bytes</th><th>Mbit/s</th></tr></thead><tbody id="jobs-events"></tbody></table>
+              <table class="dashboard-table jobs-table"><thead><tr><th>Extremo</th><th>Tiempo (s)</th><th>Bytes acumulados</th><th>Bytes del intervalo</th><th>Mbit/s</th></tr></thead><tbody id="jobs-events"></tbody></table>
             </div></details>
             </div>
             <p id="jobs-metrics"></p>
             <div id="jobs-diagnostic-panel" hidden><p id="jobs-diagnostic-note" class="muted"></p><ul id="jobs-diagnostic-rows"></ul></div>
-            <details><summary>Resultado detallado</summary><pre id="jobs-output"></pre></details>
+            <details><summary>Resultado detallado (JSON original)</summary><pre id="jobs-output"></pre></details>
             <div class="action-row">
               <button type="button" id="jobs-json" disabled>Exportar JSON</button>
               <button type="button" id="jobs-csv" disabled>Exportar CSV</button>

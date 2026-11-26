@@ -65,11 +65,12 @@ def record(db, job_id):
 
 def enqueue(directory, actor, payload, *, stream_enabled=False):
     """Reservar una única plaza global para trabajos activos de esta base."""
+    from .stream_protocol import STREAM_ACTIONS
     selection = select(payload)
     job_id, now = str(uuid.uuid4()), stamp()
     data = {"schema": "NETLAB360_S08_JOB_V1", "selection": selection.parameters(),
             "deadline_s": selection.deadline_s, "started_at_utc": None, "result": None,
-            "stream_enabled": stream_enabled is True and selection.action == "test.content.tcp",
+            "stream_enabled": stream_enabled is True and selection.action in STREAM_ACTIONS,
             "cancel_requested": False, "progress": []}
     with transaction(directory) as db:
         operator(db, actor)
@@ -197,7 +198,7 @@ def history(directory, actor):
 
 
 def append_progress(directory, job_id, raw):
-    """Persistir solo muestras reales del transporte de contenido configurado."""
+    """Persistir solo muestras reales del transporte de transferencias configurado."""
     from .stream_protocol import MAX_EVENTS, sample
     with transaction(directory) as db:
         job = record(db, job_id)
@@ -222,7 +223,7 @@ def cancellation_requested(directory, job_id):
 
 
 def request_cancel(directory, actor, job_id):
-    """Cancelar en cola o registrar una petición activa de contenido, no su éxito."""
+    """Cancelar en cola o registrar una petición activa de transferencia, no su éxito."""
     with transaction(directory) as db:
         operator(db, actor)
         job = record(db, job_id)

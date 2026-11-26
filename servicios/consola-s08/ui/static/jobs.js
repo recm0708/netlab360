@@ -36,7 +36,7 @@ function createJobsView(context, request, formatDate) {
   let generation = 0, configured = false, pending = false, choices = [], selected = null, owner = null, occupied = false;
   let lastPoll = 0, loaded = false, requestedId = null;
   const text = (id,value) => {byId(id).textContent = String(value ?? "—");};
-  const number = value => Number.isFinite(value) ? value.toLocaleString("es-PA",{maximumFractionDigits:3}) : "—";
+  const number = NetlabNumbers.format;
   const permitted = () => location.pathname === "/diagnostics" && context()?.role === "OPERATOR" && context()?.active;
   const selection = () => choices.find(row => fields.every((field,i) => field.value === row[["action","route","profile"][i]]));
   function options(field, values, labels = {}) {
@@ -52,8 +52,8 @@ function createJobsView(context, request, formatDate) {
       Object.fromEntries(relevant.map(row=>[row.profile,profileLabel(row)])));
     const row = selection();
     const rateNote = row && row.profile !== "default" ? "Tasa objetivo configurada, no rendimiento garantizado. " : "";
-    text("profile-note", row ? rateNote + (row.live_progress ? "Contadores reales en vivo y cancelación activa de contenido." :
-      "Seguimiento del estado; métricas de la prueba al finalizar. Cancelación solo en cola.") + " Plazo máximo: " + row.deadline_s + " s." : "");
+    text("profile-note", row ? rateNote + (row.live_progress ? "Contadores reales en vivo y cancelación activa de la transferencia." :
+      "Seguimiento del estado; métricas de la prueba al finalizar. Cancelación solo en cola.") + " Plazo máximo: " + number(row.deadline_s,"count") + " s." : "");
     controls();
   }
   function controls() {
@@ -84,7 +84,7 @@ function createJobsView(context, request, formatDate) {
   }
   function samples(job) {
     const progress = job.data?.progress || [], m = job.data?.result?.measurement || {};
-    if (progress.length) return progress.map(x=>({role:x.role,time:x.elapsed_s,bytes:x.bytes,rate:x.mbps,kind:"CONTENIDO_ACUMULADO"}));
+    if (progress.length) return progress.map(x=>({role:x.role,time:x.elapsed_s,bytes:x.bytes,rate:x.mbps,kind:Number.isFinite(x.interval_bytes)?"IPERF_ACUMULADO":"CONTENIDO_ACUMULADO",intervalBytes:x.interval_bytes,start:x.start_s}));
     return ["sender","receiver"].flatMap(role=>(m[role+"_intervals"] || []).map(x=>(
       {role,time:x.end_s,bytes:x.bytes,rate:x.mbps,kind:"IPERF_INTERVALO_FINAL"})));
   }
@@ -108,33 +108,36 @@ function createJobsView(context, request, formatDate) {
       button.textContent=current?"Viendo":"Ver resultado";
       button.setAttribute("aria-pressed",String(current));
     }
-    text("tx",number(m?.bytes_sent ?? (data.progress?.length ? tx?.bytes : undefined))+" bytes");
-    text("rx",number(m?.bytes_received ?? (data.progress?.length ? rx?.bytes : undefined))+" bytes");
-    text("tx-rate",number(m?.sender_mbps ?? tx?.rate)+" Mbit/s");
-    text("rx-rate",number(m?.receiver_mbps ?? rx?.rate)+" Mbit/s");
-    const targets={"content-100mb":100000000,"content-500mb":500000000,"content-1gb":1000000000,"content-2gb":2000000000,"content-5gb":5000000000};
+    text("tx",number(m?.bytes_sent ?? (data.progress?.length ? tx?.bytes : undefined),"bytes")+" bytes");
+    text("rx",number(m?.bytes_received ?? (data.progress?.length ? rx?.bytes : undefined),"bytes")+" bytes");
+    text("tx-rate",number(m?.sender_mbps ?? tx?.rate,"rate")+" Mbit/s");
+    text("rx-rate",number(m?.receiver_mbps ?? rx?.rate,"rate")+" Mbit/s");
+    const targets={"content-100mb":100000000,"content-500mb":500000000,"content-1gb":1000000000,"content-2gb":2000000000,"content-5gb":5000000000,
+      "tcp-100mb":100000000,"tcp-500mb":500000000,"tcp-1gb":1000000000,"tcp-2gb":2000000000,"tcp-5gb":5000000000};
     const target=m?.target_bytes ?? targets[data.selection.profile];
     const received=m?.bytes_received ?? (data.progress?.length ? rx?.bytes : undefined);
     const measured=Number.isFinite(target)&&target>0&&Number.isFinite(received);
     byId("progress").hidden=!measured;
     if (measured) byId("progress").value=Math.min(100,received*100/target);
-    text("progress-note",measured?number(received)+" / "+number(target)+" bytes observados":
+    text("progress-note",measured?number(received,"bytes")+" / "+number(target,"bytes")+" bytes observados · "+number(received*100/target,"percentage")+" % del objetivo":
+      Number.isFinite(rx?.time)?"Tiempo observado del receptor: "+number(rx.time,"seconds")+" s":
       active(job)?"Esperando medición; no se estima el avance por tiempo.":"Sin volumen medible.");
-    const metrics=m?[["Estado de medición",m.status],["Paquetes enviados",m.sent],["Paquetes recibidos",m.received],
-      ["RTT mín. (ms)",m.rtt_min_ms],["RTT medio (ms)",m.rtt_avg_ms],["RTT máx. (ms)",m.rtt_max_ms],
-      ["RTT p95 (ms)",m.rtt_p95_ms],["Pérdida (%)",m.loss_pct],
-      ["Saltos",Array.isArray(m.hops)?m.hops.length:null],
+    const metrics=m?[["Estado de medición",m.status],["Paquetes enviados",m.sent,"count"],["Paquetes recibidos",m.received,"count"],
+      ["RTT mín. (ms)",m.rtt_min_ms,"latency"],["RTT medio (ms)",m.rtt_avg_ms,"latency"],["RTT máx. (ms)",m.rtt_max_ms,"latency"],
+      ["RTT p95 (ms)",m.rtt_p95_ms,"latency"],["Pérdida (%)",m.loss_pct,"loss"],
+      ["Saltos",Array.isArray(m.hops)?m.hops.length:null,"count"],
       ["Destino alcanzado",typeof m.reached==="boolean"?(m.reached?"Sí":"No"):null],
-      ["Tiempo HTTP (ms)",m.elapsed_ms],["Backend activo",m.active_backend],
-      ["Jitter (ms)",m.jitter_ms],["Retransmisiones TCP",m.retransmissions],["HTTP",m.http_status],
+      ["Tiempo HTTP (ms)",m.elapsed_ms,"latency"],["Backend activo",m.active_backend],
+      ["Jitter (ms)",m.jitter_ms,"jitter"],["Retransmisiones TCP",m.retransmissions,"count"],["HTTP",m.http_status],
       ["Integridad de contenido",data.selection.action==="test.content.tcp" && typeof m.content_integrity_verified==="boolean"?(m.content_integrity_verified?"Verificada":"No verificada"):null]]:
       [];
-    text("metrics",metrics.filter(x=>x[1]!==null&&x[1]!==undefined).map(x=>x[0]+": "+x[1]).join(" · "));
+    if(job.status==="CANCELLED")metrics.push(["Limpieza",data.cleanup_verified===true?"Verificada":"Sin confirmar"]);
+    text("metrics",metrics.filter(x=>x[1]!==null&&x[1]!==undefined).map(x=>x[0]+": "+(x[2]?number(x[1],x[2]):x[1])).join(" · "));
     const diagnosticRows = (Array.isArray(m?.hops)?m.hops:Array.isArray(m?.samples)?m.samples:[]).map(item=>{
       const li=document.createElement("li");
       li.textContent=Array.isArray(m.hops)?"Salto "+item.hop+" · "+(item.address ?? "Sin respuesta")+
-        (item.rtt_ms==null?"":" · "+number(item.rtt_ms)+" ms")+(item.annotation?" · "+item.annotation:""):
-        "Paquete "+item.seq+" · "+number(item.rtt_ms)+" ms";
+        (item.rtt_ms==null?"":" · "+number(item.rtt_ms,"latency")+" ms")+(item.annotation?" · "+item.annotation:""):
+        "Paquete "+item.seq+" · "+number(item.rtt_ms,"latency")+" ms";
       return li;
     });
     byId("diagnostic-rows").replaceChildren(...diagnosticRows);
@@ -142,7 +145,7 @@ function createJobsView(context, request, formatDate) {
       active(job)?"Esperando resultado del diagnóstico.":"Sin medición confirmada.");
     const rows=points.map(point=>{
       const tr=document.createElement("tr");
-      for(const value of [point.role==="sender"?"Emisor":"Receptor",number(point.time),number(point.bytes),number(point.rate)]){
+      for(const value of [point.role==="sender"?"Emisor":"Receptor",number(point.time,"seconds"),number(point.kind==="IPERF_INTERVALO_FINAL"?null:point.bytes,"bytes"),number(point.kind==="IPERF_INTERVALO_FINAL"?point.bytes:point.intervalBytes,"bytes"),number(point.rate,"rate")]){
         const td=document.createElement("td");td.textContent=value;tr.append(td);
       }
       return tr;
@@ -263,6 +266,8 @@ function createJobsView(context, request, formatDate) {
     const rows=[["job_id","fecha_utc","fecha_panama","accion_id","prueba","perfil_id","configuracion",
       "ruta","estado","tipo","extremo","tiempo_s","bytes","mbps","metrica","valor"],
       ...samples(selected).map(x=>[...identity,x.kind,x.role,x.time,x.bytes,x.rate,"",""])];
+    for(const point of samples(selected))if(Number.isFinite(point.intervalBytes))
+      rows.push([...identity,"IPERF_INTERVALO_NATIVO",point.role,point.time,point.intervalBytes,point.rate,"inicio_s",point.start]);
     const m=selected.data.result?.measurement || {};
     for(const [key,value] of Object.entries(m)){
       if(value!==null && ["string","number","boolean"].includes(typeof value))

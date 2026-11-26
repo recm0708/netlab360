@@ -10,6 +10,7 @@ from . import jobs, sessions
 from .auth_http import COOKIE, MAX_BODY, require_origin
 from .job_contract import catalog, select
 from .probe_broker import unique_object
+from .stream_protocol import STREAM_ACTIONS
 
 LOG = logging.getLogger(__name__)
 
@@ -108,8 +109,8 @@ def register_jobs(app: FastAPI, directory, transport, stream_transport=None):
     async def job_catalog(request: Request):
         await operator(request)
         rows = [dict(row, execution_enabled=True,
-                     live_progress=stream_transport is not None and row["action"] == "test.content.tcp",
-                     active_cancel=stream_transport is not None and row["action"] == "test.content.tcp")
+                     live_progress=stream_transport is not None and row["action"] in STREAM_ACTIONS,
+                     active_cancel=stream_transport is not None and row["action"] in STREAM_ACTIONS)
                 for row in catalog()]
         return {"selections": rows, "transport_configured": True,
                 "network_mutations_authorized": False}

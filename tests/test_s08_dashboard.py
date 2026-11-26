@@ -13,11 +13,11 @@ const fs = require("node:fs");
 const vm = require("node:vm");
 const assert = require("node:assert/strict");
 const source = fs.readFileSync(process.argv[1], "utf8");
-const start = source.indexOf("const dashboardInventory =");
+const start = source.indexOf("const NetlabNumbers =");
 const end = source.indexOf("/* Fin de la proyección pura del dashboard. */");
 assert(start >= 0 && end > start);
 const model = vm.runInNewContext(source.slice(start,end) +
-  "\n({dashboardInventory,dashboardBatch,dashboardRows,dashboardSummary,dashboardDetail});");
+  "\n({NetlabNumbers,dashboardInventory,dashboardBatch,dashboardRows,dashboardSummary,dashboardDetail});");
 const {dashboardInventory: inventory, dashboardBatch: batch,
        dashboardRows: rows, dashboardSummary: summary, dashboardDetail: detail} = model;
 const stamp = "2026-11-24T23:00:00Z";
@@ -56,6 +56,23 @@ function all() {
   return Object.fromEntries(Object.keys(inventory).map(key=>[key,{rows:batch(key,payload(key),1000)}]));
 }
 
+const fmt=model.NetlabNumbers.format;
+assert.equal(fmt(25003200,"bytes"),"25,003,200");
+assert.equal(fmt(20,"rate"),"20.000");
+assert.equal(fmt(0.02684290293371846,"jitter"),"0.0268");
+assert.equal(fmt(0,"loss"),"0.000");
+assert.equal(fmt(99.95,"percentage"),"99.95");
+assert.equal(fmt(0.000001,"jitter"),"<0.0001");
+assert.equal(fmt(-0.000001,"jitter"),">-0.0001");
+assert.equal(fmt(null,"rate"),"—");
+assert.equal(fmt(NaN,"rate"),"—");
+assert.equal(fmt("123","count"),"—");
+assert.equal(fmt(12.5,"count"),"—");
+assert.equal(fmt(1000.1234,"volume"),"1,000.12");
+assert.equal(fmt(0.97851,"probability"),"0.9785");
+assert.equal(fmt(45.24,"temperature"),"45.2");
+assert.equal(model.NetlabNumbers.axis("jitter"),",.4f");
+assert.throws(()=>fmt(1,"unknown"),{name:"RangeError"});
 const scenario=process.argv[2];
 if(scenario==="inventory") {
   const r=rows(all(),1000), s=summary(r);

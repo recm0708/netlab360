@@ -10,7 +10,7 @@ ROOT = Path("/usr/local/libexec/netlab360/s08-broker")
 API_FILES = (
     "__init__.py", "probe_catalog.py", "probe_executor.py", "transfer_executor.py",
     "content_executor.py", "content_worker.py", "job_contract.py", "probe_broker.py", "broker_transfer.py",
-    "broker_stream.py", "stream_protocol.py",
+    "broker_stream.py", "stream_protocol.py", "iperf_native.py",
 )
 
 

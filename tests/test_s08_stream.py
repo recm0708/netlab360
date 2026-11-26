@@ -57,6 +57,46 @@ class StreamTests(unittest.TestCase):
             progress.poll(handle)
         emit.assert_called_once_with(EVENT)
 
+    def test_native_progress_complete_and_partial(self):
+        selection = select({"action":"test.iperf.tcp","route":"HQ_A_S1","profile":"tcp-10s"})
+        emit = Mock()
+        progress = S.NativeProgress("sender", selection, emit)
+        start = {"event":"start","data":{"test_start":{"protocol":"TCP"},
+                 "connected":[{"local_host":"10.70.20.20","remote_host":"10.71.20.20"}]}}
+        interval = {"event":"interval","data":{"sum":{"start":0,"end":1,"bytes":100,"bits_per_second":800}}}
+        line = json.dumps(interval).encode() + b"\n"
+        with tempfile.TemporaryFile() as handle:
+            handle.write(json.dumps(start).encode() + b"\n" + line[:20])
+            handle.flush()
+            progress.poll(handle)
+            emit.assert_not_called()
+            handle.write(line[20:])
+            handle.flush()
+            progress.poll(handle)
+            emit.assert_called_once()
+            self.assertEqual(emit.call_args.args[0]["interval_bytes"],100)
+            handle.write(json.dumps({"event":"end","data":{}}).encode() + b"\n")
+            handle.flush()
+            progress.poll(handle,complete=True)
+            self.assertEqual(len(progress.finish()["intervals"]),1)
+
+    def test_native_zero_interval_and_counter(self):
+        event = {"role":"receiver","bytes":100,"elapsed_s":1,"mbps":0.001,
+                 "interval_bytes":100,"start_s":0}
+        first = sample(event,"tcp-10s")
+        second = dict(event,bytes=100,elapsed_s=2,start_s=1,interval_bytes=0,mbps=0)
+        self.assertEqual(sample(second,"tcp-10s",first),second)
+        with self.assertRaises(ValueError):
+            sample(dict(second,bytes=101),"tcp-10s",first)
+
+    def test_native_cancel_before_workers(self):
+        left, right = socket.socketpair()
+        selection = select({"action":"test.iperf.udp","route":"HQ_A_S2","profile":"udp-10s"})
+        with left, right, patch.object(S,"verify_identity"), patch.object(S.T,"listener",return_value=""), patch.object(S.T,"managed") as managed:
+            left.sendall(b"CANCEL\n")
+            self.assertEqual(S.run(right,selection,994,971), S.final("CANCELLED",cleanup=True))
+            managed.assert_not_called()
+
     def test_cancel_from_same_connection(self):
         left, right = socket.socketpair()
         with left, right:
