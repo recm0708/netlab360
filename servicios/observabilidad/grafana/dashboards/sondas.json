@@ -1,0 +1,638 @@
+{
+  "uid": "netlab360-s08-observacion",
+  "title": "NETLAB360 · Observabilidad de sondas",
+  "description": "Vista especializada de la fuente Prometheus. No sustituye el portal operacional ni su evaluación de calidad.",
+  "tags": [
+    "netlab360",
+    "observabilidad"
+  ],
+  "timezone": "utc",
+  "editable": false,
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Disponibilidad de adquisición",
+      "description": "1 = scrape correcto; ausencia no equivale a fallo medido.",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "netlab360-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "spanNulls": false,
+            "showPoints": "auto"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "netlab360-prometheus"
+          },
+          "refId": "A",
+          "expr": "up{job=\"netlab360-s08-blackbox\"}",
+          "legendFormat": "{{probe_id}}",
+          "instant": false,
+          "range": true,
+          "editorMode": "code"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Éxito de sonda",
+      "description": "Resultado de sonda medido; no interpolar ausencias.",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "netlab360-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "spanNulls": false,
+            "showPoints": "auto"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "netlab360-prometheus"
+          },
+          "refId": "A",
+          "expr": "probe_success{job=\"netlab360-s08-blackbox\"}",
+          "legendFormat": "{{probe_id}}",
+          "instant": false,
+          "range": true,
+          "editorMode": "code"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Duración de sonda",
+      "description": "Duración total de Blackbox, no RTT.",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "netlab360-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "decimals": 3,
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "spanNulls": false,
+            "showPoints": "auto"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "netlab360-prometheus"
+          },
+          "refId": "A",
+          "expr": "probe_duration_seconds{job=\"netlab360-s08-blackbox\"} * 1000",
+          "legendFormat": "{{probe_id}}",
+          "instant": false,
+          "range": true,
+          "editorMode": "code"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Código HTTP observado",
+      "description": "Código de respuesta; 0 puede indicar ausencia de respuesta HTTP.",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "netlab360-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "spanNulls": false,
+            "showPoints": "auto"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "netlab360-prometheus"
+          },
+          "refId": "A",
+          "expr": "probe_http_status_code{job=\"netlab360-s08-blackbox\"}",
+          "legendFormat": "{{probe_id}}",
+          "instant": false,
+          "range": true,
+          "editorMode": "code"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "SLI observado · 5 min",
+      "description": "Porcentaje sobre muestras medidas; no certifica cobertura ni cumplimiento SLO.",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "netlab360-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 2
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value_and_name"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "netlab360-prometheus"
+          },
+          "refId": "A",
+          "expr": "100 * sum_over_time(probe_success{job=\"netlab360-s08-blackbox\"}[5m]) / count_over_time(probe_success{job=\"netlab360-s08-blackbox\"}[5m])",
+          "legendFormat": "{{probe_id}}",
+          "instant": true,
+          "range": false,
+          "editorMode": "code"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Cobertura · 5 min",
+      "description": "Muestras originales frente a 30 esperadas por sonda.",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "netlab360-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 16,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value_and_name"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "netlab360-prometheus"
+          },
+          "refId": "A",
+          "expr": "count_over_time(up{job=\"netlab360-s08-blackbox\"}[5m])",
+          "legendFormat": "{{probe_id}} adquisición",
+          "instant": true,
+          "range": false,
+          "editorMode": "code"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "netlab360-prometheus"
+          },
+          "refId": "B",
+          "expr": "sum_over_time(up{job=\"netlab360-s08-blackbox\"}[5m])",
+          "legendFormat": "{{probe_id}} adquisición correcta",
+          "instant": true,
+          "range": false,
+          "editorMode": "code"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "netlab360-prometheus"
+          },
+          "refId": "C",
+          "expr": "count_over_time(probe_success{job=\"netlab360-s08-blackbox\"}[5m])",
+          "legendFormat": "{{probe_id}} medidas",
+          "instant": true,
+          "range": false,
+          "editorMode": "code"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "netlab360-prometheus"
+          },
+          "refId": "D",
+          "expr": "sum_over_time(probe_success{job=\"netlab360-s08-blackbox\"}[5m])",
+          "legendFormat": "{{probe_id}} éxitos",
+          "instant": true,
+          "range": false,
+          "editorMode": "code"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "SLI observado · 15 min",
+      "description": "Porcentaje sobre muestras medidas; no certifica cobertura ni cumplimiento SLO.",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "netlab360-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 24,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 2
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value_and_name"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "netlab360-prometheus"
+          },
+          "refId": "A",
+          "expr": "100 * sum_over_time(probe_success{job=\"netlab360-s08-blackbox\"}[15m]) / count_over_time(probe_success{job=\"netlab360-s08-blackbox\"}[15m])",
+          "legendFormat": "{{probe_id}}",
+          "instant": true,
+          "range": false,
+          "editorMode": "code"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Cobertura · 15 min",
+      "description": "Muestras originales frente a 90 esperadas por sonda.",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "netlab360-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 24,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value_and_name"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "netlab360-prometheus"
+          },
+          "refId": "A",
+          "expr": "count_over_time(up{job=\"netlab360-s08-blackbox\"}[15m])",
+          "legendFormat": "{{probe_id}} adquisición",
+          "instant": true,
+          "range": false,
+          "editorMode": "code"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "netlab360-prometheus"
+          },
+          "refId": "B",
+          "expr": "sum_over_time(up{job=\"netlab360-s08-blackbox\"}[15m])",
+          "legendFormat": "{{probe_id}} adquisición correcta",
+          "instant": true,
+          "range": false,
+          "editorMode": "code"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "netlab360-prometheus"
+          },
+          "refId": "C",
+          "expr": "count_over_time(probe_success{job=\"netlab360-s08-blackbox\"}[15m])",
+          "legendFormat": "{{probe_id}} medidas",
+          "instant": true,
+          "range": false,
+          "editorMode": "code"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "netlab360-prometheus"
+          },
+          "refId": "D",
+          "expr": "sum_over_time(probe_success{job=\"netlab360-s08-blackbox\"}[15m])",
+          "legendFormat": "{{probe_id}} éxitos",
+          "instant": true,
+          "range": false,
+          "editorMode": "code"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "SLI observado · 60 min",
+      "description": "Porcentaje sobre muestras medidas; no certifica cobertura ni cumplimiento SLO.",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "netlab360-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 32,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 2
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value_and_name"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "netlab360-prometheus"
+          },
+          "refId": "A",
+          "expr": "100 * sum_over_time(probe_success{job=\"netlab360-s08-blackbox\"}[60m]) / count_over_time(probe_success{job=\"netlab360-s08-blackbox\"}[60m])",
+          "legendFormat": "{{probe_id}}",
+          "instant": true,
+          "range": false,
+          "editorMode": "code"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "title": "Cobertura · 60 min",
+      "description": "Muestras originales frente a 360 esperadas por sonda.",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "netlab360-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 32,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value_and_name"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "netlab360-prometheus"
+          },
+          "refId": "A",
+          "expr": "count_over_time(up{job=\"netlab360-s08-blackbox\"}[60m])",
+          "legendFormat": "{{probe_id}} adquisición",
+          "instant": true,
+          "range": false,
+          "editorMode": "code"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "netlab360-prometheus"
+          },
+          "refId": "B",
+          "expr": "sum_over_time(up{job=\"netlab360-s08-blackbox\"}[60m])",
+          "legendFormat": "{{probe_id}} adquisición correcta",
+          "instant": true,
+          "range": false,
+          "editorMode": "code"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "netlab360-prometheus"
+          },
+          "refId": "C",
+          "expr": "count_over_time(probe_success{job=\"netlab360-s08-blackbox\"}[60m])",
+          "legendFormat": "{{probe_id}} medidas",
+          "instant": true,
+          "range": false,
+          "editorMode": "code"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "netlab360-prometheus"
+          },
+          "refId": "D",
+          "expr": "sum_over_time(probe_success{job=\"netlab360-s08-blackbox\"}[60m])",
+          "legendFormat": "{{probe_id}} éxitos",
+          "instant": true,
+          "range": false,
+          "editorMode": "code"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+# Panel especializado, sin duplicar topología ni navegación.
+apiVersion: 1
+providers:
+  - name: NETLAB360
+    orgId: 1
+    folder: NETLAB360
+    type: file
+    disableDeletion: true
+    allowUiUpdates: false
+    updateIntervalSeconds: 30
+    options:
+      path: /opt/netlab360-grafana/grafana-config/dashboards

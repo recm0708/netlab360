@@ -1,0 +1,31 @@
+# Grafana independiente, sin privilegios ni exposición a la red administrativa.
+[Unit]
+Description=NETLAB360 Grafana especializado
+After=network.target
+
+[Service]
+Type=exec
+User=netlab360-s08-grafana
+Group=netlab360-s08-grafana
+WorkingDirectory=/opt/netlab360-grafana/grafana-13.3.2
+ExecStart=/opt/netlab360-grafana/grafana-13.3.2/bin/grafana server --homepath=/opt/netlab360-grafana/grafana-13.3.2 --config=/opt/netlab360-grafana/grafana-config/grafana.ini
+LoadCredential=admin-password:/etc/netlab360/grafana/admin-password
+LoadCredential=secret-key:/etc/netlab360/grafana/secret-key
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+UMask=0077
+ReadWritePaths=/var/lib/netlab360/grafana
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+IPAddressDeny=any
+IPAddressAllow=localhost
+MemoryMax=1536M
+TasksMax=256
+TimeoutStopSec=20
+LimitCORE=0
+
+[Install]
+WantedBy=multi-user.target
