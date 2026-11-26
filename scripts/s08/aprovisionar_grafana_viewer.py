@@ -15,15 +15,37 @@ LOGIN = "netlab360-viewer"
 ADMIN = "netlab360-admin"
 
 
-def password_prompt():
-    """Exigir entrada oculta en terminal y una contraseña independiente."""
-    with warnings.catch_warnings():
-        warnings.simplefilter("error", getpass.GetPassWarning)
-        password = getpass.getpass("Nueva contraseña Viewer (mínimo 20 caracteres): ")
-        repeated = getpass.getpass("Confirmar contraseña Viewer: ")
-    if password != repeated or len(password) < 20 or password != password.strip():
-        raise ValueError("PASSWORD_INVALID_OR_MISMATCH")
-    return password
+class PasswordInputError(ValueError):
+    """Código fijo de validación, sin incluir el contenido de la contraseña."""
+
+
+def validate_password(password, repeated, admin):
+    """Distinguir los rechazos locales antes de crear una identidad."""
+    if password != repeated:
+        raise PasswordInputError("PASSWORD_MISMATCH")
+    if len(password) < 20:
+        raise PasswordInputError("PASSWORD_TOO_SHORT")
+    if password != password.strip():
+        raise PasswordInputError("PASSWORD_EDGE_WHITESPACE")
+    if password == admin:
+        raise PasswordInputError("PASSWORD_MUST_BE_INDEPENDENT")
+
+
+def password_prompt(admin):
+    """Exigir entrada oculta y permitir hasta tres intentos de validación local."""
+    for attempt in range(1, 4):
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", getpass.GetPassWarning)
+            password = getpass.getpass("Nueva contraseña Viewer (mínimo 20 caracteres): ")
+            repeated = getpass.getpass("Confirmar contraseña Viewer: ")
+        try:
+            validate_password(password, repeated, admin)
+        except PasswordInputError as error:
+            print(f"ENTRADA_RECHAZADA={error} INTENTO={attempt}/3", flush=True)
+            continue
+        print("VALIDACION_LOCAL_CONTRASENA=OK", flush=True)
+        return password
+    raise PasswordInputError("PASSWORD_ATTEMPTS_EXHAUSTED")
 
 
 def denied(call, allowed=(403,)):
@@ -31,9 +53,12 @@ def denied(call, allowed=(403,)):
     try:
         call()
     except HTTPError as error:
-        if error.code not in allowed:
-            raise
-        return error.code
+        try:
+            if error.code not in allowed:
+                raise
+            return error.code
+        finally:
+            error.close()
     raise ValueError("UNEXPECTED_ACCESS")
 
 
@@ -70,9 +95,8 @@ def provision(root, admin):
         assert flags[flag] == "false", flag
     before = members(admin)
     dash_before = fetch(dash_url, admin)["dashboard"]
-    password = password_prompt()
-    if password == admin:
-        raise ValueError("PASSWORD_MUST_BE_INDEPENDENT")
+    print("CUENTA_VIEWER_PREEXISTENTE=NO", flush=True)
+    password = password_prompt(admin)
     created_id = None
     try:
         result = fetch(BASE + "/api/admin/users", admin, {
@@ -80,6 +104,7 @@ def provision(root, admin):
             "login": LOGIN, "password": password, "OrgId": 1})
         created_id = result["id"]
         assert type(created_id) is int and created_id > 0
+        print("CUENTA_NUEVA_ID_CONFIRMADO=SI", flush=True)
         user = fetch(lookup, admin)
         assert user["id"] == created_id
         me = fetch(BASE + "/api/user", password, username=LOGIN)
@@ -122,6 +147,9 @@ if __name__ == "__main__":
         provision(Path(sys.argv[1]), sys.stdin.readline().strip())
     except Exception as error:
         print("VIEWER_ERROR=" + type(error).__name__, file=sys.stderr)
+        if isinstance(error, PasswordInputError):
+            print("CODIGO_ENTRADA=" + str(error), file=sys.stderr)
         if isinstance(error, HTTPError):
             print("HTTP_STATUS=" + str(error.code), file=sys.stderr)
+            error.close()
         raise SystemExit(1)
