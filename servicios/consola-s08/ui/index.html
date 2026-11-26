@@ -9,6 +9,7 @@
   <script src="/ui/static/jobs.js"></script>
   <script src="/ui/static/app.js"></script>
   <script src="/ui/static/history.js"></script>
+  <script src="/ui/static/observation.js"></script>
   <script src="/ui/static/topology.js"></script>
 </head>
 <body>
@@ -193,8 +194,39 @@
           </div>
         </section>
         <section id="history-view" hidden>
-          <div class="heading"><div><p class="eyebrow">Observabilidad</p><h1>Históricos de supervisión</h1><p class="muted">Muestras reales de Prometheus. Los estados administrativos no acreditan conectividad.</p></div></div>
+          <div class="heading"><div><p class="eyebrow">Observabilidad</p><h1>Observabilidad</h1><p class="muted">Sondas reales, objetivos provisionales, notificaciones e históricos de supervisión.</p></div></div>
+          <section class="panel" id="obs-panel">
+            <div class="heading"><div><h2>Sondas y calidad de observación</h2><p class="muted">FE-HQ: servicio frontal de HQ. Duración total Blackbox, no RTT. Hora de Panamá.</p></div><button id="obs-refresh" type="button" disabled>Consultar sondas</button></div>
+            <p id="obs-notice" role="status" aria-live="polite">Consulte las sondas.</p>
+            <p id="obs-source" class="muted">Sin observación vigente.</p>
+            <div class="dashboard-table-wrap"><table class="dashboard-table"><thead><tr><th>Sonda</th><th>Vigencia al corte</th><th>Última muestra</th><th>Adquisición</th><th>Resultado</th><th>Duración</th></tr></thead><tbody id="obs-latest"></tbody></table></div>
+            <h2>Historial de sondas</h2>
+            <label for="obs-span">Intervalo de gráficos <select id="obs-span"><option value="5">5 minutos</option><option value="15">15 minutos</option><option value="60" selected>1 hora</option></select></label>
+            <p class="muted">● Adquisición correcta / éxito · × Error / fallo medido · hueco: sin evidencia. Cada marcador corresponde a una muestra real.</p>
+            <div class="obs-chart-grid">
+              <section class="obs-chart"><h3>Estado de adquisición de métricas</h3><div id="obs-scrape_up" hidden aria-label="Histórico de adquisición"></div></section>
+              <section class="obs-chart"><h3>Estado de las sondas</h3><div id="obs-probe_success" hidden aria-label="Histórico de éxito de sondas"></div></section>
+              <section class="obs-chart obs-duration"><h3>Duración de las sondas</h3><div id="obs-duration_seconds" hidden aria-label="Duración total observada"></div></section>
+              <section class="obs-chart"><h3>Respuestas HTTP · S2 → FE-HQ</h3><p class="muted">Muestras originales de la última hora, más recientes primero. 0: sin respuesta; sin datos: ausencia de evidencia.</p><div class="dashboard-table-wrap obs-scroll"><table class="dashboard-table"><thead><tr><th>Fecha y hora</th><th>Código HTTP</th></tr></thead><tbody id="obs-http"></tbody></table></div></section>
+            </div>
+            <h2>Éxito observado (SLI) y cobertura</h2>
+            <p class="muted">Objetivo provisional de laboratorio: 99 %. No es un SLA; una ventana parcial no acredita cumplimiento. Presupuesto en cantidad de fallos y burn rate sobre muestras medidas.</p>
+            <div id="obs-cards" class="obs-window-grid"></div>
+            <div class="dashboard-table-wrap"><table class="dashboard-table obs-detail"><thead><tr><th>Ventana</th><th>Sonda</th><th>SLI</th><th>Adquiridas / nominal</th><th>Adq. correctas</th><th>Medidas</th><th>Éxitos</th><th>Presupuesto restante</th><th>Burn rate</th><th>Calidad / evaluación</th></tr></thead><tbody id="obs-windows"></tbody></table></div>
+          </section>
+          <section class="panel" aria-label="Notificaciones de Alertmanager">
+            <h2>Notificaciones de Alertmanager</h2>
+            <div class="action-row"><label for="obs-scope">Ámbito <select id="obs-scope"><option value="operational">Operacional</option><option value="validation" hidden disabled>Validación sintética (operador)</option></select></label><button id="obs-notify" type="button" disabled>Consultar notificaciones</button></div>
+            <p id="obs-notify-status" role="status" aria-live="polite">Sin consulta de notificaciones.</p>
+            <div class="dashboard-table-wrap"><table class="dashboard-table"><thead><tr><th>Alerta</th><th>Sonda</th><th>Estado</th><th>Inicio</th><th>Resolución</th><th>Recepción</th></tr></thead><tbody id="obs-notifications"></tbody></table></div>
+          </section>
           <section class="panel">
+            <h2>Herramientas especializadas</h2>
+            <p><a href="http://127.0.0.1:3000/d/netlab360-s08-observacion" target="_blank" rel="noopener noreferrer">Abrir Grafana · Observabilidad de sondas</a></p>
+            <p class="muted">Requiere túnel SSH local y autenticación independiente de Grafana. Prometheus y Alertmanager se consultan mediante los lectores autorizados de NETLAB360, sin exponer interfaces ni credenciales adicionales.</p>
+          </section>
+          <section class="panel">
+            <h2>Históricos de supervisión</h2>
             <div class="history-controls">
               <label for="history-group">Grupo<select id="history-group"><option value="collection">Recolección de telemetría</option><option value="routers">Contenedores de routers</option><option value="wan">Interfaces WAN</option><option value="vlan">Interfaces VLAN</option><option value="alerts">Alertas y transiciones</option></select></label>
               <label for="history-window">Intervalo histórico<select id="history-window"><option value="5m">5 minutos</option><option value="15m" selected>15 minutos</option><option value="1h">1 hora</option></select></label>
