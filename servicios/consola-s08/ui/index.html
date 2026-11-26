@@ -213,7 +213,7 @@
             <div class="obs-chart-grid">
               <section class="obs-chart"><h3>Estado de adquisición de métricas</h3><div id="obs-scrape_up" hidden aria-label="Histórico de adquisición"></div></section>
               <section class="obs-chart"><h3>Estado de las sondas</h3><div id="obs-probe_success" hidden aria-label="Histórico de éxito de sondas"></div></section>
-              <section class="obs-chart obs-duration"><h3>Duración de las sondas</h3><div id="obs-duration_seconds" hidden aria-label="Duración total observada"></div></section>
+              <section class="obs-chart obs-duration"><h3>Duración de las sondas</h3><div id="obs-duration_seconds" hidden aria-label="Duración total observada"></div><details class="obs-disclosure"><summary>Estadísticas del intervalo (ms)</summary><p class="muted">Último valor disponible, promedio y máximo de duraciones válidas, sin interpolación.</p><div class="dashboard-table-wrap"><table class="dashboard-table"><thead><tr><th>Sonda</th><th>Muestras</th><th>Último</th><th>Promedio</th><th>Máximo</th></tr></thead><tbody id="obs-duration-stats"></tbody></table></div></details></section>
               <section class="obs-chart"><h3>Respuestas HTTP · S2 → FE-HQ</h3><p class="muted">Código de la última muestra y distribución en el intervalo seleccionado. 0: sin respuesta; sin datos: ausencia de evidencia.</p>
                 <div class="obs-http-summary"><strong id="obs-http-latest">—</strong><small id="obs-http-detail">—</small></div>
                 <p id="obs-http-count" class="muted">—</p><div id="obs-http-codes" class="obs-code-list"></div>
