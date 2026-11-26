@@ -182,8 +182,8 @@ Presentamos NETLAB360 como consola de operaciones: los identificadores
 de gestión se conservan únicamente donde sean necesarios para la trazabilidad,
 no en textos, etiquetas, tablas o mensajes visibles. Traducimos los
 identificadores de procedencia a nombres funcionales de las fuentes.
-Mostramos fechas en la zona America/Panama, formato mes/día/año y
-12 horas con segundos e indicador AM/PM; conservamos UTC en los contratos
+Mostramos fechas en la zona America/Panama, formato MM/DD/AAAA · HH:mm:ss
+con hora de 24 horas; conservamos UTC en los contratos
 internos. La etiqueta Fecha y hora en el panel de identidad representa
 el vencimiento de la sesión, indicado mediante una aclaración visible.
 
@@ -353,21 +353,20 @@ sin alterar la infraestructura. La vista descarta datos al perder sesión
 o vigencia; la API no acepta destinos arbitrarios. Conservamos la
 interfaz previa hasta completar y validar la equivalencia funcional.
 
-Mantenemos una vista resumida con dos enlaces WAN lógicos y una vista
-detallada en la misma pestaña, abierta mediante /topology?view=detailed.
-La representación detallada conserva los 18 nodos y 21 enlaces,
+Mantenemos un único diagrama completo en /topology, sin selector de
+vista resumida o detallada. Conservamos los 18 nodos y 21 enlaces,
 incluidas las relaciones HTTP. Separamos físicamente el dibujo de las
 conexiones de acceso y las relaciones lógicas de servicio. Actualizamos
 atributos de los elementos SVG existentes, no su geometría, y mantenemos
 la selección durante las consultas. La limitación compartida de frecuencia
 provoca reintentos, no el borrado del inventario. Los estados caducados o
-no disponibles pasan a desconocidos; al perder sesión eliminamos todos
-los datos. La presentación detallada admite pantalla completa nativa.
+no disponibles pasan a desconocidos sin perder el inventario estático;
+al perder sesión eliminamos todos los datos. La topología admite pantalla completa nativa.
 
 ## Navegación y supervisión por dominio
 
 Aplicamos encuadre por sede, acercamiento, alejamiento, desplazamiento y
-restablecimiento sobre ambas vistas SVG sin modificar el inventario. El
+restablecimiento sobre el diagrama SVG sin modificar el inventario. El
 encuadre se conserva durante las consultas. Retiramos el enlace auxiliar
 de salto y los recuadros adicionales de foco, conservando la selección
 funcional y una indicación discreta para el teclado.
@@ -385,17 +384,22 @@ pantalla completa. La preferencia contiene solo un interruptor y uno de
 los intervalos 5, 10, 15, 30, 60 o 300 segundos; el valor inicial es cinco
 segundos. Consultamos únicamente la vista activa, sin solicitudes
 superpuestas ni renovación automática de la sesión. Las muestras
-caducan aunque se pause la adquisición. En Observabilidad y Diagnóstico técnico las consultas de datos son
-exclusivamente manuales; conservamos la preferencia global sin aplicarla
-allí. Las páginas aún no implementadas no ejecutan
+caducan aunque se pause la adquisición. Observabilidad carga las sondas, notificaciones operacionales e históricos
+al entrar. El temporizador de sondas tiene preferencia independiente,
+intervalo inicial de diez segundos y no actualiza notificaciones ni históricos.
+Las selecciones de ámbito, grupo e intervalo disparan sus lecturas delimitadas;
+Diagnóstico técnico conserva la consulta explícita. Las páginas aún no implementadas no ejecutan
 consultas. Conservamos las protecciones y límites del servidor.
 
 ## Presentación compacta y vistas por sede
 
 Aplicamos una escala tipográfica común y alineamos el menú contraído
 mediante reservas de desplazamiento simétricas. Los controles de consulta
-se ubican en el área de contenido; en históricos y diagnóstico técnico
-se colocan junto a sus selectores sin temporizador periódico.
+se ubican en el área de contenido; en diagnóstico técnico
+se colocan junto a sus selectores sin temporizador periódico. El historial de
+trabajos se carga automáticamente, se sincroniza tras iniciar y cancelar,
+y se consulta por sondeo sin repetir ejecuciones. Los resultados anteriores
+se expanden junto a su fila y disponen de exportación propia.
 
 La vista de inicio conserva los indicadores globales y permite filtrar
 inventario y observaciones por sede. Las vistas WAN, VLAN y LACP admiten
