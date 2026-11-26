@@ -422,6 +422,7 @@ function initializeConsole() {
   function controls() {
     syncRefreshControls();
     jobsView.controls();
+    observationView.controls();
     logout.disabled = busy || session === null;
     idleLogout.disabled = busy || session === null;
     idleContinue.disabled = busy || session === null ||
@@ -434,6 +435,7 @@ function initializeConsole() {
     lastActivitySent = -Infinity;
     session = null;
     jobsView.reset();
+    observationView.clear();
     resetDebug();
     clearDashboard();
     clearHistory();
@@ -479,6 +481,7 @@ function initializeConsole() {
       throw new Error("INVALID_IDENTITY");
     }
     const first = session === null;
+    if (session && (session.username !== data.username || session.role !== data.role)) observationView.clear();
     session = {
       username: data.username, role: data.role, csrf: data.csrf_token,
       expiresAt: data.expires_at, warningAt: data.warning_at,
@@ -540,6 +543,7 @@ function initializeConsole() {
     const remaining = Math.ceil(session.expiresAt - serverNow());
     if (remaining <= 0) {
       jobsView.reset();
+      observationView.clear();
       clearDashboard();
       clearHistory();
       clearTopology();
@@ -1291,6 +1295,9 @@ function initializeConsole() {
     }finally{if(epoch===historyEpoch)historyBusy=false;}
   }
   let plotlyLoading = null, historyDraw = Promise.resolve();
+  const observationView = window.NetlabObservation?.create(debugRead,
+    () => session ? {key:session.username+":"+session.role,role:session.role,active:serverNow()<session.warningAt} : null,
+    formatPanama,loadPlotly,NetlabNumbers.format) || {clear(){},controls(){}};
 
   function historyAllowed() {
     return location.pathname === "/observability" && session !== null &&
