@@ -249,7 +249,10 @@ class StructureTests(unittest.TestCase):
 
     def test_product_labels_and_clock(self):
         html = (UI / "index.html").read_text(encoding="utf-8")
-        self.assertNotRegex(html.lower(), r"\bfase\s*\d+|\bs0[1-9]\b|laboratorio académico")
+        # El UID estable de Grafana es técnico, no una etiqueta visible del producto.
+        destination = 'href="http://127.0.0.1:3000/d/netlab360-s08-observacion"'
+        self.assertEqual(html.count(destination), 1)
+        self.assertNotRegex(html.replace(destination, '').lower(), r"\bfase\s*\d+|\bs0[1-9]\b|laboratorio académico")
         self.assertIn("CENTRO DE OPERACIONES DE RED", html)
         self.assertIn("<dt>Fecha y hora</dt>", html)
         self.assertIn("Vencimiento de la sesión por inactividad o límite máximo.", html)
