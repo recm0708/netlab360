@@ -1,15 +1,15 @@
 {
   "uid": "netlab360-s08-observacion",
   "title": "NETLAB360 · Observabilidad de sondas",
-  "description": "Vista especializada de la fuente Prometheus. No sustituye el portal operacional ni su evaluación de calidad.",
+  "description": "Vista especializada de Prometheus. Hora de Panamá (UTC−5). SLI observado y cobertura se interpretan por separado; no sustituye el portal operacional.",
   "tags": [
     "netlab360",
     "observabilidad"
   ],
-  "timezone": "utc",
+  "timezone": "America/Panama",
   "editable": false,
   "schemaVersion": 39,
-  "version": 1,
+  "version": 8,
   "refresh": "30s",
   "time": {
     "from": "now-1h",
@@ -18,9 +18,9 @@
   "panels": [
     {
       "id": 1,
-      "title": "Disponibilidad de adquisición",
-      "description": "1 = scrape correcto; ausencia no equivale a fallo medido.",
-      "type": "timeseries",
+      "title": "Estado de adquisición de métricas",
+      "description": "1 = scrape correcto; ausencia no equivale a fallo medido. FE-HQ: servicio frontal de la sede central; los identificadores originales se conservan en las consultas.",
+      "type": "state-timeline",
       "datasource": {
         "type": "prometheus",
         "uid": "netlab360-prometheus"
@@ -29,29 +29,139 @@
         "x": 0,
         "y": 0,
         "w": 12,
-        "h": 8
+        "h": 9
       },
       "fieldConfig": {
         "defaults": {
           "unit": "none",
           "decimals": 0,
           "custom": {
-            "drawStyle": "line",
-            "lineWidth": 1,
+            "fillOpacity": 75,
+            "lineWidth": 0,
             "spanNulls": false,
-            "showPoints": "auto"
+            "insertNulls": 15000
+          },
+          "noValue": "Sin datos",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "gray"
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "Error de adquisición",
+                  "color": "red",
+                  "index": 0
+                },
+                "1": {
+                  "text": "Adquisición correcta",
+                  "color": "green",
+                  "index": 1
+                }
+              }
+            },
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "Sin datos",
+                  "color": "gray"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "hq-s1-icmp"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "HQ → S1 · ICMP"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "hq-s2-icmp"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "HQ → S2 · ICMP"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "s2-hq-http"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "S2 → FE-HQ · HTTP"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "s2-hq-icmp"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "S2 → FE-HQ · ICMP"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "s2-hq-tcp"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "S2 → FE-HQ · TCP"
+              }
+            ]
+          }
+        ]
       },
       "options": {
+        "mergeValues": true,
+        "showValue": "never",
+        "alignValue": "center",
+        "rowHeight": 0.75,
         "legend": {
+          "showLegend": true,
           "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
+          "placement": "bottom"
         },
         "tooltip": {
-          "mode": "multi",
+          "mode": "single",
           "sort": "none"
         }
       },
@@ -72,9 +182,9 @@
     },
     {
       "id": 2,
-      "title": "Éxito de sonda",
-      "description": "Resultado de sonda medido; no interpolar ausencias.",
-      "type": "timeseries",
+      "title": "Estado de las sondas",
+      "description": "Resultado de sonda medido; no interpolar ausencias. FE-HQ: servicio frontal de la sede central; los identificadores originales se conservan en las consultas.",
+      "type": "state-timeline",
       "datasource": {
         "type": "prometheus",
         "uid": "netlab360-prometheus"
@@ -83,29 +193,139 @@
         "x": 12,
         "y": 0,
         "w": 12,
-        "h": 8
+        "h": 9
       },
       "fieldConfig": {
         "defaults": {
           "unit": "none",
           "decimals": 0,
           "custom": {
-            "drawStyle": "line",
-            "lineWidth": 1,
+            "fillOpacity": 75,
+            "lineWidth": 0,
             "spanNulls": false,
-            "showPoints": "auto"
+            "insertNulls": 15000
+          },
+          "noValue": "Sin datos",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "gray"
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "Fallo medido",
+                  "color": "red",
+                  "index": 0
+                },
+                "1": {
+                  "text": "Éxito",
+                  "color": "green",
+                  "index": 1
+                }
+              }
+            },
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "Sin datos",
+                  "color": "gray"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "hq-s1-icmp"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "HQ → S1 · ICMP"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "hq-s2-icmp"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "HQ → S2 · ICMP"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "s2-hq-http"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "S2 → FE-HQ · HTTP"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "s2-hq-icmp"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "S2 → FE-HQ · ICMP"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "s2-hq-tcp"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "S2 → FE-HQ · TCP"
+              }
+            ]
+          }
+        ]
       },
       "options": {
+        "mergeValues": true,
+        "showValue": "never",
+        "alignValue": "center",
+        "rowHeight": 0.75,
         "legend": {
+          "showLegend": true,
           "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
+          "placement": "bottom"
         },
         "tooltip": {
-          "mode": "multi",
+          "mode": "single",
           "sort": "none"
         }
       },
@@ -126,8 +346,8 @@
     },
     {
       "id": 3,
-      "title": "Duración de sonda",
-      "description": "Duración total de Blackbox, no RTT.",
+      "title": "Duración de las sondas",
+      "description": "Duración total de Blackbox, no RTT. FE-HQ: servicio frontal de la sede central; los identificadores originales se conservan en las consultas.",
       "type": "timeseries",
       "datasource": {
         "type": "prometheus",
@@ -135,32 +355,102 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 8,
-        "w": 12,
-        "h": 8
+        "y": 9,
+        "w": 16,
+        "h": 10
       },
       "fieldConfig": {
         "defaults": {
           "unit": "ms",
-          "decimals": 3,
+          "decimals": 2,
           "custom": {
             "drawStyle": "line",
-            "lineWidth": 1,
+            "lineWidth": 2,
             "spanNulls": false,
-            "showPoints": "auto"
-          }
+            "insertNulls": 15000,
+            "showPoints": "never",
+            "fillOpacity": 8,
+            "axisSoftMin": 0
+          },
+          "noValue": "Sin datos"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "hq-s1-icmp"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "HQ → S1 · ICMP"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "hq-s2-icmp"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "HQ → S2 · ICMP"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "s2-hq-http"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "S2 → FE-HQ · HTTP"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "s2-hq-icmp"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "S2 → FE-HQ · ICMP"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "s2-hq-tcp"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "S2 → FE-HQ · TCP"
+              }
+            ]
+          }
+        ]
       },
       "options": {
         "legend": {
-          "displayMode": "list",
+          "displayMode": "table",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": true,
+          "calcs": [
+            "last",
+            "mean",
+            "max"
+          ]
         },
         "tooltip": {
           "mode": "multi",
-          "sort": "none"
+          "sort": "desc"
         }
       },
       "targets": [
@@ -180,42 +470,137 @@
     },
     {
       "id": 4,
-      "title": "Código HTTP observado",
-      "description": "Código de respuesta; 0 puede indicar ausencia de respuesta HTTP.",
-      "type": "timeseries",
+      "title": "Respuestas HTTP · S2 → FE-HQ",
+      "description": "Historial de valores de la consulta de rango, ordenado por hora de evaluación descendente. No es un registro de transiciones ni de timestamps originales de scrape. Código 0: sin respuesta HTTP; ausencia: sin datos. No se generan filas ficticias ni se agrupan códigos por umbrales.",
+      "type": "table",
       "datasource": {
         "type": "prometheus",
         "uid": "netlab360-prometheus"
       },
       "gridPos": {
-        "x": 12,
-        "y": 8,
-        "w": 12,
-        "h": 8
+        "x": 16,
+        "y": 9,
+        "w": 8,
+        "h": 10
       },
       "fieldConfig": {
         "defaults": {
           "unit": "none",
           "decimals": 0,
           "custom": {
-            "drawStyle": "line",
-            "lineWidth": 1,
-            "spanNulls": false,
-            "showPoints": "auto"
-          }
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false,
+            "minWidth": 100
+          },
+          "noValue": "Sin datos",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "gray",
+                "value": null
+              },
+              {
+                "color": "blue",
+                "value": 100
+              },
+              {
+                "color": "green",
+                "value": 200
+              },
+              {
+                "color": "blue",
+                "value": 300
+              },
+              {
+                "color": "orange",
+                "value": 400
+              },
+              {
+                "color": "red",
+                "value": 500
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "Sin respuesta HTTP",
+                  "color": "gray",
+                  "index": 0
+                },
+                "200": {
+                  "text": "200 OK",
+                  "color": "green",
+                  "index": 1
+                }
+              }
+            },
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "Sin datos",
+                  "color": "gray"
+                }
+              }
+            }
+          ]
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byType",
+              "options": "time"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Fecha y hora"
+              },
+              {
+                "id": "unit",
+                "value": "dateTimeAsLocal"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byType",
+              "options": "number"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Código HTTP"
+              },
+              {
+                "id": "custom.align",
+                "value": "center"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          }
+        ]
       },
       "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "none"
-        }
+        "showHeader": true,
+        "cellHeight": "sm",
+        "sortBy": []
       },
       "targets": [
         {
@@ -230,12 +615,25 @@
           "range": true,
           "editorMode": "code"
         }
+      ],
+      "transformations": [
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Time",
+                "desc": true
+              }
+            ]
+          }
+        }
       ]
     },
     {
       "id": 5,
-      "title": "SLI observado · 5 min",
-      "description": "Porcentaje sobre muestras medidas; no certifica cobertura ni cumplimiento SLO.",
+      "title": "Éxito observado (SLI) · 5 min",
+      "description": "SLI sobre muestras medidas. Azul: ≥99 % (referencia provisional); ámbar: ≥95 % y <99 %; rojo: <95 %. Los colores son bandas visuales, no una declaración de cumplimiento SLO. Consultar la cobertura de muestras debajo. FE-HQ: servicio frontal de la sede central; los identificadores originales se conservan en las consultas.",
       "type": "stat",
       "datasource": {
         "type": "prometheus",
@@ -243,28 +641,122 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 16,
-        "w": 12,
+        "y": 19,
+        "w": 8,
         "h": 8
       },
       "fieldConfig": {
         "defaults": {
           "unit": "percent",
-          "decimals": 2
+          "decimals": 2,
+          "noValue": "Sin datos",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 95
+              },
+              {
+                "color": "blue",
+                "value": 99
+              }
+            ]
+          },
+          "min": 0,
+          "max": 100,
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "Sin datos",
+                  "color": "gray",
+                  "index": 0
+                }
+              }
+            },
+            {
+              "type": "special",
+              "options": {
+                "match": "nan",
+                "result": {
+                  "text": "Sin datos",
+                  "color": "gray",
+                  "index": 1
+                }
+              }
+            }
+          ]
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Metric"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "hq-s1-icmp": {
+                        "text": "HQ → S1 · ICMP",
+                        "index": 0
+                      },
+                      "hq-s2-icmp": {
+                        "text": "HQ → S2 · ICMP",
+                        "index": 1
+                      },
+                      "s2-hq-http": {
+                        "text": "S2 → FE-HQ · HTTP",
+                        "index": 2
+                      },
+                      "s2-hq-icmp": {
+                        "text": "S2 → FE-HQ · ICMP",
+                        "index": 3
+                      },
+                      "s2-hq-tcp": {
+                        "text": "S2 → FE-HQ · TCP",
+                        "index": 4
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       },
       "options": {
         "reduceOptions": {
           "calcs": [
-            "lastNotNull"
+            "last"
           ],
           "fields": "",
-          "values": false
+          "values": true,
+          "limit": 5
         },
-        "colorMode": "none",
+        "orientation": "auto",
+        "colorMode": "background",
         "graphMode": "none",
-        "textMode": "value_and_name"
+        "textMode": "value_and_name",
+        "justifyMode": "center",
+        "wideLayout": false,
+        "text": {
+          "titleSize": 13,
+          "valueSize": 22
+        }
       },
       "targets": [
         {
@@ -279,41 +771,203 @@
           "range": false,
           "editorMode": "code"
         }
+      ],
+      "transformations": [
+        {
+          "id": "seriesToRows",
+          "options": {}
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Metric",
+                "desc": false
+              }
+            ]
+          }
+        }
       ]
     },
     {
       "id": 6,
-      "title": "Cobertura · 5 min",
-      "description": "Muestras originales frente a 30 esperadas por sonda.",
-      "type": "stat",
+      "title": "Cobertura de muestras · 5 min",
+      "description": "30 muestras esperadas por sonda (5 min a 10 s). Ámbar: cantidad distinta de la nominal; verde: coincide con la nominal; gris: sin datos. No equivale por sí sola a cumplimiento SLO. FE-HQ: servicio frontal de la sede central; los identificadores originales se conservan en las consultas.",
+      "type": "table",
       "datasource": {
         "type": "prometheus",
         "uid": "netlab360-prometheus"
       },
       "gridPos": {
-        "x": 12,
-        "y": 16,
-        "w": 12,
-        "h": 8
+        "x": 0,
+        "y": 27,
+        "w": 8,
+        "h": 7
       },
       "fieldConfig": {
         "defaults": {
           "unit": "none",
-          "decimals": 0
+          "decimals": 0,
+          "noValue": "Sin datos",
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false,
+            "minWidth": 85
+          },
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "orange",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 30
+              },
+              {
+                "color": "orange",
+                "value": 31
+              }
+            ]
+          },
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "Sin datos",
+                  "color": "gray"
+                }
+              }
+            }
+          ]
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Sonda"
+            },
+            "properties": [
+              {
+                "id": "custom.align",
+                "value": "left"
+              },
+              {
+                "id": "custom.width",
+                "value": 156
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "hq-s1-icmp": {
+                        "text": "HQ → S1 · ICMP",
+                        "index": 0
+                      },
+                      "hq-s2-icmp": {
+                        "text": "HQ → S2 · ICMP",
+                        "index": 1
+                      },
+                      "s2-hq-http": {
+                        "text": "S2 → FE-HQ · HTTP",
+                        "index": 2
+                      },
+                      "s2-hq-icmp": {
+                        "text": "S2 → FE-HQ · ICMP",
+                        "index": 3
+                      },
+                      "s2-hq-tcp": {
+                        "text": "S2 → FE-HQ · TCP",
+                        "index": 4
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Adquiridas"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Adq. correctas"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Medidas"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Éxitos"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          }
+        ]
       },
       "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
         },
-        "colorMode": "none",
-        "graphMode": "none",
-        "textMode": "value_and_name"
+        "sortBy": [
+          {
+            "displayName": "Sonda",
+            "desc": false
+          }
+        ]
       },
       "targets": [
         {
@@ -326,7 +980,8 @@
           "legendFormat": "{{probe_id}} adquisición",
           "instant": true,
           "range": false,
-          "editorMode": "code"
+          "editorMode": "code",
+          "format": "time_series"
         },
         {
           "datasource": {
@@ -338,7 +993,8 @@
           "legendFormat": "{{probe_id}} adquisición correcta",
           "instant": true,
           "range": false,
-          "editorMode": "code"
+          "editorMode": "code",
+          "format": "time_series"
         },
         {
           "datasource": {
@@ -350,7 +1006,8 @@
           "legendFormat": "{{probe_id}} medidas",
           "instant": true,
           "range": false,
-          "editorMode": "code"
+          "editorMode": "code",
+          "format": "time_series"
         },
         {
           "datasource": {
@@ -362,43 +1019,181 @@
           "legendFormat": "{{probe_id}} éxitos",
           "instant": true,
           "range": false,
-          "editorMode": "code"
+          "editorMode": "code",
+          "format": "time_series"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "seriesToRows",
+          "options": {}
+        },
+        {
+          "id": "extractFields",
+          "options": {
+            "source": "Metric",
+            "format": "regexp",
+            "regExp": "/^(?<Sonda>[a-z0-9-]+) (?<Contador>adquisición correcta|adquisición|medidas|éxitos)$/",
+            "replace": false
+          }
+        },
+        {
+          "id": "groupingToMatrix",
+          "options": {
+            "rowField": "Sonda",
+            "columnField": "Contador",
+            "valueField": "Value",
+            "emptyValue": "null"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "Sonda\\Contador": 0,
+              "adquisición": 1,
+              "adquisición correcta": 2,
+              "medidas": 3,
+              "éxitos": 4
+            },
+            "renameByName": {
+              "Sonda\\Contador": "Sonda",
+              "adquisición": "Adquiridas",
+              "adquisición correcta": "Adq. correctas",
+              "medidas": "Medidas",
+              "éxitos": "Éxitos"
+            }
+          }
         }
       ]
     },
     {
       "id": 7,
-      "title": "SLI observado · 15 min",
-      "description": "Porcentaje sobre muestras medidas; no certifica cobertura ni cumplimiento SLO.",
+      "title": "Éxito observado (SLI) · 15 min",
+      "description": "SLI sobre muestras medidas. Azul: ≥99 % (referencia provisional); ámbar: ≥95 % y <99 %; rojo: <95 %. Los colores son bandas visuales, no una declaración de cumplimiento SLO. Consultar la cobertura de muestras debajo. FE-HQ: servicio frontal de la sede central; los identificadores originales se conservan en las consultas.",
       "type": "stat",
       "datasource": {
         "type": "prometheus",
         "uid": "netlab360-prometheus"
       },
       "gridPos": {
-        "x": 0,
-        "y": 24,
-        "w": 12,
+        "x": 8,
+        "y": 19,
+        "w": 8,
         "h": 8
       },
       "fieldConfig": {
         "defaults": {
           "unit": "percent",
-          "decimals": 2
+          "decimals": 2,
+          "noValue": "Sin datos",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 95
+              },
+              {
+                "color": "blue",
+                "value": 99
+              }
+            ]
+          },
+          "min": 0,
+          "max": 100,
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "Sin datos",
+                  "color": "gray",
+                  "index": 0
+                }
+              }
+            },
+            {
+              "type": "special",
+              "options": {
+                "match": "nan",
+                "result": {
+                  "text": "Sin datos",
+                  "color": "gray",
+                  "index": 1
+                }
+              }
+            }
+          ]
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Metric"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "hq-s1-icmp": {
+                        "text": "HQ → S1 · ICMP",
+                        "index": 0
+                      },
+                      "hq-s2-icmp": {
+                        "text": "HQ → S2 · ICMP",
+                        "index": 1
+                      },
+                      "s2-hq-http": {
+                        "text": "S2 → FE-HQ · HTTP",
+                        "index": 2
+                      },
+                      "s2-hq-icmp": {
+                        "text": "S2 → FE-HQ · ICMP",
+                        "index": 3
+                      },
+                      "s2-hq-tcp": {
+                        "text": "S2 → FE-HQ · TCP",
+                        "index": 4
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       },
       "options": {
         "reduceOptions": {
           "calcs": [
-            "lastNotNull"
+            "last"
           ],
           "fields": "",
-          "values": false
+          "values": true,
+          "limit": 5
         },
-        "colorMode": "none",
+        "orientation": "auto",
+        "colorMode": "background",
         "graphMode": "none",
-        "textMode": "value_and_name"
+        "textMode": "value_and_name",
+        "justifyMode": "center",
+        "wideLayout": false,
+        "text": {
+          "titleSize": 13,
+          "valueSize": 22
+        }
       },
       "targets": [
         {
@@ -413,41 +1208,203 @@
           "range": false,
           "editorMode": "code"
         }
+      ],
+      "transformations": [
+        {
+          "id": "seriesToRows",
+          "options": {}
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Metric",
+                "desc": false
+              }
+            ]
+          }
+        }
       ]
     },
     {
       "id": 8,
-      "title": "Cobertura · 15 min",
-      "description": "Muestras originales frente a 90 esperadas por sonda.",
-      "type": "stat",
+      "title": "Cobertura de muestras · 15 min",
+      "description": "90 muestras esperadas por sonda (15 min a 10 s). Ámbar: cantidad distinta de la nominal; verde: coincide con la nominal; gris: sin datos. No equivale por sí sola a cumplimiento SLO. FE-HQ: servicio frontal de la sede central; los identificadores originales se conservan en las consultas.",
+      "type": "table",
       "datasource": {
         "type": "prometheus",
         "uid": "netlab360-prometheus"
       },
       "gridPos": {
-        "x": 12,
-        "y": 24,
-        "w": 12,
-        "h": 8
+        "x": 8,
+        "y": 27,
+        "w": 8,
+        "h": 7
       },
       "fieldConfig": {
         "defaults": {
           "unit": "none",
-          "decimals": 0
+          "decimals": 0,
+          "noValue": "Sin datos",
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false,
+            "minWidth": 85
+          },
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "orange",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 90
+              },
+              {
+                "color": "orange",
+                "value": 91
+              }
+            ]
+          },
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "Sin datos",
+                  "color": "gray"
+                }
+              }
+            }
+          ]
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Sonda"
+            },
+            "properties": [
+              {
+                "id": "custom.align",
+                "value": "left"
+              },
+              {
+                "id": "custom.width",
+                "value": 156
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "hq-s1-icmp": {
+                        "text": "HQ → S1 · ICMP",
+                        "index": 0
+                      },
+                      "hq-s2-icmp": {
+                        "text": "HQ → S2 · ICMP",
+                        "index": 1
+                      },
+                      "s2-hq-http": {
+                        "text": "S2 → FE-HQ · HTTP",
+                        "index": 2
+                      },
+                      "s2-hq-icmp": {
+                        "text": "S2 → FE-HQ · ICMP",
+                        "index": 3
+                      },
+                      "s2-hq-tcp": {
+                        "text": "S2 → FE-HQ · TCP",
+                        "index": 4
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Adquiridas"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Adq. correctas"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Medidas"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Éxitos"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          }
+        ]
       },
       "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
         },
-        "colorMode": "none",
-        "graphMode": "none",
-        "textMode": "value_and_name"
+        "sortBy": [
+          {
+            "displayName": "Sonda",
+            "desc": false
+          }
+        ]
       },
       "targets": [
         {
@@ -460,7 +1417,8 @@
           "legendFormat": "{{probe_id}} adquisición",
           "instant": true,
           "range": false,
-          "editorMode": "code"
+          "editorMode": "code",
+          "format": "time_series"
         },
         {
           "datasource": {
@@ -472,7 +1430,8 @@
           "legendFormat": "{{probe_id}} adquisición correcta",
           "instant": true,
           "range": false,
-          "editorMode": "code"
+          "editorMode": "code",
+          "format": "time_series"
         },
         {
           "datasource": {
@@ -484,7 +1443,8 @@
           "legendFormat": "{{probe_id}} medidas",
           "instant": true,
           "range": false,
-          "editorMode": "code"
+          "editorMode": "code",
+          "format": "time_series"
         },
         {
           "datasource": {
@@ -496,43 +1456,181 @@
           "legendFormat": "{{probe_id}} éxitos",
           "instant": true,
           "range": false,
-          "editorMode": "code"
+          "editorMode": "code",
+          "format": "time_series"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "seriesToRows",
+          "options": {}
+        },
+        {
+          "id": "extractFields",
+          "options": {
+            "source": "Metric",
+            "format": "regexp",
+            "regExp": "/^(?<Sonda>[a-z0-9-]+) (?<Contador>adquisición correcta|adquisición|medidas|éxitos)$/",
+            "replace": false
+          }
+        },
+        {
+          "id": "groupingToMatrix",
+          "options": {
+            "rowField": "Sonda",
+            "columnField": "Contador",
+            "valueField": "Value",
+            "emptyValue": "null"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "Sonda\\Contador": 0,
+              "adquisición": 1,
+              "adquisición correcta": 2,
+              "medidas": 3,
+              "éxitos": 4
+            },
+            "renameByName": {
+              "Sonda\\Contador": "Sonda",
+              "adquisición": "Adquiridas",
+              "adquisición correcta": "Adq. correctas",
+              "medidas": "Medidas",
+              "éxitos": "Éxitos"
+            }
+          }
         }
       ]
     },
     {
       "id": 9,
-      "title": "SLI observado · 60 min",
-      "description": "Porcentaje sobre muestras medidas; no certifica cobertura ni cumplimiento SLO.",
+      "title": "Éxito observado (SLI) · 60 min",
+      "description": "SLI sobre muestras medidas. Azul: ≥99 % (referencia provisional); ámbar: ≥95 % y <99 %; rojo: <95 %. Los colores son bandas visuales, no una declaración de cumplimiento SLO. Consultar la cobertura de muestras debajo. FE-HQ: servicio frontal de la sede central; los identificadores originales se conservan en las consultas.",
       "type": "stat",
       "datasource": {
         "type": "prometheus",
         "uid": "netlab360-prometheus"
       },
       "gridPos": {
-        "x": 0,
-        "y": 32,
-        "w": 12,
+        "x": 16,
+        "y": 19,
+        "w": 8,
         "h": 8
       },
       "fieldConfig": {
         "defaults": {
           "unit": "percent",
-          "decimals": 2
+          "decimals": 2,
+          "noValue": "Sin datos",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 95
+              },
+              {
+                "color": "blue",
+                "value": 99
+              }
+            ]
+          },
+          "min": 0,
+          "max": 100,
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "Sin datos",
+                  "color": "gray",
+                  "index": 0
+                }
+              }
+            },
+            {
+              "type": "special",
+              "options": {
+                "match": "nan",
+                "result": {
+                  "text": "Sin datos",
+                  "color": "gray",
+                  "index": 1
+                }
+              }
+            }
+          ]
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Metric"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "hq-s1-icmp": {
+                        "text": "HQ → S1 · ICMP",
+                        "index": 0
+                      },
+                      "hq-s2-icmp": {
+                        "text": "HQ → S2 · ICMP",
+                        "index": 1
+                      },
+                      "s2-hq-http": {
+                        "text": "S2 → FE-HQ · HTTP",
+                        "index": 2
+                      },
+                      "s2-hq-icmp": {
+                        "text": "S2 → FE-HQ · ICMP",
+                        "index": 3
+                      },
+                      "s2-hq-tcp": {
+                        "text": "S2 → FE-HQ · TCP",
+                        "index": 4
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       },
       "options": {
         "reduceOptions": {
           "calcs": [
-            "lastNotNull"
+            "last"
           ],
           "fields": "",
-          "values": false
+          "values": true,
+          "limit": 5
         },
-        "colorMode": "none",
+        "orientation": "auto",
+        "colorMode": "background",
         "graphMode": "none",
-        "textMode": "value_and_name"
+        "textMode": "value_and_name",
+        "justifyMode": "center",
+        "wideLayout": false,
+        "text": {
+          "titleSize": 13,
+          "valueSize": 22
+        }
       },
       "targets": [
         {
@@ -547,41 +1645,203 @@
           "range": false,
           "editorMode": "code"
         }
+      ],
+      "transformations": [
+        {
+          "id": "seriesToRows",
+          "options": {}
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Metric",
+                "desc": false
+              }
+            ]
+          }
+        }
       ]
     },
     {
       "id": 10,
-      "title": "Cobertura · 60 min",
-      "description": "Muestras originales frente a 360 esperadas por sonda.",
-      "type": "stat",
+      "title": "Cobertura de muestras · 60 min",
+      "description": "360 muestras esperadas por sonda (60 min a 10 s). Ámbar: cantidad distinta de la nominal; verde: coincide con la nominal; gris: sin datos. No equivale por sí sola a cumplimiento SLO. FE-HQ: servicio frontal de la sede central; los identificadores originales se conservan en las consultas.",
+      "type": "table",
       "datasource": {
         "type": "prometheus",
         "uid": "netlab360-prometheus"
       },
       "gridPos": {
-        "x": 12,
-        "y": 32,
-        "w": 12,
-        "h": 8
+        "x": 16,
+        "y": 27,
+        "w": 8,
+        "h": 7
       },
       "fieldConfig": {
         "defaults": {
           "unit": "none",
-          "decimals": 0
+          "decimals": 0,
+          "noValue": "Sin datos",
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false,
+            "minWidth": 85
+          },
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "orange",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 360
+              },
+              {
+                "color": "orange",
+                "value": 361
+              }
+            ]
+          },
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "Sin datos",
+                  "color": "gray"
+                }
+              }
+            }
+          ]
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Sonda"
+            },
+            "properties": [
+              {
+                "id": "custom.align",
+                "value": "left"
+              },
+              {
+                "id": "custom.width",
+                "value": 156
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "hq-s1-icmp": {
+                        "text": "HQ → S1 · ICMP",
+                        "index": 0
+                      },
+                      "hq-s2-icmp": {
+                        "text": "HQ → S2 · ICMP",
+                        "index": 1
+                      },
+                      "s2-hq-http": {
+                        "text": "S2 → FE-HQ · HTTP",
+                        "index": 2
+                      },
+                      "s2-hq-icmp": {
+                        "text": "S2 → FE-HQ · ICMP",
+                        "index": 3
+                      },
+                      "s2-hq-tcp": {
+                        "text": "S2 → FE-HQ · TCP",
+                        "index": 4
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Adquiridas"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Adq. correctas"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Medidas"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Éxitos"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          }
+        ]
       },
       "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
         },
-        "colorMode": "none",
-        "graphMode": "none",
-        "textMode": "value_and_name"
+        "sortBy": [
+          {
+            "displayName": "Sonda",
+            "desc": false
+          }
+        ]
       },
       "targets": [
         {
@@ -594,7 +1854,8 @@
           "legendFormat": "{{probe_id}} adquisición",
           "instant": true,
           "range": false,
-          "editorMode": "code"
+          "editorMode": "code",
+          "format": "time_series"
         },
         {
           "datasource": {
@@ -606,7 +1867,8 @@
           "legendFormat": "{{probe_id}} adquisición correcta",
           "instant": true,
           "range": false,
-          "editorMode": "code"
+          "editorMode": "code",
+          "format": "time_series"
         },
         {
           "datasource": {
@@ -618,7 +1880,8 @@
           "legendFormat": "{{probe_id}} medidas",
           "instant": true,
           "range": false,
-          "editorMode": "code"
+          "editorMode": "code",
+          "format": "time_series"
         },
         {
           "datasource": {
@@ -630,7 +1893,51 @@
           "legendFormat": "{{probe_id}} éxitos",
           "instant": true,
           "range": false,
-          "editorMode": "code"
+          "editorMode": "code",
+          "format": "time_series"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "seriesToRows",
+          "options": {}
+        },
+        {
+          "id": "extractFields",
+          "options": {
+            "source": "Metric",
+            "format": "regexp",
+            "regExp": "/^(?<Sonda>[a-z0-9-]+) (?<Contador>adquisición correcta|adquisición|medidas|éxitos)$/",
+            "replace": false
+          }
+        },
+        {
+          "id": "groupingToMatrix",
+          "options": {
+            "rowField": "Sonda",
+            "columnField": "Contador",
+            "valueField": "Value",
+            "emptyValue": "null"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "Sonda\\Contador": 0,
+              "adquisición": 1,
+              "adquisición correcta": 2,
+              "medidas": 3,
+              "éxitos": 4
+            },
+            "renameByName": {
+              "Sonda\\Contador": "Sonda",
+              "adquisición": "Adquiridas",
+              "adquisición correcta": "Adq. correctas",
+              "medidas": "Medidas",
+              "éxitos": "Éxitos"
+            }
+          }
         }
       ]
     }

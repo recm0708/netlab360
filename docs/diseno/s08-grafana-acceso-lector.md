@@ -1,0 +1,7 @@
+# Acceso nativo de lectura a Grafana
+
+Creamos una identidad local netlab360-viewer en la organización 1 con el rol básico Viewer. La contraseña se introduce de manera oculta en terminal, se conserva en el gestor de contraseñas del operador y no se incluye en código, argumentos, evidencias ni URLs. No se modifican identidades anteriores. Se requiere copia de seguridad consistente de SQLite antes de crear la cuenta.
+
+Verificamos identidad y rol efectivos, acceso al dashboard, ausencia de capacidades de edición y guardado, denegación de las APIs administrativas y coincidencia de las 19 consultas con Prometheus. El rol Viewer permite consultar la fuente de datos de la organización, no exclusivamente las expresiones de los paneles. No lo presentamos como autorización granular por consulta. La única fuente aprovisionada es Prometheus; las interfaces de administración, ciclo de vida e ingestión remota deben estar deshabilitadas. Si falla la aceptación, eliminamos únicamente la identidad nueva cuando se ha confirmado su ID y su nombre; un resultado incierto exige inventario antes de reintentar.
+
+El acceso desde Windows se realiza mediante un túnel SSH con escucha local en 127.0.0.1 y autenticación propia de Grafana. No se publica el puerto 3000 en VMware ni se emplea la cuenta administrativa en el navegador. La integración contextual en NETLAB360 y la presentación visual se verifican en pasos posteriores.

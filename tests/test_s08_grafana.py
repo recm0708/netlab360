@@ -25,8 +25,8 @@ class GrafanaTests(unittest.TestCase):
         for minutes in (5, 15, 60):
             # Comparar títulos completos para distinguir 5 min de 15 min.
             expected = {
-                f"SLI observado · {minutes} min": 1,
-                f"Cobertura · {minutes} min": 4,
+                f"Éxito observado (SLI) · {minutes} min": 1,
+                f"Cobertura de muestras · {minutes} min": 4,
             }
             selected = [p for p in dashboard["panels"] if p["title"] in expected]
             self.assertEqual(len(selected), 2)
@@ -73,6 +73,125 @@ class GrafanaTests(unittest.TestCase):
         self.assertIn(f"PREFIX={prefix}", installer)
         self.assertIn('-g "$ACCOUNT" -m 0750 "$PREFIX"', installer)
         self.assertIn('sudo -n -u "$ACCOUNT" test -x "$INSTALL/bin/grafana"', installer)
+
+    def test_visual_contract(self):
+        dashboard = json.loads((CONFIG / "dashboards/sondas.json").read_text())
+        self.assertEqual(dashboard["timezone"], "America/Panama")
+        panels = {p["id"]: p for p in dashboard["panels"]}
+        for i in (1, 2):
+            self.assertEqual(panels[i]["type"], "state-timeline")
+            self.assertFalse(panels[i]["fieldConfig"]["defaults"]["custom"]["spanNulls"])
+        self.assertEqual(panels[3]["fieldConfig"]["defaults"]["unit"], "ms")
+        for i, nominal in ((6, 30), (8, 90), (10, 360)):
+            p = panels[i]
+            self.assertEqual(p["type"], "table")
+            self.assertTrue(all(t["format"] == "time_series" for t in p["targets"]))
+            self.assertEqual([t["id"] for t in p["transformations"]], ["seriesToRows", "extractFields", "groupingToMatrix", "organize"])
+            self.assertEqual(list(p["transformations"][3]["options"]["renameByName"].values()),
+                             ["Sonda", "Adquiridas", "Adq. correctas", "Medidas", "Éxitos"])
+            matrix = p["transformations"][2]["options"]
+            self.assertEqual(matrix, {"rowField": "Sonda", "columnField": "Contador",
+                                      "valueField": "Value", "emptyValue": "null"})
+            self.assertEqual(p["transformations"][1]["options"]["source"], "Metric")
+            steps = p["fieldConfig"]["defaults"]["thresholds"]["steps"]
+            self.assertEqual([(s["value"], s["color"]) for s in steps],
+                             [(None, "orange"), (nominal, "green"), (nominal + 1, "orange")])
+            sli = panels[i - 1]["fieldConfig"]["defaults"]
+            self.assertEqual(sli["unit"], "percent")
+            self.assertEqual(sli["thresholds"]["steps"][-1]["color"], "blue")
+
+
+    def test_sli_cards(self):
+        dashboard = json.loads((CONFIG / "dashboards/sondas.json").read_text())
+        panels = {p["id"]: p for p in dashboard["panels"]}
+        for panel_id in (5, 7, 9):
+            panel = panels[panel_id]
+            self.assertEqual(panel["type"], "stat")
+            x = ((panel_id - 5) // 2) * 8
+            self.assertEqual(panel["gridPos"], {"x": x, "y": 19, "w": 8, "h": 8})
+            coverage = panels[panel_id + 1]
+            self.assertEqual(coverage["gridPos"], {"x": x, "y": 27, "w": 8, "h": 7})
+            self.assertEqual(coverage["options"]["cellHeight"], "sm")
+            self.assertEqual(coverage["fieldConfig"]["defaults"]["custom"]["minWidth"], 85)
+            self.assertEqual(coverage["fieldConfig"]["overrides"][0]["properties"][1]["value"], 156)
+            self.assertEqual(panel["options"]["orientation"], "auto")
+            self.assertEqual(panel["options"]["colorMode"], "background")
+            self.assertFalse(panel["options"]["wideLayout"])
+            self.assertEqual(panel["options"]["justifyMode"], "center")
+            self.assertTrue(panel["options"]["reduceOptions"]["values"])
+            self.assertEqual(panel["options"]["reduceOptions"]["limit"], 5)
+            self.assertEqual(panel["options"]["graphMode"], "none")
+            self.assertEqual(panel["transformations"], [
+                {"id": "seriesToRows", "options": {}},
+                {"id": "sortBy", "options": {"sort": [{"field": "Metric", "desc": False}]}},
+            ])
+            defaults = panel["fieldConfig"]["defaults"]
+            self.assertEqual((defaults["min"], defaults["max"], defaults["decimals"]), (0, 100, 2))
+            self.assertEqual([(s["value"], s["color"]) for s in defaults["thresholds"]["steps"]],
+                             [(None, "red"), (95, "orange"), (99, "blue")])
+            self.assertEqual({m["options"]["match"] for m in defaults["mappings"]}, {"null", "nan"})
+            self.assertTrue(all(m["options"]["result"]["color"] == "gray" for m in defaults["mappings"]))
+            self.assertEqual(panel["targets"][0]["legendFormat"], "{{probe_id}}")
+
+
+    def test_visible_probe_names(self):
+        dashboard = json.loads((CONFIG / "dashboards/sondas.json").read_text())
+        panels = {p["id"]: p for p in dashboard["panels"]}
+        names = {
+            "hq-s1-icmp": "HQ → S1 · ICMP",
+            "hq-s2-icmp": "HQ → S2 · ICMP",
+            "s2-hq-http": "S2 → FE-HQ · HTTP",
+            "s2-hq-icmp": "S2 → FE-HQ · ICMP",
+            "s2-hq-tcp": "S2 → FE-HQ · TCP",
+        }
+        for i in (1, 2, 3):
+            p = panels[i]
+            overrides = {o["matcher"]["options"]: o["properties"][0]["value"]
+                         for o in p["fieldConfig"]["overrides"]}
+            self.assertEqual(overrides, names)
+            self.assertEqual(p["targets"][0]["legendFormat"], "{{probe_id}}")
+        for i in (1, 2):
+            defaults = panels[i]["fieldConfig"]["defaults"]
+            self.assertEqual(defaults["color"]["mode"], "fixed")
+            self.assertEqual(defaults["mappings"][0]["options"]["0"]["color"], "red")
+            self.assertEqual(defaults["mappings"][0]["options"]["1"]["color"], "green")
+            self.assertFalse(defaults["custom"]["spanNulls"])
+        for i in range(5, 11):
+            field = "Metric" if i % 2 else "Sonda"
+            override = next(o for o in panels[i]["fieldConfig"]["overrides"]
+                            if o["matcher"]["options"] == field)
+            mapping = next(p["value"] for p in override["properties"] if p["id"] == "mappings")
+            self.assertEqual({k: v["text"] for k, v in mapping[0]["options"].items()}, names)
+            if not i % 2:
+                self.assertEqual(panels[i]["fieldConfig"]["defaults"]["mappings"][0]["options"]["result"]["text"],
+                                 "Sin datos")
+
+
+    def test_http_state_history(self):
+        dashboard = json.loads((CONFIG / "dashboards/sondas.json").read_text())
+        panels = {p["id"]: p for p in dashboard["panels"]}
+        duration, http = panels[3], panels[4]
+        self.assertEqual(duration["gridPos"], {"x": 0, "y": 9, "w": 16, "h": 10})
+        self.assertEqual(http["gridPos"], {"x": 16, "y": 9, "w": 8, "h": 10})
+        self.assertEqual(http["type"], "table")
+        self.assertTrue(http["options"]["showHeader"])
+        self.assertEqual(http["transformations"], [
+            {"id": "sortBy", "options": {"sort": [{"field": "Time", "desc": True}]}},
+        ])
+        overrides = {o["matcher"]["options"]: o["properties"]
+                     for o in http["fieldConfig"]["overrides"]}
+        self.assertEqual(overrides["time"][0], {"id": "displayName", "value": "Fecha y hora"})
+        self.assertEqual(overrides["number"][0], {"id": "displayName", "value": "Código HTTP"})
+        self.assertEqual(overrides["number"][2]["value"], {"type": "color-text"})
+        self.assertEqual(http["targets"][0]["legendFormat"], "{{probe_id}}")
+        defaults = http["fieldConfig"]["defaults"]
+        self.assertEqual(defaults["mappings"][0]["options"]["0"]["text"], "Sin respuesta HTTP")
+        self.assertEqual(defaults["mappings"][0]["options"]["200"]["text"], "200 OK")
+        self.assertEqual(defaults["mappings"][1]["options"]["result"]["text"], "Sin datos")
+        self.assertEqual(http["targets"][0]["expr"],
+                         'probe_http_status_code{job="netlab360-s08-blackbox"}')
+        self.assertTrue(http["targets"][0]["range"])
+        self.assertFalse(http["targets"][0]["instant"])
 
 
 if __name__ == "__main__":
