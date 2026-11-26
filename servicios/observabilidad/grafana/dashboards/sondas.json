@@ -9,7 +9,7 @@
   "timezone": "America/Panama",
   "editable": false,
   "schemaVersion": 39,
-  "version": 4,
+  "version": 5,
   "refresh": "30s",
   "time": {
     "from": "now-1h",
@@ -418,7 +418,7 @@
         "x": 0,
         "y": 19,
         "w": 8,
-        "h": 10
+        "h": 8
       },
       "fieldConfig": {
         "defaults": {
@@ -483,14 +483,14 @@
           "values": true,
           "limit": 5
         },
-        "orientation": "horizontal",
+        "orientation": "auto",
         "colorMode": "background",
         "graphMode": "none",
         "textMode": "value_and_name",
-        "justifyMode": "auto",
-        "wideLayout": true,
+        "justifyMode": "center",
+        "wideLayout": false,
         "text": {
-          "titleSize": 15,
+          "titleSize": 13,
           "valueSize": 22
         }
       },
@@ -536,10 +536,10 @@
         "uid": "netlab360-prometheus"
       },
       "gridPos": {
-        "x": 8,
-        "y": 19,
-        "w": 16,
-        "h": 10
+        "x": 0,
+        "y": 27,
+        "w": 8,
+        "h": 7
       },
       "fieldConfig": {
         "defaults": {
@@ -551,7 +551,8 @@
             "cellOptions": {
               "type": "auto"
             },
-            "inspect": false
+            "inspect": false,
+            "minWidth": 85
           },
           "color": {
             "mode": "thresholds"
@@ -587,7 +588,7 @@
               },
               {
                 "id": "custom.width",
-                "value": 180
+                "value": 132
               }
             ]
           },
@@ -651,7 +652,7 @@
       },
       "options": {
         "showHeader": true,
-        "cellHeight": "md",
+        "cellHeight": "sm",
         "footer": {
           "show": false
         },
@@ -770,10 +771,10 @@
         "uid": "netlab360-prometheus"
       },
       "gridPos": {
-        "x": 0,
-        "y": 29,
+        "x": 8,
+        "y": 19,
         "w": 8,
-        "h": 10
+        "h": 8
       },
       "fieldConfig": {
         "defaults": {
@@ -838,14 +839,14 @@
           "values": true,
           "limit": 5
         },
-        "orientation": "horizontal",
+        "orientation": "auto",
         "colorMode": "background",
         "graphMode": "none",
         "textMode": "value_and_name",
-        "justifyMode": "auto",
-        "wideLayout": true,
+        "justifyMode": "center",
+        "wideLayout": false,
         "text": {
-          "titleSize": 15,
+          "titleSize": 13,
           "valueSize": 22
         }
       },
@@ -892,9 +893,9 @@
       },
       "gridPos": {
         "x": 8,
-        "y": 29,
-        "w": 16,
-        "h": 10
+        "y": 27,
+        "w": 8,
+        "h": 7
       },
       "fieldConfig": {
         "defaults": {
@@ -906,7 +907,8 @@
             "cellOptions": {
               "type": "auto"
             },
-            "inspect": false
+            "inspect": false,
+            "minWidth": 85
           },
           "color": {
             "mode": "thresholds"
@@ -942,7 +944,7 @@
               },
               {
                 "id": "custom.width",
-                "value": 180
+                "value": 132
               }
             ]
           },
@@ -1006,7 +1008,7 @@
       },
       "options": {
         "showHeader": true,
-        "cellHeight": "md",
+        "cellHeight": "sm",
         "footer": {
           "show": false
         },
@@ -1125,10 +1127,10 @@
         "uid": "netlab360-prometheus"
       },
       "gridPos": {
-        "x": 0,
-        "y": 39,
+        "x": 16,
+        "y": 19,
         "w": 8,
-        "h": 10
+        "h": 8
       },
       "fieldConfig": {
         "defaults": {
@@ -1193,14 +1195,14 @@
           "values": true,
           "limit": 5
         },
-        "orientation": "horizontal",
+        "orientation": "auto",
         "colorMode": "background",
         "graphMode": "none",
         "textMode": "value_and_name",
-        "justifyMode": "auto",
-        "wideLayout": true,
+        "justifyMode": "center",
+        "wideLayout": false,
         "text": {
-          "titleSize": 15,
+          "titleSize": 13,
           "valueSize": 22
         }
       },
@@ -1246,10 +1248,10 @@
         "uid": "netlab360-prometheus"
       },
       "gridPos": {
-        "x": 8,
-        "y": 39,
-        "w": 16,
-        "h": 10
+        "x": 16,
+        "y": 27,
+        "w": 8,
+        "h": 7
       },
       "fieldConfig": {
         "defaults": {
@@ -1261,7 +1263,8 @@
             "cellOptions": {
               "type": "auto"
             },
-            "inspect": false
+            "inspect": false,
+            "minWidth": 85
           },
           "color": {
             "mode": "thresholds"
@@ -1297,7 +1300,7 @@
               },
               {
                 "id": "custom.width",
-                "value": 180
+                "value": 132
               }
             ]
           },
@@ -1361,7 +1364,7 @@
       },
       "options": {
         "showHeader": true,
-        "cellHeight": "md",
+        "cellHeight": "sm",
         "footer": {
           "show": false
         },
