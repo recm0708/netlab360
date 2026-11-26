@@ -338,8 +338,8 @@ footer { padding:8px 20px; }
 .content-tools { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; margin:0 0 12px; }
 .content-tools #auth-notice { margin:0; }
 .refresh-controls { gap:8px; }
-#history-refresh-slot,#debug-refresh-slot { display:inline-flex; }
-#history-refresh-slot .refresh-controls,#debug-refresh-slot .refresh-controls { justify-content:flex-start; }
+#debug-refresh-slot { display:inline-flex; }
+#debug-refresh-slot .refresh-controls { justify-content:flex-start; }
 .site-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; }
 .site-card { border:1px solid var(--line); border-radius:7px; padding:10px; background:var(--bg); }
 .site-card h3 { font-size:1rem; margin:0 0 6px; }
@@ -471,3 +471,5 @@ button.secondary, .topology-action {
 .jobs-history-detail .panel { margin:0; }
 .jobs-history-detail pre { max-height:280px; overflow:auto; }
 .jobs-history-detail .action-row { flex-wrap:wrap; }
+.obs-alert-id { display:block; margin-top:3px; overflow-wrap:anywhere; }
+.jobs-history-detail ul { max-height:220px; overflow:auto; }
