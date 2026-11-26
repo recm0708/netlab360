@@ -25,8 +25,8 @@ class GrafanaTests(unittest.TestCase):
         for minutes in (5, 15, 60):
             # Comparar títulos completos para distinguir 5 min de 15 min.
             expected = {
-                f"SLI observado · {minutes} min": 1,
-                f"Cobertura · {minutes} min": 4,
+                f"Éxito observado (SLI) · {minutes} min": 1,
+                f"Cobertura de muestras · {minutes} min": 4,
             }
             selected = [p for p in dashboard["panels"] if p["title"] in expected]
             self.assertEqual(len(selected), 2)
@@ -113,7 +113,7 @@ class GrafanaTests(unittest.TestCase):
             self.assertEqual(coverage["gridPos"], {"x": x, "y": 27, "w": 8, "h": 7})
             self.assertEqual(coverage["options"]["cellHeight"], "sm")
             self.assertEqual(coverage["fieldConfig"]["defaults"]["custom"]["minWidth"], 85)
-            self.assertEqual(coverage["fieldConfig"]["overrides"][0]["properties"][1]["value"], 132)
+            self.assertEqual(coverage["fieldConfig"]["overrides"][0]["properties"][1]["value"], 156)
             self.assertEqual(panel["options"]["orientation"], "auto")
             self.assertEqual(panel["options"]["colorMode"], "background")
             self.assertFalse(panel["options"]["wideLayout"])
@@ -132,6 +132,39 @@ class GrafanaTests(unittest.TestCase):
             self.assertEqual({m["options"]["match"] for m in defaults["mappings"]}, {"null", "nan"})
             self.assertTrue(all(m["options"]["result"]["color"] == "gray" for m in defaults["mappings"]))
             self.assertEqual(panel["targets"][0]["legendFormat"], "{{probe_id}}")
+
+
+    def test_visible_probe_names(self):
+        dashboard = json.loads((CONFIG / "dashboards/sondas.json").read_text())
+        panels = {p["id"]: p for p in dashboard["panels"]}
+        names = {
+            "hq-s1-icmp": "HQ → S1 · ICMP",
+            "hq-s2-icmp": "HQ → S2 · ICMP",
+            "s2-hq-http": "S2 → FE-HQ · HTTP",
+            "s2-hq-icmp": "S2 → FE-HQ · ICMP",
+            "s2-hq-tcp": "S2 → FE-HQ · TCP",
+        }
+        for i in (1, 2, 3, 4):
+            p = panels[i]
+            overrides = {o["matcher"]["options"]: o["properties"][0]["value"]
+                         for o in p["fieldConfig"]["overrides"]}
+            self.assertEqual(overrides, names if i != 4 else {"s2-hq-http": names["s2-hq-http"]})
+            self.assertEqual(p["targets"][0]["legendFormat"], "{{probe_id}}")
+        for i in (1, 2):
+            defaults = panels[i]["fieldConfig"]["defaults"]
+            self.assertEqual(defaults["color"]["mode"], "fixed")
+            self.assertEqual(defaults["mappings"][0]["options"]["0"]["color"], "red")
+            self.assertEqual(defaults["mappings"][0]["options"]["1"]["color"], "green")
+            self.assertFalse(defaults["custom"]["spanNulls"])
+        for i in range(5, 11):
+            field = "Metric" if i % 2 else "Sonda"
+            override = next(o for o in panels[i]["fieldConfig"]["overrides"]
+                            if o["matcher"]["options"] == field)
+            mapping = next(p["value"] for p in override["properties"] if p["id"] == "mappings")
+            self.assertEqual({k: v["text"] for k, v in mapping[0]["options"].items()}, names)
+            if not i % 2:
+                self.assertEqual(panels[i]["fieldConfig"]["defaults"]["mappings"][0]["options"]["result"]["text"],
+                                 "Sin datos")
 
 
 if __name__ == "__main__":
