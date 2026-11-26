@@ -136,6 +136,13 @@ const fmt=x=>x.toISOString();
 for(const metric of ["scrape_up","probe_success","duration_seconds"]){
   const f=M.figure(d,metric,fmt,colors,5);
   assert.equal(f.traces.length,5);
+  if(metric==="duration_seconds"){
+    assert.equal(f.layout.height,400);
+    assert.equal(f.layout.yaxis.rangemode,"tozero");
+    assert.equal(f.layout.legend.x,0.5);
+    assert.equal(f.layout.legend.xanchor,"center");
+    assert.equal(f.layout.legend.entrywidth,175);
+  }
   for(const t of f.traces){
     assert.equal(t.x.length,30);
     if(metric==="duration_seconds"){
