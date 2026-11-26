@@ -181,7 +181,7 @@
             </div>
             <p id="topology-status" role="status" aria-live="polite">Esperando sesión.</p>
             <div class="topology-toolbar">
-              <label>Enfocar zona <select id="topology-site"><option value="all">Todas las sedes</option><option value="HQ">HQ</option><option value="S1">S1</option><option value="S2">S2</option><option value="SDN">Dominio SDN</option></select></label>
+              <label>Enfocar zona <select id="topology-site"><option value="all">Todas las zonas</option><option value="HQ">HQ</option><option value="S1">S1</option><option value="S2">S2</option><option value="SDN">Dominio SDN</option></select></label>
               <button type="button" class="secondary" id="topology-zoom-in" title="Acercar">+</button><button type="button" class="secondary" id="topology-zoom-out" title="Alejar">−</button>
               <button type="button" class="secondary" id="topology-left" title="Desplazar a la izquierda">←</button><button type="button" class="secondary" id="topology-up" title="Desplazar arriba">↑</button><button type="button" class="secondary" id="topology-down" title="Desplazar abajo">↓</button><button type="button" class="secondary" id="topology-right" title="Desplazar a la derecha">→</button>
               <button type="button" class="secondary" id="topology-reset">Restablecer vista</button>
@@ -190,7 +190,31 @@
               <section class="panel topology-map"><svg id="topology-map" viewBox="0 0 1440 1250" aria-label="Diagrama interactivo multisede"></svg></section>
               <section class="panel topology-inspector"><h2>Inspector</h2><p id="topology-selection" class="muted">Seleccione un equipo o enlace.</p><dl id="topology-details"></dl></section>
             </div>
-            <section class="panel"><h2>Convenciones</h2><p class="muted">Verde: existencia observada o principal elegida por FIB, según el recurso. Azul: respaldo elegido. Naranja: principal elegida con respaldo inactivo. Rojo: inactividad comprobada. Gris: sin verificación o en espera. La selección visual es independiente del estado. Las líneas HTTP representan relaciones de servicio, no cables físicos. FIB no acredita OSPF FULL ni tráfico.</p></section>
+            <section class="panel topology-legend" aria-label="Convenciones del diagrama">
+              <h2>Código de colores y convenciones</h2>
+              <div class="topology-legend-grid">
+                <section><h3>Estados observados</h3>
+                  <ul>
+                    <li><strong data-state="ok"><span class="topology-legend-dot"></span>Verde</strong><span>Existencia observada, selección principal por FIB, relación HTTP seleccionada, agregado normal o control/flujos observados, según el recurso.</span></li>
+                    <li><strong data-state="recovery"><span class="topology-legend-dot"></span>Azul</strong><span>Ruta WAN de respaldo seleccionada por FIB.</span></li>
+                    <li><strong data-state="warn"><span class="topology-legend-dot"></span>Naranja</strong><span>Agregado LACP degradado.</span></li>
+                    <li><strong data-state="fault"><span class="topology-legend-dot"></span>Rojo</strong><span>Inactividad, deshabilitación administrativa o fallo comprobado dentro del alcance de la fuente.</span></li>
+                    <li><strong data-state="unknown"><span class="topology-legend-dot"></span>Gris</strong><span>Estado sin verificar, inventario sin medición o respaldo en espera.</span></li>
+                  </ul>
+                </section>
+                <section><h3>Conexiones y selección</h3>
+                  <ul>
+                    <li><strong><svg class="topology-legend-line" viewBox="0 0 42 12" aria-hidden="true"><path d="M1 6 H41"/></svg>Continua</strong><span>Conexión de red o WAN principal.</span></li>
+                    <li><strong><svg class="topology-legend-line" viewBox="0 0 42 12" aria-hidden="true"><path class="backup" d="M1 6 H41"/></svg>Discontinua</strong><span>WAN de respaldo.</span></li>
+                    <li><strong><svg class="topology-legend-line" viewBox="0 0 42 12" aria-hidden="true"><path d="M1 3 H41 M1 9 H41"/></svg>Doble</strong><span>Agregado LACP: dos miembros de inventario, estado por extremo.</span></li>
+                    <li><strong><svg class="topology-legend-line" viewBox="0 0 42 12" aria-hidden="true"><path class="service" d="M1 6 H41"/></svg>Punteada</strong><span>Relación lógica HTTP.</span></li>
+                    <li><strong><svg class="topology-legend-line" viewBox="0 0 42 12" aria-hidden="true"><path class="control" d="M1 6 H41"/></svg>Raya y punto</strong><span>Canal de control OpenFlow.</span></li>
+                    <li><strong class="topology-legend-selection"><span class="topology-legend-dot"></span>Resaltado</strong><span>Elemento seleccionado; no cambia su estado operativo.</span></li>
+                  </ul>
+                </section>
+              </div>
+              <p class="muted topology-legend-note">FIB no acredita OSPF FULL ni tráfico. Los recuentos LACP no acreditan capacidad ni estado individual de miembros. Los flujos OpenFlow no acreditan forwarding ni conectividad de hosts. Las relaciones HTTP y de control no representan cables físicos.</p>
+            </section>
           </div>
         </section>
         <section id="history-view" hidden>
