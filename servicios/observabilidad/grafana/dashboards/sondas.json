@@ -9,7 +9,7 @@
   "timezone": "America/Panama",
   "editable": false,
   "schemaVersion": 39,
-  "version": 6,
+  "version": 7,
   "refresh": "30s",
   "time": {
     "from": "now-1h",
@@ -356,7 +356,7 @@
       "gridPos": {
         "x": 0,
         "y": 9,
-        "w": 12,
+        "w": 16,
         "h": 10
       },
       "fieldConfig": {
@@ -470,17 +470,17 @@
     },
     {
       "id": 4,
-      "title": "Código de respuesta HTTP",
-      "description": "Código de respuesta; 0 puede indicar ausencia de respuesta HTTP. FE-HQ: servicio frontal de la sede central; los identificadores originales se conservan en las consultas.",
-      "type": "timeseries",
+      "title": "Historial de respuestas HTTP",
+      "description": "Código HTTP observado en cada muestra de S2 → FE-HQ. Verde: 2xx; azul: 1xx/3xx; ámbar: 4xx; rojo: 5xx; gris: sin respuesta (0). Los huecos indican falta de datos, no un código 0. El detalle conserva el código original. FE-HQ: servicio frontal de la sede central.",
+      "type": "state-timeline",
       "datasource": {
         "type": "prometheus",
         "uid": "netlab360-prometheus"
       },
       "gridPos": {
-        "x": 12,
+        "x": 16,
         "y": 9,
-        "w": 12,
+        "w": 8,
         "h": 10
       },
       "fieldConfig": {
@@ -488,15 +488,10 @@
           "unit": "none",
           "decimals": 0,
           "custom": {
-            "drawStyle": "line",
-            "lineWidth": 2,
+            "fillOpacity": 85,
+            "lineWidth": 0,
             "spanNulls": false,
-            "insertNulls": 15000,
-            "showPoints": "never",
-            "fillOpacity": 0,
-            "axisSoftMin": 0,
-            "lineInterpolation": "stepAfter",
-            "axisSoftMax": 500
+            "insertNulls": 15000
           },
           "noValue": "Sin datos",
           "thresholds": {
@@ -575,17 +570,18 @@
         ]
       },
       "options": {
+        "mergeValues": true,
+        "showValue": "always",
+        "alignValue": "center",
+        "rowHeight": 0.45,
         "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true,
-          "calcs": [
-            "last"
-          ]
+          "showLegend": false,
+          "displayMode": "list",
+          "placement": "bottom"
         },
         "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "targets": [
