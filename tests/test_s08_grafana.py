@@ -107,10 +107,17 @@ class GrafanaTests(unittest.TestCase):
         for panel_id in (5, 7, 9):
             panel = panels[panel_id]
             self.assertEqual(panel["type"], "stat")
-            self.assertEqual(panel["gridPos"]["h"], panels[panel_id + 1]["gridPos"]["h"])
-            self.assertEqual(panel["options"]["orientation"], "horizontal")
+            x = ((panel_id - 5) // 2) * 8
+            self.assertEqual(panel["gridPos"], {"x": x, "y": 19, "w": 8, "h": 8})
+            coverage = panels[panel_id + 1]
+            self.assertEqual(coverage["gridPos"], {"x": x, "y": 27, "w": 8, "h": 7})
+            self.assertEqual(coverage["options"]["cellHeight"], "sm")
+            self.assertEqual(coverage["fieldConfig"]["defaults"]["custom"]["minWidth"], 85)
+            self.assertEqual(coverage["fieldConfig"]["overrides"][0]["properties"][1]["value"], 132)
+            self.assertEqual(panel["options"]["orientation"], "auto")
             self.assertEqual(panel["options"]["colorMode"], "background")
-            self.assertTrue(panel["options"]["wideLayout"])
+            self.assertFalse(panel["options"]["wideLayout"])
+            self.assertEqual(panel["options"]["justifyMode"], "center")
             self.assertTrue(panel["options"]["reduceOptions"]["values"])
             self.assertEqual(panel["options"]["reduceOptions"]["limit"], 5)
             self.assertEqual(panel["options"]["graphMode"], "none")
