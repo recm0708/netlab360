@@ -52,7 +52,7 @@ def validate_role(user, organizations, dashboard):
 def members(admin):
     """Capturar identidades y roles, excluyendo campos volátiles de último acceso."""
     return sorted((u["userId"], u["login"], u["role"])
-                  for u in fetch(BASE + "/api/org/users", admin))
+                  for u in fetch(BASE + "/api/org/users", admin, expected=list))
 
 
 def provision(root, admin):
@@ -62,7 +62,7 @@ def provision(root, admin):
     admin_user = fetch(BASE + "/api/user", admin)
     assert admin_user["login"] == ADMIN and admin_user["isGrafanaAdmin"] is True
     denied(lambda: fetch(lookup, admin), (404,))
-    sources = fetch(BASE + "/api/datasources", admin)
+    sources = fetch(BASE + "/api/datasources", admin, expected=list)
     assert len(sources) == 1 and sources[0]["uid"] == UID
     assert sources[0]["url"] == PROM and sources[0]["type"] == "prometheus"
     flags = fetch(PROM + "/api/v1/status/flags")["data"]
@@ -84,7 +84,7 @@ def provision(root, admin):
         assert user["id"] == created_id
         me = fetch(BASE + "/api/user", password, username=LOGIN)
         assert me["login"] == LOGIN and me["id"] == created_id
-        organizations = fetch(BASE + "/api/user/orgs", password, username=LOGIN)
+        organizations = fetch(BASE + "/api/user/orgs", password, username=LOGIN, expected=list)
         dashboard = fetch(dash_url, password, username=LOGIN)
         validate_role(user, organizations, dashboard)
         anonymous = denied(lambda: fetch(dash_url), (401, 403))
@@ -93,7 +93,7 @@ def provision(root, admin):
         run(root / "grafana-viewer-paneles.json", password, username=LOGIN)
         assert members(admin) == sorted(before + [(created_id, LOGIN, "Viewer")])
         assert fetch(dash_url, admin)["dashboard"] == dash_before
-        assert fetch(BASE + "/api/datasources", admin) == sources
+        assert fetch(BASE + "/api/datasources", admin, expected=list) == sources
         with (root / "grafana-viewer-acceso.json").open("x", encoding="utf-8") as handle:
             json.dump({"login": LOGIN, "id": created_id, "org_id": 1, "role": "Viewer",
                        "admin": False, "can_edit": False, "can_save": False,
