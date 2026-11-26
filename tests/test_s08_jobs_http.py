@@ -166,7 +166,7 @@ class JobHttpTests(unittest.TestCase):
             self.client = client
             headers = self.login()
             rows = client.get(BASE+"/catalog").json()["selections"]
-            self.assertEqual(sum(row["live_progress"] for row in rows),10)
+            self.assertEqual(sum(row["live_progress"] for row in rows),24)
             job = client.post(BASE,json=selection,headers=headers).json()
             result = client.get(BASE+"/"+job["job_id"]).json()
             self.assertEqual(result["status"],"SUCCEEDED")
