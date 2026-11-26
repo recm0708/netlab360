@@ -231,6 +231,18 @@ assert.throws(()=>M.validateNotifications({...empty,transport:"UNAVAILABLE"},"op
 assert.equal(M.validateNotifications({...empty,transport:"UNAVAILABLE",total:null},"operational").total,null);
 """, None)
 
+    def test_http_samples_compact_panel(self):
+        ui = ROOT / "servicios/consola-s08/ui"
+        html = (ui / "index.html").read_text()
+        css = (ui / "static/styles.css").read_text()
+        panel = html.split("Respuestas HTTP · S2 → FE-HQ", 1)[1].split("</section>", 1)[0]
+        self.assertIn('id="obs-http"', panel)
+        self.assertEqual(html.count('id="obs-http"'), 1)
+        self.assertIn('tabindex="0" role="region"', panel)
+        self.assertIn("max-height:calc(5 * var(--http-row))", css)
+        self.assertIn("grid-column:span 14", css)
+        self.assertIn("grid-column:span 6", css)
+
     def test_static_safety(self):
         ui = ROOT / "servicios/consola-s08/ui"
         js = (ui / "static/observation.js").read_text()
