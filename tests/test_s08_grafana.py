@@ -144,11 +144,11 @@ class GrafanaTests(unittest.TestCase):
             "s2-hq-icmp": "S2 → FE-HQ · ICMP",
             "s2-hq-tcp": "S2 → FE-HQ · TCP",
         }
-        for i in (1, 2, 3, 4):
+        for i in (1, 2, 3):
             p = panels[i]
             overrides = {o["matcher"]["options"]: o["properties"][0]["value"]
                          for o in p["fieldConfig"]["overrides"]}
-            self.assertEqual(overrides, names if i != 4 else {"s2-hq-http": names["s2-hq-http"]})
+            self.assertEqual(overrides, names)
             self.assertEqual(p["targets"][0]["legendFormat"], "{{probe_id}}")
         for i in (1, 2):
             defaults = panels[i]["fieldConfig"]["defaults"]
@@ -173,13 +173,18 @@ class GrafanaTests(unittest.TestCase):
         duration, http = panels[3], panels[4]
         self.assertEqual(duration["gridPos"], {"x": 0, "y": 9, "w": 16, "h": 10})
         self.assertEqual(http["gridPos"], {"x": 16, "y": 9, "w": 8, "h": 10})
-        self.assertEqual(http["type"], "state-timeline")
-        self.assertTrue(http["options"]["mergeValues"])
-        self.assertEqual(http["options"]["showValue"], "always")
-        self.assertFalse(http["options"]["legend"]["showLegend"])
+        self.assertEqual(http["type"], "table")
+        self.assertTrue(http["options"]["showHeader"])
+        self.assertEqual(http["transformations"], [
+            {"id": "sortBy", "options": {"sort": [{"field": "Time", "desc": True}]}},
+        ])
+        overrides = {o["matcher"]["options"]: o["properties"]
+                     for o in http["fieldConfig"]["overrides"]}
+        self.assertEqual(overrides["time"][0], {"id": "displayName", "value": "Fecha y hora"})
+        self.assertEqual(overrides["number"][0], {"id": "displayName", "value": "Código HTTP"})
+        self.assertEqual(overrides["number"][2]["value"], {"type": "color-text"})
+        self.assertEqual(http["targets"][0]["legendFormat"], "{{probe_id}}")
         defaults = http["fieldConfig"]["defaults"]
-        self.assertFalse(defaults["custom"]["spanNulls"])
-        self.assertEqual(defaults["custom"]["insertNulls"], 15000)
         self.assertEqual(defaults["mappings"][0]["options"]["0"]["text"], "Sin respuesta HTTP")
         self.assertEqual(defaults["mappings"][0]["options"]["200"]["text"], "200 OK")
         self.assertEqual(defaults["mappings"][1]["options"]["result"]["text"], "Sin datos")
