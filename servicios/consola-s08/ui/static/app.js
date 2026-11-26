@@ -1125,7 +1125,7 @@ function initializeConsole() {
   }
   setInterval(()=>{if(networkAllowed())renderNetwork();},1000);
 
-  // Una consulta fija alimenta ambas vistas. Los errores transitorios no borran el mapa.
+  // El grafo y las observaciones LACP/SDN tienen cortes independientes.
   const topologyMap=document.getElementById("topology-map");
   const topologyStatus=document.getElementById("topology-status");
   const topologyDetails=document.getElementById("topology-details");
@@ -1134,7 +1134,7 @@ function initializeConsole() {
   const topologyFull=document.getElementById("topology-fullscreen");
   const topologyMode="detailed";
   let topologyEpoch=0,topologyBusy=false,topologyData=null,topologySelected=null;
-  let topologyReceived=0,topologyUnavailable=false,topologyInspectorKey="";
+  let topologyReceived=0,topologyUnavailable=false,topologyInspectorKey="",topologySources=null;
   const topologySite=document.getElementById("topology-site");
   let topologyBox=window.NetlabTopology.viewport(topologyMode);
   function applyTopologyBox(){topologyMap.setAttribute("viewBox",topologyBox.join(" "));}
@@ -1157,7 +1157,7 @@ function initializeConsole() {
 
   function clearTopology() {
     topologyEpoch++;topologyBusy=false;topologyData=null;topologySelected=null;
-    topologyUnavailable=false;topologyInspectorKey="";
+    topologyUnavailable=false;topologyInspectorKey="";topologySources=null;
     window.NetlabTopology.reset(topologyMap);topologyDetails.replaceChildren();
     resetTopologyBox();
     topologySelection.textContent="Seleccione un equipo o enlace.";
@@ -1170,7 +1170,8 @@ function initializeConsole() {
     if(!topologyData||!topologyAllowed()) return;
     const model=window.NetlabTopology;
     const elapsed=(performance.now()-topologyReceived)/1000;
-    const aged=model.aged(topologyData,elapsed,topologyUnavailable);
+    const rows=dashboardRows({sources:topologySources},performance.now());
+    const aged=model.augment(model.aged(topologyData,elapsed,topologyUnavailable),rows);
     if(!topologyUnavailable&&!model.isFresh(topologyData.graph,elapsed))
       topologyStatus.textContent="Observación caducada. Inventario conservado sin estados vigentes.";
     const display=model.view(aged,topologyMode);
@@ -1181,12 +1182,12 @@ function initializeConsole() {
     applyTopologyBox();
     const item=[...display.nodes,...display.links].find(x=>x.id===topologySelected);
     const label=item?model.name(item):"Seleccione un equipo o enlace.";
-    const rows=item?model.details(item):[];
-    const key=JSON.stringify([label,rows]);
+    const detailRows=item?model.details(item,formatPanama):[];
+    const key=JSON.stringify([label,detailRows]);
     if(key!==topologyInspectorKey){
       topologyInspectorKey=key;topologySelection.textContent=label;
       topologyDetails.replaceChildren();
-      for(const [name,value] of rows){
+      for(const [name,value] of detailRows){
         const dt=document.createElement("dt"),dd=document.createElement("dd");
         dt.textContent=name;dd.textContent=value;topologyDetails.append(dt,dd);
       }
@@ -1209,11 +1210,26 @@ function initializeConsole() {
       if(status!==200||!window.NetlabTopology.valid(data)||data.graph.quality!=="VALID") throw new Error("GRAPH");
       topologyData=data;topologyReceived=started;topologyUnavailable=false;
       renderTopology();
-      topologyStatus.textContent="Consulta: "+formatPanama(new Date(data.graph.observed_at_utc))+
-        " · "+NetlabNumbers.format(data.nodes.length,"count")+" equipos y "+NetlabNumbers.format(data.links.length,"count")+" enlaces en inventario · "+NetlabNumbers.format(data.warning_count,"count")+" advertencias de origen.";
+      const sourceStarted=performance.now();
+      let extraStatus="Fuentes adicionales consultadas.";
+      try {
+        const extra=await debugRead("/api/v1/sources");
+        if(epoch!==topologyEpoch||!topologyAllowed())return;
+        if(extra.status===401||extra.status===403){clearTopology();recover();return;}
+        if(extra.status===200)topologySources={rows:dashboardBatch("sources",extra.data,sourceStarted)};
+        else if(extra.status===429)extraStatus="Fuentes adicionales ocupadas; se conserva su corte anterior.";
+        else {topologySources=null;extraStatus="Fuentes adicionales no disponibles.";}
+      }catch{
+        if(epoch!==topologyEpoch||!topologyAllowed())return;
+        topologySources=null;extraStatus="Fuentes adicionales no disponibles.";
+      }
+      renderTopology();
+      const full=window.NetlabTopology.augment(data,[]);
+      topologyStatus.textContent="Grafo: "+formatPanama(new Date(data.graph.observed_at_utc))+
+        " · "+NetlabNumbers.format(full.nodes.length,"count")+" equipos y "+NetlabNumbers.format(full.links.length,"count")+" relaciones de inventario · "+NetlabNumbers.format(data.warning_count,"count")+" advertencias. "+extraStatus;
     } catch {
       if(epoch!==topologyEpoch) return;
-      topologyUnavailable=true;
+      topologyUnavailable=true;topologySources=null;
       renderTopology();
       topologyStatus.textContent="Fuente temporalmente no disponible. Conservamos el inventario sin estados vigentes.";
     } finally {
