@@ -274,7 +274,7 @@ function siteInventory(rows,site){
   return {running,wan:counts("WAN-END-"),vlan:counts("VLAN-")};
 }
 function automaticPage(path){
-  return ["/home","/topology","/wan","/lan","/services","/lacp","/sdn","/intelligence"].includes(path);
+  return ["/home","/topology","/wan","/lan","/services","/lacp","/sdn","/intelligence","/observability"].includes(path);
 }
 
 /* Preferencias de actualización global: únicamente valores de presentación. */
@@ -312,14 +312,14 @@ function initializeConsole() {
   const panamaClock = new Intl.DateTimeFormat("en-US", {
     timeZone: "America/Panama", year: "numeric", month: "2-digit",
     day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit",
-    hourCycle: "h12"
+    hourCycle: "h23"
   });
 
   function formatPanama(date) {
     const parts = Object.fromEntries(panamaClock.formatToParts(date)
       .filter(part => part.type !== "literal").map(part => [part.type, part.value]));
-    return parts.month + "/" + parts.day + "/" + parts.year + " " +
-      parts.hour + ":" + parts.minute + ":" + parts.second + " " + parts.dayPeriod;
+    return parts.month + "/" + parts.day + "/" + parts.year + " · " +
+      parts.hour + ":" + parts.minute + ":" + parts.second;
   }
 
   const fields = [
@@ -1103,10 +1103,9 @@ function initializeConsole() {
   const topologySelection=document.getElementById("topology-selection");
   const topologyWorkspace=document.getElementById("topology-workspace");
   const topologyFull=document.getElementById("topology-fullscreen");
-  const topologyMode=new URLSearchParams(location.search).get("view")==="detailed"?"detailed":"summary";
+  const topologyMode="detailed";
   let topologyEpoch=0,topologyBusy=false,topologyData=null,topologySelected=null;
   let topologyReceived=0,topologyUnavailable=false,topologyInspectorKey="";
-  const detailed=topologyMode==="detailed";
   const topologySite=document.getElementById("topology-site");
   let topologyBox=window.NetlabTopology.viewport(topologyMode);
   function applyTopologyBox(){topologyMap.setAttribute("viewBox",topologyBox.join(" "));}
@@ -1120,10 +1119,8 @@ function initializeConsole() {
     });
   }
   document.getElementById("topology-reset").addEventListener("click",resetTopologyBox);
-  document.getElementById("topology-expand").hidden=detailed;
-  document.getElementById("topology-return").hidden=!detailed;
-  topologyFull.hidden=!detailed;
-  document.getElementById("topology-title").textContent=detailed?"Topología detallada":"Topología en vivo";
+  topologyFull.hidden=false;
+  document.getElementById("topology-title").textContent="Topología en vivo";
 
   function topologyAllowed() {
     return location.pathname==="/topology" && session!==null && serverNow()<session.expiresAt;
@@ -1215,6 +1212,7 @@ function initializeConsole() {
   const historyStatus = document.getElementById("history-status");
   const historyPlot = document.getElementById("history-plot");
   let historyEpoch = 0, historyBusy = false, historyData = null, alertsData=null;
+  let historyTimer=null,historyRequest=Promise.resolve();
   const alertsSite=document.getElementById("alerts-site"),alertsExport=document.getElementById("alerts-export");
   const alertNames=Object.freeze({
     NETLAB360S04ExporterUnavailable:"Exportador no disponible",NETLAB360S04CollectorUnknown:"Colector sin observación",
@@ -1297,7 +1295,7 @@ function initializeConsole() {
   let plotlyLoading = null, historyDraw = Promise.resolve();
   const observationView = window.NetlabObservation?.create(debugRead,
     () => session ? {key:session.username+":"+session.role,role:session.role,active:serverNow()<session.warningAt} : null,
-    formatPanama,loadPlotly,NetlabNumbers.format) || {clear(){},controls(){}};
+    formatPanama,loadPlotly,NetlabNumbers.format) || {clear(){},controls(){},refresh(){},refreshNotifications(){}};
 
   function historyAllowed() {
     return location.pathname === "/observability" && session !== null &&
@@ -1306,6 +1304,7 @@ function initializeConsole() {
 
   function clearHistory() {
     historyEpoch++;
+    clearTimeout(historyTimer);historyTimer=null;
     historyData = null;
     clearAlerts();
     historyBusy = false;
@@ -1356,7 +1355,7 @@ function initializeConsole() {
     return historyDraw;
   }
 
-  async function updateHistory() {
+  async function updateHistory(retry=true) {
     if(!historyAllowed()||historyBusy||serverNow()>=session.warningAt) return;
     const group=historyGroup.value, span=historyWindow.value;
     if(group==="alerts")return updateAlerts();
@@ -1369,6 +1368,11 @@ function initializeConsole() {
       const {status,data}=await debugRead("/api/v1/history/"+group+"/"+span,1048576);
       if(epoch!==historyEpoch||!historyAllowed()) return;
       if(status===401||status===403) {clearHistory();recover();return;}
+      if(status===429&&retry){
+        historyStatus.textContent="Consulta ocupada; reintento en dos segundos.";
+        historyTimer=setTimeout(()=>{if(epoch===historyEpoch&&historyAllowed()&&!document.hidden)void updateHistory(false);},2100);
+        return;
+      }
       if(status===429) throw new Error("LIMITED");
       if(status!==200) throw new Error("UNAVAILABLE");
       const result=window.NetlabHistory.validate(data,group,span);
@@ -1405,7 +1409,11 @@ function initializeConsole() {
     document.getElementById("history-chart-content").hidden=alerts;
     document.getElementById("alerts-content").hidden=!alerts;
     historyWindow.disabled=alerts;
-    historyStatus.textContent=alerts?"Pulse Consultar histórico para obtener alertas y transiciones.":"Pulse Consultar histórico para obtener el intervalo seleccionado.";
+    historyStatus.textContent="Consultando selección…";
+    const epoch=historyEpoch;
+    historyTimer=setTimeout(()=>{
+      historyRequest=historyRequest.catch(()=>{}).then(()=>{if(epoch===historyEpoch&&historyAllowed()&&!document.hidden)return updateHistory();});
+    },150);
   }
   historyGroup.addEventListener("change",historySelectionChanged);
   historyWindow.addEventListener("change",historySelectionChanged);
@@ -1515,7 +1523,7 @@ function initializeConsole() {
 
   // Comprobar la sesión también al volver desde la caché de navegación.
   window.addEventListener("pageshow", event => {
-    if (event.persisted) recover();
+    if (event.persisted) recover().then(()=>{if(session&&observationPage)void refreshCurrent("initial");});
   });
   // Un solo temporizador de adquisición; la caducidad visual continúa sin consultas.
   const refreshControls=document.getElementById("refresh-controls");
@@ -1524,15 +1532,19 @@ function initializeConsole() {
   let refreshPreference=parseRefresh(null),refreshBusy=false;
   try{refreshPreference=parseRefresh(localStorage.getItem(refreshKey));}catch{}
   const scheduler=refreshScheduler(refreshCurrent,window);
-  const manualHistory=location.pathname==="/observability",manualDebug=location.pathname==="/debug";
+  const observationPage=location.pathname==="/observability",manualDebug=location.pathname==="/debug";
+  if(observationPage){
+    try{refreshPreference=parseRefresh(localStorage.getItem(refreshKey+".observation")||"on:10");}catch{refreshPreference=parseRefresh("on:10");}
+    refreshInterval.querySelector('option[value="5"]').disabled=true;
+  }
+  const preferenceKey=observationPage?refreshKey+".observation":refreshKey;
   const autoPage=automaticPage(location.pathname);
   const slot=document.getElementById("refresh-slot");
-  if(manualHistory)document.getElementById("history-refresh-slot").append(refreshControls);
   if(manualDebug)document.getElementById("debug-refresh-slot").append(refreshControls);
   slot.hidden=!autoPage;
   document.getElementById("refresh-auto-label").hidden=!autoPage;
   document.getElementById("refresh-interval-label").hidden=!autoPage;
-  const manualLabel=manualHistory?"Consultar histórico":manualDebug?"Ejecutar consulta":"Actualizar";
+  const manualLabel=manualDebug?"Ejecutar consulta":"Actualizar";
   function refreshAvailable(){
     return dashboardAllowed()||topologyAllowed()||networkAllowed()||historyAllowed()||debugAllowed();
   }
@@ -1543,13 +1555,16 @@ function initializeConsole() {
   async function refreshCurrent(reason="manual"){
     if(refreshBusy||!refreshAvailable()||document.hidden||serverNow()>=session.warningAt)return;
     if(reason==="auto"&&(!autoPage||!refreshPreference.auto))return;
-    if(reason==="initial"&&manualHistory)return;
     refreshBusy=true;syncRefreshControls();
     try{
       if(dashboardAllowed())await updateDashboard();
       else if(topologyAllowed())await updateTopology();
       else if(networkAllowed())await updateNetwork();
-      else if(historyAllowed())await updateHistory();
+      else if(historyAllowed()){
+        if(reason==="initial"){
+          await Promise.all([observationView.refresh(),observationView.refreshNotifications(),updateHistory()]);
+        }else await observationView.refresh();
+      }
       else if(debugAllowed()){
         if(!debugReady)await loadDebug();
         else if(reason!=="initial")await runDebug();
@@ -1557,6 +1572,7 @@ function initializeConsole() {
     }finally{refreshBusy=false;syncRefreshControls();}
   }
   function applyRefreshPreference(){
+    if(observationPage&&refreshPreference.seconds<10)refreshPreference={...refreshPreference,seconds:10};
     refreshAuto.checked=refreshPreference.auto;
     refreshInterval.value=String(refreshPreference.seconds);
     refreshInterval.disabled=!refreshPreference.auto;
@@ -1566,15 +1582,15 @@ function initializeConsole() {
   function saveRefreshPreference(){
     const value=refreshValue(refreshAuto.checked,Number(refreshInterval.value));
     refreshPreference=parseRefresh(value);
-    try{localStorage.setItem(refreshKey,value);}catch{}
+    try{localStorage.setItem(preferenceKey,value);}catch{}
     applyRefreshPreference();
   }
   refresh.addEventListener("click",()=>refreshCurrent("manual"));
   refreshAuto.addEventListener("change",saveRefreshPreference);
   refreshInterval.addEventListener("change",saveRefreshPreference);
   window.addEventListener("storage",event=>{
-    if(event.key===refreshKey||event.key===null){
-      refreshPreference=parseRefresh(event.key===null?null:event.newValue);applyRefreshPreference();
+    if(event.key===preferenceKey||event.key===null){
+      refreshPreference=parseRefresh(event.key===null?(observationPage?"on:10":null):event.newValue);applyRefreshPreference();
     }
   });
   document.addEventListener("visibilitychange",()=>{
