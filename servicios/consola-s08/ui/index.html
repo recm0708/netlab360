@@ -181,13 +181,13 @@
             </div>
             <p id="topology-status" role="status" aria-live="polite">Esperando sesión.</p>
             <div class="topology-toolbar">
-              <label>Enfocar sede <select id="topology-site"><option value="all">Todas las sedes</option><option value="HQ">HQ</option><option value="S1">S1</option><option value="S2">S2</option></select></label>
+              <label>Enfocar zona <select id="topology-site"><option value="all">Todas las sedes</option><option value="HQ">HQ</option><option value="S1">S1</option><option value="S2">S2</option><option value="SDN">Dominio SDN</option></select></label>
               <button type="button" class="secondary" id="topology-zoom-in" title="Acercar">+</button><button type="button" class="secondary" id="topology-zoom-out" title="Alejar">−</button>
               <button type="button" class="secondary" id="topology-left" title="Desplazar a la izquierda">←</button><button type="button" class="secondary" id="topology-up" title="Desplazar arriba">↑</button><button type="button" class="secondary" id="topology-down" title="Desplazar abajo">↓</button><button type="button" class="secondary" id="topology-right" title="Desplazar a la derecha">→</button>
               <button type="button" class="secondary" id="topology-reset">Restablecer vista</button>
             </div>
             <div class="topology-layout">
-              <section class="panel topology-map"><svg id="topology-map" viewBox="0 0 1440 955" aria-label="Diagrama interactivo multisede"></svg></section>
+              <section class="panel topology-map"><svg id="topology-map" viewBox="0 0 1440 1250" aria-label="Diagrama interactivo multisede"></svg></section>
               <section class="panel topology-inspector"><h2>Inspector</h2><p id="topology-selection" class="muted">Seleccione un equipo o enlace.</p><dl id="topology-details"></dl></section>
             </div>
             <section class="panel"><h2>Convenciones</h2><p class="muted">Verde: existencia observada o principal elegida por FIB, según el recurso. Azul: respaldo elegido. Naranja: principal elegida con respaldo inactivo. Rojo: inactividad comprobada. Gris: sin verificación o en espera. La selección visual es independiente del estado. Las líneas HTTP representan relaciones de servicio, no cables físicos. FIB no acredita OSPF FULL ni tráfico.</p></section>
