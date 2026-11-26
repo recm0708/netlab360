@@ -407,3 +407,23 @@ button.secondary, .topology-action {
 #jobs-title:focus-visible { text-decoration:underline; text-underline-offset:4px; }
 #jobs-diagnostic-rows { margin:8px 0; padding-inline-start:24px; }
 @media(max-width:700px) { #jobs-view .jobs-endpoints { grid-template-columns:1fr; } }
+
+/* Observabilidad: densidad informativa adaptable y paleta compartida. */
+.obs-chart-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:12px 0 18px; }
+.obs-chart { min-width:0; border:1px solid var(--line); border-radius:8px; padding:12px; }
+.obs-chart h3, .obs-window h3 { margin:0 0 8px; font-size:.95rem; }
+.obs-chart .obs-scroll { max-height:300px; overflow:auto; }
+.obs-window-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:12px 0; }
+.obs-window { border:1px solid var(--line); border-radius:8px; padding:10px; min-width:0; }
+.obs-card-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
+.obs-card { border:1px solid var(--line); border-radius:6px; padding:8px; background:var(--unknown-bg); min-width:0; }
+.obs-card[data-state="ok"] { background:var(--ok-bg); }
+.obs-card[data-state="fault"] { background:var(--fault-bg); }
+.obs-card[data-state="unknown"] { background:var(--unknown-bg); }
+.obs-card span,.obs-card small { display:block; color:var(--text); font-size:.8rem; overflow-wrap:anywhere; }
+.obs-card strong { display:block; font-size:1.25rem; font-variant-numeric:tabular-nums; }
+.obs-card:last-child { grid-column:1/-1; }
+#obs-panel .obs-detail { min-width:880px; }
+#obs-panel .dashboard-table-wrap { overflow-x:auto; }
+@media (min-width:1400px) { .obs-chart-grid { grid-template-columns:2fr 1fr; } .obs-chart-grid > :nth-child(-n+2) { grid-column:auto; } }
+@media (max-width:1000px) { .obs-chart-grid,.obs-window-grid { grid-template-columns:1fr; } }
