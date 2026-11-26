@@ -9,7 +9,7 @@
   "timezone": "America/Panama",
   "editable": false,
   "schemaVersion": 39,
-  "version": 7,
+  "version": 8,
   "refresh": "30s",
   "time": {
     "from": "now-1h",
@@ -470,9 +470,9 @@
     },
     {
       "id": 4,
-      "title": "Historial de respuestas HTTP",
-      "description": "Código HTTP observado en cada muestra de S2 → FE-HQ. Verde: 2xx; azul: 1xx/3xx; ámbar: 4xx; rojo: 5xx; gris: sin respuesta (0). Los huecos indican falta de datos, no un código 0. El detalle conserva el código original. FE-HQ: servicio frontal de la sede central.",
-      "type": "state-timeline",
+      "title": "Respuestas HTTP · S2 → FE-HQ",
+      "description": "Historial de valores de la consulta de rango, ordenado por hora de evaluación descendente. No es un registro de transiciones ni de timestamps originales de scrape. Código 0: sin respuesta HTTP; ausencia: sin datos. No se generan filas ficticias ni se agrupan códigos por umbrales.",
+      "type": "table",
       "datasource": {
         "type": "prometheus",
         "uid": "netlab360-prometheus"
@@ -488,10 +488,12 @@
           "unit": "none",
           "decimals": 0,
           "custom": {
-            "fillOpacity": 85,
-            "lineWidth": 0,
-            "spanNulls": false,
-            "insertNulls": 15000
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false,
+            "minWidth": 100
           },
           "noValue": "Sin datos",
           "thresholds": {
@@ -557,32 +559,48 @@
         "overrides": [
           {
             "matcher": {
-              "id": "byName",
-              "options": "s2-hq-http"
+              "id": "byType",
+              "options": "time"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "S2 → FE-HQ · HTTP"
+                "value": "Fecha y hora"
+              },
+              {
+                "id": "unit",
+                "value": "dateTimeAsLocal"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byType",
+              "options": "number"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Código HTTP"
+              },
+              {
+                "id": "custom.align",
+                "value": "center"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
               }
             ]
           }
         ]
       },
       "options": {
-        "mergeValues": true,
-        "showValue": "always",
-        "alignValue": "center",
-        "rowHeight": 0.45,
-        "legend": {
-          "showLegend": false,
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
+        "showHeader": true,
+        "cellHeight": "sm",
+        "sortBy": []
       },
       "targets": [
         {
@@ -596,6 +614,19 @@
           "instant": false,
           "range": true,
           "editorMode": "code"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Time",
+                "desc": true
+              }
+            ]
+          }
         }
       ]
     },
