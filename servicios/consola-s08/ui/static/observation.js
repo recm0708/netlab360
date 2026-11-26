@@ -85,6 +85,23 @@
   }
   function httpLabel(code){return code===null?"Sin datos":code===0?"0 · Sin respuesta":code===200?"200 OK":String(code);}
   function httpState(code){return code===null||code===0?"unknown":code>=500?"fault":code>=400?"warn":code>=300?"recovery":code>=200?"ok":"unknown";}
+  // Resúmenes de presentación: no sustituyen los valores del contrato.
+  function overview(data){
+    const fresh=data.probes.filter(p=>p.quality==="VALID"&&p.latest);
+    return {fresh:fresh.length,acquired:fresh.filter(p=>p.latest.scrape_up===1).length,
+      measured:fresh.filter(p=>p.latest.probe_success!==null).length,
+      passed:fresh.filter(p=>p.latest.probe_success===1).length,
+      complete:data.probes.flatMap(p=>p.windows).filter(w=>w.quality==="OBSERVED").length};
+  }
+  function httpHistory(data,span){
+    requireValue(minutes.includes(span));
+    const probe=data.probes.find(p=>p.probe.id==="s2-hq-http");
+    const rows=probe.samples.filter(s=>s.timestamp_unix>data.window_end_unix-span*60).slice().reverse();
+    const counts=new Map();
+    for(const s of rows)counts.set(s.http_status_code,(counts.get(s.http_status_code)||0)+1);
+    return {latest:probe.latest,quality:probe.quality,rows,
+      counts:[...counts].sort((a,b)=>(a[0]??Infinity)-(b[0]??Infinity))};
+  }
   function figure(data,key,format,colors,span){
     requireValue(["scrape_up","probe_success","duration_seconds"].includes(key)&&minutes.includes(span));
     const start=data.window_end_unix-span*60,end=data.window_end_unix, duration=key==="duration_seconds";
@@ -111,15 +128,15 @@
         traces.push({type:"scatter",mode:"markers",name:names[id],x:valid.map(s=>s.timestamp_unix),
           y:valid.map(()=>ids.length-1-i),customdata:valid.map(s=>[format(new Date(s.timestamp_unix*1000)),
             s[key]===1?(key==="scrape_up"?"Adquisición correcta":"Éxito"):(key==="scrape_up"?"Error de adquisición":"Fallo medido")]),
-          marker:{size:5,color:valid.map(s=>s[key]===1?colors.ok:colors.fault),symbol:valid.map(s=>s[key]===1?"circle":"x")},
+          marker:{size:span===60?2.5:span===15?4:6,color:valid.map(s=>s[key]===1?colors.ok:colors.fault),symbol:valid.map(s=>s[key]===1?"circle":"x")},
           showlegend:false,hovertemplate:names[id]+"<br>%{customdata[0]}<br>%{customdata[1]}<extra></extra>"});
       }
     }
-    const ticks=Array.from({length:5},(_,i)=>start+(end-start)*i/4);
-    return {traces,layout:{height:duration?340:225,autosize:true,paper_bgcolor:colors.surface,plot_bgcolor:colors.surface,
-      font:{color:colors.text,size:12},margin:{l:duration?65:155,r:15,t:10,b:duration?90:50},
+    const ticks=Array.from({length:5},(_,i)=>start+(end-start)*(i+0.5)/5);
+    return {traces,layout:{height:duration?350:215,autosize:true,paper_bgcolor:colors.surface,plot_bgcolor:colors.surface,
+      font:{color:colors.text,size:12},margin:{l:duration?65:165,r:20,t:12,b:duration?85:40},
       hovermode:"closest",dragmode:"zoom",separators:".,",
-      xaxis:{type:"linear",range:[start,end],tickmode:"array",tickvals:ticks,ticktext:ticks.map(t=>format(new Date(t*1000)).slice(11)),gridcolor:colors.line},
+      xaxis:{type:"linear",range:[start,end],tickmode:"array",tickvals:ticks,ticktext:ticks.map(t=>new Intl.DateTimeFormat("es-PA",{timeZone:"America/Panama",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).format(new Date(t*1000))),gridcolor:colors.line},
       yaxis:duration?{title:{text:"Duración (ms)"},rangemode:"tozero",gridcolor:colors.line}:
         {tickmode:"array",tickvals:ids.map((_,i)=>ids.length-1-i),ticktext:ids.map(id=>names[id]),range:[-0.6,4.6],fixedrange:true,gridcolor:colors.line,zeroline:false},
       legend:{orientation:"h",y:-0.23},showlegend:duration}};
@@ -143,9 +160,14 @@
       for(const v of values)Array.isArray(v)?cell(tr,v[0],v[1]):cell(tr,v);
       return tr;
     }
+    function resetSummary(){
+      for(const id of ["fresh","acquired","passed","complete","http-latest","http-detail","http-count"])text(id,"—");
+      table("http-codes",[]);
+    }
     function clear(){
       epoch++;data=null;busy=false;notifyBusy=false;
       for(const id of ["latest","windows","http","notifications","cards"])table(id,[]);
+      resetSummary();
       text("source","Sin observación vigente.");text("notice","Consulte las sondas.");
       text("notify-status","Sin consulta de notificaciones.");
       for(const key of charts)el(key).hidden=true;
@@ -160,8 +182,14 @@
       if(option.hidden&&scope.value==="validation"){scope.value="operational";table("notifications",[]);text("notify-status","Consulte las notificaciones operacionales.");}
     }
     function render(result){
+      const summary=overview(result);
+      text("fresh",summary.fresh+" / 5");
+      text("acquired",summary.acquired+" / 5");
+      text("passed",summary.passed+" / "+summary.measured);
+      text("complete",summary.complete+" / 15");
+      const labels={up:"Adquisición",probe_success:"Resultado",probe_duration_seconds:"Duración",probe_http_status_code:"HTTP"};
       text("source","Prometheus · Blackbox · corte Panamá: "+format(new Date(result.window_end_unix*1000))+
-        " · cadencia 10 s · "+Object.entries(result.transport).map(([k,v])=>k+": "+v).join(" · "));
+        " · cadencia 10 s · "+Object.entries(result.transport).map(([k,v])=>labels[k]+": "+v).join(" · "));
       table("latest",ids.map(id=>{
         const p=result.probes.find(r=>r.probe.id===id),s=p.latest;
         return rowOf([names[id],quality[p.quality],
@@ -170,13 +198,14 @@
           s?.probe_success===1?["Éxito","ok"]:s?.probe_success===0?["Fallo medido","fault"]:["Sin datos","unknown"],
           s?.duration_seconds==null?"—":number(s.duration_seconds*1000,"latency")+" ms"]);
       }));
-      const cards=minutes.map(m=>{
-        const section=document.createElement("section"), title=document.createElement("h3"), grid=document.createElement("div");
-        section.className="obs-window";title.textContent=m+" min";grid.className="obs-card-grid";
-        for(const id of ids){
-          const w=result.probes.find(r=>r.probe.id===id).windows.find(w=>w.window_minutes===m);
-          const card=document.createElement("div"), label=document.createElement("span"), value=document.createElement("strong"), detail=document.createElement("small");
-          card.className="obs-card";label.textContent=names[id];
+      const cards=ids.map(id=>{
+        const section=document.createElement("section"),title=document.createElement("h3"),grid=document.createElement("div");
+        section.className="obs-window";title.textContent=names[id];grid.className="obs-card-grid";
+        const probe=result.probes.find(r=>r.probe.id===id);
+        for(const m of minutes){
+          const w=probe.windows.find(w=>w.window_minutes===m);
+          const card=document.createElement("div"),label=document.createElement("span"),value=document.createElement("strong"),detail=document.createElement("small");
+          card.className="obs-card";label.textContent=m+" min";
           value.textContent=w?.observed_availability_pct==null?"—":number(w.observed_availability_pct,"percentage")+" %";
           detail.textContent=w?quality[w.quality]+" · "+w.probe_count+"/"+w.nominal_slots+" medidas":"Sin datos";
           state(card,w?.meets_observed_target===true?"ok":w?.meets_observed_target===false?"fault":"unknown");
@@ -195,8 +224,22 @@
           w.burn_rate_observed===null?"—":number(w.burn_rate_observed,"burn")+"×",
           [quality[w.quality]+" · "+assessment[0],assessment[1]]]);
       })));
-      const http=result.probes.find(p=>p.probe.id==="s2-hq-http");
-      table("http",[...http.samples].reverse().map(s=>rowOf([format(new Date(s.timestamp_unix*1000)),[httpLabel(s.http_status_code),httpState(s.http_status_code)]])));
+      renderHttp(result);
+    }
+    function renderHttp(result){
+      const h=httpHistory(result,Number(el("span").value));
+      text("http-latest",h.latest?httpLabel(h.latest.http_status_code):"Sin datos");
+      state(el("http-latest"),h.quality==="VALID"&&h.latest?httpState(h.latest.http_status_code):"unknown");
+      text("http-detail",h.latest?quality[h.quality]+" · "+format(new Date(h.latest.timestamp_unix*1000)):quality[h.quality]);
+      text("http-count",h.rows.length+" muestras adquiridas en el intervalo");
+      const tags=h.counts.map(([code,n])=>{
+        const tag=document.createElement("span");
+        tag.className="obs-code-tag";state(tag,httpState(code));
+        tag.textContent=httpLabel(code)+" · "+n;
+        return tag;
+      });
+      table("http-codes",tags);
+      table("http",h.rows.map(s=>rowOf([format(new Date(s.timestamp_unix*1000)),[httpLabel(s.http_status_code),httpState(s.http_status_code)]])));
     }
     function renderPlots(){
       const current=data,e=epoch,actor=context()?.key;
@@ -229,7 +272,7 @@
         await renderPlots();
       }catch(error){
         if(same(e,actor)){data=null;for(const id of ["latest","windows","http","cards"])table(id,[]);
-          for(const key of charts)el(key).hidden=true;text("source","Sin observación confirmada.");
+          for(const key of charts)el(key).hidden=true;resetSummary();text("source","Sin observación confirmada.");
           text("notice",error.message==="HTTP_429"?"Consulta ocupada. Reintente después de dos segundos.":"No se pudo confirmar la observación.");}
       }finally{if(epoch===e){busy=false;controls();}}
     }
@@ -254,9 +297,9 @@
     }
     button.addEventListener("click",refresh);notify.addEventListener("click",refreshNotifications);
     scope.addEventListener("change",()=>{table("notifications",[]);text("notify-status","Consulte el ámbito seleccionado.");});
-    el("span").addEventListener("change",renderPlots);
+    el("span").addEventListener("change",()=>{if(data&&permitted()){renderHttp(data);renderPlots();}});
     new MutationObserver(()=>{if(data&&permitted())renderPlots();}).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
     return {clear,controls};
   }
-  root.NetlabObservation=Object.freeze({names,validate,validateNotifications,httpLabel,httpState,figure,create});
+  root.NetlabObservation=Object.freeze({names,validate,validateNotifications,httpLabel,httpState,overview,httpHistory,figure,create});
 })(typeof window==="undefined"?globalThis:window);
