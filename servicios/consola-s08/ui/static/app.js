@@ -512,7 +512,7 @@ function initializeConsole() {
       refreshCurrent("initial").then(() => restoreContentIfUnchanged());
       if (debugAllowed() && new URLSearchParams(location.search).get("tab") === "docs") openSwagger();
     }
-    if(!first&&location.pathname==="/observability"&&!observationInitialized)void refreshCurrent("initial");
+    if(!first&&observationPage&&!observationInitialized)void refreshCurrent("initial");
     authNotice.textContent = "Sesión vigente. Las mutaciones de red están deshabilitadas.";
     controls();
     tick();
@@ -1545,15 +1545,13 @@ function initializeConsole() {
   const refreshControls=document.getElementById("refresh-controls");
   const refreshAuto=document.getElementById("refresh-auto");
   const refreshInterval=document.getElementById("refresh-interval");
-  let refreshPreference=parseRefresh(null),refreshBusy=false,observationInitialized=false;
-  try{refreshPreference=parseRefresh(localStorage.getItem(refreshKey));}catch{}
-  const scheduler=refreshScheduler(refreshCurrent,window);
   const observationPage=location.pathname==="/observability",manualDebug=location.pathname==="/debug";
-  if(observationPage){
-    try{refreshPreference=parseRefresh(localStorage.getItem(refreshKey+".observation")||"on:10");}catch{refreshPreference=parseRefresh("on:10");}
-    refreshInterval.querySelector('option[value="5"]').disabled=true;
-  }
   const preferenceKey=observationPage?refreshKey+".observation":refreshKey;
+  const defaultRefresh=observationPage?"on:10":null;
+  let refreshPreference=parseRefresh(defaultRefresh),refreshBusy=false,observationInitialized=false;
+  try{refreshPreference=parseRefresh(localStorage.getItem(preferenceKey)||defaultRefresh);}catch{}
+  const scheduler=refreshScheduler(refreshCurrent,window);
+  if(observationPage)refreshInterval.querySelector('option[value="5"]').disabled=true;
   const autoPage=automaticPage(location.pathname);
   const slot=document.getElementById("refresh-slot");
   if(manualDebug)document.getElementById("debug-refresh-slot").append(refreshControls);
