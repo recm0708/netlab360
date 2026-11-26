@@ -291,10 +291,14 @@ details.summary > summary { cursor: pointer; font-weight: 600; }
 .topology-item[data-state="warn"] { --edge:var(--warn); }
 .topology-edge-label { pointer-events:none; }
 .topology-item.selected .topology-edge { filter:drop-shadow(0 0 3px var(--accent)); }
-#topology-workspace:fullscreen { background:var(--bg); color:var(--text); padding:24px; overflow:auto; }
-#topology-workspace:fullscreen .topology-layout { grid-template-columns:minmax(0,1fr) minmax(220px,280px); }
-#topology-workspace:fullscreen #topology-map { max-height:calc(100vh - 185px); }
-@media(max-width:900px){#topology-workspace:fullscreen .topology-layout{grid-template-columns:minmax(0,1fr);}}
+#topology-workspace:fullscreen { background:var(--bg); color:var(--text); padding:14px; overflow:auto; }
+#topology-workspace:fullscreen .topology-layout { grid-template-columns:minmax(0,1fr) minmax(210px,250px); gap:10px; }
+/* Ajuste al ancho, no a la altura: preservar proporciones y permitir scroll vertical. */
+#topology-workspace:fullscreen .topology-map { padding:6px; }
+#topology-workspace:fullscreen #topology-map { width:100%; height:auto; max-height:none; }
+#topology-workspace:fullscreen .topology-inspector { top:8px; max-height:calc(100dvh - 24px); }
+@media(max-width:1100px){#topology-workspace:fullscreen .topology-layout{grid-template-columns:minmax(0,1fr);}
+  #topology-workspace:fullscreen .topology-inspector { position:static; max-height:none; }}
 
 /* El halo de selección no sustituye el color de estado de un enlace o equipo. */
 .topology-highlight { fill:none; stroke:transparent; stroke-width:9; pointer-events:none; }
@@ -504,3 +508,8 @@ button.secondary, .topology-action {
 .topology-legend-note { margin:16px 0 0; padding-top:12px; border-top:1px solid var(--line); }
 @media(min-width:1101px){.topology-inspector { position:sticky; top:12px; max-height:calc(100dvh - 100px); overflow-y:auto; overscroll-behavior:auto; }}
 @media(max-width:900px){.topology-legend-grid { grid-template-columns:1fr; }}
+
+/* Jerarquía de campos y valores, común a todos los recursos del inspector. */
+#topology-selection { color:var(--text); font-size:1rem; font-weight:700; margin:8px 0 12px; overflow-wrap:anywhere; }
+.topology-inspector dt { color:var(--muted); font-size:.79rem; font-weight:700; border-top:1px solid var(--line); padding-top:8px; margin-top:8px; }
+.topology-inspector dd { color:var(--text); font-size:.94rem; line-height:1.45; margin:3px 0 0; text-align:left; }
