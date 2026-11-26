@@ -98,7 +98,7 @@
     const times=Array.from({length:5},(_,i)=>data.start_epoch+span*i/4);
     const plotHeight=Math.max(180,entries.length*56);
     const layout={
-      height:plotHeight+90,autosize:true,uirevision:data.group+":"+data.window,
+      height:plotHeight+90,autosize:true,separators:".,",uirevision:data.group+":"+data.window,
       paper_bgcolor:colors.surface,plot_bgcolor:colors.surface,font:{color:colors.text,size:12},
       margin:{l:130,r:20,t:12,b:78},hovermode:"closest",dragmode:"zoom",
       xaxis:{type:"linear",range:[data.start_epoch,data.end_epoch],tickmode:"array",
