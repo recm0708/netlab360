@@ -10,7 +10,7 @@ from urllib.parse import urlencode
 from urllib.request import Request
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from contrastar_grafana import BASE, DASH, OPEN, ROOT, UID, get
+from contrastar_grafana import BASE, DASH, OPEN, ROOT, UID
 from api import readers, slo_contract as S
 
 PROM = "http://127.0.0.1:9091"
@@ -18,14 +18,16 @@ STEP = 10
 SPAN = 300
 
 
-def fetch(url, password=None, payload=None):
+def fetch(url, password=None, payload=None, username="netlab360-admin", method=None):
     """Consultar únicamente orígenes locales con respuestas acotadas."""
-    req = Request(url, data=None if payload is None else json.dumps(payload).encode())
+    assert url.startswith((BASE + "/", PROM + "/"))
+    assert password is None or (url.startswith(BASE + "/") and ":" not in username)
+    req = Request(url, data=None if payload is None else json.dumps(payload).encode(), method=method)
     if payload is not None:
         req.add_header("Content-Type", "application/json")
     if password is not None:
         req.add_header("Authorization", "Basic " + base64.b64encode(
-            ("netlab360-admin:" + password).encode()).decode())
+            (username + ":" + password).encode()).decode())
     with OPEN.open(req, timeout=20) as response:
         return readers.decode(response.read(2_097_153), 2_097_152)
 
@@ -89,9 +91,9 @@ def compare_points(actual, expected, probes, stamps):
         assert math.isclose(actual[key], expected[key], rel_tol=0, abs_tol=1e-9), key
 
 
-def run(destination, password):
+def run(destination, password, username="netlab360-admin"):
     """Ejecutar cada target aprovisionado al mismo corte fijo y registrar resultados."""
-    dashboard = get("/api/dashboards/uid/" + DASH, password)["dashboard"]
+    dashboard = fetch(BASE + "/api/dashboards/uid/" + DASH, password, username=username)["dashboard"]
     expected = json.loads((ROOT / "servicios/observabilidad/grafana/dashboards/sondas.json").read_text())
     assert dashboard["uid"] == DASH
     assert {p["id"] for p in dashboard["panels"]} == set(range(1, 11))
@@ -113,7 +115,7 @@ def run(destination, password):
             query = dict(target, format="time_series", intervalMs=STEP * 1000,
                          maxDataPoints=1000)
             payload = {"from": str(start * 1000), "to": str(end * 1000), "queries": [query]}
-            result = fetch(BASE + "/api/ds/query", password, payload)["results"]
+            result = fetch(BASE + "/api/ds/query", password, payload, username=username)["results"]
             assert set(result) == {target["refId"]}
             actual = frame_points(result[target["refId"]])
             args = {"query": target["expr"]}
