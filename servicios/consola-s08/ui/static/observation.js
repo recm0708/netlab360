@@ -102,6 +102,16 @@
     return {latest:probe.latest,quality:probe.quality,rows,
       counts:[...counts].sort((a,b)=>(a[0]??Infinity)-(b[0]??Infinity))};
   }
+  function durationStats(data,span){
+    requireValue(minutes.includes(span));
+    return ids.map(id=>{
+      const points=data.probes.find(p=>p.probe.id===id).samples.filter(s=>s.timestamp_unix>data.window_end_unix-span*60&&s.duration_seconds!==null);
+      const values=points.map(s=>s.duration_seconds*1000);
+      return {id,count:values.length,last:values.at(-1)??null,
+        mean:values.length?values.reduce((sum,n)=>sum+n,0)/values.length:null,
+        max:values.length?Math.max(...values):null};
+    });
+  }
   function figure(data,key,format,colors,span){
     requireValue(["scrape_up","probe_success","duration_seconds"].includes(key)&&minutes.includes(span));
     const start=data.window_end_unix-span*60,end=data.window_end_unix, duration=key==="duration_seconds";
@@ -162,7 +172,8 @@
     }
     function resetSummary(){
       for(const id of ["fresh","acquired","passed","complete","http-latest","http-detail","http-count"])text(id,"—");
-      table("http-codes",[]);
+      table("http-codes",[]);table("duration-stats",[]);
+      state(el("http-latest"),"unknown");
     }
     function clear(){
       epoch++;data=null;busy=false;notifyBusy=false;
@@ -185,11 +196,12 @@
       const summary=overview(result);
       text("fresh",summary.fresh+" / 5");
       text("acquired",summary.acquired+" / 5");
-      text("passed",summary.passed+" / "+summary.measured);
+      text("passed",summary.measured?summary.passed+" / "+summary.measured:"Sin datos");
       text("complete",summary.complete+" / 15");
       const labels={up:"Adquisición",probe_success:"Resultado",probe_duration_seconds:"Duración",probe_http_status_code:"HTTP"};
+      const statuses={OK:"Disponible",INVALID:"Inválida",UNAVAILABLE:"No disponible",UNKNOWN:"Desconocida",NOT_STARTED:"Sin iniciar"};
       text("source","Prometheus · Blackbox · corte Panamá: "+format(new Date(result.window_end_unix*1000))+
-        " · cadencia 10 s · "+Object.entries(result.transport).map(([k,v])=>labels[k]+": "+v).join(" · "));
+        " · cadencia 10 s · "+Object.entries(result.transport).map(([k,v])=>labels[k]+": "+statuses[v]).join(" · "));
       table("latest",ids.map(id=>{
         const p=result.probes.find(r=>r.probe.id===id),s=p.latest;
         return rowOf([names[id],quality[p.quality],
@@ -224,9 +236,11 @@
           w.burn_rate_observed===null?"—":number(w.burn_rate_observed,"burn")+"×",
           [quality[w.quality]+" · "+assessment[0],assessment[1]]]);
       })));
-      renderHttp(result);
+      renderInterval(result);
     }
-    function renderHttp(result){
+    function renderInterval(result){
+      const ms=n=>n===null?"—":number(n,"latency")+" ms";
+      table("duration-stats",durationStats(result,Number(el("span").value)).map(s=>rowOf([names[s.id],s.count,ms(s.last),ms(s.mean),ms(s.max)])));
       const h=httpHistory(result,Number(el("span").value));
       text("http-latest",h.latest?httpLabel(h.latest.http_status_code):"Sin datos");
       state(el("http-latest"),h.quality==="VALID"&&h.latest?httpState(h.latest.http_status_code):"unknown");
@@ -287,7 +301,7 @@
         if(status!==200)throw Error("HTTP_"+status);
         const batch=validateNotifications(result,selected);
         text("notify-status",batch.transport==="OK"?number(batch.total,"count")+" registros · "+(batch.truncated?"Últimos 200 · ":"")+
-          (selected==="validation"?"Validación sintética, no operacional.":"Notificaciones operacionales."):"Fuente "+batch.transport+"; cantidad no confirmada.");
+          (selected==="validation"?"Validación sintética, no operacional.":batch.total===0?"No hay notificaciones operacionales registradas.":"Notificaciones operacionales."):"Fuente "+batch.transport+"; cantidad no confirmada.");
         table("notifications",batch.records.map(r=>rowOf([r.alertname,names[r.labels?.probe_id]??"—",
           r.status==="firing"?["Activa","fault"]:["Resuelta","recovery"],
           format(new Date(r.starts_at_utc)),r.ends_at_utc?format(new Date(r.ends_at_utc)):"—",
@@ -297,9 +311,9 @@
     }
     button.addEventListener("click",refresh);notify.addEventListener("click",refreshNotifications);
     scope.addEventListener("change",()=>{table("notifications",[]);text("notify-status","Consulte el ámbito seleccionado.");});
-    el("span").addEventListener("change",()=>{if(data&&permitted()){renderHttp(data);renderPlots();}});
+    el("span").addEventListener("change",()=>{if(data&&permitted()){renderInterval(data);renderPlots();}});
     new MutationObserver(()=>{if(data&&permitted())renderPlots();}).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
     return {clear,controls};
   }
-  root.NetlabObservation=Object.freeze({names,validate,validateNotifications,httpLabel,httpState,overview,httpHistory,figure,create});
+  root.NetlabObservation=Object.freeze({names,validate,validateNotifications,httpLabel,httpState,overview,httpHistory,durationStats,figure,create});
 })(typeof window==="undefined"?globalThis:window);
