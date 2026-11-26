@@ -35,7 +35,7 @@ function createJobsView(context, request, formatDate) {
   const uuid = value => typeof value === "string" && /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/.test(value);
   let generation = 0, configured = false, pending = false, choices = [], selected = null, owner = null, occupied = false;
   let lastPoll = 0, loaded = false, requestedId = null;
-  let historical=null,historyFingerprint=null;
+  let historical=null,historyFingerprint=null,historicalOpen=false;
   const text = (id,value) => {byId(id).textContent = String(value ?? "—");};
   const number = NetlabNumbers.format;
   const permitted = () => location.pathname === "/diagnostics" && context()?.role === "OPERATOR" && context()?.active;
@@ -79,7 +79,7 @@ function createJobsView(context, request, formatDate) {
   }
   function reset() {
     generation++; configured=false; pending=false; loaded=false; occupied=false; choices=[]; owner=null; requestedId=null;
-    historical=null;historyFingerprint=null;lastPoll=0;
+    historical=null;historyFingerprint=null;historicalOpen=false;lastPoll=0;
     fields.forEach(field=>field.replaceChildren()); history.replaceChildren(); clearResult();
     text("profile-note",""); notice.textContent="Sin catálogo autenticado."; controls();
   }
@@ -197,12 +197,14 @@ function createJobsView(context, request, formatDate) {
     }
     if(historical&&active(historical)){
       const id=historical.job_id,job=await call("/api/v1/jobs/"+id);
-      if(epoch===generation&&permitted()&&historical?.job_id===id){historical=job;mountHistorical();}
+      if(epoch===generation&&permitted()&&historical?.job_id===id){
+        if(job?.job_id!==id||job.actor_id!==owner||!job.data?.selection)throw Error("INVALID_JOB");
+        historical=job;mountHistorical();
+      }
     }
   }
   function mountHistorical(){
     const previous=history.querySelector(".jobs-history-detail");
-    const wasOpen=previous?.querySelector("details")?.open===true;
     previous?.remove();
     for(const row of history.querySelectorAll("tr[data-job-id]")){
       const current=row.dataset.jobId===historical?.job_id,button=row.querySelector("button");
@@ -221,8 +223,15 @@ function createJobsView(context, request, formatDate) {
     const m=job.data.result?.measurement,points=samples(job),tx=points.filter(p=>p.role==="sender").at(-1),rx=points.filter(p=>p.role==="receiver").at(-1);
     const sent=m?.bytes_sent??tx?.bytes,received=m?.bytes_received??rx?.bytes;
     if(Number.isFinite(sent)||Number.isFinite(received))add("p","Emisor: "+number(sent,"bytes")+" bytes · Receptor: "+number(received,"bytes")+" bytes · Rendimiento receptor: "+number(m?.receiver_mbps??rx?.rate,"rate")+" Mbit/s");
+    if(points.length){
+      const list=document.createElement("ul");
+      for(const p of points){const li=document.createElement("li");li.textContent=(p.role==="sender"?"Emisor":"Receptor")+" · "+number(p.time,"seconds")+" s · "+number(p.bytes,"bytes")+" bytes ("+(p.kind==="IPERF_INTERVALO_FINAL"?"intervalo":"acumulados")+") · "+number(p.rate,"rate")+" Mbit/s";list.append(li);}
+      const samplesDetail=document.createElement("details"),caption=document.createElement("summary");caption.textContent="Muestras de transferencia ("+number(points.length,"count")+")";samplesDetail.append(caption,list);panel.append(samplesDetail);
+    }
+    const diagnostic=Array.isArray(m?.hops)?m.hops:Array.isArray(m?.samples)?m.samples:[];
+    if(diagnostic.length){const list=document.createElement("ul");for(const p of diagnostic){const li=document.createElement("li");li.textContent=(Array.isArray(m.hops)?"Salto "+p.hop+" · "+(p.address??"Sin respuesta"):"Paquete "+p.seq)+(p.rtt_ms==null?"":" · "+number(p.rtt_ms,"latency")+" ms");list.append(li);}panel.append(list);}
     const details=document.createElement("details"),summary=document.createElement("summary"),pre=document.createElement("pre");
-    details.open=wasOpen;summary.textContent="Registro completo (JSON original)";pre.textContent=JSON.stringify(job,null,2);details.append(summary,pre);panel.append(details);
+    details.open=historicalOpen;details.addEventListener("toggle",()=>{if(details.isConnected)historicalOpen=details.open;});summary.textContent="Registro completo (JSON original)";pre.textContent=JSON.stringify(job,null,2);details.append(summary,pre);panel.append(details);
     const actions=document.createElement("div");actions.className="action-row";
     for(const format of ["json","csv"]){const button=document.createElement("button");button.type="button";button.textContent="Exportar "+format.toUpperCase();button.disabled=active(job);button.addEventListener("click",()=>download(format,job));actions.append(button);}
     panel.append(actions);td.append(panel);detail.append(td);row.after(detail);
@@ -230,12 +239,12 @@ function createJobsView(context, request, formatDate) {
   function openResult(id) {
     if(!permitted()||!configured||!uuid(id))return;
     if(pending){requestedId=id;return;}
-    if(historical?.job_id===id){historical=null;mountHistorical();return;}
+    if(historical?.job_id===id){historical=null;historicalOpen=false;mountHistorical();return;}
     void perform(async epoch=>{
       const result=await call("/api/v1/jobs/"+id);
       if(epoch===generation&&permitted()){
         if(!uuid(result?.job_id)||result.job_id!==id||result.actor_id!==owner||!result.data?.selection)throw Error("INVALID_JOB");
-        historical=result;mountHistorical();
+        historical=result;historicalOpen=false;mountHistorical();
       }
     });
   }
