@@ -58,6 +58,22 @@ class GrafanaTests(unittest.TestCase):
                         "User=netlab360-s08-grafana", "CapabilityBoundingSet="):
             self.assertIn(setting, unit)
 
+    def test_private_installation_prefix(self):
+        prefix = "/opt/netlab360-grafana"
+        unit = (ROOT / "operacion/plantillas/netlab360-s08-grafana.service").read_text()
+        self.assertIn(f"WorkingDirectory={prefix}/grafana-13.3.2", unit)
+        self.assertIn(f"--homepath={prefix}/grafana-13.3.2", unit)
+        self.assertIn(f"--config={prefix}/grafana-config/grafana.ini", unit)
+        config = configparser.ConfigParser(interpolation=None)
+        config.read(CONFIG / "grafana.ini")
+        self.assertEqual(config["paths"]["provisioning"], f"{prefix}/grafana-config/provisioning")
+        provider = (CONFIG / "provisioning/dashboards/netlab360.yml").read_text()
+        self.assertIn(f"path: {prefix}/grafana-config/dashboards", provider)
+        installer = (ROOT / "scripts/s08/desplegar_grafana.sh").read_text()
+        self.assertIn(f"PREFIX={prefix}", installer)
+        self.assertIn('-g "$ACCOUNT" -m 0750 "$PREFIX"', installer)
+        self.assertIn('sudo -n -u "$ACCOUNT" test -x "$INSTALL/bin/grafana"', installer)
+
 
 if __name__ == "__main__":
     unittest.main()
