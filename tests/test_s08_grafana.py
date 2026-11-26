@@ -101,5 +101,31 @@ class GrafanaTests(unittest.TestCase):
             self.assertEqual(sli["thresholds"]["steps"][-1]["color"], "blue")
 
 
+    def test_sli_cards(self):
+        dashboard = json.loads((CONFIG / "dashboards/sondas.json").read_text())
+        panels = {p["id"]: p for p in dashboard["panels"]}
+        for panel_id in (5, 7, 9):
+            panel = panels[panel_id]
+            self.assertEqual(panel["type"], "stat")
+            self.assertEqual(panel["gridPos"]["h"], panels[panel_id + 1]["gridPos"]["h"])
+            self.assertEqual(panel["options"]["orientation"], "horizontal")
+            self.assertEqual(panel["options"]["colorMode"], "background")
+            self.assertTrue(panel["options"]["wideLayout"])
+            self.assertTrue(panel["options"]["reduceOptions"]["values"])
+            self.assertEqual(panel["options"]["reduceOptions"]["limit"], 5)
+            self.assertEqual(panel["options"]["graphMode"], "none")
+            self.assertEqual(panel["transformations"], [
+                {"id": "seriesToRows", "options": {}},
+                {"id": "sortBy", "options": {"sort": [{"field": "Metric", "desc": False}]}},
+            ])
+            defaults = panel["fieldConfig"]["defaults"]
+            self.assertEqual((defaults["min"], defaults["max"], defaults["decimals"]), (0, 100, 2))
+            self.assertEqual([(s["value"], s["color"]) for s in defaults["thresholds"]["steps"]],
+                             [(None, "red"), (95, "orange"), (99, "blue")])
+            self.assertEqual({m["options"]["match"] for m in defaults["mappings"]}, {"null", "nan"})
+            self.assertTrue(all(m["options"]["result"]["color"] == "gray" for m in defaults["mappings"]))
+            self.assertEqual(panel["targets"][0]["legendFormat"], "{{probe_id}}")
+
+
 if __name__ == "__main__":
     unittest.main()
