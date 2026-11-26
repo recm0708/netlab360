@@ -52,7 +52,7 @@ function createJobsView(context, request, formatDate) {
       Object.fromEntries(relevant.map(row=>[row.profile,profileLabel(row)])));
     const row = selection();
     const rateNote = row && row.profile !== "default" ? "Tasa objetivo configurada, no rendimiento garantizado. " : "";
-    text("profile-note", row ? rateNote + (row.live_progress ? "Contadores reales en vivo y cancelación activa de contenido." :
+    text("profile-note", row ? rateNote + (row.live_progress ? "Contadores reales en vivo y cancelación activa de la transferencia." :
       "Seguimiento del estado; métricas de la prueba al finalizar. Cancelación solo en cola.") + " Plazo máximo: " + row.deadline_s + " s." : "");
     controls();
   }
@@ -84,7 +84,7 @@ function createJobsView(context, request, formatDate) {
   }
   function samples(job) {
     const progress = job.data?.progress || [], m = job.data?.result?.measurement || {};
-    if (progress.length) return progress.map(x=>({role:x.role,time:x.elapsed_s,bytes:x.bytes,rate:x.mbps,kind:"CONTENIDO_ACUMULADO"}));
+    if (progress.length) return progress.map(x=>({role:x.role,time:x.elapsed_s,bytes:x.bytes,rate:x.mbps,kind:Number.isFinite(x.interval_bytes)?"IPERF_ACUMULADO":"CONTENIDO_ACUMULADO",intervalBytes:x.interval_bytes,start:x.start_s}));
     return ["sender","receiver"].flatMap(role=>(m[role+"_intervals"] || []).map(x=>(
       {role,time:x.end_s,bytes:x.bytes,rate:x.mbps,kind:"IPERF_INTERVALO_FINAL"})));
   }
@@ -112,13 +112,15 @@ function createJobsView(context, request, formatDate) {
     text("rx",number(m?.bytes_received ?? (data.progress?.length ? rx?.bytes : undefined))+" bytes");
     text("tx-rate",number(m?.sender_mbps ?? tx?.rate)+" Mbit/s");
     text("rx-rate",number(m?.receiver_mbps ?? rx?.rate)+" Mbit/s");
-    const targets={"content-100mb":100000000,"content-500mb":500000000,"content-1gb":1000000000,"content-2gb":2000000000,"content-5gb":5000000000};
+    const targets={"content-100mb":100000000,"content-500mb":500000000,"content-1gb":1000000000,"content-2gb":2000000000,"content-5gb":5000000000,
+      "tcp-100mb":100000000,"tcp-500mb":500000000,"tcp-1gb":1000000000,"tcp-2gb":2000000000,"tcp-5gb":5000000000};
     const target=m?.target_bytes ?? targets[data.selection.profile];
     const received=m?.bytes_received ?? (data.progress?.length ? rx?.bytes : undefined);
     const measured=Number.isFinite(target)&&target>0&&Number.isFinite(received);
     byId("progress").hidden=!measured;
     if (measured) byId("progress").value=Math.min(100,received*100/target);
     text("progress-note",measured?number(received)+" / "+number(target)+" bytes observados":
+      Number.isFinite(rx?.time)?"Tiempo observado del receptor: "+number(rx.time)+" s":
       active(job)?"Esperando medición; no se estima el avance por tiempo.":"Sin volumen medible.");
     const metrics=m?[["Estado de medición",m.status],["Paquetes enviados",m.sent],["Paquetes recibidos",m.received],
       ["RTT mín. (ms)",m.rtt_min_ms],["RTT medio (ms)",m.rtt_avg_ms],["RTT máx. (ms)",m.rtt_max_ms],
@@ -263,6 +265,8 @@ function createJobsView(context, request, formatDate) {
     const rows=[["job_id","fecha_utc","fecha_panama","accion_id","prueba","perfil_id","configuracion",
       "ruta","estado","tipo","extremo","tiempo_s","bytes","mbps","metrica","valor"],
       ...samples(selected).map(x=>[...identity,x.kind,x.role,x.time,x.bytes,x.rate,"",""])];
+    for(const point of samples(selected))if(Number.isFinite(point.intervalBytes))
+      rows.push([...identity,"IPERF_INTERVALO_NATIVO",point.role,point.time,point.intervalBytes,point.rate,"inicio_s",point.start]);
     const m=selected.data.result?.measurement || {};
     for(const [key,value] of Object.entries(m)){
       if(value!==null && ["string","number","boolean"].includes(typeof value))
