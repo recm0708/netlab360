@@ -435,7 +435,7 @@ button.secondary, .topology-action {
 .obs-window { border:1px solid var(--line); border-radius:9px; padding:11px; min-width:0; background:var(--bg); }
 .obs-window h3 { min-height:1.5em; overflow-wrap:anywhere; }
 .obs-card-grid { display:grid; gap:6px; }
-.obs-card { display:grid; grid-template-columns:auto 1fr; align-items:baseline; gap:2px 8px; border:1px solid var(--line); border-left:3px solid currentColor; border-radius:6px; padding:7px 9px; background:var(--unknown-bg); min-width:0; }
+.obs-card { display:grid; grid-template-columns:auto 1fr; align-items:baseline; gap:2px 8px; border:1px solid var(--line); border-radius:6px; padding:7px 9px; background:var(--unknown-bg); min-width:0; }
 .obs-card[data-state="ok"] { background:var(--ok-bg); }
 .obs-card[data-state="fault"] { background:var(--fault-bg); }
 .obs-card span,.obs-card small { color:var(--text); font-size:.79rem; overflow-wrap:anywhere; }
