@@ -40,7 +40,7 @@ class StructureTests(unittest.TestCase):
         parser.feed((UI / "index.html").read_text(encoding="utf-8"))
         self.assertEqual(set(parser.resources), {"/ui/static/styles.css", "/ui/static/app.js",
                                                  "/ui/static/history.js", "/ui/static/topology.js",
-                                                 "/ui/static/jobs.js"})
+                                                 "/ui/static/jobs.js", "/ui/static/observation.js"})
         self.assertEqual(len(parser.ids), len(set(parser.ids)))
         self.assertTrue({"main", "refresh", "notice", "api-state", "capabilities", "observed"} <= set(parser.ids))
         self.assertFalse(parser.inline)
@@ -330,7 +330,8 @@ class UIHttpTests(unittest.TestCase):
                            ("/ui/static/login.js", "text/javascript"),
                            ("/ui/static/history.js", "text/javascript"),
                            ("/ui/static/topology.js", "text/javascript"),
-                           ("/ui/static/jobs.js", "text/javascript")):
+                           ("/ui/static/jobs.js", "text/javascript"),
+                           ("/ui/static/observation.js", "text/javascript")):
             r = self.client.get(path)
             self.assertEqual(r.status_code, 200)
             self.assertIn(mime, r.headers["content-type"])
