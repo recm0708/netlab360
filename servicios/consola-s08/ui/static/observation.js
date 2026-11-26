@@ -155,9 +155,9 @@
     const el=id=>document.getElementById("obs-"+id);
     const scope=el("scope");
     const charts=["scrape_up","probe_success","duration_seconds"];
-    let epoch=0,data=null,busy=false,notifyBusy=false,draw=Promise.resolve();
+    let epoch=0,data=null,busy=false,draw=Promise.resolve();
     let notifySequence=0,notifyTimer=null,probeTimer=null,notifyRequest=Promise.resolve();
-    const permitted=()=>location.pathname==="/observability"&&context()?.active===true&&!document.hidden;
+    const permitted=()=>location.pathname==="/observability"&&context()?.active===true;
     const same=(e,actor)=>epoch===e&&permitted()&&context().key===actor;
     const text=(id,value)=>{el(id).textContent=value;};
     const state=(node,value)=>{node.dataset.state=value;};
@@ -177,7 +177,7 @@
       state(el("http-latest"),"unknown");
     }
     function clear(){
-      epoch++;data=null;busy=false;notifyBusy=false;notifySequence++;
+      epoch++;data=null;busy=false;notifySequence++;
       clearTimeout(notifyTimer);clearTimeout(probeTimer);
       for(const id of ["latest","windows","http","notifications","cards"])table(id,[]);
       resetSummary();
@@ -282,7 +282,8 @@
       return draw;
     }
     async function refresh(retry=true){
-      if(!permitted()||busy)return;
+      if(!permitted()||busy||document.hidden)return;
+      clearTimeout(probeTimer);
       const e=epoch,actor=context().key;busy=true;controls();
       text("notice","Consultando muestras reales…");
       try{
@@ -311,10 +312,10 @@
       return notifyRequest;
     }
     async function queryNotifications(sequence,retry){
-      if(!permitted()||sequence!==notifySequence)return;
+      if(!permitted()||document.hidden||sequence!==notifySequence)return;
       const e=epoch,actor=context().key,selected=scope.value;
       if(!["operational","validation"].includes(selected)||(selected==="validation"&&context().role!=="OPERATOR"))return;
-      notifyBusy=true;controls();table("notifications",[]);text("notify-status","Consultando notificaciones…");
+      controls();table("notifications",[]);text("notify-status","Consultando notificaciones…");
       try{
         const {status,data:result}=await read("/api/v1/alerts/notifications/"+selected,2097152);
         if(!same(e,actor)||scope.value!==selected||sequence!==notifySequence)return;
@@ -327,12 +328,21 @@
         const batch=validateNotifications(result,selected);
         text("notify-status",batch.transport==="OK"?number(batch.total,"count")+" registros · "+(batch.truncated?"Últimos 200 · ":"")+
           (selected==="validation"?"Validación sintética, no operacional.":batch.total===0?"No hay notificaciones operacionales registradas.":"Notificaciones operacionales."):"Fuente "+batch.transport+"; cantidad no confirmada.");
-        table("notifications",batch.records.map(r=>rowOf([r.alertname,names[r.labels?.probe_id]??"—",
-          r.status==="firing"?["Activación","fault"]:["Resolución","recovery"],
-          format(new Date(r.starts_at_utc)),r.ends_at_utc?format(new Date(r.ends_at_utc)):"—",
-          format(new Date(r.received_at_utc))])));
+        const labels=Object.freeze({
+          NETLAB360S08ProbeFailed:"Fallo medido de la sonda",
+          NETLAB360S08ProbeAcquisitionFailed:"Fallo de adquisición de métricas",
+          NETLAB360S08ProbeMetricMissing:"Métrica de resultado ausente",
+          NETLAB360S08Validation:"Validación sintética de notificaciones"
+        });
+        table("notifications",batch.records.map(r=>{
+          const row=rowOf([labels[r.alertname]||"Alerta sin descripción catalogada",names[r.labels?.probe_id]??"—",
+            r.status==="firing"?["Activación","fault"]:["Resolución","recovery"],
+            format(new Date(r.starts_at_utc)),r.ends_at_utc?format(new Date(r.ends_at_utc)):"—",
+            format(new Date(r.received_at_utc))]);
+          const id=document.createElement("small");id.className="muted obs-alert-id";id.textContent=r.alertname;row.firstChild.append(id);return row;
+        }));
       }catch(error){if(same(e,actor)&&scope.value===selected&&sequence===notifySequence)text("notify-status",error.message==="HTTP_429"?"Consulta ocupada. Reintente después de dos segundos.":"No se pudo confirmar la fuente.");}
-      finally{if(epoch===e){notifyBusy=false;controls();}}
+      finally{if(epoch===e)controls();}
     }
     scope.addEventListener("change",refreshNotifications);
     el("span").addEventListener("change",()=>{if(data&&permitted()){renderInterval(data);renderPlots();}});
