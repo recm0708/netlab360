@@ -1,6 +1,6 @@
 # Consola interactiva y acciones
 
-**Estado:** backend, sesiones, dashboard, topología SVG resumida y detallada, vistas por dominio, históricos Plotly y explorador Swagger implementados y validados incrementalmente. Conservamos el despliegue local de desarrollo; la equivalencia completa, inferencia activa, pruebas de red, sondas, actuación protegida, administración de identidades y reconstrucción permanecen pendientes.
+**Estado:** backend, sesiones, dashboard, topología SVG, vistas por dominio, históricos Plotly y explorador Swagger implementados y validados incrementalmente. Conservamos el despliegue local de desarrollo; la equivalencia completa, inferencia activa, pruebas de red, sondas, actuación protegida, administración de identidades y reconstrucción permanecen pendientes.
 
 ## 1. Experiencia de usuario
 
@@ -252,3 +252,9 @@ La [matriz de cobertura académica](../gestion/cobertura-academica-netlab360.md)
 ## Estado de integración de la interfaz
 
 Validamos 204 casos específicos, topología de 18 nodos y 21 enlaces (vista resumida de 15 nodos y 14 enlaces), filtros por sede, selección persistente, zoom, pantalla completa y actualización incremental. Los intervalos de consulta configurables son 5, 10, 15, 30, 60 y 300 segundos; históricos y diagnóstico técnico se consultan manualmente. La documentación Swagger usa la sesión vigente, ambas paletas y consultas GET permitidas. La copia histórica de alertas conserva su procedencia y no equivale a un registro continuo. La equivalencia completa con las interfaces anteriores se comprueba antes de su retiro.
+
+## Consolidación de la experiencia de usuario
+
+El portal oficial permanece en 127.0.0.1:9140. Conservamos un único diagrama completo de 18 nodos y 21 enlaces, incluidos los tres servidores HA y cuatro enlaces WAN del grafo NOC. Retiramos los controles de vista resumida/detallada sin retirar el origen del grafo. Diferenciamos inventario, estado administrativo, FIB y observación HTTP en el inspector. La integración gráfica de activos LACP y SDN requiere contrastar su inventario y relaciones reales antes de ampliar el contrato.
+
+La observabilidad carga al entrar; su temporizador independiente actualiza las sondas y los SLI, no los históricos ni las notificaciones. Estos últimos consultan por selección. Los trabajos conservan su historial y exportaciones, con resultados expandibles sin desplazamiento deliberado y sondeo de lectura. Normalizamos la fecha visible como MM/DD/AAAA · HH:mm:ss, hora de Panamá y formato de 24 horas. Conservamos los datos, los permisos y los contratos de ejecución; el retiro de las interfaces anteriores y la recuperación se acreditan mediante pruebas independientes.
