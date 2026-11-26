@@ -158,8 +158,8 @@
           </section>
           <section class="panel">
             <h2>Historial propio</h2>
-            <p class="muted">Últimas 50 pruebas propias, activas primero. Ver resultado abre el panel superior sin salir de esta página.</p>
-            <div class="action-row"><button type="button" id="jobs-refresh" disabled>Actualizar historial</button></div>
+            <p class="muted">Últimas 50 pruebas propias, activas primero. Consulte resultados anteriores sin desplazamiento automático.</p>
+            <p id="jobs-history-status" class="muted" role="status">Historial actualizado automáticamente.</p>
             <div class="dashboard-table-wrap"><table class="dashboard-table jobs-table"><thead><tr><th>Fecha y hora</th><th>Tipo de prueba</th><th>Configuración</th><th>Ruta</th><th>Estado</th><th>Resultado</th></tr></thead><tbody id="jobs-history"></tbody></table></div>
           </section>
         </section>
@@ -177,7 +177,7 @@
         <section id="topology-view" hidden>
           <div id="topology-workspace">
             <div class="heading"><div><p class="eyebrow">Supervisión</p><h1 id="topology-title">Topología en vivo</h1><p class="muted">Inventario multisede y observaciones reales de red.</p></div>
-              <div class="topology-controls"><a id="topology-expand" class="topology-action" href="/topology?view=detailed">Vista detallada</a><a id="topology-return" class="topology-action" href="/topology" hidden>Vista resumida</a><button id="topology-fullscreen" type="button" hidden>Pantalla completa</button></div>
+              <div class="topology-controls"><button id="topology-fullscreen" type="button" hidden>Pantalla completa</button></div>
             </div>
             <p id="topology-status" role="status" aria-live="polite">Esperando sesión.</p>
             <div class="topology-toolbar">
@@ -187,17 +187,17 @@
               <button type="button" class="secondary" id="topology-reset">Restablecer vista</button>
             </div>
             <div class="topology-layout">
-              <section class="panel topology-map"><svg id="topology-map" viewBox="0 0 1250 620" aria-label="Diagrama interactivo multisede"></svg></section>
+              <section class="panel topology-map"><svg id="topology-map" viewBox="0 0 1440 955" aria-label="Diagrama interactivo multisede"></svg></section>
               <section class="panel topology-inspector"><h2>Inspector</h2><p id="topology-selection" class="muted">Seleccione un equipo o enlace.</p><dl id="topology-details"></dl></section>
             </div>
-            <section class="panel"><h2>Convenciones</h2><p class="muted">Verde: existencia observada o principal elegida por FIB, según el recurso. Azul: respaldo elegido. Naranja: principal elegida con respaldo inactivo. Rojo: inactividad comprobada (en el resumen WAN, ambas alternativas inactivas). Gris: sin verificación o en espera. La selección visual es independiente del estado. Las líneas HTTP representan relaciones de servicio, no cables físicos. FIB no acredita OSPF FULL ni tráfico.</p></section>
+            <section class="panel"><h2>Convenciones</h2><p class="muted">Verde: existencia observada o principal elegida por FIB, según el recurso. Azul: respaldo elegido. Naranja: principal elegida con respaldo inactivo. Rojo: inactividad comprobada. Gris: sin verificación o en espera. La selección visual es independiente del estado. Las líneas HTTP representan relaciones de servicio, no cables físicos. FIB no acredita OSPF FULL ni tráfico.</p></section>
           </div>
         </section>
         <section id="history-view" hidden>
           <div class="heading"><div><p class="eyebrow">Observabilidad</p><h1>Observabilidad</h1><p class="muted">Sondas reales, objetivos provisionales, notificaciones e históricos de supervisión.</p></div></div>
           <section class="panel" id="obs-panel">
-            <div class="heading"><div><h2>Sondas y calidad de observación</h2><p class="muted">FE-HQ: servicio frontal de HQ. Duración total Blackbox, no RTT. Hora de Panamá.</p></div><button id="obs-refresh" type="button" disabled>Consultar sondas</button></div>
-            <p id="obs-notice" role="status" aria-live="polite">Consulte las sondas.</p>
+            <div class="heading"><div><h2>Sondas y calidad de observación</h2><p class="muted">FE-HQ: servicio frontal de HQ. Duración total Blackbox, no RTT. Hora de Panamá.</p></div></div>
+            <p id="obs-notice" role="status" aria-live="polite">Esperando observaciones autenticadas.</p>
             <p id="obs-source" class="muted">Sin observación vigente.</p>
             <div class="obs-summary-grid" aria-label="Resumen al corte consultado">
               <article class="obs-kpi"><span>Sondas vigentes</span><strong id="obs-fresh">—</strong><small>De las cinco configuradas</small></article>
@@ -213,22 +213,24 @@
             <div class="obs-chart-grid">
               <section class="obs-chart"><h3>Estado de adquisición de métricas</h3><div id="obs-scrape_up" hidden aria-label="Histórico de adquisición"></div></section>
               <section class="obs-chart"><h3>Estado de las sondas</h3><div id="obs-probe_success" hidden aria-label="Histórico de éxito de sondas"></div></section>
-              <section class="obs-chart obs-duration"><h3>Duración de las sondas</h3><div id="obs-duration_seconds" hidden aria-label="Duración total observada"></div><details class="obs-disclosure"><summary>Estadísticas del intervalo (ms)</summary><p class="muted">Último valor disponible, promedio y máximo de duraciones válidas, sin interpolación.</p><div class="dashboard-table-wrap"><table class="dashboard-table"><thead><tr><th>Sonda</th><th>Muestras</th><th>Último</th><th>Promedio</th><th>Máximo</th></tr></thead><tbody id="obs-duration-stats"></tbody></table></div></details></section>
+              <section class="obs-chart obs-duration"><h3>Duración de las sondas</h3><div id="obs-duration_seconds" hidden aria-label="Duración total observada"></div></section>
               <section class="obs-chart"><h3>Respuestas HTTP · S2 → FE-HQ</h3><p class="muted">Código de la última muestra y distribución en el intervalo seleccionado. 0: sin respuesta; sin datos: ausencia de evidencia.</p>
                 <div class="obs-http-summary"><strong id="obs-http-latest">—</strong><small id="obs-http-detail">—</small></div>
-                <p id="obs-http-count" class="muted">—</p><div id="obs-http-codes" class="obs-code-list"></div>
-                <details class="obs-disclosure"><summary>Ver muestras HTTP individuales</summary><div class="dashboard-table-wrap obs-scroll"><table class="dashboard-table"><thead><tr><th>Fecha y hora</th><th>Código HTTP</th></tr></thead><tbody id="obs-http"></tbody></table></div></details></section>
+                <p id="obs-http-count" class="muted">—</p><div id="obs-http-distribution" class="obs-distribution" role="img" aria-label="Distribución de códigos HTTP"></div><div id="obs-http-codes" class="obs-code-list"></div>
+                </section>
             </div>
+            <details class="obs-disclosure"><summary>Estadísticas del intervalo (ms)</summary><p class="muted">Último valor disponible, promedio y máximo de duraciones válidas, sin interpolación.</p><div class="dashboard-table-wrap"><table class="dashboard-table"><thead><tr><th>Sonda</th><th>Muestras</th><th>Último</th><th>Promedio</th><th>Máximo</th></tr></thead><tbody id="obs-duration-stats"></tbody></table></div></details>
+            <details class="obs-disclosure"><summary>Ver muestras HTTP individuales</summary><div class="dashboard-table-wrap obs-scroll"><table class="dashboard-table"><thead><tr><th>Fecha y hora</th><th>Código HTTP</th></tr></thead><tbody id="obs-http"></tbody></table></div></details>
             <div class="obs-section-heading"><h2>Éxito observado (SLI) y cobertura</h2><span class="muted">Comparación por ruta</span></div>
             <p class="muted">Objetivo provisional de laboratorio: 99 %. No es un SLA; una ventana parcial no acredita cumplimiento. Presupuesto en cantidad de fallos y burn rate sobre muestras medidas.</p>
             <div id="obs-cards" class="obs-window-grid"></div>
             <details class="obs-disclosure"><summary>Detalle de cobertura, presupuesto de error y burn rate</summary><div class="dashboard-table-wrap"><table class="dashboard-table obs-detail"><thead><tr><th>Ventana</th><th>Sonda</th><th>SLI</th><th>Adquiridas / nominal</th><th>Adq. correctas</th><th>Medidas</th><th>Éxitos</th><th>Presupuesto restante</th><th>Burn rate</th><th>Calidad / evaluación</th></tr></thead><tbody id="obs-windows"></tbody></table></div></details>
           </section>
           <section class="panel" aria-label="Notificaciones de Alertmanager">
-            <h2>Notificaciones de Alertmanager</h2>
-            <div class="action-row"><label for="obs-scope">Ámbito <select id="obs-scope"><option value="operational">Operacional</option><option value="validation" hidden disabled>Validación sintética (operador)</option></select></label><button id="obs-notify" type="button" disabled>Consultar notificaciones</button></div>
+            <h2>Notificaciones de Alertmanager</h2><p class="muted">Historial de eventos recibidos; las activaciones anteriores no implican alertas vigentes. El ámbito determina la consulta.</p>
+            <div class="action-row"><label for="obs-scope">Ámbito <select id="obs-scope"><option value="operational">Operacional</option><option value="validation" hidden disabled>Validación sintética (operador)</option></select></label></div>
             <p id="obs-notify-status" role="status" aria-live="polite">Sin consulta de notificaciones.</p>
-            <div class="dashboard-table-wrap"><table class="dashboard-table"><thead><tr><th>Alerta</th><th>Sonda</th><th>Estado</th><th>Inicio</th><th>Resolución</th><th>Recepción</th></tr></thead><tbody id="obs-notifications"></tbody></table></div>
+            <div class="dashboard-table-wrap"><table class="dashboard-table"><thead><tr><th>Alerta</th><th>Sonda</th><th>Evento notificado</th><th>Inicio</th><th>Resolución</th><th>Recepción</th></tr></thead><tbody id="obs-notifications"></tbody></table></div>
           </section>
           <section class="panel">
             <h2>Herramientas especializadas</h2>
@@ -241,9 +243,8 @@
               <label for="history-group">Grupo<select id="history-group"><option value="collection">Recolección de telemetría</option><option value="routers">Contenedores de routers</option><option value="wan">Interfaces WAN</option><option value="vlan">Interfaces VLAN</option><option value="alerts">Alertas y transiciones</option></select></label>
               <label for="history-window">Intervalo histórico<select id="history-window"><option value="5m">5 minutos</option><option value="15m" selected>15 minutos</option><option value="1h">1 hora</option></select></label>
 
-              <span id="history-refresh-slot"></span>
             </div>
-            <p class="muted">Consulta manual: seleccione el grupo y el intervalo histórico.</p>
+            <p class="muted">Consulta automática al ingresar o cambiar el grupo y el intervalo.</p>
             <p id="history-status" role="status" aria-live="polite">Esperando sesión.</p>
             <div id="history-chart-content"><p id="history-scope" class="muted"></p>
             <div class="history-counts"><p>Muestras válidas: <strong id="history-valid">—</strong></p><p>Muestras nulas: <strong id="history-null">—</strong></p><p>Series con datos: <strong id="history-series">—</strong></p></div>
